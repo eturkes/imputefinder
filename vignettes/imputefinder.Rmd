@@ -1,0 +1,87 @@
+---
+title: "Introduction to imputefinder"
+author: "Emir Turkes"
+date: "`r Sys.Date()`"
+package: imputefinder
+output:
+  BiocStyle::html_document:
+    toc: true
+    toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{Introduction to imputefinder}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+`imputefinder` provides a flexible method for distinguishing between
+**Missing Not At Random (MNAR)** and **Missing At Random (MAR)** values
+in quantitative proteomics data such as label-free quantification (LFQ).
+For each experimental condition the package inspects the empirical
+distribution of feature mean intensities and uses elbow detection on
+the cumulative intensity curve to derive an intensity cutoff. Features
+with mean intensity below the cutoff are classified as MNAR; remaining
+features with enough non-missing values are classified as MAR.
+
+The package exposes a single user-facing entry point,
+`classify_missingness()`, which operates on a
+`SummarizedExperiment` whose `colData` contains a `condition`
+column.
+
+# Using `classify_missingness()`
+
+```{r load}
+library(imputefinder)
+library(SummarizedExperiment)
+```
+
+`classify_missingness()` enforces two preconditions on its input. First,
+the supplied object must inherit from `SummarizedExperiment`; any other
+object is rejected with an informative error.
+
+```{r non-se-input}
+res <- try(classify_missingness(matrix(1:6, nrow = 2)), silent = TRUE)
+inherits(res, "try-error")
+```
+
+Second, the assay must actually contain missing values, since the
+classification is only meaningful in that case.
+
+```{r no-missing}
+counts <- matrix(
+  seq_len(12),
+  nrow = 4,
+  dimnames = list(
+    paste0("p", seq_len(4)),
+    paste0("s", seq_len(3))
+  )
+)
+se <- SummarizedExperiment(
+  assays = list(intensity = counts),
+  colData = DataFrame(condition = c("A", "A", "B"))
+)
+res <- try(classify_missingness(se), silent = TRUE)
+inherits(res, "try-error")
+```
+
+In a typical analysis you would pass a `SummarizedExperiment` of
+log-intensities with a `condition` column in `colData()` and several
+`NA` values in the assay; the call returns a named list with the
+filtered `SummarizedExperiment`, the per-condition cutoffs, and the
+sets of features classified as MAR and MNAR. The `return_plot = TRUE`
+argument additionally yields a list of `ggplot` objects showing the
+cumulative intensity curve and the detected elbow per condition.
+
+# Session information
+
+```{r sessioninfo}
+sessionInfo()
+```

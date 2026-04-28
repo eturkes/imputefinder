@@ -16,26 +16,97 @@
 #
 #    Emir Turkes can be contacted at emir.turkes@eturkes.com
 
+# Names used inside ggplot2 aes() and the running-accumulator inside
+# Map() are flagged by R CMD check as "undefined globals"; declare them
+# here so the static check stays clean.
+utils::globalVariables(c("x", "y", "final_MAR"))
+
+# Internal helper that builds the cumulative intensity plot consumed by
+# `classify_missingness()` for elbow detection. Not exported.
+plot_detect_custom <- function(se, elbow = TRUE, threshold = 0.35) {
+  m <- SummarizedExperiment::assay(se)
+  means <- rowMeans(m, na.rm = TRUE)
+  means <- means[is.finite(means)]
+  if (length(means) < 3L) {
+    stop("Not enough finite mean intensities for elbow detection.")
+  }
+  sorted_means <- sort(means)
+  df <- data.frame(
+    x = sorted_means,
+    y = seq_along(sorted_means) / length(sorted_means)
+  )
+  ggplot2::ggplot(df, ggplot2::aes(x = x, y = y)) +
+    ggplot2::geom_line()
+}
+
 #' Classify Missingness as MAR or MNAR Based on Intensity Distribution
 #'
-#' This function identifies MNAR and MAR features using intensity distributions and missingness patterns.
+#' Identifies Missing Not At Random (MNAR) and Missing At Random (MAR)
+#' features in a [SummarizedExperiment::SummarizedExperiment] of
+#' quantitative proteomics intensities. For each experimental condition
+#' the empirical distribution of feature mean intensities is inspected
+#' and an elbow on the cumulative curve is used to derive an
+#' intensity cutoff: features with mean intensity below the cutoff are
+#' classified as MNAR, while the remaining features with at least
+#' `min_non_na` non-missing values are classified as MAR.
 #'
-#' @param se A \code{SummarizedExperiment} object.
-#' @param threshold A numeric value for the second derivative threshold (default = 0.35).
-#' @param min_non_na Integer. Minimum number of non-missing values required for MAR retention (default = 5).
-#' @param return_plot Logical. If TRUE, a ggplot object is returned alongside results.
-#' @return A list with:
-#'   \item{data}{Filtered \code{SummarizedExperiment} object.}
-#'   \item{MAR}{Character vector of MAR feature names.}
-#'   \item{MNAR}{Character vector of MNAR feature names.}
-#'   \item{cutoffs}{Named numeric vector of intensity cutoffs per condition.}
-#'   \item{plot}{List of ggplot objects, if \code{return_plot = TRUE}.}
+#' @param se A [SummarizedExperiment::SummarizedExperiment] object whose
+#'   first assay contains the quantitative intensities and whose
+#'   `colData` has a `condition` column describing the experimental
+#'   groups.
+#' @param threshold A numeric value for the second derivative threshold
+#'   used to locate the elbow on the cumulative intensity curve
+#'   (default `0.35`).
+#' @param min_non_na Integer. Minimum number of non-missing values
+#'   required for a feature to be retained as MAR (default `5`).
+#' @param return_plot Logical. If `TRUE`, a list of `ggplot` objects
+#'   (one per condition) is returned alongside the classification
+#'   results.
+#'
+#' @return A named `list` with the following elements:
+#' \describe{
+#'   \item{`data`}{The input `SummarizedExperiment` filtered to the
+#'     union of MAR and MNAR features.}
+#'   \item{`MAR`}{Character vector of feature names classified as MAR
+#'     in at least one condition.}
+#'   \item{`MNAR`}{Character vector of feature names classified as MNAR
+#'     in at least one condition.}
+#'   \item{`cutoffs`}{Named numeric vector giving the intensity cutoff
+#'     used for each condition.}
+#'   \item{`plot`}{Optional list of `ggplot` objects, one per
+#'     condition, returned only when `return_plot = TRUE`.}
+#' }
+#'
+#' @examples
+#' library(SummarizedExperiment)
+#'
+#' # `classify_missingness()` requires a SummarizedExperiment as input;
+#' # supplying any other object raises an informative error.
+#' res <- try(classify_missingness(matrix(1:6, nrow = 2)), silent = TRUE)
+#' inherits(res, "try-error")
+#'
+#' # It also requires that the assay actually contains missing values,
+#' # otherwise classification is not meaningful.
+#' counts <- matrix(
+#'   seq_len(6),
+#'   nrow = 2,
+#'   dimnames = list(c("p1", "p2"), c("s1", "s2", "s3"))
+#' )
+#' se <- SummarizedExperiment(
+#'   assays = list(intensity = counts),
+#'   colData = DataFrame(condition = c("A", "A", "B"))
+#' )
+#' res <- try(classify_missingness(se), silent = TRUE)
+#' inherits(res, "try-error")
 #'
 #' @importFrom SummarizedExperiment assay colData
+#' @importFrom ggplot2 ggplot_build
 #' @export
 classify_missingness <- function(se, threshold = 0.35, min_non_na = 5, return_plot = FALSE) {
   stopifnot(inherits(se, "SummarizedExperiment"))
-  if (!any(is.na(assay(se)))) stop("No missing values detected in assay.")
+  if (!any(is.na(assay(se)))) {
+    stop("No missing values detected in assay.")
+  }
 
   data <- se
   conditions <- unique(colData(data)$condition)

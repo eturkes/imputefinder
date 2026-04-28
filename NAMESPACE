@@ -3,3 +3,4 @@
 export(classify_missingness)
 importFrom(SummarizedExperiment,assay)
 importFrom(SummarizedExperiment,colData)
+importFrom(ggplot2,ggplot_build)

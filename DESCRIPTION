@@ -1,18 +1,35 @@
 Package: imputefinder
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Title: Classify Missing Values in Quantitative Proteomics Data
+Version: 0.99.0
+Authors@R:
+    person("Emir", "Turkes", , "emir.turkes@eturkes.com",
+           role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-2345-6789"))
+Description: Provides a flexible method for distinguishing between Missing
+    Not At Random (MNAR) and Missing At Random (MAR) values in
+    quantitative proteomics data such as label-free quantification (LFQ).
+    The package uses intensity distributions and elbow detection on the
+    cumulative missingness curve to classify features per experimental
+    condition and returns a filtered SummarizedExperiment together with
+    classified feature sets and per-condition cutoffs.
+License: GPL-3
+URL: https://github.com/eturkes/imputefinder
+BugReports: https://github.com/eturkes/imputefinder/issues
+biocViews: Software, Proteomics, MassSpectrometry, StatisticalMethod,
+    Preprocessing
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Depends:
+    R (>= 4.4.0)
 Imports:
     SummarizedExperiment,
     ggplot2,
-    tidyr,
-    dplyr,
-    assertthat,
     methods
+Suggests:
+    knitr,
+    rmarkdown,
+    BiocStyle,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Config/testthat/edition: 3

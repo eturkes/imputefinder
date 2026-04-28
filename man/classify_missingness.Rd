@@ -7,22 +7,67 @@
 classify_missingness(se, threshold = 0.35, min_non_na = 5, return_plot = FALSE)
 }
 \arguments{
-\item{se}{A \code{SummarizedExperiment} object.}
+\item{se}{A \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment::SummarizedExperiment} object whose
+first assay contains the quantitative intensities and whose
+\code{colData} has a \code{condition} column describing the experimental
+groups.}
 
-\item{threshold}{A numeric value for the second derivative threshold (default = 0.35).}
+\item{threshold}{A numeric value for the second derivative threshold
+used to locate the elbow on the cumulative intensity curve
+(default \code{0.35}).}
 
-\item{min_non_na}{Integer. Minimum number of non-missing values required for MAR retention (default = 5).}
+\item{min_non_na}{Integer. Minimum number of non-missing values
+required for a feature to be retained as MAR (default \code{5}).}
 
-\item{return_plot}{Logical. If TRUE, a ggplot object is returned alongside results.}
+\item{return_plot}{Logical. If \code{TRUE}, a list of \code{ggplot} objects
+(one per condition) is returned alongside the classification
+results.}
 }
 \value{
-A list with:
-\item{data}{Filtered \code{SummarizedExperiment} object.}
-\item{MAR}{Character vector of MAR feature names.}
-\item{MNAR}{Character vector of MNAR feature names.}
-\item{cutoffs}{Named numeric vector of intensity cutoffs per condition.}
-\item{plot}{List of ggplot objects, if \code{return_plot = TRUE}.}
+A named \code{list} with the following elements:
+\describe{
+\item{\code{data}}{The input \code{SummarizedExperiment} filtered to the
+union of MAR and MNAR features.}
+\item{\code{MAR}}{Character vector of feature names classified as MAR
+in at least one condition.}
+\item{\code{MNAR}}{Character vector of feature names classified as MNAR
+in at least one condition.}
+\item{\code{cutoffs}}{Named numeric vector giving the intensity cutoff
+used for each condition.}
+\item{\code{plot}}{Optional list of \code{ggplot} objects, one per
+condition, returned only when \code{return_plot = TRUE}.}
+}
 }
 \description{
-This function identifies MNAR and MAR features using intensity distributions and missingness patterns.
+Identifies Missing Not At Random (MNAR) and Missing At Random (MAR)
+features in a \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment::SummarizedExperiment} of
+quantitative proteomics intensities. For each experimental condition
+the empirical distribution of feature mean intensities is inspected
+and an elbow on the cumulative curve is used to derive an
+intensity cutoff: features with mean intensity below the cutoff are
+classified as MNAR, while the remaining features with at least
+\code{min_non_na} non-missing values are classified as MAR.
+}
+\examples{
+library(SummarizedExperiment)
+
+# `classify_missingness()` requires a SummarizedExperiment as input;
+# supplying any other object raises an informative error.
+res <- try(classify_missingness(matrix(1:6, nrow = 2)), silent = TRUE)
+inherits(res, "try-error")
+
+# It also requires that the assay actually contains missing values,
+# otherwise classification is not meaningful.
+counts <- matrix(
+  seq_len(6),
+  nrow = 2,
+  dimnames = list(c("p1", "p2"), c("s1", "s2", "s3"))
+)
+se <- SummarizedExperiment(
+  assays = list(intensity = counts),
+  colData = DataFrame(condition = c("A", "A", "B"))
+)
+res <- try(classify_missingness(se), silent = TRUE)
+inherits(res, "try-error")
+
 }
