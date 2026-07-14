@@ -24,15 +24,19 @@ input; omitted for \code{SummarizedExperiment} input.}
 
 \item{assay}{Assay name for \code{SummarizedExperiment} input.}
 
-\item{cutoffs}{Optional named numeric condition cutoffs.}
+\item{cutoffs}{Optional named numeric vector. A cutoff is required for each
+condition containing missing values; conditions without missing values need
+no cutoff.}
 
 \item{seed}{Integer rescue seed.}
 }
 \value{
-An \code{imputefinder_result} object once classification is complete.
+An \code{imputefinder_result} containing filtered seed-modified data,
+per-condition classifications and groups, feature audit status, cutoffs,
+diagnostics, and seed provenance.
 }
 \description{
-Prepare condition-aligned quantitative proteomics data for condition-specific
-missingness classification. The scientific classification core is introduced
-in the subsequent implementation milestones.
+Rescue condition-specific absences, classify missingness independently within
+each condition, and retain features suitable for condition-aware downstream
+imputation. Input values must be unnormalised log2 protein intensities.
 }

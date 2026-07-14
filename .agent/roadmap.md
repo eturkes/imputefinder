@@ -11,10 +11,12 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
 - [x] M2 global absence + condition rescue
   - [x] M2a deterministic rescue core + seed audit
   - [x] M2b local RNG + row/column permutation invariants
-- [ ] M3 manual classification + reconciliation
+- [x] M3 manual classification + reconciliation
   - [x] M3a post-seed statistics + cutoff validation + four states
-  - M3b n-condition retention + groups + complete result contract
+  - [x] M3b n-condition retention + groups + complete result contract
 - [ ] M4 explicit profiles + plotting
+  - M4a count-weighted profile calculation + result storage
+  - M4b profile plotting from stored data
 - [ ] M5 automatic cutoff research + implementation
 - [ ] M6 public integration + obsolete dependency cleanup
 - [ ] M7 scientific regression suite
@@ -197,5 +199,46 @@ Verification + completion evidence:
 - `git diff --check` → pass.
 
 Exact next task after M3a → M3b: add focused red n-condition reconciliation/result tests; implement deterministic `all_missing` → `insufficient:<sorted conditions>` → `MNAR_all_conditions` precedence, retained per-condition groups, matrix/`SummarizedExperiment` reconstruction, and manual-cutoff public orchestration so the normative fixture + full suite pass.
+
+Blockers → none.
+
+### 2026-07-14 - M3b reconciliation + manual public pipeline
+
+Scope → reconcile arbitrary condition counts, populate retained-only condition
+groups, and connect the validated matrix core to the public matrix/SE result.
+Automatic cutoffs and explicit profiles remain M4-M5 work.
+
+Implementation:
+
+- explicit feature-by-condition state matrix applies deterministic precedence:
+  `all_missing` → `insufficient:<sorted labels>` → `MNAR_all_conditions`;
+- feature audit + every surviving long-table row receive final retention/reason;
+- per-condition `MNAR`, `MAR`, `complete`, and `MAR_or_complete` groups contain
+  retained features only and preserve original feature order;
+- public classifier now runs preparation → rescue → statistics → manual cutoff
+  resolution → state assignment → reconciliation → representation restoration;
+- filtered matrix output preserves sample order; `SummarizedExperiment` output
+  preserves non-selected assays, row/column metadata, metadata, and class;
+- result carries classifications, groups, feature audit, cutoffs/diagnostics,
+  seed provenance, aligned groups, and matched call.
+
+Verification + completion evidence:
+
+- focused red baseline → 6 expected errors from absent reconciliation helpers +
+  public skeleton stop;
+- focused M3b suite → 45 expectations pass, including all drop rules, empty
+  retained output, three conditions, all-complete/no-cutoff input, and matrix/SE
+  equivalence;
+- package-wide source suite → 266 expectations pass;
+- `R CMD build . --no-manual --no-build-vignettes` → pass;
+- source-tarball `R CMD check --no-manual --no-build-vignettes` → tests pass,
+  1 known placeholder-licence WARNING + 1 known unused-import NOTE; no errors,
+  code problems, documentation mismatch, or new finding;
+- `git diff --check` → pass.
+
+Exact next task after M3b → M4a: add focused red numerical tests for the common
+intensity grid, count-weighted missing proportion, repeated/one-class means, and
+stored per-condition raw/profile data; implement the pure profile builder and
+wire profiles into results without cutoff detection or plotting.
 
 Blockers → none.

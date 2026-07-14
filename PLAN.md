@@ -542,9 +542,9 @@ Gate: normative `on_off` and `globally_absent` tests pass; row/column permutatio
 - [x] Validate named manual cutoffs.
 - [x] Implement `complete`, `MNAR`, `MAR`, and `insufficient` states exactly as specified.
 - [x] Derive strict majority separately for every condition.
-- [ ] Implement n-condition reconciliation and deterministic drop reasons.
-- [ ] Populate per-condition `MNAR`, `MAR`, `complete`, and `MAR_or_complete` lists.
-- [ ] Remove the broken global union logic.
+- [x] Implement n-condition reconciliation and deterministic drop reasons.
+- [x] Populate per-condition `MNAR`, `MAR`, `complete`, and `MAR_or_complete` lists.
+- [x] Remove the broken global union logic.
 
 Gate: all normative fixture expectations pass using manual cutoffs, including unequal group sizes and more than two conditions.
 
@@ -669,15 +669,15 @@ At minimum, tests must cover the following behavior.
 
 ### Reconciliation tests
 
-- [ ] complete/MAR in all groups retained;
-- [ ] MNAR in one group and complete/MAR in another retained;
-- [ ] MNAR in every group dropped;
-- [ ] insufficient in any group dropped;
-- [ ] globally absent drop reason has precedence;
-- [ ] rules generalize to 3+ conditions;
-- [ ] convenience lists contain retained features only and agree with the long table;
-- [ ] no retained feature is simultaneously in `MNAR` and `MAR_or_complete` within a condition;
-- [ ] every retained feature appears in exactly one of those two sets per condition.
+- [x] complete/MAR in all groups retained;
+- [x] MNAR in one group and complete/MAR in another retained;
+- [x] MNAR in every group dropped;
+- [x] insufficient in any group dropped;
+- [x] globally absent drop reason has precedence;
+- [x] rules generalize to 3+ conditions;
+- [x] convenience lists contain retained features only and agree with the long table;
+- [x] no retained feature is simultaneously in `MNAR` and `MAR_or_complete` within a condition;
+- [x] every retained feature appears in exactly one of those two sets per condition.
 
 ### Profile and cutoff tests
 
