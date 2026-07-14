@@ -34,3 +34,63 @@ classification_row <- function(result, feature, condition) {
         drop = FALSE
     ]
 }
+
+matrix_input_fixture <- function() {
+    x <- matrix(
+        c(0, -2, NA, 3, 4, 5),
+        nrow = 2,
+        dimnames = list(c("protein_b", "protein_a"), c("s2", "s1", "s3"))
+    )
+
+    list(x = x, group = c("B", "A", "B"))
+}
+
+prepare_matrix_input <- function(x, group, group_col = NULL, assay = NULL) {
+    imputefinder:::.prepare_matrix_input(
+        x = x,
+        group = group,
+        group_col = group_col,
+        assay = assay
+    )
+}
+
+summarized_experiment_input_fixture <- function(multiple_assays = FALSE) {
+    fixture <- matrix_input_fixture()
+    assays <- list(intensity = fixture$x)
+    if (multiple_assays) {
+        assays$auxiliary <- fixture$x + 100
+    }
+
+    se <- SummarizedExperiment::SummarizedExperiment(
+        assays = assays,
+        rowData = data.frame(
+            annotation = c("second", "first"),
+            row.names = rownames(fixture$x)
+        ),
+        colData = data.frame(
+            batch = c(2L, 1L, 2L),
+            condition = factor(fixture$group),
+            row.names = colnames(fixture$x)
+        ),
+        metadata = list(source = "adapter fixture")
+    )
+
+    list(se = se, x = fixture$x, group = fixture$group)
+}
+
+prepare_input <- function(x, group = NULL, group_col = NULL, assay = NULL) {
+    imputefinder:::.prepare_input(
+        x = x,
+        group = group,
+        group_col = group_col,
+        assay = assay
+    )
+}
+
+restore_output_data <- function(data, prepared, original) {
+    imputefinder:::.restore_output_data(
+        data = data,
+        prepared = prepared,
+        original = original
+    )
+}

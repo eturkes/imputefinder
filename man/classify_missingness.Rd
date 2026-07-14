@@ -2,27 +2,37 @@
 % Please edit documentation in R/imputefinder.R
 \name{classify_missingness}
 \alias{classify_missingness}
-\title{Classify Missingness as MAR or MNAR Based on Intensity Distribution}
+\title{Classify Missingness by Condition}
 \usage{
-classify_missingness(se, threshold = 0.35, min_non_na = 5, return_plot = FALSE)
+classify_missingness(
+  x,
+  group = NULL,
+  group_col = NULL,
+  assay = NULL,
+  cutoffs = NULL,
+  seed = 1L
+)
 }
 \arguments{
-\item{se}{A \code{SummarizedExperiment} object.}
+\item{x}{Numeric matrix or a \code{SummarizedExperiment} object.}
 
-\item{threshold}{A numeric value for the second derivative threshold (default = 0.35).}
+\item{group}{Atomic condition vector or aligned design data frame for matrix
+input; omitted for \code{SummarizedExperiment} input.}
 
-\item{min_non_na}{Integer. Minimum number of non-missing values required for MAR retention (default = 5).}
+\item{group_col}{Condition column for design or
+\code{SummarizedExperiment} input.}
 
-\item{return_plot}{Logical. If TRUE, a ggplot object is returned alongside results.}
+\item{assay}{Assay name for \code{SummarizedExperiment} input.}
+
+\item{cutoffs}{Optional named numeric condition cutoffs.}
+
+\item{seed}{Integer rescue seed.}
 }
 \value{
-A list with:
-\item{data}{Filtered \code{SummarizedExperiment} object.}
-\item{MAR}{Character vector of MAR feature names.}
-\item{MNAR}{Character vector of MNAR feature names.}
-\item{cutoffs}{Named numeric vector of intensity cutoffs per condition.}
-\item{plot}{List of ggplot objects, if \code{return_plot = TRUE}.}
+An \code{imputefinder_result} object once classification is complete.
 }
 \description{
-This function identifies MNAR and MAR features using intensity distributions and missingness patterns.
+Prepare condition-aligned quantitative proteomics data for condition-specific
+missingness classification. The scientific classification core is introduced
+in the subsequent implementation milestones.
 }

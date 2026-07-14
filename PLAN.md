@@ -519,10 +519,10 @@ Gate: tests express the intended method even though implementation tests are sti
 ### M1 - Input core and result skeleton
 
 - [x] Implement matrix validation and aligned group handling.
-- [ ] Implement `SummarizedExperiment` extraction/reconstruction with configurable assay and group column.
-- [ ] Reject unsupported values and ambiguous inputs with specific messages.
-- [ ] Create the internal state vocabulary and result constructor.
-- [ ] Guarantee input immutability and original order preservation.
+- [x] Implement `SummarizedExperiment` extraction/reconstruction with configurable assay and group column.
+- [x] Reject unsupported values and ambiguous inputs with specific messages.
+- [x] Create the internal state vocabulary and result constructor.
+- [x] Guarantee input immutability and original order preservation.
 
 Gate: matrix and `SummarizedExperiment` adapters feed identical matrices/groups into the core; validation tests pass.
 
@@ -636,14 +636,14 @@ At minimum, tests must cover the following behavior.
 
 - [x] matrix + vector groups;
 - [x] matrix + aligned design data frame;
-- [ ] `SummarizedExperiment` + explicit group column;
-- [ ] one assay vs multiple assays requiring explicit choice;
-- [ ] missing, duplicate, and mismatched feature/sample names;
-- [ ] missing group labels;
-- [ ] nonnumeric assay;
-- [ ] `Inf`, `-Inf`, and `NaN` rejection;
-- [ ] zeros and negative finite log2 intensities preserved;
-- [ ] input object unchanged.
+- [x] `SummarizedExperiment` + explicit group column;
+- [x] one assay vs multiple assays requiring explicit choice;
+- [x] missing, duplicate, and mismatched feature/sample names;
+- [x] missing group labels;
+- [x] nonnumeric assay;
+- [x] `Inf`, `-Inf`, and `NaN` rejection;
+- [x] zeros and negative finite log2 intensities preserved;
+- [x] input object unchanged.
 
 ### Rescue tests
 

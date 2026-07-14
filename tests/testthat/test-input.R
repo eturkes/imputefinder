@@ -1,22 +1,3 @@
-matrix_input_fixture <- function() {
-    x <- matrix(
-        c(0, -2, NA, 3, 4, 5),
-        nrow = 2,
-        dimnames = list(c("protein_b", "protein_a"), c("s2", "s1", "s3"))
-    )
-
-    list(x = x, group = c("B", "A", "B"))
-}
-
-prepare_matrix_input <- function(x, group, group_col = NULL, assay = NULL) {
-    imputefinder:::.prepare_matrix_input(
-        x = x,
-        group = group,
-        group_col = group_col,
-        assay = assay
-    )
-}
-
 test_that("unnamed matrix groups align positionally", {
     fixture <- matrix_input_fixture()
     original <- fixture$x

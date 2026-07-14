@@ -5,9 +5,9 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
 ## Current release path
 
 - [x] M0 baseline + red contract + API decision
-- [ ] M1 input core + result skeleton
+- [x] M1 input core + result skeleton
   - [x] M1a matrix validation + vector/design group alignment
-  - [ ] M1b `SummarizedExperiment` adapter + representation-preserving result skeleton
+  - [x] M1b `SummarizedExperiment` adapter + representation-preserving result skeleton
 - [ ] M2 global absence + condition rescue
   - M2a deterministic rescue core + seed audit
   - M2b local RNG + row/column permutation invariants
@@ -93,5 +93,31 @@ Verification + completion evidence:
 - `git diff --check` → pass.
 
 Exact next task after M1a → M1b: add focused red adapter/result tests, then implement `SummarizedExperiment` assay/group extraction, unified input routing, representation-preserving reconstruction, the stable state vocabulary, and the result skeleton without rescue/classification logic.
+
+Blockers → none.
+
+### 2026-07-14 - M1b SummarizedExperiment adapter + result skeleton
+
+Scope → complete the shared input boundary and output scaffolding without implementing rescue or scientific classification.
+
+Implementation:
+
+- unified matrix/`SummarizedExperiment` dispatch; one selected ordinary numeric assay and one explicit `colData` condition column feed the matrix-core contract;
+- implicit selection only for a single assay; named selection required and exact for multiple assays;
+- representation reconstruction replaces only the selected assay after ordered row filtering, preserving other assays, `rowData`, `colData`, metadata, class, and sample order;
+- stable `complete`/`MNAR`/`MAR`/`insufficient` vocabulary plus typed empty classification, feature-status, condition-group, cutoff, profile, and seed-log components;
+- public signature now matches the M0 decision and fails explicitly at the still-unimplemented classification boundary rather than executing prototype logic;
+- obsolete `plot_detect_custom`, `ggplot_build`, `%||%`, fixed-majority, and global-union code removed.
+
+Verification + completion evidence:
+
+- focused adapter/result red baseline → expected missing dispatch/reconstruction/constructor errors plus old-signature failure;
+- focused matrix + adapter + result green suite → 95 expectations pass;
+- package-wide source tests → 96 expectations pass; expected M2-M3 classifier contract remains red (4 errors);
+- `R CMD build . --no-manual --no-build-vignettes` → pass;
+- source-tarball `R CMD check --no-manual --no-build-vignettes` → expected 1 ERROR from the four M2-M3 contract tests, baseline placeholder-licence WARNING, and baseline unused-import NOTE; no code/documentation mismatch or undefined-symbol finding;
+- `git diff --check` → pass.
+
+Exact next task after M1b → M2a: add focused red global-absence/condition-minimum/rescue-audit tests, then implement the deterministic rescue core and seed log without classification or reconciliation.
 
 Blockers → none.
