@@ -14,10 +14,13 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
 - [x] M3 manual classification + reconciliation
   - [x] M3a post-seed statistics + cutoff validation + four states
   - [x] M3b n-condition retention + groups + complete result contract
-- [ ] M4 explicit profiles + plotting
+- [x] M4 explicit profiles + plotting
   - [x] M4a count-weighted profile calculation + result storage
-  - M4b profile plotting from stored data
+  - [x] M4b profile plotting from stored data
 - [ ] M5 automatic cutoff research + implementation
+  - [ ] M5a deterministic simulations + predeclared benchmark protocol
+  - [ ] M5b candidate benchmark + method decision
+  - [ ] M5c pure detector + quality/failure contract
 - [ ] M6 public integration + obsolete dependency cleanup
 - [ ] M7 scientific regression suite
 - [ ] M8 documentation + package metadata
@@ -280,5 +283,45 @@ Exact next task after M4a → M4b: add focused red plot tests, then implement
 `plot_missingness(result, condition)` exclusively from stored profile data with
 condition title, percentage y axis, recorded cutoff line when available, and
 uncluttered seed/diagnostic cues; verify a clean installed namespace.
+
+Blockers → none.
+
+### 2026-07-14 - M4b stored-profile plotting
+
+Scope → expose the M4a evidence as a condition-specific plot without deriving
+scientific values from rendered objects or re-reading input data.
+
+Implementation:
+
+- exported `plot_missingness(result, condition)` validates the result,
+  condition, stored grid/raw evidence, cutoff, and diagnostic schemas;
+- filled proportion curve uses the stored 512-point grid directly; fixed
+  percentage scale, condition title, and mean-log2-intensity axis make the
+  diagnostic explicit;
+- finite recorded cutoffs receive a labelled subtitle + vertical line;
+  no-missing conditions omit the irrelevant cutoff layer;
+- bottom rug ticks mark seeded feature-condition blocks; captions appear only
+  for seed provenance or stored profile/cutoff warnings;
+- plotting uses namespace-qualified `ggplot2` calls; algorithmic code remains
+  independent of `ggplot_build()`.
+
+Verification + completion evidence:
+
+- focused red baseline → 5 expected errors from absent `plot_missingness()`;
+- focused plot suite → 29 expectations pass;
+- package-wide source suite → 329 expectations pass;
+- installed-package smoke → export present; `ggplot_build()` renders;
+  1200x750 PNG visual QA confirms title, percentage axis, cutoff, seed tick, and
+  caption;
+- `R CMD build . --no-manual --no-build-vignettes` → pass;
+- source-tarball `R CMD check --no-manual --no-build-vignettes` → tests pass,
+  1 known placeholder-licence WARNING + 1 known unused-import NOTE; no error,
+  code problem, documentation mismatch, namespace leak, or new finding;
+- `git diff --check` → pass.
+
+Exact next task after M4b → M5a: create deterministic clear/noisy/weak/flat/
+multi-transition synthetic profile scenarios plus a reproducible validation
+harness/report; predeclare cutoff-error, boundary-bias, stability, false-
+confidence, and runtime criteria before comparing detector candidates.
 
 Blockers → none.
