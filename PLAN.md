@@ -531,8 +531,8 @@ Gate: matrix and `SummarizedExperiment` adapters feed identical matrices/groups 
 - [x] Implement `all_missing` detection and audit status.
 - [x] Compute pre-seed condition minima.
 - [x] Insert exactly one condition-minimum value for each fully missing feature-condition block that is observed elsewhere.
-- [ ] Implement local seeded randomness, stable processing order, and a complete seed log.
-- [ ] Verify the caller's RNG state is unchanged.
+- [x] Implement local seeded randomness, stable processing order, and a complete seed log.
+- [x] Verify the caller's RNG state is unchanged.
 
 Gate: normative `on_off` and `globally_absent` tests pass; row/column permutations preserve named results under the same seed.
 
@@ -652,9 +652,9 @@ At minimum, tests must cover the following behavior.
 - [x] seed equals the condition-wide minimum computed before any seeds;
 - [x] different rescued features may select the same sample;
 - [x] seed assignments are reproducible and logged;
-- [ ] caller RNG state is unchanged;
+- [x] caller RNG state is unchanged;
 - [x] a condition with no finite value anywhere errors clearly;
-- [ ] sample/feature permutation retains assignments by name under the same seed.
+- [x] sample/feature permutation retains assignments by name under the same seed.
 
 ### Classification tests
 

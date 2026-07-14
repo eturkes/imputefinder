@@ -8,9 +8,9 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
 - [x] M1 input core + result skeleton
   - [x] M1a matrix validation + vector/design group alignment
   - [x] M1b `SummarizedExperiment` adapter + representation-preserving result skeleton
-- [ ] M2 global absence + condition rescue
+- [x] M2 global absence + condition rescue
   - [x] M2a deterministic rescue core + seed audit
-  - M2b local RNG + row/column permutation invariants
+  - [x] M2b local RNG + row/column permutation invariants
 - [ ] M3 manual classification + reconciliation
   - M3a post-seed statistics + cutoff validation + four states
   - M3b n-condition retention + groups + complete result contract
@@ -146,5 +146,30 @@ Verification + completion evidence:
 - `git diff --check` → pass.
 
 Exact next task after M2a → M2b: formalize RNG-state restoration (seed initially present/absent), row/column/condition-order named invariants, and original-order output assertions; adjust the rescue core if those adversarial tests expose a gap, then close the M2 gate.
+
+Blockers → none.
+
+### 2026-07-14 - M2b RNG + permutation invariants
+
+Scope → formalize rescue side-effect and order guarantees, adversarially verify the M2a core, and close the M2 gate. Production code required no correction.
+
+Regression coverage:
+
+- caller `.Random.seed` present → exact state restored after rescue;
+- caller `.Random.seed` absent → rescue leaves it absent;
+- row order, column order, condition block order, and factor level order changes → identical canonical condition minima, seed log, and named seed cells under the same seed;
+- shuffled named group vectors → identical rescue result after sample-name alignment;
+- returned data + feature audit retain each input's feature/sample order while named reindexing reproduces the baseline result.
+
+Verification + completion evidence:
+
+- first focused adversarial run → 1 test-comparison failure from incidental data-frame row names after named reindexing; comparison normalized those non-contractual row names;
+- focused M2 suite → 48 expectations pass;
+- package-wide source tests → 144 expectations pass; expected M3 classifier contract remains red (4 errors);
+- `R CMD build . --no-manual --no-build-vignettes` → pass;
+- source-tarball `R CMD check --no-manual --no-build-vignettes` → expected 1 ERROR from four M3 contract tests, baseline placeholder-licence WARNING, and baseline unused-import NOTE; installed suite reports 144 passes;
+- `git diff --check` → pass.
+
+Exact next task after M2b → M3a: add focused red tests for post-seed feature-condition statistics, named manual-cutoff validation, no-missing cutoff behavior, and exact four-state boundaries; implement those pure helpers without cross-condition reconciliation.
 
 Blockers → none.

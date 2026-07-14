@@ -20,6 +20,38 @@ rescue_fixture <- function() {
     list(x = x, group = rep(c("A", "B"), each = 2))
 }
 
+with_preserved_random_seed <- function(code) {
+    caller_has_seed <- exists(
+        ".Random.seed",
+        envir = globalenv(),
+        inherits = FALSE
+    )
+    if (caller_has_seed) {
+        caller_seed <- get(
+            ".Random.seed",
+            envir = globalenv(),
+            inherits = FALSE
+        )
+    }
+
+    on.exit(
+        {
+            if (caller_has_seed) {
+                assign(".Random.seed", caller_seed, envir = globalenv())
+            } else if (exists(
+                ".Random.seed",
+                envir = globalenv(),
+                inherits = FALSE
+            )) {
+                rm(".Random.seed", envir = globalenv())
+            }
+        },
+        add = TRUE
+    )
+
+    force(code)
+}
+
 test_that("globally absent features are audited, excluded, and never seeded", {
     fixture <- normative_fixture()
 
@@ -109,6 +141,118 @@ test_that("rescue is reproducible for a fixed seed", {
     second <- seed_missing_conditions(fixture$x, fixture$group, seed = 8L)
 
     expect_identical(first, second)
+})
+
+test_that("rescue preserves an existing caller RNG state", {
+    fixture <- rescue_fixture()
+
+    with_preserved_random_seed({
+        set.seed(90210L)
+        caller_seed <- get(
+            ".Random.seed",
+            envir = globalenv(),
+            inherits = FALSE
+        )
+
+        rescued <- seed_missing_conditions(fixture$x, fixture$group)
+
+        expect_gt(nrow(rescued$seed_log), 0L)
+        expect_identical(
+            get(
+                ".Random.seed",
+                envir = globalenv(),
+                inherits = FALSE
+            ),
+            caller_seed
+        )
+    })
+})
+
+test_that("rescue does not create a caller RNG state", {
+    fixture <- rescue_fixture()
+
+    with_preserved_random_seed({
+        if (exists(".Random.seed", envir = globalenv(), inherits = FALSE)) {
+            rm(".Random.seed", envir = globalenv())
+        }
+        expect_false(exists(
+            ".Random.seed",
+            envir = globalenv(),
+            inherits = FALSE
+        ))
+
+        rescued <- seed_missing_conditions(fixture$x, fixture$group)
+
+        expect_gt(nrow(rescued$seed_log), 0L)
+        expect_false(exists(
+            ".Random.seed",
+            envir = globalenv(),
+            inherits = FALSE
+        ))
+    })
+})
+
+test_that("named rescue assignments are invariant to input order", {
+    fixture <- rescue_fixture()
+    baseline <- seed_missing_conditions(fixture$x, fixture$group, seed = 19L)
+
+    row_order <- c(5L, 3L, 1L, 4L, 2L)
+    column_order <- c(4L, 3L, 2L, 1L)
+    permuted_x <- fixture$x[row_order, column_order, drop = FALSE]
+    permuted_group <- factor(
+        fixture$group[column_order],
+        levels = c("B", "A")
+    )
+    permuted <- seed_missing_conditions(
+        permuted_x,
+        permuted_group,
+        seed = 19L
+    )
+
+    expect_identical(permuted$condition_minima, baseline$condition_minima)
+    expect_identical(permuted$seed_log, baseline$seed_log)
+    expect_identical(
+        permuted$data[rownames(baseline$data), colnames(baseline$data)],
+        baseline$data
+    )
+    permuted_status <- permuted$feature_status[
+        match(
+            baseline$feature_status$feature,
+            permuted$feature_status$feature
+        ),
+        ,
+        drop = FALSE
+    ]
+    rownames(permuted_status) <- NULL
+    expect_identical(
+        permuted_status,
+        baseline$feature_status
+    )
+
+    expected_rows <- rownames(permuted_x)[
+        rownames(permuted_x) != "globally_absent"
+    ]
+    expect_identical(rownames(permuted$data), expected_rows)
+    expect_identical(colnames(permuted$data), colnames(permuted_x))
+    expect_identical(permuted$feature_status$feature, rownames(permuted_x))
+})
+
+test_that("named group order does not alter rescue assignments", {
+    fixture <- rescue_fixture()
+    groups_by_sample <- stats::setNames(fixture$group, colnames(fixture$x))
+
+    aligned <- seed_missing_conditions(
+        fixture$x,
+        groups_by_sample,
+        seed = 31L
+    )
+    shuffled <- seed_missing_conditions(
+        fixture$x,
+        groups_by_sample[c("s3", "s1", "s4", "s2")],
+        seed = 31L
+    )
+
+    expect_identical(shuffled, aligned)
 })
 
 test_that("every condition requires a finite pre-seed minimum", {
