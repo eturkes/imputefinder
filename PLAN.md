@@ -575,8 +575,9 @@ Gate: automatic selection passes the scientific/stability acceptance tests and n
 - [x] Integrate manual/automatic paths into the public function.
 - [x] Implement `print`, `summary`, and missingness plot methods/helpers.
 - [x] Ensure matrix and `SummarizedExperiment` outputs preserve metadata and order.
-- [ ] Remove obsolete prototype code and unused imports.
-- [ ] Add any justified deprecation behavior with tests and clear messages.
+- [x] Remove obsolete prototype code and unused imports.
+- [x] Add any justified deprecation behavior with tests and clear messages (none
+  justified by the M0 public-usage audit).
 
 Gate: the installed package's public API works from a clean R session and exposes no unqualified/missing symbols.
 

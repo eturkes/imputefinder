@@ -21,10 +21,10 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [x] M5a deterministic simulations + predeclared benchmark protocol
   - [x] M5b candidate benchmark + method decision
   - [x] M5c pure detector + quality/failure contract
-- [ ] M6 public integration + obsolete dependency cleanup
+- [x] M6 public integration + obsolete dependency cleanup
   - [x] M6a result presentation + installed S3 dispatch
   - [x] M6b representation/order integration audit
-  - [ ] M6c obsolete code/import + compatibility cleanup
+  - [x] M6c obsolete code/import + compatibility cleanup
 - [ ] M7 scientific regression suite
 - [ ] M8 documentation + package metadata
 - [ ] M9 CI + Bioconductor hardening
@@ -575,5 +575,47 @@ Exact next task after M6b → M6c: prove no tracked code, tests, docs, or public
 usage needs the prototype-only `assertthat`, `dplyr`, or `tidyr` dependencies;
 remove obsolete imports and any remaining dead prototype artefacts, run the
 installed API/namespace and source-tarball checks, then close M6.
+
+Blockers → none.
+
+### 2026-07-14 - M6c dependency + prototype cleanup
+
+Scope → remove unused runtime declarations and dangerous scaffold generators,
+confirm the compatibility decision, and close the installed-public-API gate.
+
+Audit + implementation:
+
+- pre-change source-tarball check reproduced the expected unused-import NOTE for
+  `assertthat`, `dplyr`, and `tidyr`; exact tracked search found no runtime, test,
+  documentation, or public use beyond `DESCRIPTION` and historical ledgers;
+- removed those three imports; retained `methods`, `SummarizedExperiment`, and
+  `ggplot2`, which are all namespace-qualified runtime dependencies;
+- deleted four unreferenced `biocthis` bootstrap scripts that could recreate
+  placeholder metadata, obsolete workflows, branches, tests, and documentation;
+  retained the reproducible M5 cutoff-validation script/report;
+- no deprecation shim added: M0 found no releases or public dependents, and the
+  obsolete arguments never formed a working released API.
+
+Verification + completion evidence:
+
+- package-wide source suite → 489/489 expectations pass;
+- post-change tracked search → removed dependencies appear only in normative or
+  historical plan/ledger text;
+- `R CMD build . --no-manual --no-build-vignettes` → pass;
+- source-tarball `R CMD check --no-manual --no-build-vignettes` → tests,
+  installation, dependency analysis, namespace, S3, code, and Rd checks pass;
+  the unused-import NOTE is gone and only the known M8 placeholder-licence
+  WARNING remains;
+- isolated-library vanilla-session smoke → installed package path, dependency
+  declarations, matrix classification, plotting, result/summary output, and all
+  three S3 registrations pass;
+- `git diff --check` → pass.
+
+Exact next task after M6c → M7a: freeze a compact independent scientific
+simulation protocol for manual + automatic cutoffs, including uniform 5%/25%
+MAR, intensity-dependent MNAR, condition-specific on/off truth, group sizes
+4/8/20, a cliff near 12, cutoff sweeps 8-14, seeds/permutations, and predeclared
+classification/retention/cutoff metrics; keep long runs in `dev/` and establish
+the smallest deterministic routine-test subset before judging results.
 
 Blockers → none.
