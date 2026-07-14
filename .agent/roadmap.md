@@ -12,7 +12,7 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [x] M2a deterministic rescue core + seed audit
   - [x] M2b local RNG + row/column permutation invariants
 - [ ] M3 manual classification + reconciliation
-  - M3a post-seed statistics + cutoff validation + four states
+  - [x] M3a post-seed statistics + cutoff validation + four states
   - M3b n-condition retention + groups + complete result contract
 - [ ] M4 explicit profiles + plotting
 - [ ] M5 automatic cutoff research + implementation
@@ -171,5 +171,31 @@ Verification + completion evidence:
 - `git diff --check` → pass.
 
 Exact next task after M2b → M3a: add focused red tests for post-seed feature-condition statistics, named manual-cutoff validation, no-missing cutoff behavior, and exact four-state boundaries; implement those pure helpers without cross-condition reconciliation.
+
+Blockers → none.
+
+### 2026-07-14 - M3a statistics + manual states
+
+Scope → calculate post-rescue feature-condition evidence, resolve manual cutoffs, and assign the stable state vocabulary; cross-condition retention + public orchestration remain M3b.
+
+Implementation:
+
+- typed feature-major long statistics preserve input feature order + canonical condition order; counts, missing fraction, arithmetic mean, and seed provenance derive directly from rescued data;
+- surviving all-missing blocks fail as a rescue-order invariant violation;
+- manual cutoffs require unique exact condition names + finite values, allow partial overrides for later automatic filling, and preserve suspicious out-of-range values with condition-specific diagnostics;
+- conditions without missing values force cutoff `NA`, diagnostic source `not_needed`, and `complete` states;
+- state assignment applies `complete` first, strict `< cutoff` for MNAR, equality on the MAR side, and per-condition strict majority only to MAR candidates; unresolved incomplete conditions fail explicitly;
+- classification output already matches the typed long-result schema, with retention fields intentionally unresolved for M3b.
+
+Verification + completion evidence:
+
+- focused red baseline → 12 errors from absent statistics/cutoff/state helpers;
+- focused M3a suite → 60 expectations pass;
+- package-wide source tests → 204 expectations pass; expected M3b public contract remains red (4 errors);
+- `R CMD build . --no-manual --no-build-vignettes` → pass;
+- source-tarball `R CMD check --no-manual --no-build-vignettes` → expected 1 ERROR from four M3b public integration tests, baseline placeholder-licence WARNING, and baseline unused-import NOTE; installed suite reports 204 passes;
+- `git diff --check` → pass.
+
+Exact next task after M3a → M3b: add focused red n-condition reconciliation/result tests; implement deterministic `all_missing` → `insufficient:<sorted conditions>` → `MNAR_all_conditions` precedence, retained per-condition groups, matrix/`SummarizedExperiment` reconstruction, and manual-cutoff public orchestration so the normative fixture + full suite pass.
 
 Blockers → none.

@@ -94,3 +94,21 @@ restore_output_data <- function(data, prepared, original) {
         original = original
     )
 }
+
+post_seed_statistics <- function(x, group, seed = 1L) {
+    prepared <- prepare_matrix_input(x, group)
+    rescued <- imputefinder:::.seed_missing_conditions(
+        prepared$data,
+        prepared$groups_by_sample,
+        seed
+    )
+
+    list(
+        rescued = rescued,
+        statistics = imputefinder:::.feature_condition_statistics(
+            rescued$data,
+            prepared$groups_by_sample,
+            rescued$seed_log
+        )
+    )
+}

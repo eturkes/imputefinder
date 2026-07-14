@@ -538,10 +538,10 @@ Gate: normative `on_off` and `globally_absent` tests pass; row/column permutatio
 
 ### M3 - Manual-cutoff classification and reconciliation
 
-- [ ] Calculate per-feature/per-condition statistics after seeding.
-- [ ] Validate named manual cutoffs.
-- [ ] Implement `complete`, `MNAR`, `MAR`, and `insufficient` states exactly as specified.
-- [ ] Derive strict majority separately for every condition.
+- [x] Calculate per-feature/per-condition statistics after seeding.
+- [x] Validate named manual cutoffs.
+- [x] Implement `complete`, `MNAR`, `MAR`, and `insufficient` states exactly as specified.
+- [x] Derive strict majority separately for every condition.
 - [ ] Implement n-condition reconciliation and deterministic drop reasons.
 - [ ] Populate per-condition `MNAR`, `MAR`, `complete`, and `MAR_or_complete` lists.
 - [ ] Remove the broken global union logic.
@@ -658,14 +658,14 @@ At minimum, tests must cover the following behavior.
 
 ### Classification tests
 
-- [ ] complete overrides low mean;
-- [ ] incomplete mean below cutoff is MNAR;
-- [ ] incomplete mean equal to cutoff is on the MAR side;
-- [ ] incomplete mean above cutoff with strict majority is MAR;
-- [ ] incomplete mean above cutoff at exactly half observed is insufficient;
-- [ ] sparse MNAR with one observation remains eligible;
-- [ ] arithmetic mean, not median, drives boundary behavior;
-- [ ] no-missing condition produces complete states and needs no cutoff.
+- [x] complete overrides low mean;
+- [x] incomplete mean below cutoff is MNAR;
+- [x] incomplete mean equal to cutoff is on the MAR side;
+- [x] incomplete mean above cutoff with strict majority is MAR;
+- [x] incomplete mean above cutoff at exactly half observed is insufficient;
+- [x] sparse MNAR with one observation remains eligible;
+- [x] arithmetic mean, not median, drives boundary behavior;
+- [x] no-missing condition produces complete states and needs no cutoff.
 
 ### Reconciliation tests
 
@@ -683,7 +683,7 @@ At minimum, tests must cover the following behavior.
 
 - [ ] explicit profile matches the count-weighted density formula;
 - [ ] profile computation handles repeated means without division-by-zero artifacts;
-- [ ] manual cutoff validation and source metadata;
+- [x] manual cutoff validation and source metadata;
 - [ ] automatic clear-cliff accuracy;
 - [ ] automatic condition-specific cutoffs;
 - [ ] automatic stability under permutations and modest bootstrap noise;
