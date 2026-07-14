@@ -26,6 +26,9 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [x] M6b representation/order integration audit
   - [x] M6c obsolete code/import + compatibility cleanup
 - [ ] M7 scientific regression suite
+  - [x] M7a independent simulation protocol + frozen gates
+  - [ ] M7b full scientific benchmark + assessment
+  - [ ] M7c compact routine regressions + gate closure
 - [ ] M8 documentation + package metadata
 - [ ] M9 CI + Bioconductor hardening
 - [ ] M10 release-candidate adversarial review
@@ -617,5 +620,54 @@ MAR, intensity-dependent MNAR, condition-specific on/off truth, group sizes
 4/8/20, a cliff near 12, cutoff sweeps 8-14, seeds/permutations, and predeclared
 classification/retention/cutoff metrics; keep long runs in `dev/` and establish
 the smallest deterministic routine-test subset before judging results.
+
+Blockers → none.
+
+### 2026-07-14 - M7a frozen scientific-validation protocol
+
+Scope → freeze an independent causal simulation, oracle, metrics, acceptance
+gates, and routine/long-run split before inspecting any classifier result.
+
+Protocol:
+
+- sample-level two-condition generator retains complete intensities plus separate
+  cell-level uniform MAR and ramped intensity-dependent MNAR masks; disjoint
+  structural A-off/B-off sets force full condition dropout and exercise rescue;
+- causal oracle treats any realized MNAR mask as MNAR, applies strict majority
+  only to MAR-only blocks, then independently reconciles global absence,
+  insufficiency, and all-MNAR state;
+- 13 long scenarios pair 5%/25% MAR with group sizes 4/8/20 and a translated
+  cutoff sweep 8-14; eight simulation seeds, three rescue seeds, and four exact
+  name-aligned permutation audits are fixed;
+- the 20-sample/25%-MAR case is explicitly an evidence-sensitivity audit because
+  `.75^20` leaves too few complete blocks for the production detector; it must
+  fail structurally below evidence floors rather than fabricate a cutoff;
+- mechanism/state/retention/on-off/cutoff metrics + quantitative manual/automatic
+  gates are predeclared in `dev/scientific-validation.md`; two compact cases are
+  fixed for routine tests only after the long assessment;
+- generator/scorer use local base-R RNG and no production helper; M7a verification
+  examines generator/oracle invariants only, so this commit makes no performance
+  claim.
+
+Verification + completion evidence:
+
+- initial red command → expected missing `dev/scientific-validation.R` failure;
+- `Rscript --vanilla dev/scientific-validation.R --verify` → pass: 13 long + 2
+  routine scenarios, exact RNG restoration/repetition, causal-mask union,
+  structural-off truth, perfect-oracle scorer, translated 8/14 masks/states, and
+  valid B-first feature/sample permutation; manifest MD5
+  `4011e381bba2d0d747e91d277a45de5e`;
+- package-wide source suite → 489/489 expectations pass;
+- `R CMD build . --no-manual --no-build-vignettes` → pass;
+- source-tarball `R CMD check --no-manual --no-build-vignettes` → tests,
+  installation, namespace, code, and Rd checks pass; only the known M8
+  placeholder-licence WARNING remains;
+- `git diff --check` → pass.
+
+Exact next task after M7a → M7b: preserve protocol version 1 unchanged; add the
+public-path manual/automatic benchmark runner, invariant + alternative-rescue-
+seed + exact permutation assessors, and deterministic summaries; run all 13 × 8
+simulations, append every outcome/failed gate to the report, and correct the
+runtime method only when evidence identifies a real implementation defect.
 
 Blockers → none.
