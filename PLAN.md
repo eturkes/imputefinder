@@ -372,14 +372,36 @@ Recommended methods:
 
 Do not store a second full copy of the original matrix merely for convenience. The caller's input remains unchanged, while `seed_log` and `feature_status` provide provenance.
 
-Illustrative API capability, not a mandatory exact signature:
+Public signature decided in M0:
+
+```r
+classify_missingness <- function(
+    x,
+    group = NULL,
+    group_col = NULL,
+    assay = NULL,
+    cutoffs = NULL,
+    seed = 1L
+)
+```
+
+Argument routing is explicit:
+
+- matrix `x` + atomic `group`: unnamed groups align positionally; named groups must have exactly the sample names and are aligned by name; `group_col` and `assay` must be `NULL`;
+- matrix `x` + data-frame `group`: unique row names must equal the sample names, rows are aligned by name, `group_col` selects exactly one column, and `assay` must be `NULL`;
+- `SummarizedExperiment` `x`: `group` is omitted, `group_col` explicitly selects `colData(x)`, and `assay` is optional only when exactly one assay exists;
+- `cutoffs` is `NULL` for automatic selection or a named, optionally partial numeric vector of manual condition cutoffs; automatic selection fills conditions without a manual value;
+- `seed` is one non-missing integer and defaults to `1L`.
+
+`threshold`, `min_non_na`, and `return_plot` are removed. Stored profiles plus the plot method replace `return_plot`. M0 found no public dependent usage, releases, tags, or forks, so no compatibility shim is warranted.
+
+Illustrative use:
 
 ```r
 fit <- classify_missingness(
     x = intensity_matrix,
     group = design$condition,
-    cutoffs = c(Neg = 12.4, Pos = 12.4),
-    seed = 1L
+    cutoffs = c(Neg = 12.4, Pos = 12.4)
 )
 
 fit$groups$Neg$MNAR
@@ -485,12 +507,12 @@ The session boundaries below are suggestions. Split any milestone further when t
 
 ### M0 - Baseline, tests, and API decision record
 
-- [ ] Re-audit current `main`; run the existing package build/check and record actual failures.
-- [ ] Add `testthat` edition 3 infrastructure and the normative fixture.
-- [ ] Add red tests for the central current failures: absent plot helper, fully missing condition, dynamic majority, per-condition output, and all-MNAR exclusion.
-- [ ] Decide and document the exact public function signature while preserving all capabilities required in Sections 5-6.
-- [ ] Decide whether to add a temporary deprecation shim after searching public dependent code.
-- [ ] Create `.agent/roadmap.md` and map the remaining milestones.
+- [x] Re-audit current `main`; run the existing package build/check and record actual failures.
+- [x] Add `testthat` edition 3 infrastructure and the normative fixture.
+- [x] Add red tests for the central current failures: absent plot helper, fully missing condition, dynamic majority, per-condition output, and all-MNAR exclusion.
+- [x] Decide and document the exact public function signature while preserving all capabilities required in Sections 5-6.
+- [x] Decide whether to add a temporary deprecation shim after searching public dependent code.
+- [x] Create `.agent/roadmap.md` and map the remaining milestones.
 
 Gate: tests express the intended method even though implementation tests are still red; package baseline failures are documented rather than guessed.
 
