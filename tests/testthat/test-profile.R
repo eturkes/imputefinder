@@ -257,3 +257,29 @@ test_that("profile grids are invariant to statistics row order", {
         )
     }
 })
+
+test_that("large profile calculations are byte-stable under row order", {
+    feature_count <- 1600L
+    means <- seq(6, 20, length.out = feature_count) +
+        sin(seq_len(feature_count)) / 100
+    missing <- seq_len(feature_count) %% 3L != 0L
+    statistics <- data.frame(
+        feature = sprintf("feature_%04d", seq_len(feature_count)),
+        condition = rep("A", feature_count),
+        sample_count = rep(8L, feature_count),
+        observed_count = ifelse(missing, 5L, 8L),
+        missing_count = ifelse(missing, 3L, 0L),
+        missing_fraction = ifelse(missing, 3 / 8, 0),
+        mean_intensity = means,
+        seeded = rep(FALSE, feature_count),
+        stringsAsFactors = FALSE
+    )
+
+    baseline <- missingness_profiles(statistics)$A
+    reversed <- missingness_profiles(
+        statistics[rev(seq_len(feature_count)), ]
+    )$A
+
+    expect_identical(baseline$grid, reversed$grid)
+    expect_identical(baseline$metadata, reversed$metadata)
+})

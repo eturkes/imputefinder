@@ -18,7 +18,7 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [x] M4a count-weighted profile calculation + result storage
   - [x] M4b profile plotting from stored data
 - [ ] M5 automatic cutoff research + implementation
-  - [ ] M5a deterministic simulations + predeclared benchmark protocol
+  - [x] M5a deterministic simulations + predeclared benchmark protocol
   - [ ] M5b candidate benchmark + method decision
   - [ ] M5c pure detector + quality/failure contract
 - [ ] M6 public integration + obsolete dependency cleanup
@@ -323,5 +323,57 @@ Exact next task after M4b → M5a: create deterministic clear/noisy/weak/flat/
 multi-transition synthetic profile scenarios plus a reproducible validation
 harness/report; predeclare cutoff-error, boundary-bias, stability, false-
 confidence, and runtime criteria before comparing detector candidates.
+
+Blockers → none.
+
+### 2026-07-14 - M5a frozen automatic-cutoff benchmark
+
+Scope → freeze simulation truth, comparison metrics, and pass/failure gates before
+any candidate detector is evaluated; provide the reusable benchmark machinery.
+
+Implementation:
+
+- `dev/cutoff-validation.R` generates sample-level log2 intensities + independent
+  cell-level MAR and ramped MNAR masks for 12 deterministic scenarios / 13 target
+  profiles, then uses the production rescue, statistics, reconciliation, and
+  profile functions rather than a parallel approximation;
+- a complete anchor condition preserves fully absent target-condition blocks for
+  real one-cell rescue while eliminating accidental global absence;
+- frozen cases cover sharp/broad/weak cliffs, noisy tail, 5%/25% MAR, flat/null,
+  dominant dual transitions, class imbalance, exact duplicate means, two
+  condition-specific boundaries, and 96-feature near-floor data;
+- protocol fixes eight simulation seeds, right-boundary targets, scenario-specific
+  error/bias/bootstrap tolerances, ≥80 total / ≥12-per-class eligibility floor,
+  oracle-relative mechanism/retention metrics, runtime gates, and zero-tolerance
+  false confidence on flat data;
+- detector contract + benchmark, summary, machine gate, stratified bootstrap, and
+  malformed-output handling are reusable for M5b; raw stochastic output remains
+  regenerable rather than tracked;
+- KDE inputs are radix-sorted before bandwidth/density calculation, removing
+  machine-precision row-order drift exposed by the large scenarios; large-profile
+  exact-order regression added.
+
+Verification + completion evidence:
+
+- focused red baseline → harness path absent, so the declared `--verify` command
+  failed before implementation;
+- `Rscript --vanilla dev/cutoff-validation.R --verify` → pass: 12 scenarios, 13
+  target profiles, deterministic truth/RNG restoration, ≥12 members in both
+  profile classes, exact raw-row/sample/condition-order profiles + rescue log,
+  detector-contract/scoring self-checks;
+- focused profile suite → 51 expectations pass;
+- package-wide source suite → 331 expectations pass;
+- `R CMD build . --no-manual --no-build-vignettes` → pass;
+- source-tarball `R CMD check --no-manual --no-build-vignettes` → tests pass,
+  1 known placeholder-licence WARNING + 1 known unused-import NOTE; no error,
+  code problem, documentation mismatch, or new finding;
+- `git diff --check` → pass.
+
+Exact next task after M5a → M5b: keep the committed protocol frozen; review
+primary method sources, implement at least one segmented/change-point and one
+fixed derivative/boundary candidate in the development harness, run the full
+eight-seed + bootstrap comparison, append every failed gate and concise result to
+`dev/cutoff-validation.md`, then select the simplest passing method or record that
+no candidate qualifies.
 
 Blockers → none.

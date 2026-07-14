@@ -202,6 +202,7 @@
 }
 
 .profile_bandwidth <- function(values) {
+    values <- sort(values, method = "radix")
     bandwidth_values <- if (length(values) == 1L) {
         rep(values, 2L)
     } else {
@@ -254,6 +255,7 @@
         ))
     }
 
+    values <- sort(values, method = "radix")
     estimated <- stats::density(
         values,
         bw = bandwidth,
