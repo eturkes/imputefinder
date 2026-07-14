@@ -134,3 +134,90 @@ Append a concise candidate table + decision here. Keep raw stochastic output
 regenerable rather than tracked; record R/package versions, command, elapsed time,
 all failed gates, and summary hashes. A no-winner result triggers algorithm
 revision/new candidates - the frozen gates remain the comparison target.
+
+## M5b candidate comparison + decision
+
+Date → 2026-07-14. Protocol changes after freeze → none.
+
+Method basis:
+
+- segmented candidate → continuous two-breakpoint regression, following the
+  piecewise-regression family in [Muggeo (2003)](https://doi.org/10.1002/sim.1545);
+- derivative candidate → local polynomial smoothing/differentiation following
+  [Savitzky and Golay (1964)](https://doi.org/10.1021/ac60214a047).
+
+Both base-R candidates are fixed in `dev/cutoff-candidates.R`. Shared evidence
+guard → ≥80 total / ≥12 per class; largest contiguous region at ≥10% peak total
+density; negative raw missingness/intensity logistic slope with likelihood-ratio
+`p <= .001`; profile drop ≥.05. These are internal quality rules, not public
+tuning parameters.
+
+Candidate definitions:
+
+- `segmented_plateau_v1` → count-density-weighted continuous high plateau →
+  linear ramp → low plateau. Exhaustive fixed grid: width `0.5..8` pooled KDE
+  bandwidths by `.25`, center stride = 4 profile points; flat-SSE gain ≥.35;
+  cutoff = fitted right breakpoint - one bandwidth.
+- `derivative_boundary_v1` → cubic Savitzky-Golay fit; half-window = `.5`
+  bandwidth; enumerate negative local derivative lobes; half-depth recovery;
+  robust peak/noise ≥1.5; select lowest-intensity credible lobe; cutoff = lesser
+  of right half-depth recovery - one bandwidth and derivative peak + `.5`
+  bandwidth. This right-side cap prevents a noisy tail from stretching the lobe.
+
+Final comparison:
+
+| Candidate | Eight-seed rows | Bootstrap rows | Flat finite cutoffs | Warm runtime | Decision |
+|---|---:|---:|---:|---:|---|
+| `derivative_boundary_v1` | 13/13 pass | 13/13 pass | 0/8 + 0/200 | median 1-3 ms; max p95 8 ms | selected |
+| `segmented_plateau_v1` | 10/13 pass | 11/13 pass | 0/8 + 0/200 | median 23-29 ms; max p95 46 ms | rejected |
+
+Selected-method bounds across the 12 identifiable eight-seed targets → success
+8/8 each; maximum median absolute error `.219`; maximum 90th-percentile absolute
+error `.388`; minimum 10th-percentile MNAR-F1 delta `-.0371`; minimum
+10th-percentile retention-F1 delta `-.00336`; exact repeat + profile-row/sample/
+condition-order decisions throughout. Bootstrap → success `1.0` except
+`small_feature_count = .98`; maximum cutoff IQR `.495`; maximum 90% absolute
+error `.759` (both small case, within its declared `1.0` / `1.5` gates).
+
+Every rejected-candidate gate:
+
+| Stage | Scenario | Failed gates | Observed vs required |
+|---|---|---|---|
+| eight-seed | `heavy_mar_25` | MNAR F1 | q10 delta `-.2273 < -.05` |
+| eight-seed | `sharp_cliff` | q90 error; MNAR F1 | `1.998 > .675`; q10 delta `-.1340 < -.05` |
+| eight-seed | `two_transitions` | median error; q90 error; right boundary | `2.983 > .75`; `3.283 > 1.125`; signed bias `2.983 > .75` |
+| bootstrap | `small_feature_count` | cutoff IQR; q90 error | `2.887 > 1.0`; `3.395 > 1.5` |
+| bootstrap | `two_transitions` | q90 error | `3.180 > 1.125` |
+
+The global segmented fit follows the larger high-intensity transition when two
+exist and is unstable near the small-case evidence floor. The derivative method
+passes because it selects the first statistically credible descending lobe and
+fails deterministically when the common profile has no credible trend.
+
+Reproduction:
+
+```sh
+R_LIBS_USER="$PWD/.agent/R-library" \
+  Rscript --vanilla dev/cutoff-validation.R --benchmark
+```
+
+Final run → Debian 13 x86_64; Intel Core Ultra 7 268V (8 logical CPUs); R 4.6.1;
+base `stats`/`tools` 4.6.1; source package 0.0.0.9000; elapsed 111.4 s. Development
+library context → testthat 3.3.2, SummarizedExperiment 1.42.0, ggplot2 4.0.3;
+candidate runtime itself uses base R only. A clean-environment namespace defect
+was corrected before comparison; scenarios, targets, metrics, gates, and final
+candidate definitions were unchanged during the reportable run.
+
+Deterministic RDS/MD5 summaries (elapsed fields excluded):
+
+```text
+decisions             6ada371e3669e8c4892d187c37fb6ee7
+benchmark_assessment  6af8fc7e616cc162a3f3f183163eec85
+bootstrap_assessment  7dbbbd7573f30ffbac2e77e5ebeab56c
+```
+
+Decision → promote `derivative_boundary_v1` into the pure M5c detector. Preserve
+its fixed evidence/failure rules; expose quality statistics + condition-specific
+structured failure; record a production algorithm/version identifier. The
+segmented implementation remains a reproducible rejected comparator, not runtime
+package code. Raw stochastic rows remain regenerable and untracked.

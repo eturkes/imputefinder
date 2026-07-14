@@ -1058,6 +1058,149 @@ assess_cutoff_bootstrap <- function(results, target) {
     )
 }
 
+benchmark_cutoff_bootstraps <- function(
+    detectors,
+    catalog = cutoff_validation_catalog(),
+    simulation_seed = cutoff_validation_seeds()[[1L]],
+    replicates = 200L,
+    bootstrap_seed = 424242L
+) {
+    valid <- is.list(detectors) && length(detectors) > 0L &&
+        !is.null(names(detectors)) && all(nzchar(names(detectors))) &&
+        !anyDuplicated(names(detectors)) &&
+        all(vapply(detectors, is.function, logical(1L)))
+    if (!valid) {
+        stop("`detectors` must be a uniquely named list of functions.", call. = FALSE)
+    }
+
+    rows <- list()
+    next_row <- 1L
+    for (scenario_name in names(catalog)) {
+        simulation <- simulate_cutoff_scenario(
+            scenario_name,
+            simulation_seed,
+            catalog
+        )
+        targets <- catalog[[scenario_name]]$targets
+        for (target_index in seq_len(nrow(targets))) {
+            target <- targets[target_index, , drop = FALSE]
+            condition <- target$condition[[1L]]
+            for (detector_name in names(detectors)) {
+                raw <- bootstrap_cutoff_detector(
+                    detectors[[detector_name]],
+                    simulation,
+                    condition,
+                    replicates,
+                    bootstrap_seed
+                )
+                assessed <- assess_cutoff_bootstrap(raw, target)
+                rows[[next_row]] <- data.frame(
+                    detector = detector_name,
+                    scenario = scenario_name,
+                    condition = condition,
+                    identifiable = target$identifiable[[1L]],
+                    replicates = as.integer(replicates),
+                    success_rate = assessed$success_rate,
+                    cutoff_iqr = assessed$cutoff_iqr,
+                    q90_absolute_error = assessed$q90_absolute_error,
+                    passed = assessed$passed,
+                    failed_gates = assessed$failed_gates,
+                    stringsAsFactors = FALSE
+                )
+                next_row <- next_row + 1L
+            }
+        }
+    }
+
+    result <- do.call(rbind, rows)
+    rownames(result) <- NULL
+    result[order(result$detector, result$scenario, result$condition), ]
+}
+
+.cutoff_candidate_environment <- function() {
+    file <- "dev/cutoff-candidates.R"
+    if (!file.exists(file)) {
+        stop("The M5b cutoff-candidate source is absent.", call. = FALSE)
+    }
+    environment <- new.env(parent = baseenv())
+    sys.source(file, envir = environment)
+    if (!exists(
+        "cutoff_candidate_detectors",
+        envir = environment,
+        inherits = FALSE
+    )) {
+        stop("The M5b cutoff-candidate registry is absent.", call. = FALSE)
+    }
+    environment
+}
+
+.cutoff_validation_md5 <- function(object) {
+    path <- tempfile("imputefinder-cutoff-validation-", fileext = ".rds")
+    on.exit(unlink(path), add = TRUE)
+    saveRDS(object, path, version = 2L, compress = FALSE)
+    unname(tools::md5sum(path))
+}
+
+run_cutoff_candidate_validation <- function(
+    seeds = cutoff_validation_seeds(),
+    catalog = cutoff_validation_catalog(),
+    bootstrap_replicates = 200L
+) {
+    started <- proc.time()[["elapsed"]]
+    candidate_environment <- .cutoff_candidate_environment()
+    detectors <- candidate_environment$cutoff_candidate_detectors()
+    raw <- benchmark_cutoff_detectors(detectors, seeds, catalog)
+    summary <- summarise_cutoff_benchmark(raw)
+    assessment <- assess_cutoff_benchmark(summary, catalog)
+    bootstrap <- benchmark_cutoff_bootstraps(
+        detectors,
+        catalog,
+        simulation_seed = seeds[[1L]],
+        replicates = bootstrap_replicates
+    )
+
+    selection <- lapply(
+        names(detectors),
+        function(detector) {
+            benchmark_rows <- assessment$detector == detector
+            bootstrap_rows <- bootstrap$detector == detector
+            data.frame(
+                detector = detector,
+                benchmark_passed = all(assessment$passed[benchmark_rows]),
+                bootstrap_passed = all(bootstrap$passed[bootstrap_rows]),
+                passed = all(assessment$passed[benchmark_rows]) &&
+                    all(bootstrap$passed[bootstrap_rows]),
+                stringsAsFactors = FALSE
+            )
+        }
+    )
+    selection <- do.call(rbind, selection)
+    rownames(selection) <- NULL
+
+    deterministic_raw <- raw[, setdiff(names(raw), "elapsed_ms"), drop = FALSE]
+    deterministic_assessment <- assessment[, setdiff(
+        names(assessment),
+        c("median_elapsed_ms", "p95_elapsed_ms")
+    ), drop = FALSE]
+    hashes <- c(
+        decisions = .cutoff_validation_md5(deterministic_raw),
+        benchmark_assessment = .cutoff_validation_md5(
+            deterministic_assessment
+        ),
+        bootstrap_assessment = .cutoff_validation_md5(bootstrap)
+    )
+
+    list(
+        raw = raw,
+        summary = summary,
+        assessment = assessment,
+        bootstrap = bootstrap,
+        selection = selection,
+        hashes = hashes,
+        elapsed_seconds = proc.time()[["elapsed"]] - started
+    )
+}
+
 cutoff_validation_manifest <- function(simulations) {
     rows <- list()
     next_row <- 1L
@@ -1242,22 +1385,53 @@ verify_cutoff_validation <- function() {
 }
 
 .cutoff_validation_main <- function(arguments = commandArgs(trailingOnly = TRUE)) {
-    if (!identical(arguments, "--verify")) {
+    if (identical(arguments, "--verify")) {
+        manifest <- verify_cutoff_validation()
+        print(manifest, row.names = FALSE, digits = 4)
+        message(
+            sprintf(
+                "M5a verification passed: %d scenarios, %d target profiles.",
+                length(unique(manifest$scenario)),
+                nrow(manifest)
+            )
+        )
+        return(invisible(manifest))
+    }
+    if (!identical(arguments, "--benchmark")) {
         stop(
-            "Usage: Rscript --vanilla dev/cutoff-validation.R --verify",
+            paste0(
+                "Usage: Rscript --vanilla dev/cutoff-validation.R ",
+                "--verify|--benchmark"
+            ),
             call. = FALSE
         )
     }
-    manifest <- verify_cutoff_validation()
-    print(manifest, row.names = FALSE, digits = 4)
+    result <- run_cutoff_candidate_validation()
+    assessment_columns <- c(
+        "detector", "scenario", "condition", "success_rate",
+        "median_signed_error", "median_absolute_error",
+        "q90_absolute_error", "q10_mnar_f1_delta",
+        "q10_retention_f1_delta", "median_elapsed_ms",
+        "p95_elapsed_ms", "passed", "failed_gates"
+    )
+    print(
+        result$assessment[, assessment_columns],
+        row.names = FALSE,
+        digits = 4
+    )
+    print(result$bootstrap, row.names = FALSE, digits = 4)
+    print(result$selection, row.names = FALSE)
     message(
         sprintf(
-            "M5a verification passed: %d scenarios, %d target profiles.",
-            length(unique(manifest$scenario)),
-            nrow(manifest)
+            "M5b hashes: %s",
+            paste(names(result$hashes), result$hashes, sep = "=", collapse = "; ")
         )
     )
-    invisible(manifest)
+    message(sprintf("M5b elapsed: %.1f seconds.", result$elapsed_seconds))
+    if (!any(result$selection$passed)) {
+        stop("No automatic-cutoff candidate passed every frozen gate.", call. = FALSE)
+    }
+    invisible(result)
 }
 
 if (sys.nframe() == 0L) {

@@ -19,7 +19,7 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [x] M4b profile plotting from stored data
 - [ ] M5 automatic cutoff research + implementation
   - [x] M5a deterministic simulations + predeclared benchmark protocol
-  - [ ] M5b candidate benchmark + method decision
+  - [x] M5b candidate benchmark + method decision
   - [ ] M5c pure detector + quality/failure contract
 - [ ] M6 public integration + obsolete dependency cleanup
 - [ ] M7 scientific regression suite
@@ -375,5 +375,62 @@ fixed derivative/boundary candidate in the development harness, run the full
 eight-seed + bootstrap comparison, append every failed gate and concise result to
 `dev/cutoff-validation.md`, then select the simplest passing method or record that
 no candidate qualifies.
+
+Blockers → none.
+
+### 2026-07-14 - M5b cutoff candidates + method decision
+
+Scope → compare fixed segmented and derivative families under the frozen M5a
+protocol; select a production candidate only if every scientific, failure,
+stability, bootstrap, and runtime gate passes. Production integration remains
+M5c.
+
+Implementation + research:
+
+- reviewed primary piecewise-regression (Muggeo 2003) and local-polynomial
+  smoothing/differentiation (Savitzky-Golay 1964) method sources;
+- added clean-environment, base-R `segmented_plateau_v1` and
+  `derivative_boundary_v1` candidates with fixed internal evidence/failure rules;
+- extended the harness with the declared 200-resample stratified bootstrap,
+  per-detector selection gate, deterministic elapsed-free hashes, and a
+  `--benchmark` machine entry point;
+- kept frozen scenarios, seeds, targets, tolerances, metrics, and gates unchanged;
+  raw stochastic rows remain regenerable rather than tracked.
+
+Decision:
+
+- `derivative_boundary_v1` selected → 13/13 eight-seed rows + 13/13 bootstrap
+  rows pass; flat false confidence = 0/8 + 0/200; exact repeat/order decisions;
+- `segmented_plateau_v1` rejected → eight-seed failures on heavy MAR, sharp, and
+  two-transition profiles; bootstrap failures on small + two-transition cases;
+  every failed gate + value recorded in `dev/cutoff-validation.md`;
+- selected method = cubic Savitzky-Golay derivative, first credible descending
+  half-depth lobe, KDE-boundary correction + asymmetric-noise cap, with negative
+  likelihood-ratio trend/evidence floors as structured-failure prerequisites.
+
+Verification + completion evidence:
+
+- preimplementation `Rscript --vanilla dev/cutoff-validation.R --benchmark` →
+  expected usage failure (M5b path absent);
+- `Rscript --vanilla dev/cutoff-validation.R --verify` → pass: frozen M5a
+  manifest unchanged;
+- final full `Rscript --vanilla dev/cutoff-validation.R --benchmark` → pass in
+  111.4 s; selected derivative warmed medians 1-3 ms/profile, max p95 8 ms;
+- deterministic hashes → decisions `6ada371e3669e8c4892d187c37fb6ee7`, benchmark
+  assessment `6af8fc7e616cc162a3f3f183163eec85`, bootstrap assessment
+  `7dbbbd7573f30ffbac2e77e5ebeab56c`;
+- package-wide source suite → 331 expectations pass;
+- `R CMD build . --no-manual --no-build-vignettes` → pass;
+- source-tarball `R CMD check --no-manual --no-build-vignettes` → tests pass,
+  1 known placeholder-licence WARNING + 1 known unused-import NOTE; no error,
+  code problem, documentation mismatch, or new finding;
+- `git diff --check` → pass.
+
+Exact next task after M5b → M5c: promote only `derivative_boundary_v1` into a pure
+runtime detector; add focused red tests for evidence floors, one-class/flat
+profiles, condition-specific structured errors, finite/interior cutoffs, quality
+statistics, algorithm/version metadata, exact order stability, and frozen clear/
+stress fixtures; then wire automatic resolution into the internal cutoff path
+without yet broadening public documentation work.
 
 Blockers → none.

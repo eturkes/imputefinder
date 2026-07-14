@@ -561,8 +561,8 @@ Gate: profile calculations are unit tested numerically; plots build without miss
 ### M5 - Automatic cutoff research and implementation
 
 - [x] Build deterministic synthetic profiles covering clear, noisy, weak, absent, and multi-transition cliffs.
-- [ ] Benchmark at least segmented/change-point and derivative-based candidates against the criteria in Section 11.
-- [ ] Select the simplest method that reliably locates the right-hand/bottom cliff boundary.
+- [x] Benchmark at least segmented/change-point and derivative-based candidates against the criteria in Section 11.
+- [x] Select the simplest method that reliably locates the right-hand/bottom cliff boundary.
 - [ ] Implement quality scoring and structured failure.
 - [ ] Record algorithm identity/version in results.
 - [ ] Remove the public `threshold` argument.
