@@ -518,7 +518,7 @@ Gate: tests express the intended method even though implementation tests are sti
 
 ### M1 - Input core and result skeleton
 
-- [ ] Implement matrix validation and aligned group handling.
+- [x] Implement matrix validation and aligned group handling.
 - [ ] Implement `SummarizedExperiment` extraction/reconstruction with configurable assay and group column.
 - [ ] Reject unsupported values and ambiguous inputs with specific messages.
 - [ ] Create the internal state vocabulary and result constructor.
@@ -634,8 +634,8 @@ At minimum, tests must cover the following behavior.
 
 ### Input and adapter tests
 
-- [ ] matrix + vector groups;
-- [ ] matrix + aligned design data frame;
+- [x] matrix + vector groups;
+- [x] matrix + aligned design data frame;
 - [ ] `SummarizedExperiment` + explicit group column;
 - [ ] one assay vs multiple assays requiring explicit choice;
 - [ ] missing, duplicate, and mismatched feature/sample names;

@@ -6,8 +6,8 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
 
 - [x] M0 baseline + red contract + API decision
 - [ ] M1 input core + result skeleton
-  - M1a matrix validation + vector/design group alignment
-  - M1b `SummarizedExperiment` adapter + representation-preserving result skeleton
+  - [x] M1a matrix validation + vector/design group alignment
+  - [ ] M1b `SummarizedExperiment` adapter + representation-preserving result skeleton
 - [ ] M2 global absence + condition rescue
   - M2a deterministic rescue core + seed audit
   - M2b local RNG + row/column permutation invariants
@@ -68,5 +68,30 @@ Verification + completion evidence:
 - `git diff --check` → pass.
 
 Exact next task after M0 → M1a: add focused red validation/alignment tests, then implement pure matrix input validation and vector/design group extraction without classification logic.
+
+Blockers → none.
+
+### 2026-07-14 - M1a matrix input core
+
+Scope → validate ordinary numeric matrices and resolve vector/design conditions into one sample-aligned representation; classification and `SummarizedExperiment` routing remain outside this commit.
+
+Implementation:
+
+- pure `.prepare_matrix_input()` boundary returns unchanged matrix data, sample-named character conditions, and representation provenance;
+- unnamed atomic groups align positionally; fully named groups align by exact sample-name set;
+- design data frames require exact, unique sample row names and exactly one explicit `group_col`;
+- rejects non-matrices/non-numeric matrices, absent/empty/duplicate feature or sample names, `NaN`, infinities, missing/empty conditions, mismatched identifiers, and matrix-inapplicable routing arguments;
+- finite zero and negative values remain untouched.
+
+Verification + completion evidence:
+
+- focused red test → 7 errors, all due to absent `.prepare_matrix_input`.
+- focused green test → 35 expectations pass.
+- package-wide source tests → new input suite passes; expected M0 classifier contract remains red (1 failure + 4 errors).
+- `R CMD build . --no-manual --no-build-vignettes` → pass.
+- source-tarball `R CMD check --no-manual --no-build-vignettes` → expected 1 ERROR (5 M2-M3 red contract tests), baseline licence WARNING, and baseline unused-import + undefined-prototype-symbol NOTEs; installed input suite reports 35 passes.
+- `git diff --check` → pass.
+
+Exact next task after M1a → M1b: add focused red adapter/result tests, then implement `SummarizedExperiment` assay/group extraction, unified input routing, representation-preserving reconstruction, the stable state vocabulary, and the result skeleton without rescue/classification logic.
 
 Blockers → none.
