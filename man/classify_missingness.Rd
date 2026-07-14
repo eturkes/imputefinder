@@ -33,7 +33,7 @@ no cutoff.}
 \value{
 An \code{imputefinder_result} containing filtered seed-modified data,
 per-condition classifications and groups, feature audit status, cutoffs,
-diagnostics, and seed provenance.
+explicit missingness profiles, diagnostics, and seed provenance.
 }
 \description{
 Rescue condition-specific absences, classify missingness independently within

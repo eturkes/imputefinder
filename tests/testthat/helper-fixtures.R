@@ -112,3 +112,7 @@ post_seed_statistics <- function(x, group, seed = 1L) {
         )
     )
 }
+
+missingness_profiles <- function(statistics) {
+    imputefinder:::.build_missingness_profiles(statistics)
+}

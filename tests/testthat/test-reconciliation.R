@@ -285,6 +285,11 @@ test_that("public SummarizedExperiment and matrix classifications agree", {
         matrix_result$classifications
     )
     expect_identical(experiment_result$groups, matrix_result$groups)
+    expect_identical(experiment_result$profiles, matrix_result$profiles)
+    expect_identical(
+        experiment_result$cutoff_diagnostics,
+        matrix_result$cutoff_diagnostics
+    )
     expect_identical(
         experiment_result$feature_status,
         matrix_result$feature_status

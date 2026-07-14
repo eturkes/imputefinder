@@ -550,11 +550,11 @@ Gate: all normative fixture expectations pass using manual cutoffs, including un
 
 ### M4 - Explicit profile data and plotting
 
-- [ ] Recreate the stacked missing-vs-complete density profile from explicit calculations.
-- [ ] Store raw statistics and profile grids in the result.
+- [x] Recreate the stacked missing-vs-complete density profile from explicit calculations.
+- [x] Store raw statistics and profile grids in the result.
 - [ ] Implement plotting from those stored data, including condition title, percentage axis, and cutoff line.
 - [ ] Mark seeded features and warnings in diagnostics where useful without cluttering the default plot.
-- [ ] Remove all algorithmic use of `ggplot_build()`.
+- [x] Remove all algorithmic use of `ggplot_build()`.
 
 Gate: profile calculations are unit tested numerically; plots build without missing functions or namespace leaks.
 
@@ -681,14 +681,14 @@ At minimum, tests must cover the following behavior.
 
 ### Profile and cutoff tests
 
-- [ ] explicit profile matches the count-weighted density formula;
-- [ ] profile computation handles repeated means without division-by-zero artifacts;
+- [x] explicit profile matches the count-weighted density formula;
+- [x] profile computation handles repeated means without division-by-zero artifacts;
 - [x] manual cutoff validation and source metadata;
 - [ ] automatic clear-cliff accuracy;
 - [ ] automatic condition-specific cutoffs;
 - [ ] automatic stability under permutations and modest bootstrap noise;
 - [ ] flat/unidentifiable profile returns structured failure;
-- [ ] only-complete and only-missing profile behavior is explicit;
+- [x] only-complete and only-missing profile behavior is explicit;
 - [ ] no candidate ever becomes `Inf`, `-Inf`, or silent endpoint fallback;
 - [ ] plot is generated from stored profile data and includes the recorded cutoff.
 

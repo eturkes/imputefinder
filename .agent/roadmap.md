@@ -15,7 +15,7 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [x] M3a post-seed statistics + cutoff validation + four states
   - [x] M3b n-condition retention + groups + complete result contract
 - [ ] M4 explicit profiles + plotting
-  - M4a count-weighted profile calculation + result storage
+  - [x] M4a count-weighted profile calculation + result storage
   - M4b profile plotting from stored data
 - [ ] M5 automatic cutoff research + implementation
 - [ ] M6 public integration + obsolete dependency cleanup
@@ -240,5 +240,45 @@ Exact next task after M3b → M4a: add focused red numerical tests for the commo
 intensity grid, count-weighted missing proportion, repeated/one-class means, and
 stored per-condition raw/profile data; implement the pure profile builder and
 wire profiles into results without cutoff detection or plotting.
+
+Blockers → none.
+
+### 2026-07-14 - M4a explicit profile calculation + storage
+
+Scope → construct the missing-vs-complete intensity profile directly from
+post-rescue evidence and store it for later plotting/cutoff detection. Plotting
+and automatic cutoff selection remain M4b-M5 work.
+
+Implementation:
+
+- each condition stores full raw feature statistics plus `has_missing`, a
+  512-point common intensity grid, and count-weighted density components;
+- Gaussian KDE uses one pooled `nrd0` bandwidth per condition, shared across
+  classes, with explicit singleton handling and a three-bandwidth grid extension;
+- `missing_proportion = n_missing * f_missing / (n_missing * f_missing +
+  n_complete * f_complete)` is calculated from stored numeric components;
+- repeated means remain finite; complete-only and missing-only profiles expose
+  exact 0/1 proportions and an explicit profile type;
+- metadata records class/seed counts, smoothing choices, observed/grid ranges,
+  unsupported points, and warnings; cutoff diagnostics reference the same
+  metadata;
+- matrix and `SummarizedExperiment` public paths produce identical profiles.
+
+Verification + completion evidence:
+
+- focused red baseline → 3 missing-helper errors + 5 empty-profile failures;
+- focused profile suite → 49 expectations pass;
+- package-wide source suite → 300 expectations pass;
+- row/statistics, feature, sample, and condition-order profile invariants → pass;
+- `R CMD build . --no-manual --no-build-vignettes` → pass;
+- source-tarball `R CMD check --no-manual --no-build-vignettes` → tests pass,
+  1 known placeholder-licence WARNING + 1 known unused-import NOTE; no errors,
+  code problems, documentation mismatch, or new finding;
+- `git diff --check` → pass.
+
+Exact next task after M4a → M4b: add focused red plot tests, then implement
+`plot_missingness(result, condition)` exclusively from stored profile data with
+condition title, percentage y axis, recorded cutoff line when available, and
+uncluttered seed/diagnostic cues; verify a clean installed namespace.
 
 Blockers → none.

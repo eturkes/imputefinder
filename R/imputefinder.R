@@ -34,7 +34,7 @@
 #' @param seed Integer rescue seed.
 #' @return An \code{imputefinder_result} containing filtered seed-modified data,
 #'   per-condition classifications and groups, feature audit status, cutoffs,
-#'   diagnostics, and seed provenance.
+#'   explicit missingness profiles, diagnostics, and seed provenance.
 #'
 #' @export
 classify_missingness <- function(
@@ -57,6 +57,7 @@ classify_missingness <- function(
         prepared$groups_by_sample,
         rescued$seed_log
     )
+    profiles <- .build_missingness_profiles(statistics)
     conditions <- sort(
         unique(unname(prepared$groups_by_sample)),
         method = "radix"
@@ -66,6 +67,10 @@ classify_missingness <- function(
         cutoffs,
         conditions
     )
+    for (condition in conditions) {
+        resolved$diagnostics[[condition]]$profile <-
+            profiles[[condition]]$metadata
+    }
     classified <- .assign_condition_states(statistics, resolved$cutoffs)
     reconciled <- .reconcile_condition_states(
         classified,
@@ -92,6 +97,7 @@ classify_missingness <- function(
         feature_status = reconciled$feature_status,
         cutoffs = resolved$cutoffs,
         cutoff_diagnostics = resolved$diagnostics,
+        profiles = profiles,
         seed_log = rescued$seed_log,
         groups_by_sample = prepared$groups_by_sample,
         call = matched_call
