@@ -9,7 +9,7 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [x] M1a matrix validation + vector/design group alignment
   - [x] M1b `SummarizedExperiment` adapter + representation-preserving result skeleton
 - [ ] M2 global absence + condition rescue
-  - M2a deterministic rescue core + seed audit
+  - [x] M2a deterministic rescue core + seed audit
   - M2b local RNG + row/column permutation invariants
 - [ ] M3 manual classification + reconciliation
   - M3a post-seed statistics + cutoff validation + four states
@@ -119,5 +119,32 @@ Verification + completion evidence:
 - `git diff --check` → pass.
 
 Exact next task after M1b → M2a: add focused red global-absence/condition-minimum/rescue-audit tests, then implement the deterministic rescue core and seed log without classification or reconciliation.
+
+Blockers → none.
+
+### 2026-07-14 - M2a deterministic rescue core + seed audit
+
+Scope → remove global absences; compute immutable pre-seed minima; seed fully missing condition blocks once; retain provenance. Classification/reconciliation remain outside this commit.
+
+Implementation:
+
+- `.seed_missing_conditions()` returns surviving data in original order, full initial feature audit, condition minima, and typed seed log;
+- globally absent features → `retained = FALSE`, `drop_reason = all_missing`, excluded before rescue;
+- rescue plan sorts conditions/features/candidate sample names, then samples independently with replacement and inserts each condition's pre-seed minimum;
+- seed log records feature, condition, selected sample, old/inserted values, and normalized integer seed;
+- caller matrix + all originally observed cells remain unchanged; invalid seeds and conditions without finite values fail explicitly;
+- local RNG scope and name-stable plan implemented; formal side-effect/permutation regressions remain M2b.
+
+Verification + completion evidence:
+
+- focused red test → 6 errors, all due to absent `.seed_missing_conditions()`;
+- focused green test → 35 expectations pass;
+- package-wide source tests → 131 expectations pass; expected M3 classifier contract remains red (4 errors);
+- `R CMD build . --no-manual --no-build-vignettes` → pass;
+- source-tarball `R CMD check --no-manual --no-build-vignettes` → expected 1 ERROR from four M3 contract tests, baseline placeholder-licence WARNING, and baseline unused-import NOTE; installed suite reports 131 passes;
+- direct RNG/permutation smoke check → existing and absent `.Random.seed` states preserved; row/column permutations retain seed log + named assignments;
+- `git diff --check` → pass.
+
+Exact next task after M2a → M2b: formalize RNG-state restoration (seed initially present/absent), row/column/condition-order named invariants, and original-order output assertions; adjust the rescue core if those adversarial tests expose a gap, then close the M2 gate.
 
 Blockers → none.

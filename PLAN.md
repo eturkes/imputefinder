@@ -528,9 +528,9 @@ Gate: matrix and `SummarizedExperiment` adapters feed identical matrices/groups 
 
 ### M2 - Global absence and condition-specific rescue
 
-- [ ] Implement `all_missing` detection and audit status.
-- [ ] Compute pre-seed condition minima.
-- [ ] Insert exactly one condition-minimum value for each fully missing feature-condition block that is observed elsewhere.
+- [x] Implement `all_missing` detection and audit status.
+- [x] Compute pre-seed condition minima.
+- [x] Insert exactly one condition-minimum value for each fully missing feature-condition block that is observed elsewhere.
 - [ ] Implement local seeded randomness, stable processing order, and a complete seed log.
 - [ ] Verify the caller's RNG state is unchanged.
 
@@ -647,13 +647,13 @@ At minimum, tests must cover the following behavior.
 
 ### Rescue tests
 
-- [ ] feature all missing globally is dropped and never seeded;
-- [ ] feature all missing in one condition but observed elsewhere gets exactly one seed;
-- [ ] seed equals the condition-wide minimum computed before any seeds;
-- [ ] different rescued features may select the same sample;
-- [ ] seed assignments are reproducible and logged;
+- [x] feature all missing globally is dropped and never seeded;
+- [x] feature all missing in one condition but observed elsewhere gets exactly one seed;
+- [x] seed equals the condition-wide minimum computed before any seeds;
+- [x] different rescued features may select the same sample;
+- [x] seed assignments are reproducible and logged;
 - [ ] caller RNG state is unchanged;
-- [ ] a condition with no finite value anywhere errors clearly;
+- [x] a condition with no finite value anywhere errors clearly;
 - [ ] sample/feature permutation retains assignments by name under the same seed.
 
 ### Classification tests
