@@ -23,7 +23,7 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [x] M5c pure detector + quality/failure contract
 - [ ] M6 public integration + obsolete dependency cleanup
   - [x] M6a result presentation + installed S3 dispatch
-  - [ ] M6b representation/order integration audit
+  - [x] M6b representation/order integration audit
   - [ ] M6c obsolete code/import + compatibility cleanup
 - [ ] M7 scientific regression suite
 - [ ] M8 documentation + package metadata
@@ -526,5 +526,54 @@ Exact next task after M6a → M6b: adversarially audit public matrix and
 `SummarizedExperiment` outputs across manual + automatic paths; add focused
 metadata, assay, feature/sample/condition-order, and core-equivalence regressions,
 fix any exposed gap, then close the representation/order gate.
+
+Blockers → none.
+
+### 2026-07-14 - M6b representation/order integration audit
+
+Scope → adversarially verify public matrix and `SummarizedExperiment` parity,
+representation preservation, and ordering across manual, automatic, and empty
+outputs. Obsolete dependency/prototype cleanup remains M6c.
+
+Audit coverage:
+
+- manual normative path permutes features, interleaves conditions/samples, uses
+  named groups + reversed cutoff names, and exercises deterministic rescue;
+- automatic path permutes 1,200-feature evidence, samples, condition blocks, and
+  factor levels while preserving the frozen condition-specific cutoffs;
+- both paths select the second of two assays and prove identical classifications,
+  groups, feature audit, cutoffs/diagnostics, profiles, seed log, and aligned groups;
+- output preserves exact class, assay names/order, non-selected assay values,
+  selected seed-modified data, `rowData`, `colData`, object metadata, retained
+  feature order, and original sample order while leaving both inputs unchanged;
+- all-ineligible `SummarizedExperiment` output retains both zero-row assays,
+  samples, column metadata, object metadata, and full audit evidence;
+- shared automatic fixtures moved into the helper layer so cutoff and adapter
+  tests use one deterministic generator.
+
+Findings:
+
+- production adapter/core required no correction;
+- initial empty-output assertion exposed only valid container convention:
+  empty base matrix row names = `NULL`; empty `SummarizedExperiment` row names =
+  `character(0)`. Retained-feature audit defines the cross-representation
+  invariant without conflating those representations.
+
+Verification + completion evidence:
+
+- pre-audit package-wide source suite → 424/424 expectations pass;
+- focused M6b suite → 65/65 expectations pass;
+- focused automatic cutoff + M6b + adapter suite → pass;
+- package-wide source suite → 489/489 expectations pass;
+- `R CMD build . --no-manual --no-build-vignettes` → pass;
+- source-tarball `R CMD check --no-manual --no-build-vignettes` → tests,
+  installation, namespace, code, and Rd checks pass; only the known placeholder-
+  licence WARNING + obsolete `assertthat`/`dplyr`/`tidyr` import NOTE remain;
+- `git diff --check` → pass.
+
+Exact next task after M6b → M6c: prove no tracked code, tests, docs, or public
+usage needs the prototype-only `assertthat`, `dplyr`, or `tidyr` dependencies;
+remove obsolete imports and any remaining dead prototype artefacts, run the
+installed API/namespace and source-tarball checks, then close M6.
 
 Blockers → none.

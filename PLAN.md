@@ -574,7 +574,7 @@ Gate: automatic selection passes the scientific/stability acceptance tests and n
 
 - [x] Integrate manual/automatic paths into the public function.
 - [x] Implement `print`, `summary`, and missingness plot methods/helpers.
-- [ ] Ensure matrix and `SummarizedExperiment` outputs preserve metadata and order.
+- [x] Ensure matrix and `SummarizedExperiment` outputs preserve metadata and order.
 - [ ] Remove obsolete prototype code and unused imports.
 - [ ] Add any justified deprecation behavior with tests and clear messages.
 
@@ -697,7 +697,7 @@ At minimum, tests must cover the following behavior.
 - [x] fresh-session namespace contains every called symbol;
 - [ ] examples run;
 - [ ] vignette builds;
-- [ ] matrix and `SummarizedExperiment` core results are equivalent;
+- [x] matrix and `SummarizedExperiment` core results are equivalent;
 - [x] result print/summary methods are concise and accurate;
 - [ ] source tarball check is clean.
 
