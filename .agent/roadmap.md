@@ -17,10 +17,10 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
 - [x] M4 explicit profiles + plotting
   - [x] M4a count-weighted profile calculation + result storage
   - [x] M4b profile plotting from stored data
-- [ ] M5 automatic cutoff research + implementation
+- [x] M5 automatic cutoff research + implementation
   - [x] M5a deterministic simulations + predeclared benchmark protocol
   - [x] M5b candidate benchmark + method decision
-  - [ ] M5c pure detector + quality/failure contract
+  - [x] M5c pure detector + quality/failure contract
 - [ ] M6 public integration + obsolete dependency cleanup
 - [ ] M7 scientific regression suite
 - [ ] M8 documentation + package metadata
@@ -432,5 +432,54 @@ profiles, condition-specific structured errors, finite/interior cutoffs, quality
 statistics, algorithm/version metadata, exact order stability, and frozen clear/
 stress fixtures; then wire automatic resolution into the internal cutoff path
 without yet broadening public documentation work.
+
+Blockers → none.
+
+### 2026-07-14 - M5c production automatic cutoff
+
+Scope → promote the selected M5b derivative boundary into the runtime,
+preserve every frozen decision, expose its evidence gates, and connect automatic
+plus partial-manual resolution to the public classifier.
+
+Implementation:
+
+- pure `derivative_boundary` version `1` detector preserves the frozen evidence,
+  density-support, logistic-trend, cubic local-polynomial, half-depth boundary,
+  KDE correction, and peak-offset rules without a public tuning parameter;
+- diagnostics expose typed evidence/support/trend/derivative measures and the
+  selected transition; quality remains the interpretable vector of predeclared
+  gates rather than a synthetic composite score;
+- automatic failure returns no finite/endpoint fallback and raises
+  `imputefinder_cutoff_unidentifiable` / `imputefinder_cutoff_error` carrying the
+  exact condition, reason, diagnostic, and stored profile for manual recovery;
+- public `cutoffs = NULL` resolves each incomplete condition automatically;
+  partial named cutoffs remain exact manual overrides; complete conditions remain
+  `not_needed`;
+- automatic decisions are stable under feature/sample/condition order, while
+  output feature/sample order continues to follow input order.
+
+Verification + completion evidence:
+
+- focused red baseline → 5 absent-detector errors + unresolved automatic-path
+  error + generic public failure;
+- focused M5c suite → 74 expectations pass: clear/heavy-MAR/near-floor frozen
+  fixtures, both one-class directions, evidence floors, flat/unsupported failure,
+  finite interior boundaries, quality/version metadata, condition specificity,
+  partial manual override, typed error payload, and exact order invariance;
+- production vs selected M5b implementation → byte-identical status/cutoff
+  for all 104 frozen eight-seed scenario-condition decisions;
+- bootstrap parity → byte-identical status/cutoff/reason for all 2,600 frozen
+  resamples, including 200/200 structured flat-profile failures;
+- package-wide source suite → 405 expectations pass;
+- `R CMD build . --no-manual --no-build-vignettes` → pass;
+- source-tarball `R CMD check --no-manual --no-build-vignettes` → tests,
+  installed namespace, code, and Rd checks pass; only the known placeholder-
+  licence WARNING + obsolete-import NOTE remain for M6/M8;
+- `git diff --check` → pass.
+
+Exact next task after M5c → M6a: add focused red result-presentation tests,
+then implement concise `print.imputefinder_result()` and
+`summary.imputefinder_result()` methods with registered installed-namespace S3
+dispatch; preserve the existing result contract and stored-profile plot helper.
 
 Blockers → none.

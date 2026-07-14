@@ -28,9 +28,9 @@
 #' @param group_col Condition column for design or
 #'   \code{SummarizedExperiment} input.
 #' @param assay Assay name for \code{SummarizedExperiment} input.
-#' @param cutoffs Optional named numeric vector. A cutoff is required for each
-#'   condition containing missing values; conditions without missing values need
-#'   no cutoff.
+#' @param cutoffs Optional named numeric vector of manual condition cutoffs.
+#'   Automatic selection fills omitted conditions containing missing values;
+#'   conditions without missing values need no cutoff.
 #' @param seed Integer rescue seed.
 #' @return An \code{imputefinder_result} containing filtered seed-modified data,
 #'   per-condition classifications and groups, feature audit status, cutoffs,
@@ -62,8 +62,9 @@ classify_missingness <- function(
         unique(unname(prepared$groups_by_sample)),
         method = "radix"
     )
-    resolved <- .resolve_manual_cutoffs(
+    resolved <- .resolve_cutoffs(
         statistics,
+        profiles,
         cutoffs,
         conditions
     )

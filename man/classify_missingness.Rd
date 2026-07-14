@@ -24,9 +24,9 @@ input; omitted for \code{SummarizedExperiment} input.}
 
 \item{assay}{Assay name for \code{SummarizedExperiment} input.}
 
-\item{cutoffs}{Optional named numeric vector. A cutoff is required for each
-condition containing missing values; conditions without missing values need
-no cutoff.}
+\item{cutoffs}{Optional named numeric vector of manual condition cutoffs.
+Automatic selection fills omitted conditions containing missing values;
+conditions without missing values need no cutoff.}
 
 \item{seed}{Integer rescue seed.}
 }

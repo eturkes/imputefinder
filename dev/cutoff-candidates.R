@@ -1,5 +1,5 @@
-# Fixed automatic-cutoff candidates for the frozen M5 validation protocol.
-# Development-only until M5c promotes one detector into R/detect_cutoff.R.
+# Fixed comparators for the frozen M5 validation protocol. Runtime M5c mirrors
+# the selected derivative candidate; the rejected segmented method stays here.
 
 .cutoff_candidate_constants <- list(
     minimum_features = 80L,

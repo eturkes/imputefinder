@@ -563,16 +563,16 @@ Gate: profile calculations are unit tested numerically; plots build without miss
 - [x] Build deterministic synthetic profiles covering clear, noisy, weak, absent, and multi-transition cliffs.
 - [x] Benchmark at least segmented/change-point and derivative-based candidates against the criteria in Section 11.
 - [x] Select the simplest method that reliably locates the right-hand/bottom cliff boundary.
-- [ ] Implement quality scoring and structured failure.
-- [ ] Record algorithm identity/version in results.
-- [ ] Remove the public `threshold` argument.
-- [ ] Keep manual cutoffs as a permanent reproducibility override.
+- [x] Implement quality scoring and structured failure.
+- [x] Record algorithm identity/version in results.
+- [x] Remove the public `threshold` argument.
+- [x] Keep manual cutoffs as a permanent reproducibility override.
 
 Gate: automatic selection passes the scientific/stability acceptance tests and never fabricates a cutoff for an unidentifiable profile.
 
 ### M6 - Public API integration and compatibility cleanup
 
-- [ ] Integrate manual/automatic paths into the public function.
+- [x] Integrate manual/automatic paths into the public function.
 - [ ] Implement `print`, `summary`, and missingness plot methods/helpers.
 - [ ] Ensure matrix and `SummarizedExperiment` outputs preserve metadata and order.
 - [ ] Remove obsolete prototype code and unused imports.
@@ -684,17 +684,17 @@ At minimum, tests must cover the following behavior.
 - [x] explicit profile matches the count-weighted density formula;
 - [x] profile computation handles repeated means without division-by-zero artifacts;
 - [x] manual cutoff validation and source metadata;
-- [ ] automatic clear-cliff accuracy;
-- [ ] automatic condition-specific cutoffs;
-- [ ] automatic stability under permutations and modest bootstrap noise;
-- [ ] flat/unidentifiable profile returns structured failure;
+- [x] automatic clear-cliff accuracy;
+- [x] automatic condition-specific cutoffs;
+- [x] automatic stability under permutations and modest bootstrap noise;
+- [x] flat/unidentifiable profile returns structured failure;
 - [x] only-complete and only-missing profile behavior is explicit;
-- [ ] no candidate ever becomes `Inf`, `-Inf`, or silent endpoint fallback;
+- [x] no candidate ever becomes `Inf`, `-Inf`, or silent endpoint fallback;
 - [x] plot is generated from stored profile data and includes the recorded cutoff.
 
 ### Package tests
 
-- [ ] fresh-session namespace contains every called symbol;
+- [x] fresh-session namespace contains every called symbol;
 - [ ] examples run;
 - [ ] vignette builds;
 - [ ] matrix and `SummarizedExperiment` core results are equivalent;
