@@ -573,7 +573,7 @@ Gate: automatic selection passes the scientific/stability acceptance tests and n
 ### M6 - Public API integration and compatibility cleanup
 
 - [x] Integrate manual/automatic paths into the public function.
-- [ ] Implement `print`, `summary`, and missingness plot methods/helpers.
+- [x] Implement `print`, `summary`, and missingness plot methods/helpers.
 - [ ] Ensure matrix and `SummarizedExperiment` outputs preserve metadata and order.
 - [ ] Remove obsolete prototype code and unused imports.
 - [ ] Add any justified deprecation behavior with tests and clear messages.
@@ -698,7 +698,7 @@ At minimum, tests must cover the following behavior.
 - [ ] examples run;
 - [ ] vignette builds;
 - [ ] matrix and `SummarizedExperiment` core results are equivalent;
-- [ ] result print/summary methods are concise and accurate;
+- [x] result print/summary methods are concise and accurate;
 - [ ] source tarball check is clean.
 
 ## 11. Automatic cutoff validation protocol

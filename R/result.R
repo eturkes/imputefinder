@@ -147,3 +147,284 @@
 
     invisible(classifications)
 }
+
+#' Present an ImputeFinder Result
+#'
+#' Print a compact overview or calculate structured feature, condition-state,
+#' drop-reason, cutoff, and seed-insertion counts for an ImputeFinder result.
+#'
+#' @param x An \code{imputefinder_result}.
+#' @param object An \code{imputefinder_result}.
+#' @param ... Unused.
+#'
+#' @return \code{print.imputefinder_result()} returns \code{x} invisibly.
+#'   \code{summary.imputefinder_result()} returns a list of class
+#'   \code{summary.imputefinder_result}. Its count tables include all classified
+#'   feature-condition blocks and the retained subset separately.
+#'   \code{print.summary.imputefinder_result()} returns \code{x} invisibly.
+#'
+#' @seealso \code{\link{classify_missingness}},
+#'   \code{\link{plot_missingness}}
+#' @name imputefinder_result
+NULL
+
+#' @rdname imputefinder_result
+#' @export
+print.imputefinder_result <- function(x, ...) {
+    result_summary <- summary(x)
+    .print_result_overview(result_summary)
+
+    for (index in seq_len(nrow(result_summary$retained_states))) {
+        states <- result_summary$retained_states[index, , drop = FALSE]
+        cutoff <- result_summary$cutoffs[index, , drop = FALSE]
+        cat(sprintf(
+            paste0(
+                "%s: retained MNAR=%d, MAR=%d, complete=%d; ",
+                "cutoff=%s\n"
+            ),
+            states$condition,
+            states$MNAR,
+            states$MAR,
+            states$complete,
+            .format_result_cutoff(cutoff$cutoff, cutoff$source)
+        ))
+    }
+
+    invisible(x)
+}
+
+#' @rdname imputefinder_result
+#' @export
+summary.imputefinder_result <- function(object, ...) {
+    conditions <- .validate_result_for_presentation(object)
+    feature_count <- nrow(object$feature_status)
+    retained_count <- sum(object$feature_status$retained)
+
+    structure(
+        list(
+            call = object$call,
+            features = c(
+                total = as.integer(feature_count),
+                retained = as.integer(retained_count),
+                dropped = as.integer(feature_count - retained_count)
+            ),
+            samples = c(
+                total = as.integer(length(object$groups_by_sample)),
+                conditions = as.integer(length(conditions))
+            ),
+            seed_insertions = as.integer(nrow(object$seed_log)),
+            states = .result_state_counts(
+                object$classifications,
+                conditions
+            ),
+            retained_states = .result_state_counts(
+                object$classifications,
+                conditions,
+                retained_only = TRUE
+            ),
+            drops = .result_drop_counts(object$feature_status),
+            cutoffs = .result_cutoff_summary(object, conditions)
+        ),
+        class = "summary.imputefinder_result"
+    )
+}
+
+#' @rdname imputefinder_result
+#' @export
+print.summary.imputefinder_result <- function(x, ...) {
+    .print_result_overview(x, summary = TRUE)
+    cat("States (all classified features):\n")
+    for (index in seq_len(nrow(x$states))) {
+        states <- x$states[index, , drop = FALSE]
+        cat(sprintf(
+            "%s: complete=%d, MNAR=%d, MAR=%d, insufficient=%d\n",
+            states$condition,
+            states$complete,
+            states$MNAR,
+            states$MAR,
+            states$insufficient
+        ))
+    }
+
+    if (nrow(x$drops) == 0L) {
+        cat("Dropped: none\n")
+    } else {
+        drop_text <- sprintf("%s=%d", x$drops$reason, x$drops$count)
+        cat("Dropped: ", paste(drop_text, collapse = "; "), "\n", sep = "")
+    }
+
+    cutoff_text <- vapply(
+        seq_len(nrow(x$cutoffs)),
+        function(index) {
+            sprintf(
+                "%s=%s",
+                x$cutoffs$condition[[index]],
+                .format_result_cutoff(
+                    x$cutoffs$cutoff[[index]],
+                    x$cutoffs$source[[index]]
+                )
+            )
+        },
+        character(1L)
+    )
+    cat("Cutoffs: ", paste(cutoff_text, collapse = "; "), "\n", sep = "")
+
+    invisible(x)
+}
+
+.validate_result_for_presentation <- function(result) {
+    conditions <- names(result$groups)
+    required <- c(
+        "classifications", "feature_status", "cutoffs",
+        "cutoff_diagnostics", "seed_log", "groups_by_sample", "call"
+    )
+    valid <- inherits(result, "imputefinder_result") &&
+        is.list(result) &&
+        all(required %in% names(result)) &&
+        is.character(conditions) &&
+        length(conditions) > 0L &&
+        identical(names(result$cutoffs), conditions) &&
+        identical(names(result$cutoff_diagnostics), conditions) &&
+        is.data.frame(result$classifications) &&
+        is.data.frame(result$feature_status) &&
+        is.data.frame(result$seed_log)
+    if (!valid) {
+        stop("Result does not satisfy the presentation schema.", call. = FALSE)
+    }
+    .validate_classification_states(result$classifications)
+
+    conditions
+}
+
+.result_state_counts <- function(
+    classifications,
+    conditions,
+    retained_only = FALSE
+) {
+    if (retained_only) {
+        classifications <- classifications[
+            classifications$retained,
+            ,
+            drop = FALSE
+        ]
+    }
+    states <- .missingness_states()
+    counts <- table(
+        factor(classifications$condition, levels = conditions),
+        factor(classifications$state, levels = states)
+    )
+    columns <- lapply(
+        seq_along(states),
+        function(index) as.integer(counts[, index])
+    )
+    names(columns) <- states
+
+    data.frame(
+        c(list(condition = conditions), columns),
+        check.names = FALSE,
+        stringsAsFactors = FALSE
+    )
+}
+
+.result_drop_counts <- function(feature_status) {
+    reasons <- feature_status$drop_reason[!feature_status$retained]
+    if (length(reasons) == 0L) {
+        return(data.frame(
+            reason = character(),
+            count = integer(),
+            stringsAsFactors = FALSE
+        ))
+    }
+
+    unique_reasons <- unique(reasons)
+    insufficient <- sort(
+        unique_reasons[startsWith(unique_reasons, "insufficient:")],
+        method = "radix"
+    )
+    fixed <- c("all_missing", "MNAR_all_conditions")
+    other <- sort(
+        setdiff(unique_reasons, c(fixed, insufficient)),
+        method = "radix"
+    )
+    ordered_reasons <- c(
+        intersect("all_missing", unique_reasons),
+        insufficient,
+        intersect("MNAR_all_conditions", unique_reasons),
+        other
+    )
+    counts <- table(factor(reasons, levels = ordered_reasons))
+
+    data.frame(
+        reason = ordered_reasons,
+        count = as.integer(counts),
+        stringsAsFactors = FALSE
+    )
+}
+
+.result_cutoff_summary <- function(result, conditions) {
+    diagnostics <- result$cutoff_diagnostics[conditions]
+    sources <- vapply(
+        diagnostics,
+        function(diagnostic) {
+            valid <- is.list(diagnostic) &&
+                is.character(diagnostic$source) &&
+                length(diagnostic$source) == 1L &&
+                !is.na(diagnostic$source) &&
+                nzchar(diagnostic$source)
+            if (!valid) {
+                stop(
+                    "Result does not satisfy the presentation schema.",
+                    call. = FALSE
+                )
+            }
+            diagnostic$source
+        },
+        character(1L)
+    )
+
+    data.frame(
+        condition = conditions,
+        cutoff = as.numeric(result$cutoffs[conditions]),
+        source = unname(sources),
+        stringsAsFactors = FALSE
+    )
+}
+
+.print_result_overview <- function(result_summary, summary = FALSE) {
+    label <- if (summary) {
+        "<summary.imputefinder_result>"
+    } else {
+        "<imputefinder_result>"
+    }
+    cat(label, "\n", sep = "")
+    cat(sprintf(
+        "Features: %d/%d retained; %d dropped\n",
+        result_summary$features[["retained"]],
+        result_summary$features[["total"]],
+        result_summary$features[["dropped"]]
+    ))
+    condition_label <- if (result_summary$samples[["conditions"]] == 1L) {
+        "condition"
+    } else {
+        "conditions"
+    }
+    cat(sprintf(
+        "Samples: %d across %d %s; seed insertions: %d\n",
+        result_summary$samples[["total"]],
+        result_summary$samples[["conditions"]],
+        condition_label,
+        result_summary$seed_insertions
+    ))
+}
+
+.format_result_cutoff <- function(cutoff, source) {
+    if (is.na(cutoff) && identical(source, "not_needed")) {
+        return("not needed")
+    }
+    if (is.na(cutoff)) {
+        return(sprintf("unavailable (%s)", source))
+    }
+
+    formatted <- format(cutoff, digits = 7L, trim = TRUE)
+    sprintf("%s (%s)", formatted, source)
+}

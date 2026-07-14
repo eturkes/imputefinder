@@ -154,3 +154,152 @@ test_that("the public classifier exposes the decided argument contract", {
         c("x", "group", "group_col", "assay", "cutoffs", "seed")
     )
 })
+
+test_that("summary exposes exact feature, state, drop, and cutoff counts", {
+    result <- classify_normative_fixture()
+
+    result_summary <- summary(result)
+
+    expect_s3_class(result_summary, "summary.imputefinder_result")
+    expect_identical(
+        names(result_summary),
+        c(
+            "call",
+            "features",
+            "samples",
+            "seed_insertions",
+            "states",
+            "retained_states",
+            "drops",
+            "cutoffs"
+        )
+    )
+    expect_identical(
+        result_summary$features,
+        c(total = 7L, retained = 4L, dropped = 3L)
+    )
+    expect_identical(
+        result_summary$samples,
+        c(total = 8L, conditions = 2L)
+    )
+    expect_identical(result_summary$seed_insertions, 1L)
+    expect_identical(
+        result_summary$states,
+        data.frame(
+            condition = c("A", "B"),
+            complete = c(1L, 4L),
+            MNAR = c(3L, 1L),
+            MAR = c(1L, 1L),
+            insufficient = c(1L, 0L),
+            stringsAsFactors = FALSE
+        )
+    )
+    expect_identical(
+        result_summary$retained_states,
+        data.frame(
+            condition = c("A", "B"),
+            complete = c(1L, 3L),
+            MNAR = c(2L, 0L),
+            MAR = c(1L, 1L),
+            insufficient = c(0L, 0L),
+            stringsAsFactors = FALSE
+        )
+    )
+    expect_identical(
+        result_summary$drops,
+        data.frame(
+            reason = c(
+                "all_missing",
+                "insufficient:A",
+                "MNAR_all_conditions"
+            ),
+            count = rep(1L, 3L),
+            stringsAsFactors = FALSE
+        )
+    )
+    expect_identical(
+        result_summary$cutoffs,
+        data.frame(
+            condition = c("A", "B"),
+            cutoff = c(12, 12),
+            source = c("manual", "manual"),
+            stringsAsFactors = FALSE
+        )
+    )
+    expect_identical(result_summary$call, result$call)
+})
+
+test_that("result and summary print methods are concise and return invisibly", {
+    result <- classify_normative_fixture()
+    result_visibility <- NULL
+    result_output <- capture.output(
+        result_visibility <- withVisible(print(result))
+    )
+
+    expect_false(result_visibility$visible)
+    expect_identical(result_visibility$value, result)
+    expect_identical(
+        result_output,
+        c(
+            "<imputefinder_result>",
+            "Features: 4/7 retained; 3 dropped",
+            "Samples: 8 across 2 conditions; seed insertions: 1",
+            paste0(
+                "A: retained MNAR=2, MAR=1, complete=1; ",
+                "cutoff=12 (manual)"
+            ),
+            paste0(
+                "B: retained MNAR=0, MAR=1, complete=3; ",
+                "cutoff=12 (manual)"
+            )
+        )
+    )
+
+    result_summary <- summary(result)
+    summary_visibility <- NULL
+    summary_output <- capture.output(
+        summary_visibility <- withVisible(print(result_summary))
+    )
+
+    expect_false(summary_visibility$visible)
+    expect_identical(summary_visibility$value, result_summary)
+    expect_identical(
+        summary_output,
+        c(
+            "<summary.imputefinder_result>",
+            "Features: 4/7 retained; 3 dropped",
+            "Samples: 8 across 2 conditions; seed insertions: 1",
+            "States (all classified features):",
+            "A: complete=1, MNAR=3, MAR=1, insufficient=1",
+            "B: complete=4, MNAR=1, MAR=1, insufficient=0",
+            paste0(
+                "Dropped: all_missing=1; insufficient:A=1; ",
+                "MNAR_all_conditions=1"
+            ),
+            "Cutoffs: A=12 (manual); B=12 (manual)"
+        )
+    )
+})
+
+test_that("presentation handles no drops and conditions without cutoffs", {
+    x <- rbind(
+        low = c(1, 1, 2, 2),
+        high = c(10, 10, 20, 20)
+    )
+    colnames(x) <- paste0("s", seq_len(ncol(x)))
+    result <- classify_missingness(x, c("B", "B", "A", "A"))
+
+    result_summary <- summary(result)
+    output <- capture.output(print(result_summary))
+
+    expect_identical(
+        result_summary$drops,
+        data.frame(
+            reason = character(),
+            count = integer(),
+            stringsAsFactors = FALSE
+        )
+    )
+    expect_true(any(output == "Dropped: none"))
+    expect_true(any(output == "Cutoffs: A=not needed; B=not needed"))
+})

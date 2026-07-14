@@ -22,6 +22,9 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [x] M5b candidate benchmark + method decision
   - [x] M5c pure detector + quality/failure contract
 - [ ] M6 public integration + obsolete dependency cleanup
+  - [x] M6a result presentation + installed S3 dispatch
+  - [ ] M6b representation/order integration audit
+  - [ ] M6c obsolete code/import + compatibility cleanup
 - [ ] M7 scientific regression suite
 - [ ] M8 documentation + package metadata
 - [ ] M9 CI + Bioconductor hardening
@@ -481,5 +484,47 @@ Exact next task after M5c → M6a: add focused red result-presentation tests,
 then implement concise `print.imputefinder_result()` and
 `summary.imputefinder_result()` methods with registered installed-namespace S3
 dispatch; preserve the existing result contract and stored-profile plot helper.
+
+Blockers → none.
+
+### 2026-07-14 - M6a result presentation
+
+Scope → expose concise result/summary presentation with machine-readable counts
+and installed S3 dispatch. Representation/order audit + obsolete dependency
+cleanup remain M6b-M6c; the stored-profile plot helper was completed in M4b.
+
+Implementation:
+
+- registered `print.imputefinder_result()`,
+  `summary.imputefinder_result()`, and the summary print method;
+- structured summary retains the call and exact feature/sample/seed counts,
+  all-feature + retained state counts by condition, precedence-ordered drop
+  counts, and condition cutoffs/sources;
+- result print shows retained MNAR/MAR/complete group counts + cutoff provenance;
+  summary print shows all classified states + drop reasons without dumping the
+  underlying matrices, profiles, or diagnostics;
+- no-cutoff complete conditions render as `not needed`; every print method
+  returns its input invisibly.
+
+Verification + completion evidence:
+
+- focused red result suite → expected 4 failures + 2 errors from base list
+  printing/default summary and absent structured fields;
+- focused green result suite → 40 expectations pass;
+- package-wide source suite → 424/424 expectations pass;
+- roxygen namespace/help generation → three S3 registrations + one result-method
+  help topic; `R CMD check` reports consistent generics/methods and Rd usage;
+- clean installed-package smoke → all three `getS3method()` lookups, result
+  summary dispatch, and concise print paths pass in a fresh R session;
+- `R CMD build . --no-manual --no-build-vignettes` → pass;
+- source-tarball `R CMD check --no-manual --no-build-vignettes` → tests,
+  install/load, S3, code, and Rd checks pass; only the known placeholder-licence
+  WARNING + obsolete `assertthat`/`dplyr`/`tidyr` import NOTE remain for M8/M6c;
+- `git diff --check` → pass.
+
+Exact next task after M6a → M6b: adversarially audit public matrix and
+`SummarizedExperiment` outputs across manual + automatic paths; add focused
+metadata, assay, feature/sample/condition-order, and core-equivalence regressions,
+fix any exposed gap, then close the representation/order gate.
 
 Blockers → none.
