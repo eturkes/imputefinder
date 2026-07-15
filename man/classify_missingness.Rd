@@ -60,3 +60,7 @@ fit$groups$A
 fit$seed_log
 
 }
+\seealso{
+\code{\link{plot_missingness}} and
+\code{vignette("imputefinder")}.
+}

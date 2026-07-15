@@ -36,7 +36,8 @@ feature groups.
 }
 
 \seealso{
-\code{\link[=classify_missingness]{classify_missingness()}}, \code{\link[=plot_missingness]{plot_missingness()}}
+\code{\link[=classify_missingness]{classify_missingness()}}, \code{\link[=plot_missingness]{plot_missingness()}}, and
+\code{vignette("imputefinder")}.
 }
 \author{
 \strong{Maintainer}: Emir Turkes \email{emir.turkes@eturkes.com} [copyright holder]

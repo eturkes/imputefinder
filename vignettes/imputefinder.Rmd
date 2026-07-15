@@ -1,0 +1,404 @@
+---
+title: "Condition-aware proteomics missingness with ImputeFinder"
+author:
+- name: Emir Turkes
+  email: emir.turkes@eturkes.com
+package: imputefinder
+output:
+  BiocStyle::html_document:
+    toc_float: true
+abstract: |
+  ImputeFinder classifies quantitative-proteomics missingness independently
+  within experimental conditions. This vignette demonstrates the on/off rescue,
+  manual and automatic intensity cutoffs, auditable result data, and the split
+  into condition-specific downstream imputation branches.
+vignette: |
+  %\VignetteIndexEntry{Condition-aware proteomics missingness with ImputeFinder}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>",
+    fig.width = 7,
+    fig.height = 4.5,
+    dpi = 96,
+    crop = NULL
+)
+library(imputefinder)
+```
+
+# Introduction
+
+Missing quantitative-proteomics observations can reflect more than one
+process. Some values are absent for approximately intensity-independent,
+MAR-like reasons. Low-abundance features can instead fall below detection and
+produce MNAR-like missingness. A protein can also be detected throughout one
+biological condition and absent throughout another. That condition-specific
+on/off pattern can be informative, but a single global label obscures it.
+
+ImputeFinder addresses this boundary of the workflow. It takes unnormalised
+log2 protein intensities, assigns a state to every feature-condition block,
+filters features without adequate evidence, and returns the data and audit
+trail needed for downstream processing. The labels mean **likely MAR** and
+**likely MNAR** under an intensity-cutoff heuristic; they do not establish the
+true causal missingness mechanism. ImputeFinder neither normalises nor imputes
+values.
+
+Bioconductor packages such as
+[`DEP`](https://bioconductor.org/packages/DEP),
+[`MSnbase`](https://bioconductor.org/packages/MSnbase), and
+[`msImpute`](https://bioconductor.org/packages/msImpute) provide broader
+proteomics analysis or imputation machinery. ImputeFinder has a narrower role:
+it preserves condition-specific state and coordinates separate downstream
+branches while returning either an ordinary matrix or a
+`SummarizedExperiment`.
+
+# Installation
+
+Once ImputeFinder is available from a Bioconductor package repository, install
+and load it as follows. Installation code is intentionally not evaluated while
+building the vignette.
+
+```{r installation, eval=FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("imputefinder")
+
+library(imputefinder)
+```
+
+# Input and classification rules
+
+The input must be an ordinary numeric matrix, or a selected numeric assay in a
+`SummarizedExperiment`, with named protein features in rows and uniquely named
+samples in columns. Missing values are `NA`; `NaN` and infinite values are
+rejected. Condition labels must align one-to-one with samples. ImputeFinder
+trusts the scientific input contract: it does not infer or apply a log
+transform, normalisation, centring, or scaling, and it does not reinterpret
+zero.
+
+After rescue, each feature-condition block receives exactly one state:
+
+| State | Evidence |
+|---|---|
+| `complete` | No value is missing. |
+| `MNAR` | At least one value is missing and the arithmetic mean of observed values is below the condition cutoff. |
+| `MAR` | At least one value is missing, the mean is at or above the cutoff, and strictly more than half the samples are observed. |
+| `insufficient` | The block is on the MAR side of the cutoff but lacks a strict observed majority. |
+
+The arithmetic mean is deliberate: one strong observed signal can move a
+partly observed block toward the MAR side. Equality belongs to that side too.
+MAR-like downstream estimation depends on relationships among observed values,
+so a strict majority supplies minimum within-condition evidence. The majority
+rule therefore applies only to MAR candidates. A sparse low-intensity block can
+remain eligible as MNAR because one observed value may be the available
+detection-limit evidence.
+
+A feature is dropped if it is absent globally, `insufficient` in any condition,
+or `MNAR` in every condition. Otherwise its complete state matrix is retained,
+including mixtures such as MNAR in A and complete in B. An `insufficient` block
+cannot support a MAR branch, while an all-MNAR feature has no complete or
+MAR-like condition to support retention.
+
+# On/off rescue and a manual cutoff
+
+This small fixture makes every rule visible. Both conditions have four samples,
+and the manual cutoffs are 12.
+
+```{r manual-fixture}
+x <- rbind(
+    on_off = c(NA, NA, NA, NA, 15, 16, 15, 17),
+    mar_both = c(14, 15, NA, 16, 14, NA, 15, 16),
+    sparse_mar = c(20, NA, NA, NA, 20, 21, 22, 23),
+    sparse_mnar = c(8, NA, NA, NA, 14, 15, 16, 17),
+    all_mnar = c(8, NA, NA, NA, 9, NA, NA, NA),
+    globally_absent = rep(NA, 8),
+    complete_low = c(8, 8, 8, 8, 9, 9, 9, 9)
+)
+colnames(x) <- paste0("sample_", seq_len(ncol(x)))
+condition <- rep(c("A", "B"), each = 4)
+
+fit <- classify_missingness(
+    x,
+    group = condition,
+    cutoffs = c(A = 12, B = 12),
+    seed = 1L
+)
+fit
+```
+
+Before classification, a feature missing everywhere is marked `all_missing`
+and removed. Every surviving feature fully missing within one condition then
+receives one artificial anchor:
+
+1. The minimum finite intensity in each condition is calculated before any
+   anchors are inserted.
+2. One sample in each fully missing feature-condition block is selected
+   uniformly. Selection is with replacement across features.
+3. Exactly that cell receives the condition minimum; the others remain `NA`.
+4. The feature, condition, selected sample, old and inserted values, and seed
+   are recorded.
+
+```{r seed-audit}
+fit$seed_log
+fit$data["on_off", ]
+```
+
+The anchor makes the absent condition classifiable; it is not a completed
+imputation. Originally observed cells are preserved exactly. Stable name order
+and a local RNG scope make the selected sample reproducible without changing
+the caller's global RNG state.
+
+The audit table retains all original feature names, including dropped rows.
+The long classification table retains the evidence behind every surviving
+feature-condition state.
+
+```{r classification-audit}
+fit$feature_status
+fit$classifications[
+    fit$classifications$feature %in% c("on_off", "sparse_mar", "all_mnar"),
+    c("feature", "condition", "observed_count", "missing_count",
+      "mean_intensity", "cutoff", "state", "retained", "drop_reason")
+]
+```
+
+## Result components
+
+| Component | Audit or workflow role |
+|---|---|
+| `data` | Retained rows in the input representation, with logged rescue anchors inserted. |
+| `classifications` | Long feature-condition evidence, state, retention, and drop reason. |
+| `groups` | Retained `MNAR`, `MAR`, `complete`, and `MAR_or_complete` feature names for each condition. |
+| `feature_status` | One retention decision for every original feature. |
+| `cutoffs`, `cutoff_diagnostics` | Condition boundaries, source, method, quality evidence, and warnings. |
+| `profiles` | Raw feature statistics, explicit density grid, and smoothing metadata. |
+| `seed_log` | Complete provenance for each artificial rescue anchor. |
+| `groups_by_sample` | Aligned condition label for every output sample. |
+| `call` | Matched classifier call for provenance. |
+
+# The stored missingness profile
+
+For each condition, ImputeFinder estimates missing and complete feature-mean
+density curves on one intensity grid. If `n_1 f_1(x)` is the count-weighted
+density for blocks with missing values and `n_0 f_0(x)` is the corresponding
+density for complete blocks, the displayed profile is
+
+```text
+               n_1 f_1(x)
+p_missing(x) = -------------------------
+               n_1 f_1(x) + n_0 f_0(x)
+```
+
+This is the local missing-block proportion represented by a filled stacked
+density plot; it is not the average fraction of missing samples. The raw
+feature statistics, grid, bandwidth, class counts, warnings, and cutoff
+diagnostics are stored in the result. Plotting presents those stored values and
+never recovers scientific data from rendered graphics.
+
+```{r stored-evidence}
+fit$profiles$A$metadata[c("class_counts", "bandwidth", "kernel")]
+head(
+    fit$profiles$A$grid[
+        , c("intensity", "missing_proportion", "supported")
+    ]
+)
+```
+
+```{r manual-profile, fig.cap="Condition A missingness profile. The vertical line is the recorded manual cutoff; the bottom tick marks the rescued on/off block."}
+plot_missingness(fit, "A")
+```
+
+This seven-feature fixture tests rule boundaries rather than estimating a
+population profile. Its curve is shown to demonstrate stored evidence, the
+manual cutoff, and seed provenance; it is too small for scientific breakpoint
+interpretation or automatic selection.
+
+# Automatic cutoffs
+
+Manual cutoffs are a permanent reproducibility override and are useful when
+domain knowledge or a predeclared analysis fixes the boundary. With
+`cutoffs = NULL`, the default, ImputeFinder independently searches each
+incomplete condition's profile for the lower, right-hand boundary of its
+dominant descending transition. Conditions with no missing observations need
+no cutoff. Partial named vectors are also valid: automatic selection fills
+only omitted conditions.
+
+The deterministic synthetic matrix below contains two clear but different
+transitions. The modular score supplies a fixed mix of incomplete and complete
+features, avoiding random vignette output.
+
+```{r automatic-data}
+make_condition <- function(n, left, right, score_offset = 0L) {
+    index <- seq_len(n)
+    means <- qnorm((index - 0.5) / n, mean = 12.5, sd = 2.4)
+    score <- (((index + score_offset) * 104729) %% 1000003) / 1000003
+    ramp <- pmin(pmax((right - means) / (right - left), 0), 1)
+    missing_probability <- 1 - (1 - 0.05) * (1 - 0.68 * ramp)
+    missing <- score < missing_probability
+
+    block <- matrix(rep(means, 4L), nrow = n)
+    block[cbind(which(missing), rep(4L, sum(missing)))] <- NA_real_
+    block
+}
+
+feature_count <- 200L
+automatic_x <- cbind(
+    make_condition(feature_count, left = 10.2, right = 11),
+    make_condition(feature_count, left = 13.2, right = 14, score_offset = 37L)
+)
+rownames(automatic_x) <- sprintf("protein_%04d", seq_len(feature_count))
+colnames(automatic_x) <- paste0("automatic_sample_", seq_len(ncol(automatic_x)))
+automatic_condition <- rep(c("A", "B"), each = 4)
+```
+
+```{r automatic-fit}
+automatic_fit <- classify_missingness(
+    automatic_x,
+    group = automatic_condition
+)
+round(automatic_fit$cutoffs, 3)
+vapply(
+    automatic_fit$cutoff_diagnostics,
+    function(diagnostic) diagnostic$source,
+    character(1)
+)
+automatic_fit$cutoff_diagnostics$A$method
+```
+
+```{r automatic-profile, fig.cap="Automatic condition A profile. The recorded cutoff marks the lower boundary of the dominant descending transition."}
+plot_missingness(automatic_fit, "A")
+```
+
+An automatic estimate is returned only when total evidence, class evidence,
+profile support, a descending trend, and a credible transition all pass the
+detector's checks. Flat, one-class, sparse, or ambiguous profiles raise a
+condition-specific `imputefinder_cutoff_error` with the profile and diagnostic
+attached. Inspect that evidence and supply a named manual cutoff; a failed
+automatic call is not permission to invent an endpoint.
+
+# Filtered data and downstream branches
+
+`fit$data` contains only retained features and includes every logged rescue
+anchor. `fit$groups` divides those rows independently within each condition
+into `MNAR`, `MAR`, `complete`, and the combined `MAR_or_complete` group.
+
+The intended order is:
+
+1. classify the unnormalised log2 matrix;
+2. normalise the entire returned `fit$data` object with the method chosen for
+   the experiment;
+3. split samples by `fit$groups_by_sample`;
+4. within each condition, apply an MNAR method only to its `MNAR` rows and a
+   MAR method only to its `MAR_or_complete` rows;
+5. recombine conditions in original sample order.
+
+The following evaluated code performs the split but deliberately stops before
+normalisation or imputation, which are analysis-specific choices and not
+ImputeFinder dependencies.
+
+```{r downstream-branches}
+split_condition <- function(result, condition_name) {
+    samples <- names(result$groups_by_sample)[
+        result$groups_by_sample == condition_name
+    ]
+    condition_data <- result$data[, samples, drop = FALSE]
+
+    list(
+        MNAR = condition_data[
+            result$groups[[condition_name]]$MNAR,
+            ,
+            drop = FALSE
+        ],
+        MAR_or_complete = condition_data[
+            result$groups[[condition_name]]$MAR_or_complete,
+            ,
+            drop = FALSE
+        ]
+    )
+}
+
+downstream <- lapply(names(fit$groups), function(condition_name) {
+    split_condition(fit, condition_name)
+})
+names(downstream) <- names(fit$groups)
+
+vapply(downstream, function(branch) nrow(branch$MNAR), integer(1))
+vapply(downstream, function(branch) nrow(branch$MAR_or_complete), integer(1))
+c(
+    on_off_in_A_MNAR = "on_off" %in% rownames(downstream$A$MNAR),
+    on_off_in_B_MAR_or_complete =
+        "on_off" %in% rownames(downstream$B$MAR_or_complete)
+)
+```
+
+Thus `on_off` is routed to an MNAR method in A but to the complete/MAR branch in
+B. Complete blocks need no replacement; grouping them with MAR rows supplies a
+single non-MNAR branch while preserving their explicit `complete` state in the
+classification table.
+
+# `SummarizedExperiment` input
+
+A `SummarizedExperiment` uses the same matrix core. Select the condition column
+explicitly and name the assay whenever the object contains more than one. The
+returned `data` preserves the representation, unselected assays, row and column
+metadata, and sample order while filtering rows and replacing only the selected
+assay with the seed-modified values.
+
+```{r summarized-experiment}
+se <- SummarizedExperiment::SummarizedExperiment(
+    assays = list(log2_intensity = x),
+    colData = data.frame(
+        condition = condition,
+        row.names = colnames(x)
+    )
+)
+fit_se <- classify_missingness(
+    se,
+    group_col = "condition",
+    assay = "log2_intensity",
+    cutoffs = c(A = 12, B = 12)
+)
+identical(
+    SummarizedExperiment::assay(fit_se$data, "log2_intensity"),
+    fit$data
+)
+```
+
+# Limitations
+
+- The cutoff is a model assumption. Biology, acquisition, and preprocessing can
+  produce patterns without one descending intensity transition.
+- Automatic breakpoint selection needs both incomplete and complete feature
+  evidence. Structured failure is an expected result for unidentifiable data.
+- Arithmetic means are sensitive to strong observations by design.
+- Rescue anchors are artificial values. Preserve `seed_log` with the analysis
+  and assess their influence downstream.
+- Classification is heuristic. ImputeFinder does not prove mechanisms, choose
+  an imputation algorithm, or validate the final biological analysis.
+
+The deterministic repository validation covers intensity-independent MAR,
+intensity-dependent MNAR, condition-specific on/off features, several group
+sizes and cutoffs, rescue seeds, and name permutations. Synthetic evidence
+supports those tested behaviors but does not establish performance for every
+proteomics experiment.
+
+# Related methods and references {.unnumbered}
+
+- Karpievitch YV, Dabney AR, Smith RD (2012). [Normalization and missing value
+  imputation for label-free LC-MS
+  analysis](https://doi.org/10.1186/1471-2105-13-S16-S5). *BMC Bioinformatics*
+  13(Suppl 16):S5.
+- Lazar C, Gatto L, Ferro M, Bruley C, Burger T (2016). [Accounting for the
+  multiple natures of missing values in label-free quantitative proteomics data
+  sets to compare imputation
+  strategies](https://doi.org/10.1021/acs.jproteome.5b00981). *Journal of
+  Proteome Research* 15:1116-1125.
+
+# Session information {.unnumbered}
+
+```{r session-info}
+suppressWarnings(sessionInfo())
+```

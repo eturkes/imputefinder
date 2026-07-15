@@ -46,5 +46,5 @@ summary(fit)
 }
 \seealso{
 \code{\link{classify_missingness}},
-\code{\link{plot_missingness}}
+\code{\link{plot_missingness}}, and \code{vignette("imputefinder")}.
 }

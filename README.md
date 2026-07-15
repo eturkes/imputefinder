@@ -56,6 +56,11 @@ will be:
 BiocManager::install("imputefinder")
 ```
 
+After installation, run `vignette("imputefinder")` for an executable walkthrough
+of cutoff selection, on/off rescue, diagnostics, and downstream branching. The
+[vignette source](vignettes/imputefinder.Rmd) is also available in this
+repository.
+
 ## Minimal worked example
 
 The fixture below exposes all central rules. Conditions A and B each contain

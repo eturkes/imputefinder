@@ -597,11 +597,11 @@ Gate: the package has evidence for its central scientific behavior, not only cod
 - [x] Replace all `DESCRIPTION` placeholders with accurate title, author, description, GPL metadata, URLs, bug tracker, and current Bioconductor fields.
 - [x] Audit `Imports`, `Suggests`, `biocViews`, and minimum R/Bioconductor versions against current guidance.
 - [x] Rewrite README with method rationale, installation, minimal example, result interpretation, and limitations.
-- [ ] Add a vignette covering manual and automatic cutoffs, the on/off fixture, plotting, filtering, and per-condition downstream imputation.
+- [x] Add a vignette covering manual and automatic cutoffs, the on/off fixture, plotting, filtering, and per-condition downstream imputation.
 - [x] Document that input is unnormalised log2 intensity and that classification is heuristic.
 - [x] Document seed provenance and pipeline order before normalisation/imputation.
-- [ ] Add package-level help and `NEWS.md`.
-- [ ] Ensure every example runs offline or is explicitly non-evaluated for optional downstream packages.
+- [x] Add package-level help and `NEWS.md`.
+- [x] Ensure every example runs offline or is explicitly non-evaluated for optional downstream packages.
 
 Gate: a user with no thesis can understand and correctly use the package from installed documentation alone.
 
@@ -697,7 +697,7 @@ At minimum, tests must cover the following behavior.
 
 - [x] fresh-session namespace contains every called symbol;
 - [x] examples run;
-- [ ] vignette builds;
+- [x] vignette builds;
 - [x] matrix and `SummarizedExperiment` core results are equivalent;
 - [x] result print/summary methods are concise and accurate;
 - [x] source tarball check is clean.

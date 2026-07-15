@@ -35,3 +35,7 @@ fit <- classify_missingness(x, group, cutoffs = c(A = 12, B = 12))
 plot_missingness(fit, "A")
 
 }
+\seealso{
+\code{\link{classify_missingness}} and
+\code{vignette("imputefinder")}.
+}

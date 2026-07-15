@@ -12,6 +12,8 @@ utils::globalVariables(c("intensity", "mean_intensity", "missing_proportion"))
 #' @return A \code{ggplot} object. A recorded cutoff is shown as a vertical
 #'   line; bottom ticks identify seeded feature-condition blocks. Stored profile
 #'   and cutoff warnings appear in the caption.
+#' @seealso \code{\link{classify_missingness}} and
+#'   \code{vignette("imputefinder")}.
 #' @examples
 #' x <- rbind(
 #'     on_off = c(NA, NA, NA, NA, 15, 16, 15, 17),

@@ -164,7 +164,7 @@
 #'   \code{print.summary.imputefinder_result()} returns \code{x} invisibly.
 #'
 #' @seealso \code{\link{classify_missingness}},
-#'   \code{\link{plot_missingness}}
+#'   \code{\link{plot_missingness}}, and \code{vignette("imputefinder")}.
 #' @name imputefinder_result
 #' @examples
 #' x <- rbind(

@@ -29,11 +29,14 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [x] M7a independent simulation protocol + frozen gates
   - [x] M7b full scientific benchmark + assessment
   - [x] M7c compact routine regressions + gate closure
-- [ ] M8 documentation + package metadata
+- [x] M8 documentation + package metadata
   - [x] M8a metadata + package overview
   - [x] M8b README + runnable public examples
-  - [ ] M8c vignette + NEWS + documentation gate
+  - [x] M8c vignette + NEWS + documentation gate
 - [ ] M9 CI + Bioconductor hardening
+  - [ ] M9a maintained Bioconductor-aware CI
+  - [ ] M9b clean `--as-cran` + `BiocCheck`
+  - [ ] M9c hardening findings + gate closure
 - [ ] M10 release-candidate adversarial review
 
 ## Session ledger
@@ -901,5 +904,80 @@ the on/off fixture, stored plotting evidence, filtering, seed provenance, and
 condition-specific downstream branches; add `NEWS.md`, finish public/package
 help cross-links, run the vignette/examples from a clean source tarball, and
 close the M8 documentation gate.
+
+Blockers → none.
+
+### 2026-07-15 - M8c vignette + NEWS + documentation gate
+
+Scope → supply the installed task-oriented vignette + release history, make the
+long-form workflow discoverable from public help, and close every M8/package-
+vignette gate. CI and Bioconductor submission checks remain M9.
+
+Guidance + decisions:
+
+- current official Bioconductor documentation guidance requires at least one
+  task-oriented Rmd/Rnw vignette with executed non-trivial package code,
+  introduction + Bioconductor motivation, installation instructions,
+  references, and terminal `sessionInfo()`; only installation is justified as
+  non-evaluated here;
+- current guidance recommends `BiocStyle`; `DESCRIPTION` therefore declares
+  `BiocStyle`, `knitr`, and `rmarkdown` in `Suggests` plus
+  `VignetteBuilder: knitr`; no runtime dependency enters;
+- current NEWS guidance accepts one top-level Markdown file; `NEWS.md` records
+  the initial development behavior under version `0.99.1`;
+- primary guidance:
+  `https://contributions.bioconductor.org/docs.html`,
+  `https://contributions.bioconductor.org/news.html`, and
+  `https://bioconductor.org/help/package-vignettes/`.
+
+Implementation:
+
+- installed `BiocStyle` vignette executes 26/26 chunks offline except the
+  explicitly unevaluated package-installation chunk;
+- normative manual fixture demonstrates global absence, strict majority,
+  all-MNAR/insufficient exclusion, a feature MNAR in A + complete in B,
+  one-cell condition-minimum rescue, seed provenance, result components, and
+  condition-specific downstream branches without choosing an imputer;
+- deterministic 200-feature public-API example demonstrates two independent
+  automatic cutoffs + quality metadata; manual + automatic figures read only
+  stored profiles and recorded cutoffs;
+- text covers input/pipeline boundaries, arithmetic-mean + majority rationale,
+  count-weighted stacked-density meaning, automatic structured failure,
+  reconciliation, limitations, related Bioconductor tools, and matrix/SE
+  parity; the profile formula remains readable without browser-side MathJax;
+- README + all public/package Rd pages point to `vignette("imputefinder")`;
+  roxygen source + generated Rd remain synchronized;
+- optional BiocStyle image cropping is disabled rather than adding `magick`.
+
+Verification + completion evidence:
+
+- pre-change documentation assertion → expected failure at absent
+  `vignettes/`; `NEWS.md`, vignette metadata, and builder dependencies were
+  absent too;
+- public automatic-example probe across 200/300/400/600 features → both
+  conditions succeed; selected 200-feature fixture cutoffs =
+  `A 10.706691`, `B 13.978929`;
+- direct `rmarkdown` build → 26/26 chunks pass without warnings; Chromium PDF
+  review covered title/TOC, rule table, audit output, complete result table,
+  both profile figures, downstream split, references, and session information;
+  no horizontal overflow; review findings (optional crop dependency, reserved
+  References heading, sparse-fixture caveat, online math rendering) corrected;
+- package-wide source suite → pass (505 existing expectations; runtime
+  unchanged);
+- vignette-bearing source build → pass; tarball contains source + installed
+  R/Rmd/HTML vignette and `NEWS.md`, while excluded development/agent files stay
+  absent;
+- clean tarball install + installed vignette R script + installed examples for
+  `classify_missingness`, `imputefinder_result`, and `plot_missingness` → pass;
+- final `R CMD check --no-manual imputefinder_0.99.1.tar.gz` → status OK,
+  including examples, tests, installed vignette files/dependencies, and
+  vignette re-build;
+- `git diff --check` → pass.
+
+Exact next task after M8c → M9a: consult live official Bioconductor CI guidance
+and maintained action releases; add a minimal matched R/Bioconductor workflow
+that installs dependencies and runs the package test/build/check path; validate
+workflow syntax, permissions, caching, and command parity locally. Preserve
+clean `--as-cran` + `BiocCheck` execution/fixes as M9b-M9c.
 
 Blockers → none.

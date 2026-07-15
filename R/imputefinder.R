@@ -35,6 +35,8 @@
 #' @return An \code{imputefinder_result} containing filtered seed-modified data,
 #'   per-condition classifications and groups, feature audit status, cutoffs,
 #'   explicit missingness profiles, diagnostics, and seed provenance.
+#' @seealso \code{\link{plot_missingness}} and
+#'   \code{vignette("imputefinder")}.
 #' @examples
 #' x <- rbind(
 #'     on_off = c(NA, NA, NA, NA, 15, 16, 15, 17),
