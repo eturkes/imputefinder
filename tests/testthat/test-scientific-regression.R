@@ -50,6 +50,22 @@ test_that("automatic cutoff passes the frozen cliff and permutation gates", {
     expect_identical(automatic_score[["on_off_seed_recall"]], 1)
 
     permutation <- permute_scientific_routine(simulation)
+    permuted_manual <- classify_missingness(
+        simulation$data[
+            permutation$features,
+            permutation$samples,
+            drop = FALSE
+        ],
+        stats::setNames(
+            factor(
+                unname(simulation$groups[permutation$samples]),
+                levels = c("B", "A")
+            ),
+            colnames(simulation$data)[permutation$samples]
+        ),
+        cutoffs = c(B = 12, A = 12),
+        seed = 1L
+    )
     permuted <- classify_missingness(
         simulation$data[
             permutation$features,
@@ -66,6 +82,10 @@ test_that("automatic cutoff passes the frozen cliff and permutation gates", {
         seed = 1L
     )
 
+    expect_identical(
+        canonical_scientific_routine(permuted_manual),
+        canonical_scientific_routine(manual)
+    )
     expect_identical(
         canonical_scientific_routine(permuted),
         canonical_scientific_routine(automatic)

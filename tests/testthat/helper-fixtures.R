@@ -35,6 +35,40 @@ classification_row <- function(result, feature, condition) {
     ]
 }
 
+with_preserved_random_state <- function(code) {
+    caller_kind <- RNGkind()
+    caller_has_seed <- exists(
+        ".Random.seed",
+        envir = globalenv(),
+        inherits = FALSE
+    )
+    if (caller_has_seed) {
+        caller_seed <- get(
+            ".Random.seed",
+            envir = globalenv(),
+            inherits = FALSE
+        )
+    }
+
+    on.exit(
+        {
+            do.call(RNGkind, as.list(caller_kind))
+            if (caller_has_seed) {
+                assign(".Random.seed", caller_seed, envir = globalenv())
+            } else if (exists(
+                ".Random.seed",
+                envir = globalenv(),
+                inherits = FALSE
+            )) {
+                rm(".Random.seed", envir = globalenv())
+            }
+        },
+        add = TRUE
+    )
+
+    force(code)
+}
+
 matrix_input_fixture <- function() {
     x <- matrix(
         c(0, -2, NA, 3, 4, 5),

@@ -20,40 +20,6 @@ rescue_fixture <- function() {
     list(x = x, group = rep(c("A", "B"), each = 2))
 }
 
-with_preserved_random_state <- function(code) {
-    caller_kind <- RNGkind()
-    caller_has_seed <- exists(
-        ".Random.seed",
-        envir = globalenv(),
-        inherits = FALSE
-    )
-    if (caller_has_seed) {
-        caller_seed <- get(
-            ".Random.seed",
-            envir = globalenv(),
-            inherits = FALSE
-        )
-    }
-
-    on.exit(
-        {
-            do.call(RNGkind, as.list(caller_kind))
-            if (caller_has_seed) {
-                assign(".Random.seed", caller_seed, envir = globalenv())
-            } else if (exists(
-                ".Random.seed",
-                envir = globalenv(),
-                inherits = FALSE
-            )) {
-                rm(".Random.seed", envir = globalenv())
-            }
-        },
-        add = TRUE
-    )
-
-    force(code)
-}
-
 test_that("globally absent features are audited, excluded, and never seeded", {
     fixture <- normative_fixture()
 

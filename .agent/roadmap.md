@@ -39,7 +39,7 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [ ] M9c `BiocCheck` findings + hardening gate closure
 - [ ] M10 release-candidate adversarial review
   - [x] M10a public-claim + boundary-case audit
-  - [ ] M10b side-effect + invariance audit
+  - [x] M10b side-effect + invariance audit
   - [ ] M10c performance + release cleanup
 
 ## Session ledger
@@ -1220,3 +1220,47 @@ closing those three M10 checks.
 
 External blocker → Support Site Watched Tags propagation remains the sole M9
 error; it does not block M10b-M10c.
+
+### 2026-07-15 - M10b side effects + invariants
+
+Scope → verify the complete public manual/automatic paths at the process-state
+and final-cell boundaries, then close release-order invariance with canonical
+full-result comparisons.
+
+Adversarial coverage:
+
+- exact snapshots around both classifier paths + stored plot construction cover
+  caller RNG state and kind, every R option, working directory, active graphics
+  device/list, and writable graphics parameters under a non-default RNG kind;
+- one shared RNG-restoration helper now loads with the test fixtures rather than
+  depending on test-file execution order;
+- the frozen automatic scientific fixture is permuted simultaneously by feature
+  order, sample order, condition-block order, named group order, factor-level
+  order, and manual-cutoff name order; canonical manual and automatic results
+  match their baselines across data, states, groups, status, cutoffs,
+  diagnostics, profiles, seed log, and sample-condition mapping;
+- final manual + automatic matrices are compared cell-by-cell with retained
+  input rows: every originally observed value is byte-identical, every changed
+  cell was originally `NA`, and changed coordinates/values equal the retained
+  subset of `seed_log` exactly;
+- no production defect surfaced.
+
+Verification + completion evidence:
+
+- focused RNG/invariance/side-effect suite → pass;
+- package-wide source suite → 88 tests / 542 expectations, 0 failures,
+  warnings, errors, or skips;
+- vignette-bearing source build + source-tarball `R CMD check --as-cran` →
+  status OK, including installed tests and vignette/manual rebuilds;
+- new-package `BiocCheck` → 0 repository-controlled errors/warnings; only the
+  known Support Site propagation error + optional/admin notes;
+- `git diff --check` → pass.
+
+Exact next task → M10c: benchmark a representative 10,000 x 50 matrix with
+stage-level time/allocation evidence, remove dead development artefacts + stale
+comments, resolve the Bioconductor submission-version requirement from current
+official guidance, and close the release-candidate gate if clean-check evidence
+supports it.
+
+External blocker → Support Site Watched Tags propagation remains the sole M9
+error; it does not block M10c.

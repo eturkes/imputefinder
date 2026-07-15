@@ -620,9 +620,9 @@ Gate: clean package checks in CI and locally, with any unavoidable note document
 
 - [x] Review every guarantee in README/Rd/vignette against tests and implementation.
 - [x] Re-test no-missing data, one-class profiles, flat profiles, duplicated means, tiny groups, and all-special-value failures.
-- [ ] Verify no global RNG, options, graphics, or working-directory side effects.
-- [ ] Verify output invariance under row, column, and condition ordering by names.
-- [ ] Verify observed cells never change except logged seed insertions.
+- [x] Verify no global RNG, options, graphics, or working-directory side effects.
+- [x] Verify output invariance under row, column, and condition ordering by names.
+- [x] Verify observed cells never change except logged seed insertions.
 - [ ] Benchmark a representative matrix (for example 10,000 features x 50 samples) for avoidable copying or pathological runtime.
 - [ ] Remove dead development artefacts and stale comments.
 - [ ] Set the first usable development/release version consistently, provisionally `0.1.0` or the Bioconductor-appropriate equivalent.
