@@ -1335,3 +1335,36 @@ of Done items, and declare the first release candidate complete.
 External blocker → Support profile 78003 resolves to Emir Turkes, but the live
 watched-tags API still returned `{"watched_tags": ""}` at 2026-07-15 09:25 UTC.
 Propagation remains the sole M9 / release-candidate gate error.
+
+### 2026-07-15 - M9c watched-tag gate recheck
+
+Scope → re-run the sole external release gate against the current committed
+0.99.2 source and distinguish delayed propagation from an unsaved Support Site
+field. No package implementation change is warranted.
+
+Evidence:
+
+- fresh vignette-bearing `R CMD build .` → pass;
+- unskipped `BiocCheck(..., new-package = TRUE)` → 1 error, 0 warnings,
+  2 optional/admin notes; the Watched Tags requirement remains the only error;
+- the live Support Site endpoint returned `{"watched_tags": ""}` at
+  2026-07-15 09:30 UTC, including a cache-busting query;
+- current deployed-site source returns `user.profile.watched_tags` directly
+  from the account record in this endpoint, and the response carries no cache
+  metadata; continued passive waiting is therefore unsupported by the
+  available evidence;
+- the Support Site had a resolved 2025 defect that erased My Tags/Watched Tags
+  during profile edits, but the present failure cannot be corrected from the
+  repository or without the maintainer's authenticated account.
+
+Exact next task → maintainer reopens the Support Site profile, enters
+`imputefinder` specifically in **Watched Tags**, commits the tag token with
+comma/Enter/Space, saves the complete form, and confirms it persists after a
+reload. Then re-query the public endpoint; once it returns `imputefinder`, run
+the full clean-clone + tarball gates, add fatal `BiocCheckGitClone()` and
+new-package `BiocCheck()` CI steps, validate the workflow, and close M9/M10 +
+the two remaining Definition of Done items.
+
+External blocker → authenticated Support Site profile correction. M9/M10
+remain deliberately open; adding a CI check known to fail would not close the
+release gate.
