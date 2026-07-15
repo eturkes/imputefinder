@@ -34,7 +34,7 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [x] M8b README + runnable public examples
   - [x] M8c vignette + NEWS + documentation gate
 - [ ] M9 CI + Bioconductor hardening
-  - [ ] M9a maintained Bioconductor-aware CI
+  - [x] M9a maintained Bioconductor-aware CI
   - [ ] M9b clean `--as-cran` + `BiocCheck`
   - [ ] M9c hardening findings + gate closure
 - [ ] M10 release-candidate adversarial review
@@ -979,5 +979,71 @@ and maintained action releases; add a minimal matched R/Bioconductor workflow
 that installs dependencies and runs the package test/build/check path; validate
 workflow syntax, permissions, caching, and command parity locally. Preserve
 clean `--as-cran` + `BiocCheck` execution/fixes as M9b-M9c.
+
+Blockers → none.
+
+### 2026-07-15 - M9a Bioconductor-devel CI
+
+Scope → add one maintained, least-privilege package-check workflow matched to
+the live Bioconductor development environment. Submission-grade `--as-cran` and
+`BiocCheck` execution remain M9b-M9c.
+
+Guidance + decisions:
+
+- current official guidance says contributed packages develop against
+  Bioconductor devel; in the current release window that is Bioconductor 3.24
+  on R 4.6;
+- the official `bioconductor/bioconductor_docker:devel` image tracks that pair,
+  supplies Bioconductor build-system dependencies, and approximates the Linux
+  build machine; a floating devel tag is intentional for continuously current
+  CI rather than archival reproducibility;
+- maintained `r-lib/actions` major tag remains `v2`; its check action builds a
+  source tarball before checking it and runs package tests through `R CMD check`;
+- primary guidance:
+  `https://contributions.bioconductor.org/general.html`,
+  `https://contributions.bioconductor.org/use-devel.html`,
+  `https://bioconductor.org/help/docker/`, and
+  `https://github.com/r-lib/actions`.
+
+Implementation:
+
+- `.github/workflows/R-CMD-check.yaml` runs on main pushes, pull requests, and
+  manual dispatch with read-only repository permission + duplicate-run
+  cancellation;
+- one Ubuntu job runs inside the official devel container, exports its live
+  `BIOCONDUCTOR_VERSION` as `R_BIOC_VERSION`, then verifies both
+  `BiocManager::version()` and installed `BiocVersion`; this matters because
+  `pak` otherwise selects the released Bioconductor branch when one R version
+  supports both release and devel;
+- `setup-r-dependencies@v2` installs all declared/check dependencies plus
+  `rcmdcheck` with its maintained package cache; forced Suggests keep vignette
+  and example dependencies mandatory;
+- `check-r-package@v2` builds, tests, and checks the source package with warnings
+  fatal; `--as-cran` remains deliberately deferred until its clean local M9b
+  run;
+- `.github` is explicitly excluded from source packages via `.Rbuildignore`.
+
+Verification + completion evidence:
+
+- red baseline → expected absence of `.github/workflows/R-CMD-check.yaml`;
+- `actionlint` 1.7.12 + independent YAML parse → pass;
+- live refs resolve for `actions/checkout@v6` and all `r-lib/actions@v2`
+  components; official devel container tag resolved to its current multi-arch
+  manifest;
+- package-wide source suite → pass (505 existing expectations);
+- `R CMD build . --no-manual` → pass with vignette build; 486,030-byte source
+  tarball excludes `.github`, `.agent`, `AGENTS.md`, and `PLAN.md`;
+- source-tarball `R CMD check --no-manual` → status OK, including examples,
+  installed tests, dependency analysis, and vignette rebuild;
+- no local container engine is installed; hosted execution necessarily begins
+  after the maintainer pushes, while workflow syntax, references, environment
+  contract, and exact package commands are locally validated.
+
+Exact next task after M9a → M9b: provision the project-local library against
+Bioconductor 3.24, install current `BiocCheck`, then run the unit suite, a clean
+source build, `R CMD check --as-cran`, `BiocCheckGitClone()`, and
+`BiocCheck(..., new-package = TRUE)` under current official check guidance.
+Promote `--as-cran` into CI only after the local gate is clean; carry every
+hardening finding into M9c rather than suppressing it.
 
 Blockers → none.
