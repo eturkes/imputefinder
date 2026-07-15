@@ -594,8 +594,8 @@ Gate: the package has evidence for its central scientific behavior, not only cod
 
 ### M8 - Documentation and package metadata
 
-- [ ] Replace all `DESCRIPTION` placeholders with accurate title, author, description, GPL metadata, URLs, bug tracker, and current Bioconductor fields.
-- [ ] Audit `Imports`, `Suggests`, `biocViews`, and minimum R/Bioconductor versions against current guidance.
+- [x] Replace all `DESCRIPTION` placeholders with accurate title, author, description, GPL metadata, URLs, bug tracker, and current Bioconductor fields.
+- [x] Audit `Imports`, `Suggests`, `biocViews`, and minimum R/Bioconductor versions against current guidance.
 - [ ] Rewrite README with method rationale, installation, minimal example, result interpretation, and limitations.
 - [ ] Add a vignette covering manual and automatic cutoffs, the on/off fixture, plotting, filtering, and per-condition downstream imputation.
 - [ ] Document that input is unnormalised log2 intensity and that classification is heuristic.

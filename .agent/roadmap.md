@@ -30,6 +30,9 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [x] M7b full scientific benchmark + assessment
   - [x] M7c compact routine regressions + gate closure
 - [ ] M8 documentation + package metadata
+  - [x] M8a metadata + package overview
+  - [ ] M8b README + runnable public examples
+  - [ ] M8c vignette + NEWS + documentation gate
 - [ ] M9 CI + Bioconductor hardening
 - [ ] M10 release-candidate adversarial review
 
@@ -789,5 +792,59 @@ guidance, then replace `DESCRIPTION` identity/licence placeholders, audit runtim
 and suggested dependencies + minimum platform fields + `biocViews`, and add the
 package-level documentation needed to make that metadata checkable. Keep the
 README/vignette workflow rewrite as the next cohesive documentation slice.
+
+Blockers → none.
+
+### 2026-07-15 - M8a Bioconductor metadata + package overview
+
+Scope → replace scaffold identity/licence metadata, align the declared platform
+with the current Bioconductor release, and add an installed package overview.
+README workflow prose, runnable examples, vignette, and NEWS remain M8b-M8c.
+
+Guidance + decisions:
+
+- current official DESCRIPTION guidance inspected 2026-07-15 requires a
+  three-sentence functional description, one active `Authors@R` maintainer,
+  Bioconductor submission version `0.99.0`, and at least two valid same-branch
+  `biocViews`; Bioconductor 3.23 is paired with R 4.6;
+- `DESCRIPTION` now identifies Emir Turkes via the repository's durable contact,
+  uses a behavior-bounded title/description, declares `GPL (>= 3)` to match the
+  tracked version-3-or-later source headers + `COPYING`, and links the source +
+  issue tracker;
+- Software views = `MassSpectrometry`, `Proteomics`, `Preprocessing`; `Software`
+  records package type. `Depends: R (>= 4.6.0)` targets the current platform;
+- runtime audit retains namespace-used `SummarizedExperiment`, `ggplot2`, and
+  `methods`; `Suggests` currently contains only test-used `testthat`. Vignette
+  dependencies enter with the vignette rather than becoming speculative
+  metadata;
+- new roxygen package help states the unnormalised-log2 input contract,
+  heuristic likely-MNAR/MAR interpretation, audit evidence, and boundary before
+  external normalisation/imputation.
+
+Primary guidance:
+
+- `https://contributions.bioconductor.org/description.html`
+- `https://contributions.bioconductor.org/license.html`
+- `https://bioconductor.org/about/release-announcements/`
+
+Verification + completion evidence:
+
+- pre-change source-tarball check → expected single WARNING for the scaffold
+  non-standard licence string;
+- package-wide source suite → 505/505 expectations pass;
+- roxygen generation + internal DESCRIPTION validation → pass;
+- source build + project-local install → pass; installed version, GPL metadata,
+  maintainer, and `imputefinder-package` help smoke → pass;
+- final source-tarball `R CMD check --no-manual --no-build-vignettes` → status
+  OK, including installed tests, dependency analysis, namespace, code, and Rd;
+  examples/vignette remain intentionally absent until M8b-M8c;
+- `git diff --check` → pass.
+
+Exact next task after M8a → M8b: increment the Bioconductor development patch
+version; replace the README scaffold with rationale, Bioconductor/development
+installation, an offline normative-fixture walkthrough, result interpretation,
+automatic/manual cutoff guidance, seed provenance, downstream pipeline order,
+and evidence-bounded limitations; add compact runnable examples to the public
+Rd pages and verify installed examples. Keep the full vignette + NEWS for M8c.
 
 Blockers → none.

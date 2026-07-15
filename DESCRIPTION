@@ -1,12 +1,26 @@
 Package: imputefinder
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Title: Condition-Aware Missingness Classification for Proteomics
+Version: 0.99.0
+Authors@R:
+    person("Emir", "Turkes", email = "emir.turkes@eturkes.com",
+           role = c("aut", "cre", "cph"))
+Description: Classifies protein-intensity missingness independently within
+    experimental conditions while preserving biologically plausible
+    condition-specific on/off features. ImputeFinder distinguishes likely
+    missing-not-at-random (MNAR) blocks from likely missing-at-random (MAR) or
+    complete blocks using condition-specific intensity profiles, automatic or
+    manual cutoffs, and strict-majority evidence. It accepts unnormalised log2
+    quantitative-proteomics intensities in ordinary matrices or
+    SummarizedExperiment objects and returns filtered, seed-modified data with
+    auditable classifications, cutoff diagnostics, and seed provenance for
+    downstream normalisation and imputation.
+License: GPL (>= 3)
 Encoding: UTF-8
+URL: https://github.com/eturkes/imputefinder
+BugReports: https://github.com/eturkes/imputefinder/issues
+biocViews: MassSpectrometry, Proteomics, Preprocessing, Software
+Depends:
+    R (>= 4.6.0)
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports:
