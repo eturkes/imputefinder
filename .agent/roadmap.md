@@ -35,8 +35,8 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [x] M8c vignette + NEWS + documentation gate
 - [ ] M9 CI + Bioconductor hardening
   - [x] M9a maintained Bioconductor-aware CI
-  - [ ] M9b clean `--as-cran` + `BiocCheck`
-  - [ ] M9c hardening findings + gate closure
+  - [x] M9b submission checks + clean `--as-cran`
+  - [ ] M9c `BiocCheck` findings + hardening gate closure
 - [ ] M10 release-candidate adversarial review
 
 ## Session ledger
@@ -1047,3 +1047,61 @@ Promote `--as-cran` into CI only after the local gate is clean; carry every
 hardening finding into M9c rather than suppressing it.
 
 Blockers → none.
+
+### 2026-07-15 - M9b submission checks + clean `--as-cran`
+
+Scope → execute the current official new-package check sequence on
+Bioconductor devel, make the full source-tarball CRAN check locally executable,
+and promote its clean mode into CI. Repository-controlled `BiocCheck` findings
+remain the cohesive M9c hardening scope.
+
+Guidance + environment:
+
+- current official guidance requires Bioconductor devel plus `R CMD build`,
+  `R CMD check`, `BiocCheckGitClone()`, and
+  `BiocCheck(..., \`new-package\` = TRUE)`; errors and warnings must be cleared
+  and notes addressed or justified;
+- upgraded the ignored project library from Bioconductor 3.23 to 3.24 on R
+  4.6 and installed matching `BiocCheck` 1.49.29; `BiocManager::valid()` reports
+  a valid installation;
+- installed self-contained TinyTeX + required Courier/MakeIndex components and
+  HTML Tidy under `.agent/`; neither host state nor user PATH was changed;
+- primary guidance:
+  `https://contributions.bioconductor.org/general.html`,
+  `https://bioconductor.org/packages/devel/bioc/html/BiocCheck.html`, and
+  `https://yihui.org/tinytex/`.
+
+Verification + findings:
+
+- package-wide source suite on Bioconductor 3.24 → pass (505 expectations);
+- vignette-bearing `R CMD build .` → pass;
+- source-tarball `R CMD check --as-cran` with PDF + HTML manuals enabled →
+  0 errors, 0 warnings, 1 unavoidable NOTE (`New submission`); examples, tests,
+  vignettes, manual PDF, and HTML validation pass;
+- `BiocCheckGitClone()` on a clean local clone → 0 errors, 0 warnings,
+  0 notes;
+- `BiocCheck(..., new-package = TRUE)` on the source tarball → 1 error,
+  1 warning, 9 notes:
+  - external error: maintainer Support Site profile does not watch the
+    `imputefinder` tag;
+  - code warning: one locally scoped `set.seed()` call; implementation restores
+    the caller RNG exactly, but the static check still requires resolution;
+  - actionable review notes: consider `Classification` biocView; simplify six
+    condition-message constructions + one redundant signal; review two
+    warning suppressions, 12 functions over 50 lines, and formatting findings;
+  - metadata notes requiring maintainer facts/actions rather than invention:
+    ORCID, optional funder role, optional publication-backed `CITATION`, and
+    unverifiable bioc-devel subscription;
+- CI now runs `R CMD check --as-cran` with warnings fatal;
+- generated check/tool directories are ignored uniformly via `.agent/*/` and
+  `*.BiocCheck/`.
+
+Exact next task after M9b → M9c: test-drive removal of the `set.seed()`
+warning while preserving uniform rescue selection, exact local-RNG behavior,
+and all name-order invariants; resolve every repository-controlled BiocCheck
+finding, audit licence/line endings/generated docs/file sizes, then rerun the
+clean clone + tarball checks. Add BiocCheck to CI only after that gate is clean.
+
+External blocker → maintainer must add `imputefinder` to Watched Tags at
+`https://support.bioconductor.org/accounts/edit/profile`; the full unskipped
+new-package check cannot report zero errors until the account state changes.

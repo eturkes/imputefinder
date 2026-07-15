@@ -608,8 +608,8 @@ Gate: a user with no thesis can understand and correctly use the package from in
 ### M9 - CI and Bioconductor hardening
 
 - [x] Add current R package CI using maintained actions and an appropriate Bioconductor environment.
-- [ ] Run unit tests, `R CMD build`, and `R CMD check --as-cran` from a clean source tarball.
-- [ ] Run `BiocCheck` using current official guidance.
+- [x] Run unit tests, `R CMD build`, and `R CMD check --as-cran` from a clean source tarball.
+- [x] Run `BiocCheck` using current official guidance.
 - [ ] Fix all errors and warnings; resolve actionable notes rather than suppressing them.
 - [ ] Verify licence files, line endings, generated documentation, file sizes, examples, and vignette build.
 - [ ] Add code coverage only if it improves diagnosis without adding fragile infrastructure.
