@@ -297,9 +297,11 @@ intensity-dependent MNAR, on/off features, group sizes 4, 8, and 20,
 condition-specific cutoffs, rescue seeds, and named permutations. The [cutoff
 validation
 report](https://github.com/eturkes/imputefinder/blob/main/dev/cutoff-validation.md)
-records the automatic-method comparison and failure criteria. These synthetic
-results support the tested behavior; they are not a claim of performance on
-every proteomics dataset.
+records the automatic-method comparison and failure criteria. The
+[release-candidate performance report](https://github.com/eturkes/imputefinder/blob/main/dev/performance-validation.md)
+records the deterministic 10,000-feature, 50-sample runtime and allocation
+gate. These synthetic results support the tested behavior; they are not a
+claim of performance on every proteomics dataset.
 
 The normative behavior and release gates are maintained in
 [PLAN.md](https://github.com/eturkes/imputefinder/blob/main/PLAN.md).

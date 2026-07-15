@@ -66,9 +66,9 @@ The first release does not need:
 
 Keep these as future work, not reasons to delay a correct classifier.
 
-## 4. Current baseline and defects to replace
+## 4. Reviewed baseline and defects replaced
 
-The current repository is a partial prototype, not a safe base for incremental patching without tests.
+The repository at baseline commit `50c8154` was a partial prototype, not a safe base for incremental patching without tests. The milestone ledger records the tested replacements.
 
 Known baseline defects:
 
@@ -623,9 +623,9 @@ Gate: clean package checks in CI and locally, with any unavoidable note document
 - [x] Verify no global RNG, options, graphics, or working-directory side effects.
 - [x] Verify output invariance under row, column, and condition ordering by names.
 - [x] Verify observed cells never change except logged seed insertions.
-- [ ] Benchmark a representative matrix (for example 10,000 features x 50 samples) for avoidable copying or pathological runtime.
-- [ ] Remove dead development artefacts and stale comments.
-- [ ] Set the first usable development/release version consistently, provisionally `0.1.0` or the Bioconductor-appropriate equivalent.
+- [x] Benchmark a representative matrix (for example 10,000 features x 50 samples) for avoidable copying or pathological runtime.
+- [x] Remove dead development artefacts and stale comments.
+- [x] Set the usable Bioconductor prerelease version to `0.99.2`; Bioconductor promotes the `0.99.z` series to `1.0.0` at release.
 
 Gate: all Definition of Done items pass from a fresh checkout and clean library.
 
@@ -819,25 +819,25 @@ Codex must consult current official R/Bioconductor documentation when choosing v
 
 The work is complete only when all of the following are true:
 
-- [ ] The fully missing-condition rescue behavior is implemented exactly and audited.
-- [ ] Globally absent features are never rescued.
-- [ ] State is calculated per feature per condition and retained in output.
-- [ ] Complete, MNAR, MAR, and insufficient semantics match Section 5.3.
-- [ ] Majority is derived from each condition size.
-- [ ] Cross-condition reconciliation works for arbitrary condition counts.
-- [ ] All-MNAR features are excluded.
-- [ ] Condition-specific output supports separate downstream MAR/MNAR imputation.
-- [ ] Manual cutoffs work and automatic cutoffs satisfy Section 11.
-- [ ] No algorithm reads data back from a ggplot build object.
-- [ ] No missing/undefined namespace symbols remain.
-- [ ] Input data and global RNG state are unchanged.
-- [ ] Observed values are unchanged except for explicitly logged seeds in returned data.
-- [ ] Output order and named results are stable under input permutation.
-- [ ] The normative fixture and all required tests pass.
-- [ ] README, Rd help, and vignette are sufficient without thesis access.
-- [ ] Runtime dependencies are minimal and justified.
+- [x] The fully missing-condition rescue behavior is implemented exactly and audited.
+- [x] Globally absent features are never rescued.
+- [x] State is calculated per feature per condition and retained in output.
+- [x] Complete, MNAR, MAR, and insufficient semantics match Section 5.3.
+- [x] Majority is derived from each condition size.
+- [x] Cross-condition reconciliation works for arbitrary condition counts.
+- [x] All-MNAR features are excluded.
+- [x] Condition-specific output supports separate downstream MAR/MNAR imputation.
+- [x] Manual cutoffs work and automatic cutoffs satisfy Section 11.
+- [x] No algorithm reads data back from a ggplot build object.
+- [x] No missing/undefined namespace symbols remain.
+- [x] Input data and global RNG state are unchanged.
+- [x] Observed values are unchanged except for explicitly logged seeds in returned data.
+- [x] Output order and named results are stable under input permutation.
+- [x] The normative fixture and all required tests pass.
+- [x] README, Rd help, and vignette are sufficient without thesis access.
+- [x] Runtime dependencies are minimal and justified.
 - [ ] `R CMD check --as-cran`, package examples, vignette build, and `BiocCheck` pass from a clean checkout.
-- [ ] Claims in documentation do not exceed repository evidence.
+- [x] Claims in documentation do not exceed repository evidence.
 - [ ] `.agent/roadmap.md` contains no unresolved P0/P1 item for this release.
 
 ## 16. Deferred roadmap after first correct release

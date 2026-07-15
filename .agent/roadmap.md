@@ -40,7 +40,7 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
 - [ ] M10 release-candidate adversarial review
   - [x] M10a public-claim + boundary-case audit
   - [x] M10b side-effect + invariance audit
-  - [ ] M10c performance + release cleanup
+  - [x] M10c performance + release cleanup
 
 ## Session ledger
 
@@ -1264,3 +1264,71 @@ supports it.
 
 External blocker → Support Site Watched Tags propagation remains the sole M9
 error; it does not block M10c.
+
+### 2026-07-15 - M10c performance + release cleanup
+
+Scope → benchmark the full public paths at representative release scale, audit
+tracked artefact/comment provenance, and resolve the first release version from
+current Bioconductor policy.
+
+Version + cleanup decisions:
+
+- current official policy requires new submissions to use `0.99.0`, increment
+  `z` during development, and lets Bioconductor promote `0.99.z` to `1.0.0` at
+  release; the release candidate is therefore `0.99.2`, not `0.1.0`;
+- primary guidance:
+  `https://contributions.bioconductor.org/versionnum.html`,
+  `https://contributions.bioconductor.org/description.html`, and
+  `https://contributions.bioconductor.org/git-version-control.html`;
+- NEWS now separates dated 0.99.2/0.99.1 entries and renders through installed
+  `utils::news()`; its first multi-version render exposed and corrected the
+  previously latent undated-heading failure;
+- tracked provenance audit retained all three development harness families:
+  M5 candidate comparator + cutoff protocol, M7 scientific protocol, and M10
+  performance gate all remain executable evidence and stay outside the source
+  tarball; no dead tracked artefact was found;
+- stale present-tense prototype wording in `PLAN.md` and the historical M7
+  package-warning sentence now identify their exact baseline/milestone scope;
+  copyright provenance, RStudio package config, canonical plan/agent ledger,
+  frozen rejected comparator, and historical benchmark versions remain factual.
+
+Performance evidence:
+
+- `dev/performance-validation.R` SHA-256
+  `74c53ccaf0f0c400693ac76607c575f686012c5b3980ae4d758a5dc4893fc2c2`;
+  fixture + six gates were frozen before first execution;
+- deterministic 10,000 x 50 matrix = five ten-sample conditions, known cliffs,
+  5% background missingness, and 200 structural off blocks;
+- manual/automatic median elapsed = `.139/.178` s; cumulative allocation =
+  `204.4/299.7` MiB (`45.37x/66.53x` input); largest allocation = `3.81` MiB
+  (`.85x`); result = `21.19/21.25` MiB (`4.70x/4.72x`); process high-water
+  RSS <=`172.32` MiB; automatic maximum cutoff error = `.282`;
+- all predeclared runtime, allocation, result-size, RSS, cutoff, unchanged-input,
+  and seed-only-cell-change gates pass; no performance refactor is justified.
+
+Verification + completion evidence:
+
+- M5 cutoff + M7 scientific frozen-protocol verification → pass with unchanged
+  manifests;
+- package-wide source suite → 88 tests / 542 expectations, 0 failures,
+  warnings, errors, or skips;
+- installed version + dated NEWS rendering → pass at `0.99.2`;
+- vignette-bearing source build → pass; 489,720-byte tarball excludes every
+  development/agent/check/CI artefact;
+- source-tarball `R CMD check --as-cran` → status OK, including examples,
+  installed tests, vignette rebuild, and PDF/HTML manuals;
+- new-package `BiocCheck` → 0 repository-controlled errors/warnings; known
+  Support Site propagation error + optional/admin notes only;
+- no tracked CR bytes; `git diff --check` → pass.
+
+M10 work items are complete. Its release-candidate gate remains open only
+because Definition of Done includes the externally gated M9 `BiocCheck`/CI
+closure.
+
+Exact next task → when the Support Site API exposes the watched `imputefinder`
+tag, rerun unskipped new-package `BiocCheck`; then add fatal Git-clone + tarball
+BiocCheck gates to CI, validate them, close M9/M10 + the two remaining Definition
+of Done items, and declare the first release candidate complete.
+
+External blocker → Support Site Watched Tags propagation remains the sole M9 /
+release-candidate gate error.

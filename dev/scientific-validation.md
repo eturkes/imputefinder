@@ -319,6 +319,6 @@ Both cases retain every eligible on/off feature and rescue every structural off
 block. Automatic-minus-manual MNAR/retention F1 = `-.00385/-.00082`; the full
 canonical automatic result is exact after the frozen even/odd-feature,
 B-first/reversed-sample permutation. All 16 routine expectations, 505 package
-expectations, protocol verification, build, and source-tarball tests pass. The
-only package-check warning is the pre-existing licence placeholder assigned to
-M8. M7 is closed.
+expectations, protocol verification, build, and source-tarball tests passed. At
+M7c closure, the only package-check warning was the licence placeholder assigned
+to M8. M7 is closed.
