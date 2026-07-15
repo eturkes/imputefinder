@@ -12,6 +12,17 @@ utils::globalVariables(c("intensity", "mean_intensity", "missing_proportion"))
 #' @return A \code{ggplot} object. A recorded cutoff is shown as a vertical
 #'   line; bottom ticks identify seeded feature-condition blocks. Stored profile
 #'   and cutoff warnings appear in the caption.
+#' @examples
+#' x <- rbind(
+#'     on_off = c(NA, NA, NA, NA, 15, 16, 15, 17),
+#'     mar = c(14, 15, NA, 16, 14, NA, 15, 16),
+#'     low_anchor = c(8, NA, NA, NA, 14, 15, 16, 17)
+#' )
+#' colnames(x) <- paste0("sample", seq_len(ncol(x)))
+#' group <- rep(c("A", "B"), each = 4)
+#' fit <- classify_missingness(x, group, cutoffs = c(A = 12, B = 12))
+#'
+#' plot_missingness(fit, "A")
 #'
 #' @export
 plot_missingness <- function(result, condition) {

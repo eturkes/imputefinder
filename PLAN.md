@@ -596,10 +596,10 @@ Gate: the package has evidence for its central scientific behavior, not only cod
 
 - [x] Replace all `DESCRIPTION` placeholders with accurate title, author, description, GPL metadata, URLs, bug tracker, and current Bioconductor fields.
 - [x] Audit `Imports`, `Suggests`, `biocViews`, and minimum R/Bioconductor versions against current guidance.
-- [ ] Rewrite README with method rationale, installation, minimal example, result interpretation, and limitations.
+- [x] Rewrite README with method rationale, installation, minimal example, result interpretation, and limitations.
 - [ ] Add a vignette covering manual and automatic cutoffs, the on/off fixture, plotting, filtering, and per-condition downstream imputation.
-- [ ] Document that input is unnormalised log2 intensity and that classification is heuristic.
-- [ ] Document seed provenance and pipeline order before normalisation/imputation.
+- [x] Document that input is unnormalised log2 intensity and that classification is heuristic.
+- [x] Document seed provenance and pipeline order before normalisation/imputation.
 - [ ] Add package-level help and `NEWS.md`.
 - [ ] Ensure every example runs offline or is explicitly non-evaluated for optional downstream packages.
 
@@ -696,11 +696,11 @@ At minimum, tests must cover the following behavior.
 ### Package tests
 
 - [x] fresh-session namespace contains every called symbol;
-- [ ] examples run;
+- [x] examples run;
 - [ ] vignette builds;
 - [x] matrix and `SummarizedExperiment` core results are equivalent;
 - [x] result print/summary methods are concise and accurate;
-- [ ] source tarball check is clean.
+- [x] source tarball check is clean.
 
 ## 11. Automatic cutoff validation protocol
 

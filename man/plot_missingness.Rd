@@ -22,3 +22,16 @@ Plot the count-weighted proportion of features with missing observations for
 one condition. The curve is read directly from the profile stored in
 \code{result}; the input data and classifications are not recomputed.
 }
+\examples{
+x <- rbind(
+    on_off = c(NA, NA, NA, NA, 15, 16, 15, 17),
+    mar = c(14, 15, NA, 16, 14, NA, 15, 16),
+    low_anchor = c(8, NA, NA, NA, 14, 15, 16, 17)
+)
+colnames(x) <- paste0("sample", seq_len(ncol(x)))
+group <- rep(c("A", "B"), each = 4)
+fit <- classify_missingness(x, group, cutoffs = c(A = 12, B = 12))
+
+plot_missingness(fit, "A")
+
+}

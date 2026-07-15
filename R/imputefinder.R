@@ -35,6 +35,24 @@
 #' @return An \code{imputefinder_result} containing filtered seed-modified data,
 #'   per-condition classifications and groups, feature audit status, cutoffs,
 #'   explicit missingness profiles, diagnostics, and seed provenance.
+#' @examples
+#' x <- rbind(
+#'     on_off = c(NA, NA, NA, NA, 15, 16, 15, 17),
+#'     mar = c(14, 15, NA, 16, 14, NA, 15, 16),
+#'     low_anchor = c(8, NA, NA, NA, 14, 15, 16, 17)
+#' )
+#' colnames(x) <- paste0("sample", seq_len(ncol(x)))
+#' group <- rep(c("A", "B"), each = 4)
+#'
+#' fit <- classify_missingness(
+#'     x,
+#'     group = group,
+#'     cutoffs = c(A = 12, B = 12)
+#' )
+#' fit
+#' fit$feature_status
+#' fit$groups$A
+#' fit$seed_log
 #'
 #' @export
 classify_missingness <- function(

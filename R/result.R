@@ -166,6 +166,18 @@
 #' @seealso \code{\link{classify_missingness}},
 #'   \code{\link{plot_missingness}}
 #' @name imputefinder_result
+#' @examples
+#' x <- rbind(
+#'     on_off = c(NA, NA, NA, NA, 15, 16, 15, 17),
+#'     mar = c(14, 15, NA, 16, 14, NA, 15, 16),
+#'     low_anchor = c(8, NA, NA, NA, 14, 15, 16, 17)
+#' )
+#' colnames(x) <- paste0("sample", seq_len(ncol(x)))
+#' group <- rep(c("A", "B"), each = 4)
+#' fit <- classify_missingness(x, group, cutoffs = c(A = 12, B = 12))
+#'
+#' fit
+#' summary(fit)
 NULL
 
 #' @rdname imputefinder_result

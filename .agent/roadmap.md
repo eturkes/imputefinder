@@ -31,7 +31,7 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [x] M7c compact routine regressions + gate closure
 - [ ] M8 documentation + package metadata
   - [x] M8a metadata + package overview
-  - [ ] M8b README + runnable public examples
+  - [x] M8b README + runnable public examples
   - [ ] M8c vignette + NEWS + documentation gate
 - [ ] M9 CI + Bioconductor hardening
 - [ ] M10 release-candidate adversarial review
@@ -846,5 +846,60 @@ installation, an offline normative-fixture walkthrough, result interpretation,
 automatic/manual cutoff guidance, seed provenance, downstream pipeline order,
 and evidence-bounded limitations; add compact runnable examples to the public
 Rd pages and verify installed examples. Keep the full vignette + NEWS for M8c.
+
+Blockers → none.
+
+### 2026-07-15 - M8b README + runnable public examples
+
+Scope → make the complete public workflow understandable without thesis access,
+add executable help examples, and advance the Bioconductor development version.
+The full vignette + NEWS remain M8c.
+
+Guidance + implementation:
+
+- current official Bioconductor README/install guidance confirms
+  `BiocManager::install()` for repository packages and `owner/repository`
+  GitHub development installs; README identifies the latter as current and the
+  former as available only after acceptance;
+- version advances `0.99.0` → `0.99.1` as the next Bioconductor development
+  patch;
+- README now explains condition-specific MAR/MNAR rationale, exact four-state +
+  reconciliation rules, the normative on/off fixture, input assumptions,
+  one-cell condition-minimum rescue, local seed provenance, result components,
+  manual/automatic cutoff evidence + failure, matrix/SE routing, downstream
+  normalisation/imputation order, limitations, and evidence boundaries;
+- source-tarball-safe canonical links expose the tracked M5/M7 reports + plan;
+- compact manual-cutoff examples on classifier, result, and plot help pages all
+  exercise rescue + condition groups offline; roxygen-generated Rd stays synced;
+- direct plot-example verification produces `Rplots.pdf`; the exact generated
+  filename is now ignored and the working tree remains artefact-free;
+- no runtime or suggested dependency was added.
+
+Primary guidance:
+
+- `https://contributions.bioconductor.org/readme.html`
+- `https://bioconductor.org/install/`
+- `https://bioconductor.github.io/BiocManager/reference/install.html`
+
+Verification + completion evidence:
+
+- pre-change acceptance audit → version `0.99.0`, six required README concepts
+  absent, and no public Rd example blocks;
+- project-local install + direct installed `example()` calls for
+  `classify_missingness`, `imputefinder_result`, and `plot_missingness` → pass;
+- package-wide source suite → 505/505 expectations pass;
+- Pandoc → standalone HTML → Chromium PDF → six rendered pages inspected;
+  headings, tables, code, links, and page flow remain legible with no overflow;
+- `R CMD build . --no-manual --no-build-vignettes` → pass;
+- source-tarball `R CMD check --no-manual --no-build-vignettes` → status OK,
+  including examples, installed tests, dependencies, namespace, code, and Rd;
+- `git diff --check` → pass.
+
+Exact next task after M8b → M8c: consult current official Bioconductor vignette
+and NEWS guidance; add one installed vignette covering manual + automatic cutoffs,
+the on/off fixture, stored plotting evidence, filtering, seed provenance, and
+condition-specific downstream branches; add `NEWS.md`, finish public/package
+help cross-links, run the vignette/examples from a clean source tarball, and
+close the M8 documentation gate.
 
 Blockers → none.
