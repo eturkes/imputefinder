@@ -38,6 +38,9 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [x] M9b submission checks + clean `--as-cran`
   - [ ] M9c `BiocCheck` findings + hardening gate closure
 - [ ] M10 release-candidate adversarial review
+  - [x] M10a public-claim + boundary-case audit
+  - [ ] M10b side-effect + invariance audit
+  - [ ] M10c performance + release cleanup
 
 ## Session ledger
 
@@ -1163,3 +1166,57 @@ provided.
 External blocker → Support Site Watched Tags propagation; checker still reports
 the tag absent as of the final local run despite the maintainer's completed
 profile update.
+
+### 2026-07-15 - M10a public guarantees + boundary cases
+
+Scope → audit every README, Rd, and vignette guarantee against implementation
+and tests; re-run all named release-boundary cases. M9's Support Site lookup
+remains external and does not block independent M10 work.
+
+Findings + corrections:
+
+- pre-reconciliation rescue provenance intentionally includes anchors on
+  features later dropped, while filtered `data` contains anchors only for
+  retained features; README/vignette now state both halves and a public
+  regression locks the audit behavior;
+- complete-only conditions need no cutoff, so vignette automatic-failure text
+  now distinguishes that case from missing-only/flat/sparse/ambiguous failures;
+- input-order reproducibility is scoped to a fixed named dataset + seed, and
+  globally absent blocks are excluded from the state-table guarantee;
+- one- and two-sample condition tests lock the normative post-rescue result:
+  a seeded one-sample block becomes complete, while one of two observations is
+  MNAR below the cutoff and insufficient on its MAR side;
+- public-path regressions now reject `NaN`, `Inf`, `-Inf`, and conditions with
+  no finite pre-seed minimum;
+- first rebuilt tarball exposed a root `imputefinder.BiocCheck/` leak despite a
+  stale M9 audit claim; `.Rbuildignore` now excludes all `.BiocCheck` outputs,
+  and the rebuilt tarball contains no local check/tool artefact.
+
+Claim-family evidence → input/routing (`test-input`, `test-summarizedexperiment`);
+rescue/provenance (`test-seeding`, `test-reconciliation`); four states +
+reconciliation (`test-classification*`, `test-reconciliation`); stored profile,
+automatic/manual cutoffs, structured failure, and plotting (`test-profile`,
+`test-cutoff-*`, `test-plot`); result/representation/order (`test-result`,
+`test-representation-order`); evidence bounds (`dev/*-validation.md` + routine
+scientific regressions). No other implementation/claim mismatch found.
+
+Verification + completion evidence:
+
+- package-wide source suite → 86 tests / 528 expectations, 0 failures,
+  warnings, errors, or skips;
+- vignette-bearing source build → pass;
+- source-tarball `R CMD check --as-cran` → status OK, including examples,
+  installed tests, vignette rebuild, PDF manual, and HTML manual;
+- tarball content audit → no `.agent`, Git, `Rcheck`, or `BiocCheck` artefacts;
+- `BiocCheck(..., new-package = TRUE)` → 0 repository-controlled errors or
+  warnings; known Support Site propagation error + optional/admin notes only;
+- `git diff --check` → pass.
+
+Exact next task → M10b: adversarially snapshot caller RNG state/kind, options,
+graphics devices/parameters, and working directory around the complete public
+manual + automatic paths; prove named row/column/condition-order invariance and
+observed-cell integrity at the final result boundary, correcting any gap before
+closing those three M10 checks.
+
+External blocker → Support Site Watched Tags propagation remains the sole M9
+error; it does not block M10b-M10c.

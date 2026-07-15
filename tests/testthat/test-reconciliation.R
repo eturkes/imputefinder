@@ -244,6 +244,30 @@ test_that("an all-ineligible result preserves samples and audit rows", {
     expect_true(all(!result$classifications$retained))
 })
 
+test_that("seed provenance retains rescues on features later dropped", {
+    x <- rbind(
+        rescued_then_dropped = c(NA, NA, NA, NA, 9, NA, NA, NA),
+        support = rep(8, 8)
+    )
+    colnames(x) <- paste0("s", seq_len(ncol(x)))
+
+    result <- classify_missingness(
+        x,
+        rep(c("A", "B"), each = 4L),
+        cutoffs = c(A = 10, B = 10)
+    )
+
+    expect_identical(result$seed_log$feature, "rescued_then_dropped")
+    expect_identical(result$seed_log$condition, "A")
+    expect_false(result$seed_log$feature %in% rownames(result$data))
+    expect_identical(
+        result$feature_status$drop_reason[
+            result$feature_status$feature == "rescued_then_dropped"
+        ],
+        "MNAR_all_conditions"
+    )
+})
+
 test_that("public SummarizedExperiment and matrix classifications agree", {
     skip_if_not_installed("SummarizedExperiment")
     fixture <- normative_fixture()

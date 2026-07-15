@@ -48,12 +48,12 @@ biological condition and absent throughout another. That condition-specific
 on/off pattern can be informative, but a single global label obscures it.
 
 ImputeFinder addresses this boundary of the workflow. It takes unnormalised
-log2 protein intensities, assigns a state to every feature-condition block,
-filters features without adequate evidence, and returns the data and audit
-trail needed for downstream processing. The labels mean **likely MAR** and
-**likely MNAR** under an intensity-cutoff heuristic; they do not establish the
-true causal missingness mechanism. ImputeFinder neither normalises nor imputes
-values.
+log2 protein intensities, assigns a state to every non-globally-absent
+feature-condition block, filters features without adequate evidence, and
+returns the data and audit trail needed for downstream processing. The labels
+mean **likely MAR** and **likely MNAR** under an intensity-cutoff heuristic;
+they do not establish the true causal missingness mechanism. ImputeFinder
+neither normalises nor imputes values.
 
 Bioconductor packages such as
 [`DEP`](https://bioconductor.org/packages/DEP),
@@ -187,7 +187,8 @@ fit$classifications[
     quality evidence, and warnings.
 - `profiles` - raw feature statistics, explicit density grid, and smoothing
     metadata.
-- `seed_log` - complete provenance for each artificial rescue anchor.
+- `seed_log` - complete provenance for each artificial pre-filter rescue
+    anchor, including anchors on features later dropped.
 - `groups_by_sample` - aligned condition label for every output sample.
 - `call` - matched classifier call for provenance.
 
@@ -286,16 +287,18 @@ plot_missingness(automatic_fit, "A")
 
 An automatic estimate is returned only when total evidence, class evidence,
 profile support, a descending trend, and a credible transition all pass the
-detector's checks. Flat, one-class, sparse, or ambiguous profiles raise a
-condition-specific `imputefinder_cutoff_error` with the profile and diagnostic
-attached. Inspect that evidence and supply a named manual cutoff; a failed
-automatic call is not permission to invent an endpoint.
+detector's checks. When a cutoff is required, flat, missing-only, sparse, or
+ambiguous profiles raise a condition-specific `imputefinder_cutoff_error` with
+the profile and diagnostic attached. Complete-only conditions need no cutoff.
+Inspect failure evidence and supply a named manual cutoff; a failed automatic
+call is not permission to invent an endpoint.
 
 # Filtered data and downstream branches
 
-`fit$data` contains only retained features and includes every logged rescue
-anchor. `fit$groups` divides those rows independently within each condition
-into `MNAR`, `MAR`, `complete`, and the combined `MAR_or_complete` group.
+`fit$data` contains only retained features and includes their logged rescue
+anchors. `seed_log` also audits pre-filter rescues on features later dropped.
+`fit$groups` divides the retained rows independently within each condition into
+`MNAR`, `MAR`, `complete`, and the combined `MAR_or_complete` group.
 
 The intended order is:
 

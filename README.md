@@ -2,8 +2,9 @@
 
 ImputeFinder classifies quantitative-proteomics missingness independently in
 each experimental condition. It preserves plausible condition-specific on/off
-proteins, filters blocks without enough evidence for downstream imputation, and
-returns the modified data together with the evidence behind every decision.
+proteins, drops features whose condition blocks lack enough evidence for
+downstream imputation, and returns the modified data together with the evidence
+behind every decision.
 
 The package expects **unnormalised log2 protein intensities**. It classifies and
 prepares data; it does not normalise or impute them.
@@ -151,9 +152,11 @@ fit$seed_log
 ```
 
 The seed is a low-value anchor for classification, not an imputation result.
-Sampling is reproducible by feature, condition, and sample name; the default is
+For a fixed dataset and seed, stable feature, condition, and sample-name order
+makes sampling invariant to input row and column order; the default is
 `seed = 1L`. The function uses a local RNG scope, so it leaves the caller's RNG
-state unchanged. All originally observed values are preserved exactly.
+state unchanged. The input remains unchanged, and originally observed values
+on retained features are preserved exactly.
 
 ## Manual and automatic cutoffs
 
@@ -214,7 +217,7 @@ is the recorded cutoff.
 | `cutoffs` | Named condition-specific numeric cutoffs |
 | `cutoff_diagnostics` | Manual, automatic, or not-needed source; method metadata; quality evidence; warnings |
 | `profiles` | Raw feature statistics and the explicit density grid for each condition |
-| `seed_log` | Feature, condition, selected sample, old value, inserted value, and seed for every rescue |
+| `seed_log` | Feature, condition, selected sample, old value, inserted value, and seed for every pre-filter rescue, including rescues on features later dropped |
 | `groups_by_sample` | Condition vector named and ordered by output samples |
 | `call` | Matched call for provenance |
 
@@ -239,8 +242,9 @@ fit_se <- classify_missingness(
 The intended pipeline is:
 
 1. Run ImputeFinder on unnormalised log2 intensities.
-2. Use `fit$data`, which excludes unsupported features and includes every logged
-   rescue seed.
+2. Use `fit$data`, which excludes unsupported features and includes the logged
+   rescue seeds belonging to retained features. `seed_log` also preserves the
+   audit entries for rescued features later dropped.
 3. Apply the chosen normalisation to that complete returned object.
 4. Split columns by `fit$groups_by_sample`.
 5. Within each condition, apply an MNAR method only to rows named in

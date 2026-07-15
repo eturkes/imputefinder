@@ -132,6 +132,37 @@ test_that("matrix data require finite numeric values and stable identifiers", {
     )
 })
 
+test_that("the public path rejects unsupported special-value inputs", {
+    fixture <- matrix_input_fixture()
+
+    for (value in list(NaN, Inf, -Inf)) {
+        invalid <- fixture$x
+        invalid[1L, 1L] <- value
+        expect_error(
+            classify_missingness(
+                invalid,
+                fixture$group,
+                cutoffs = c(A = 1, B = 1)
+            ),
+            if (is.nan(value)) "must not contain NaN" else
+                "must not contain Inf or -Inf",
+            fixed = TRUE
+        )
+    }
+
+    no_condition_minimum <- fixture$x
+    no_condition_minimum[, fixture$group == "A"] <- NA_real_
+    expect_error(
+        classify_missingness(
+            no_condition_minimum,
+            fixture$group,
+            cutoffs = c(A = 1, B = 1)
+        ),
+        "Condition `A` has no finite intensity",
+        fixed = TRUE
+    )
+})
+
 test_that("atomic group validation is explicit", {
     fixture <- matrix_input_fixture()
 

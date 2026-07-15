@@ -618,8 +618,8 @@ Gate: clean package checks in CI and locally, with any unavoidable note document
 
 ### M10 - Release-candidate adversarial review
 
-- [ ] Review every guarantee in README/Rd/vignette against tests and implementation.
-- [ ] Re-test no-missing data, one-class profiles, flat profiles, duplicated means, tiny groups, and all-special-value failures.
+- [x] Review every guarantee in README/Rd/vignette against tests and implementation.
+- [x] Re-test no-missing data, one-class profiles, flat profiles, duplicated means, tiny groups, and all-special-value failures.
 - [ ] Verify no global RNG, options, graphics, or working-directory side effects.
 - [ ] Verify output invariance under row, column, and condition ordering by names.
 - [ ] Verify observed cells never change except logged seed insertions.

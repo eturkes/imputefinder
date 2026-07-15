@@ -64,6 +64,41 @@ test_that("strict majority is derived independently for unequal group sizes", {
     )
 })
 
+test_that("one- and two-sample conditions follow the explicit state rules", {
+    x <- rbind(
+        single_rescue = c(NA, 15, 15),
+        low_half = c(5, 8, NA),
+        high_half = c(5, 12, NA),
+        support = c(5, 5, 5)
+    )
+    colnames(x) <- c("a1", "b1", "b2")
+
+    result <- classify_missingness(
+        x,
+        c("A", "B", "B"),
+        cutoffs = c(B = 10)
+    )
+
+    a_states <- result$classifications$state[
+        result$classifications$condition == "A"
+    ]
+    b_states <- stats::setNames(
+        result$classifications$state[
+            result$classifications$condition == "B"
+        ],
+        result$classifications$feature[
+            result$classifications$condition == "B"
+        ]
+    )
+    expect_true(all(a_states == "complete"))
+    expect_identical(result$cutoffs[["A"]], NA_real_)
+    expect_identical(result$cutoff_diagnostics$A$source, "not_needed")
+    expect_identical(b_states[["low_half"]], "MNAR")
+    expect_identical(b_states[["high_half"]], "insufficient")
+    expect_identical(result$seed_log$feature, "single_rescue")
+    expect_identical(result$seed_log$condition, "A")
+})
+
 test_that("the arithmetic mean drives intensity classification", {
     classified <- classified_boundaries()
     row <- classified[
