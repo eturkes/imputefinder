@@ -1315,8 +1315,10 @@ Verification + completion evidence:
 - installed version + dated NEWS rendering → pass at `0.99.2`;
 - vignette-bearing source build → pass; 489,720-byte tarball excludes every
   development/agent/check/CI artefact;
-- source-tarball `R CMD check --as-cran` → status OK, including examples,
-  installed tests, vignette rebuild, and PDF/HTML manuals;
+- committed-state fresh clone at `69fb2384c1b774d99bcc1089a74ed662a43c7472`
+  → clean worktree; `BiocCheckGitClone()` + source build pass;
+- fresh-clone source-tarball `R CMD check --as-cran` → status OK, including
+  examples, installed tests, vignette rebuild, and PDF/HTML manuals;
 - new-package `BiocCheck` → 0 repository-controlled errors/warnings; known
   Support Site propagation error + optional/admin notes only;
 - no tracked CR bytes; `git diff --check` → pass.
@@ -1330,5 +1332,6 @@ tag, rerun unskipped new-package `BiocCheck`; then add fatal Git-clone + tarball
 BiocCheck gates to CI, validate them, close M9/M10 + the two remaining Definition
 of Done items, and declare the first release candidate complete.
 
-External blocker → Support Site Watched Tags propagation remains the sole M9 /
-release-candidate gate error.
+External blocker → Support profile 78003 resolves to Emir Turkes, but the live
+watched-tags API still returned `{"watched_tags": ""}` at 2026-07-15 09:25 UTC.
+Propagation remains the sole M9 / release-candidate gate error.
