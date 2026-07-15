@@ -20,10 +20,8 @@
     }
 
     stop(
-        paste0(
-            "`x` must be an ordinary numeric matrix or a ",
-            "SummarizedExperiment object."
-        ),
+        "`x` must be an ordinary numeric matrix or a ",
+        "SummarizedExperiment object.",
         call. = FALSE
     )
 }
@@ -100,16 +98,6 @@
         )
     }
 
-    selected_name <- if (
-        length(assay_names) >= assay_index &&
-            !is.na(assay_names[[assay_index]]) &&
-            nzchar(assay_names[[assay_index]])
-    ) {
-        assay_names[[assay_index]]
-    } else {
-        NA_character_
-    }
-
     list(
         data = data,
         groups_by_sample = .normalise_condition_labels(
@@ -118,8 +106,15 @@
         ),
         representation = "SummarizedExperiment",
         assay_index = assay_index,
-        assay_name = selected_name
+        assay_name = .selected_assay_name(assay_names, assay_index)
     )
+}
+
+.selected_assay_name <- function(assay_names, assay_index) {
+    named <- length(assay_names) >= assay_index &&
+        !is.na(assay_names[[assay_index]]) &&
+        nzchar(assay_names[[assay_index]])
+    if (named) assay_names[[assay_index]] else NA_character_
 }
 
 .resolve_assay_index <- function(assay, assay_names, assay_count) {
@@ -251,10 +246,8 @@
 
         if (!valid_names) {
             stop(
-                paste0(
-                    "Named `group` must have unique names matching all ",
-                    "sample names exactly."
-                ),
+                "Named `group` must have unique names matching all ",
+                "sample names exactly.",
                 call. = FALSE
             )
         }
@@ -280,10 +273,8 @@
 
     if (!valid_names) {
         stop(
-            paste0(
-                "Design row names must be unique and match all sample ",
-                "names exactly."
-            ),
+            "Design row names must be unique and match all sample ",
+            "names exactly.",
             call. = FALSE
         )
     }
@@ -335,7 +326,10 @@
         stop("Core output data must be a numeric matrix.", call. = FALSE)
     }
     if (any(is.nan(data)) || any(is.infinite(data))) {
-        stop("Core output data must contain only finite values or NA.", call. = FALSE)
+        stop(
+            "Core output data must contain only finite values or NA.",
+            call. = FALSE
+        )
     }
 
     source_features <- rownames(source_data)

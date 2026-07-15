@@ -611,8 +611,8 @@ Gate: a user with no thesis can understand and correctly use the package from in
 - [x] Run unit tests, `R CMD build`, and `R CMD check --as-cran` from a clean source tarball.
 - [x] Run `BiocCheck` using current official guidance.
 - [ ] Fix all errors and warnings; resolve actionable notes rather than suppressing them.
-- [ ] Verify licence files, line endings, generated documentation, file sizes, examples, and vignette build.
-- [ ] Add code coverage only if it improves diagnosis without adding fragile infrastructure.
+- [x] Verify licence files, line endings, generated documentation, file sizes, examples, and vignette build.
+- [x] Review code coverage; omit it because existing focused gates diagnose failures without fragile infrastructure.
 
 Gate: clean package checks in CI and locally, with any unavoidable note documented precisely.
 

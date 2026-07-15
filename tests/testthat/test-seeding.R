@@ -20,7 +20,8 @@ rescue_fixture <- function() {
     list(x = x, group = rep(c("A", "B"), each = 2))
 }
 
-with_preserved_random_seed <- function(code) {
+with_preserved_random_state <- function(code) {
+    caller_kind <- RNGkind()
     caller_has_seed <- exists(
         ".Random.seed",
         envir = globalenv(),
@@ -36,6 +37,7 @@ with_preserved_random_seed <- function(code) {
 
     on.exit(
         {
+            do.call(RNGkind, as.list(caller_kind))
             if (caller_has_seed) {
                 assign(".Random.seed", caller_seed, envir = globalenv())
             } else if (exists(
@@ -146,7 +148,7 @@ test_that("rescue is reproducible for a fixed seed", {
 test_that("rescue preserves an existing caller RNG state", {
     fixture <- rescue_fixture()
 
-    with_preserved_random_seed({
+    with_preserved_random_state({
         set.seed(90210L)
         caller_seed <- get(
             ".Random.seed",
@@ -171,10 +173,12 @@ test_that("rescue preserves an existing caller RNG state", {
 test_that("rescue does not create a caller RNG state", {
     fixture <- rescue_fixture()
 
-    with_preserved_random_seed({
+    with_preserved_random_state({
+        RNGkind("Knuth-TAOCP-2002", "Box-Muller", "Rejection")
         if (exists(".Random.seed", envir = globalenv(), inherits = FALSE)) {
             rm(".Random.seed", envir = globalenv())
         }
+        caller_kind <- RNGkind()
         expect_false(exists(
             ".Random.seed",
             envir = globalenv(),
@@ -189,6 +193,42 @@ test_that("rescue does not create a caller RNG state", {
             envir = globalenv(),
             inherits = FALSE
         ))
+        expect_identical(RNGkind(), caller_kind)
+    })
+})
+
+test_that("rescue is independent of the caller RNG configuration", {
+    x <- matrix(seq_len(600L), nrow = 60L)
+    x[, seq_len(5L)] <- NA_real_
+    x[[1L, 1L]] <- 1
+    rownames(x) <- paste0("feature_", seq_len(nrow(x)))
+    colnames(x) <- paste0("sample_", seq_len(ncol(x)))
+    group <- rep(c("A", "B"), each = 5L)
+
+    with_preserved_random_state({
+        RNGkind("Mersenne-Twister", "Inversion", "Rejection")
+        baseline <- seed_missing_conditions(x, group, seed = 23L)
+
+        RNGkind("Knuth-TAOCP-2002", "Box-Muller", "Rejection")
+        set.seed(90210L)
+        caller_kind <- RNGkind()
+        caller_seed <- get(
+            ".Random.seed",
+            envir = globalenv(),
+            inherits = FALSE
+        )
+        configured <- seed_missing_conditions(x, group, seed = 23L)
+
+        expect_identical(configured, baseline)
+        expect_identical(RNGkind(), caller_kind)
+        expect_identical(
+            get(
+                ".Random.seed",
+                envir = globalenv(),
+                inherits = FALSE
+            ),
+            caller_seed
+        )
     })
 })
 

@@ -1,25 +1,6 @@
 .assign_condition_states <- function(statistics, cutoffs) {
     .validate_state_statistics(statistics)
-    conditions <- sort(unique(statistics$condition), method = "radix")
-    cutoffs <- .normalise_resolved_cutoffs(cutoffs, conditions)
-
-    for (condition in conditions) {
-        condition_rows <- statistics$condition == condition
-        has_missing <- any(statistics$missing_count[condition_rows] > 0L)
-        if (!has_missing) {
-            cutoffs[[condition]] <- NA_real_
-        } else if (is.na(cutoffs[[condition]])) {
-            stop(
-                sprintf(
-                    "Condition `%s` has incomplete features but no resolved cutoff.",
-                    condition
-                ),
-                call. = FALSE
-            )
-        }
-    }
-
-    row_cutoffs <- unname(cutoffs[statistics$condition])
+    row_cutoffs <- .classification_row_cutoffs(statistics, cutoffs)
     state <- rep(NA_character_, nrow(statistics))
     complete <- statistics$missing_count == 0L
     state[complete] <- "complete"
@@ -52,6 +33,27 @@
     )
 }
 
+.classification_row_cutoffs <- function(statistics, cutoffs) {
+    conditions <- sort(unique(statistics$condition), method = "radix")
+    cutoffs <- .normalise_resolved_cutoffs(cutoffs, conditions)
+    for (condition in conditions) {
+        rows <- statistics$condition == condition
+        has_missing <- any(statistics$missing_count[rows] > 0L)
+        if (!has_missing) {
+            cutoffs[[condition]] <- NA_real_
+        } else if (is.na(cutoffs[[condition]])) {
+            stop(
+                "Condition `",
+                condition,
+                "` has incomplete features but no resolved cutoff.",
+                call. = FALSE
+            )
+        }
+    }
+
+    unname(cutoffs[statistics$condition])
+}
+
 .reconcile_condition_states <- function(classifications, feature_status) {
     .validate_reconciliation_inputs(classifications, feature_status)
 
@@ -68,11 +70,36 @@
         match(classifications$condition, conditions)
     )] <- classifications$state
 
+    decision <- .reconciled_feature_decision(state_matrix, conditions)
+    retained <- decision$retained
+    drop_reason <- decision$drop_reason
+
+    status_rows <- match(features, feature_status$feature)
+    feature_status$retained[status_rows] <- retained
+    feature_status$drop_reason[status_rows] <- drop_reason
+    classification_features <- match(classifications$feature, features)
+    classifications$retained <- retained[classification_features]
+    classifications$drop_reason <- drop_reason[classification_features]
+
+    if (anyNA(classifications$retained)) {
+        stop(
+            "Reconciliation produced an incomplete feature audit.",
+            call. = FALSE
+        )
+    }
+
+    list(
+        classifications = classifications,
+        feature_status = feature_status
+    )
+}
+
+.reconciled_feature_decision <- function(state_matrix, conditions) {
     insufficient <- state_matrix == "insufficient"
     has_insufficient <- rowSums(insufficient) > 0L
     all_mnar <- rowSums(state_matrix == "MNAR") == ncol(state_matrix)
     retained <- !has_insufficient & !all_mnar
-    drop_reason <- rep(NA_character_, length(features))
+    drop_reason <- rep(NA_character_, nrow(state_matrix))
     drop_reason[all_mnar] <- "MNAR_all_conditions"
     drop_reason[has_insufficient] <- apply(
         insufficient[has_insufficient, , drop = FALSE],
@@ -85,21 +112,7 @@
         }
     )
 
-    status_rows <- match(features, feature_status$feature)
-    feature_status$retained[status_rows] <- retained
-    feature_status$drop_reason[status_rows] <- drop_reason
-    classification_features <- match(classifications$feature, features)
-    classifications$retained <- retained[classification_features]
-    classifications$drop_reason <- drop_reason[classification_features]
-
-    if (anyNA(classifications$retained)) {
-        stop("Reconciliation produced an incomplete feature audit.", call. = FALSE)
-    }
-
-    list(
-        classifications = classifications,
-        feature_status = feature_status
-    )
+    list(retained = retained, drop_reason = drop_reason)
 }
 
 .retained_condition_groups <- function(classifications, feature_order) {
@@ -145,32 +158,29 @@
         "drop_reason"
     )
     required_status <- c("feature", "retained", "drop_reason")
-    valid_status <- is.data.frame(feature_status) &&
-        identical(names(feature_status), required_status) &&
-        is.character(feature_status$feature) &&
-        is.logical(feature_status$retained) &&
-        is.character(feature_status$drop_reason) &&
-        !anyNA(feature_status$feature) &&
-        all(nzchar(feature_status$feature)) &&
-        !anyDuplicated(feature_status$feature)
-    valid_classifications <-
-        all(required_classification %in% names(classifications)) &&
-        is.character(classifications$feature) &&
-        is.character(classifications$condition) &&
-        is.logical(classifications$retained) &&
-        is.character(classifications$drop_reason) &&
-        !anyNA(classifications$feature) &&
-        !anyNA(classifications$condition) &&
-        !anyNA(classifications$state) &&
-        all(nzchar(classifications$feature)) &&
-        all(nzchar(classifications$condition)) &&
-        !anyDuplicated(
-            classifications[, c("feature", "condition"), drop = FALSE]
-        )
+    valid_status <- .valid_reconciliation_status(
+        feature_status,
+        required_status
+    )
+    valid_classifications <- .valid_reconciliation_classifications(
+        classifications,
+        required_classification
+    )
     if (!valid_status || !valid_classifications) {
-        stop("Reconciliation inputs do not satisfy the audit schemas.", call. = FALSE)
+        stop(
+            "Reconciliation inputs do not satisfy the audit schemas.",
+            call. = FALSE
+        )
     }
 
+    .validate_reconciliation_coverage(classifications, feature_status)
+    invisible(classifications)
+}
+
+.validate_reconciliation_coverage <- function(
+    classifications,
+    feature_status
+) {
     all_missing <- !is.na(feature_status$drop_reason) &
         feature_status$drop_reason == "all_missing"
     valid_initial_status <-
@@ -185,10 +195,8 @@
         !setequal(classified_features, expected_features) ||
         any(classifications$feature %in% feature_status$feature[all_missing])) {
         stop(
-            paste0(
-                "Reconciliation must preserve all-missing precedence and ",
-                "classify every survivor."
-            ),
+            "Reconciliation must preserve all-missing precedence and ",
+            "classify every survivor.",
             call. = FALSE
         )
     }
@@ -200,7 +208,8 @@
     )
     if (length(conditions) == 0L || any(coverage != 1L)) {
         stop(
-            "Every surviving feature must have exactly one state per condition.",
+            "Every surviving feature must have exactly one state per ",
+            "condition.",
             call. = FALSE
         )
     }
@@ -208,7 +217,37 @@
     invisible(classifications)
 }
 
-.validate_reconciled_classifications <- function(classifications, feature_order) {
+.valid_reconciliation_status <- function(feature_status, required) {
+    is.data.frame(feature_status) &&
+        identical(names(feature_status), required) &&
+        is.character(feature_status$feature) &&
+        is.logical(feature_status$retained) &&
+        is.character(feature_status$drop_reason) &&
+        !anyNA(feature_status$feature) &&
+        all(nzchar(feature_status$feature)) &&
+        !anyDuplicated(feature_status$feature)
+}
+
+.valid_reconciliation_classifications <- function(classifications, required) {
+    all(required %in% names(classifications)) &&
+        is.character(classifications$feature) &&
+        is.character(classifications$condition) &&
+        is.logical(classifications$retained) &&
+        is.character(classifications$drop_reason) &&
+        !anyNA(classifications$feature) &&
+        !anyNA(classifications$condition) &&
+        !anyNA(classifications$state) &&
+        all(nzchar(classifications$feature)) &&
+        all(nzchar(classifications$condition)) &&
+        !anyDuplicated(
+            classifications[, c("feature", "condition"), drop = FALSE]
+        )
+}
+
+.validate_reconciled_classifications <- function(
+    classifications,
+    feature_order
+) {
     .validate_classification_states(classifications)
     valid_order <- is.character(feature_order) &&
         is.null(dim(feature_order)) &&
@@ -237,7 +276,8 @@
     valid_states <- retained_rows$state %in% c("complete", "MAR", "MNAR")
     if (any(coverage != 1L) || any(!valid_states)) {
         stop(
-            "Every retained feature must have one eligible state per condition.",
+            "Every retained feature must have one eligible state per ",
+            "condition.",
             call. = FALSE
         )
     }
@@ -258,7 +298,8 @@
         !any(is.infinite(cutoffs))
     if (!valid) {
         stop(
-            "Resolved cutoffs must contain one finite-or-NA value per condition.",
+            "Resolved cutoffs must contain one finite-or-NA value per ",
+            "condition.",
             call. = FALSE
         )
     }
@@ -278,7 +319,10 @@
         "seeded"
     )
     if (!is.data.frame(statistics) || !all(required %in% names(statistics))) {
-        stop("`statistics` does not satisfy the state-input schema.", call. = FALSE)
+        stop(
+            "`statistics` does not satisfy the state-input schema.",
+            call. = FALSE
+        )
     }
     valid_counts <- statistics$sample_count > 0L &
         statistics$observed_count >= 0L &

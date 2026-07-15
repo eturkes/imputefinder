@@ -1105,3 +1105,61 @@ clean clone + tarball checks. Add BiocCheck to CI only after that gate is clean.
 External blocker → maintainer must add `imputefinder` to Watched Tags at
 `https://support.bioconductor.org/accounts/edit/profile`; the full unskipped
 new-package check cannot report zero errors until the account state changes.
+
+### 2026-07-15 - M9c repository-controlled hardening
+
+Scope → eliminate every repository-controlled `BiocCheck` diagnostic, audit
+submission artefacts, and strengthen RNG + automatic-cutoff failure guarantees.
+Full M9c closure remains gated only by Support Site propagation and the ensuing
+CI promotion.
+
+Implementation:
+
+- replaced direct `set.seed()` handling with `withr` local scopes pinned to
+  Mersenne-Twister/Inversion/Rejection; nested seed + RNG-kind preservation now
+  restores even a non-default kind paired with an intentionally absent
+  `.Random.seed`;
+- added adversarial regressions for caller RNG-kind independence and exact
+  absent/present RNG state restoration;
+- captures `glm.fit()` numerical warnings in cutoff diagnostics and rejects
+  warned trend fits instead of silently accepting them; removed the unnecessary
+  bandwidth warning suppression;
+- added the suggested `Classification` biocView, simplified condition signals,
+  removed the redundant signal false positive, and refactored every function to
+  at most 50 source lines;
+- reformatted tracked R/vignette sources to the Bioconductor checks, migrated
+  generated docs to roxygen2 8, and retained its accurate legacy marker because
+  current `BiocCheck` detects generated Rd only through `RoxygenNote`;
+- reviewed coverage infrastructure and omitted it: 83 focused tests already
+  localise contract failures, while a new service would add no diagnostic value.
+
+Verification + audit evidence:
+
+- package-wide source suite → 83 tests / 513 expectations, 0 failures,
+  0 warnings;
+- vignette-bearing `R CMD build .` → pass;
+- source-tarball `R CMD check --as-cran` on R 4.6.1 / Bioconductor 3.24 →
+  0 errors, 0 warnings, 1 expected NOTE (`New submission`); examples, tests,
+  vignette rebuild, PDF manual, and HTML validation pass;
+- patched clean-clone `BiocCheckGitClone()` → pass with no findings;
+- unskipped tarball `BiocCheck(..., new-package = TRUE)` → 1 external error,
+  0 warnings, 2 metadata/admin notes; coding practice, warning handling,
+  function length, formatting, dependencies, docs, tests, and file checks are
+  clean;
+- remaining error says the public checker cannot yet see `imputefinder` in the
+  maintainer's Watched Tags; maintainer reports having added it during this
+  session, so this is now a propagation wait rather than an unperformed action;
+- GPL-3 text + `License: GPL (>= 3)` verified; no tracked CR bytes; largest
+  tracked file is 86,505 bytes; generated docs report no pending roxygen work;
+  source tarball excludes local tools/check artefacts and has no oversized files.
+
+Exact next task → rerun the full unskipped tarball `BiocCheck` after Support Site
+state propagates. Once it reports zero errors/warnings, add fatal
+`BiocCheckGitClone()` + new-package `BiocCheck()` gates to CI, validate the
+workflow, mark M9/M9c complete, and begin M10. Preserve the optional ORCID,
+funder, and publication-backed CITATION omissions unless maintainer facts are
+provided.
+
+External blocker → Support Site Watched Tags propagation; checker still reports
+the tag absent as of the final local run despite the maintainer's completed
+profile update.

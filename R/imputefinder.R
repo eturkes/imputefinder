@@ -97,6 +97,26 @@ classify_missingness <- function(
         classified,
         rescued$feature_status
     )
+    .finalise_missingness_result(
+        prepared,
+        x,
+        matched_call,
+        rescued,
+        resolved,
+        profiles,
+        reconciled
+    )
+}
+
+.finalise_missingness_result <- function(
+    prepared,
+    original,
+    matched_call,
+    rescued,
+    resolved,
+    profiles,
+    reconciled
+) {
     groups <- .retained_condition_groups(
         reconciled$classifications,
         reconciled$feature_status$feature
@@ -109,7 +129,7 @@ classify_missingness <- function(
         ,
         drop = FALSE
     ]
-    output_data <- .restore_output_data(filtered_data, prepared, x)
+    output_data <- .restore_output_data(filtered_data, prepared, original)
 
     .new_imputefinder_result(
         data = output_data,

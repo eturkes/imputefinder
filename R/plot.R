@@ -31,8 +31,13 @@ plot_missingness <- function(result, condition) {
     profile <- .stored_plot_profile(result, condition)
     cutoff <- .stored_plot_cutoff(result, condition)
     diagnostic <- .stored_plot_diagnostic(result, condition)
+    plot <- .base_missingness_plot(profile)
+    plot <- .add_missingness_markers(plot, profile, cutoff)
+    .label_missingness_plot(plot, condition, cutoff, diagnostic, profile)
+}
 
-    plot <- ggplot2::ggplot(
+.base_missingness_plot <- function(profile) {
+    ggplot2::ggplot(
         profile$grid,
         ggplot2::aes(x = intensity, y = missing_proportion)
     ) +
@@ -46,7 +51,9 @@ plot_missingness <- function(result, condition) {
             linewidth = 0.8,
             na.rm = TRUE
         )
+}
 
+.add_missingness_markers <- function(plot, profile, cutoff) {
     seeded <- profile$raw[profile$raw$seeded, , drop = FALSE]
     if (nrow(seeded) > 0L) {
         plot <- plot + ggplot2::geom_rug(
@@ -67,6 +74,16 @@ plot_missingness <- function(result, condition) {
         )
     }
 
+    plot
+}
+
+.label_missingness_plot <- function(
+    plot,
+    condition,
+    cutoff,
+    diagnostic,
+    profile
+) {
     plot +
         ggplot2::scale_x_continuous(
             expand = ggplot2::expansion(mult = c(0.01, 0.03))
@@ -198,7 +215,10 @@ plot_missingness <- function(result, condition) {
         condition %in% names(cutoffs)
     if (!valid) {
         stop(
-            sprintf("Result has no recorded cutoff for condition `%s`.", condition),
+            sprintf(
+                "Result has no recorded cutoff for condition `%s`.",
+                condition
+            ),
             call. = FALSE
         )
     }
@@ -207,7 +227,10 @@ plot_missingness <- function(result, condition) {
     if (length(cutoff) != 1L || is.nan(cutoff) ||
         (!is.na(cutoff) && !is.finite(cutoff))) {
         stop(
-            sprintf("Recorded cutoff for condition `%s` is invalid.", condition),
+            sprintf(
+                "Recorded cutoff for condition `%s` is invalid.",
+                condition
+            ),
             call. = FALSE
         )
     }
@@ -284,7 +307,7 @@ plot_missingness <- function(result, condition) {
         return(character())
     }
     if (!is.character(warnings) || anyNA(warnings)) {
-        stop(sprintf("Stored %s warnings are invalid.", source), call. = FALSE)
+        stop("Stored ", source, " notes are invalid.", call. = FALSE)
     }
 
     warnings[nzchar(warnings)]

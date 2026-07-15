@@ -23,7 +23,7 @@ needed to audit those decisions.
 \code{\link[=classify_missingness]{classify_missingness()}} accepts unnormalised log2 protein intensities with
 features in rows, named samples in columns, and one condition label per
 sample. Missing observations must be represented by \code{NA}. Ordinary numeric
-matrices and \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment::SummarizedExperiment} objects share the
+matrices and \link[SummarizedExperiment:SummarizedExperiment]{SummarizedExperiment::SummarizedExperiment} objects share the
 same matrix core.
 }
 
@@ -41,6 +41,11 @@ feature groups.
 }
 \author{
 \strong{Maintainer}: Emir Turkes \email{emir.turkes@eturkes.com} [copyright holder]
+
+Authors:
+\itemize{
+  \item Emir Turkes \email{emir.turkes@eturkes.com} [copyright holder]
+}
 
 }
 \keyword{internal}

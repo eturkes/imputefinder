@@ -28,6 +28,14 @@ knitr::opts_chunk$set(
     crop = NULL
 )
 library(imputefinder)
+manual_profile_caption <- paste(
+    "Condition A missingness profile. The vertical line is the recorded",
+    "manual cutoff; the bottom tick marks the rescued on/off block."
+)
+automatic_profile_caption <- paste(
+    "Automatic condition A profile. The recorded cutoff marks the lower",
+    "boundary of the dominant descending transition."
+)
 ```
 
 # Introduction
@@ -82,12 +90,13 @@ zero.
 
 After rescue, each feature-condition block receives exactly one state:
 
-| State | Evidence |
-|---|---|
-| `complete` | No value is missing. |
-| `MNAR` | At least one value is missing and the arithmetic mean of observed values is below the condition cutoff. |
-| `MAR` | At least one value is missing, the mean is at or above the cutoff, and strictly more than half the samples are observed. |
-| `insufficient` | The block is on the MAR side of the cutoff but lacks a strict observed majority. |
+- `complete` - no value is missing.
+- `MNAR` - at least one value is missing and the arithmetic mean of observed
+    values is below the condition cutoff.
+- `MAR` - at least one value is missing, the mean is at or above the cutoff,
+    and strictly more than half the samples are observed.
+- `insufficient` - the block is on the MAR side of the cutoff but lacks a
+    strict observed majority.
 
 The arithmetic mean is deliberate: one strong observed signal can move a
 partly observed block toward the MAR side. Equality belongs to that side too.
@@ -135,12 +144,12 @@ and removed. Every surviving feature fully missing within one condition then
 receives one artificial anchor:
 
 1. The minimum finite intensity in each condition is calculated before any
-   anchors are inserted.
+    anchors are inserted.
 2. One sample in each fully missing feature-condition block is selected
-   uniformly. Selection is with replacement across features.
+    uniformly. Selection is with replacement across features.
 3. Exactly that cell receives the condition minimum; the others remain `NA`.
 4. The feature, condition, selected sample, old and inserted values, and seed
-   are recorded.
+    are recorded.
 
 ```{r seed-audit}
 fit$seed_log
@@ -161,23 +170,26 @@ fit$feature_status
 fit$classifications[
     fit$classifications$feature %in% c("on_off", "sparse_mar", "all_mnar"),
     c("feature", "condition", "observed_count", "missing_count",
-      "mean_intensity", "cutoff", "state", "retained", "drop_reason")
+        "mean_intensity", "cutoff", "state", "retained", "drop_reason")
 ]
 ```
 
 ## Result components
 
-| Component | Audit or workflow role |
-|---|---|
-| `data` | Retained rows in the input representation, with logged rescue anchors inserted. |
-| `classifications` | Long feature-condition evidence, state, retention, and drop reason. |
-| `groups` | Retained `MNAR`, `MAR`, `complete`, and `MAR_or_complete` feature names for each condition. |
-| `feature_status` | One retention decision for every original feature. |
-| `cutoffs`, `cutoff_diagnostics` | Condition boundaries, source, method, quality evidence, and warnings. |
-| `profiles` | Raw feature statistics, explicit density grid, and smoothing metadata. |
-| `seed_log` | Complete provenance for each artificial rescue anchor. |
-| `groups_by_sample` | Aligned condition label for every output sample. |
-| `call` | Matched classifier call for provenance. |
+- `data` - retained rows in the input representation, with logged rescue
+    anchors inserted.
+- `classifications` - long feature-condition evidence, state, retention, and
+    drop reason.
+- `groups` - retained `MNAR`, `MAR`, `complete`, and `MAR_or_complete` feature
+    names for each condition.
+- `feature_status` - one retention decision for every original feature.
+- `cutoffs`, `cutoff_diagnostics` - condition boundaries, source, method,
+    quality evidence, and warnings.
+- `profiles` - raw feature statistics, explicit density grid, and smoothing
+    metadata.
+- `seed_log` - complete provenance for each artificial rescue anchor.
+- `groups_by_sample` - aligned condition label for every output sample.
+- `call` - matched classifier call for provenance.
 
 # The stored missingness profile
 
@@ -187,9 +199,9 @@ density for blocks with missing values and `n_0 f_0(x)` is the corresponding
 density for complete blocks, the displayed profile is
 
 ```text
-               n_1 f_1(x)
+                n_1 f_1(x)
 p_missing(x) = -------------------------
-               n_1 f_1(x) + n_0 f_0(x)
+                n_1 f_1(x) + n_0 f_0(x)
 ```
 
 This is the local missing-block proportion represented by a filled stacked
@@ -207,7 +219,7 @@ head(
 )
 ```
 
-```{r manual-profile, fig.cap="Condition A missingness profile. The vertical line is the recorded manual cutoff; the bottom tick marks the rescued on/off block."}
+```{r manual-profile, fig.cap=manual_profile_caption}
 plot_missingness(fit, "A")
 ```
 
@@ -268,7 +280,7 @@ vapply(
 automatic_fit$cutoff_diagnostics$A$method
 ```
 
-```{r automatic-profile, fig.cap="Automatic condition A profile. The recorded cutoff marks the lower boundary of the dominant descending transition."}
+```{r automatic-profile, fig.cap=automatic_profile_caption}
 plot_missingness(automatic_fit, "A")
 ```
 
@@ -289,10 +301,10 @@ The intended order is:
 
 1. classify the unnormalised log2 matrix;
 2. normalise the entire returned `fit$data` object with the method chosen for
-   the experiment;
+    the experiment;
 3. split samples by `fit$groups_by_sample`;
 4. within each condition, apply an MNAR method only to its `MNAR` rows and a
-   MAR method only to its `MAR_or_complete` rows;
+    MAR method only to its `MAR_or_complete` rows;
 5. recombine conditions in original sample order.
 
 The following evaluated code performs the split but deliberately stops before
@@ -370,14 +382,14 @@ identical(
 # Limitations
 
 - The cutoff is a model assumption. Biology, acquisition, and preprocessing can
-  produce patterns without one descending intensity transition.
+    produce patterns without one descending intensity transition.
 - Automatic breakpoint selection needs both incomplete and complete feature
-  evidence. Structured failure is an expected result for unidentifiable data.
+    evidence. Structured failure is an expected result for unidentifiable data.
 - Arithmetic means are sensitive to strong observations by design.
 - Rescue anchors are artificial values. Preserve `seed_log` with the analysis
-  and assess their influence downstream.
+    and assess their influence downstream.
 - Classification is heuristic. ImputeFinder does not prove mechanisms, choose
-  an imputation algorithm, or validate the final biological analysis.
+    an imputation algorithm, or validate the final biological analysis.
 
 The deterministic repository validation covers intensity-independent MAR,
 intensity-dependent MNAR, condition-specific on/off features, several group
@@ -388,14 +400,14 @@ proteomics experiment.
 # Related methods and references {.unnumbered}
 
 - Karpievitch YV, Dabney AR, Smith RD (2012). [Normalization and missing value
-  imputation for label-free LC-MS
-  analysis](https://doi.org/10.1186/1471-2105-13-S16-S5). *BMC Bioinformatics*
-  13(Suppl 16):S5.
+    imputation for label-free LC-MS
+    analysis](https://doi.org/10.1186/1471-2105-13-S16-S5). *BMC Bioinformatics*
+    13(Suppl 16):S5.
 - Lazar C, Gatto L, Ferro M, Bruley C, Burger T (2016). [Accounting for the
-  multiple natures of missing values in label-free quantitative proteomics data
-  sets to compare imputation
-  strategies](https://doi.org/10.1021/acs.jproteome.5b00981). *Journal of
-  Proteome Research* 15:1116-1125.
+    multiple natures of missing values in label-free quantitative proteomics
+    data sets to compare imputation
+    strategies](https://doi.org/10.1021/acs.jproteome.5b00981). *Journal of
+    Proteome Research* 15:1116-1125.
 
 # Session information {.unnumbered}
 

@@ -95,7 +95,10 @@
         all(nzchar(conditions)) &&
         !anyDuplicated(conditions)
     if (!valid) {
-        stop("Cutoff conditions must be unique, non-empty labels.", call. = FALSE)
+        stop(
+            "Cutoff conditions must be unique, non-empty labels.",
+            call. = FALSE
+        )
     }
 
     sort(conditions, method = "radix")
@@ -236,6 +239,7 @@
             slope = NA_real_,
             likelihood_ratio = NA_real_,
             p_value = NA_real_,
+            warnings = character(),
             maximum_p_value = specification$trend_alpha
         ),
         derivative = list(
@@ -276,24 +280,45 @@
     )
 }
 
-.automatic_cutoff_failure <- function(reason, quality, specification) {
+.automatic_cutoff_failure <- function(
+    reason,
+    quality,
+    specification,
+    warnings = character()
+) {
     .automatic_cutoff_result(
         status = "unidentifiable",
         cutoff = NA_real_,
         reason = reason,
         quality = quality,
-        specification = specification
+        specification = specification,
+        warnings = warnings
     )
 }
 
-.prepare_automatic_cutoff_input <- function(profile, specification) {
-    quality <- .empty_automatic_cutoff_quality(specification)
-    failure <- function(reason) {
-        list(ok = FALSE, reason = reason, quality = quality)
-    }
-    if (!is.list(profile) || !is.data.frame(profile$raw) ||
-        !is.data.frame(profile$grid) || !is.list(profile$metadata)) {
-        return(failure("The stored profile is malformed."))
+.automatic_cutoff_input_failure <- function(
+    reason,
+    quality,
+    warnings = character()
+) {
+    list(
+        ok = FALSE,
+        reason = reason,
+        quality = quality,
+        warnings = warnings
+    )
+}
+
+.validate_automatic_cutoff_profile <- function(profile, quality) {
+    valid_container <- is.list(profile) &&
+        is.data.frame(profile$raw) &&
+        is.data.frame(profile$grid) &&
+        is.list(profile$metadata)
+    if (!valid_container) {
+        return(.automatic_cutoff_input_failure(
+            "The stored profile is malformed.",
+            quality
+        ))
     }
 
     required_raw <- c("mean_intensity", "has_missing")
@@ -306,17 +331,28 @@
     )
     if (!all(required_raw %in% names(profile$raw)) ||
         !all(required_grid %in% names(profile$grid))) {
-        return(failure("The stored profile lacks required evidence fields."))
+        return(.automatic_cutoff_input_failure(
+            "The stored profile lacks required evidence fields.",
+            quality
+        ))
     }
 
+    list(ok = TRUE, quality = quality, warnings = character())
+}
+
+.automatic_cutoff_evidence <- function(profile, quality, specification) {
     raw <- profile$raw
-    valid_raw <- is.numeric(raw$mean_intensity) &&
+    valid <- is.numeric(raw$mean_intensity) &&
         is.logical(raw$has_missing) &&
         !anyNA(raw$has_missing) &&
         all(is.finite(raw$mean_intensity))
-    if (!valid_raw) {
-        return(failure("Raw profile evidence contains invalid values."))
+    if (!valid) {
+        return(.automatic_cutoff_input_failure(
+            "Raw profile evidence contains invalid values.",
+            quality
+        ))
     }
+
     class_counts <- c(
         missing = as.integer(sum(raw$has_missing)),
         complete = as.integer(sum(!raw$has_missing))
@@ -330,51 +366,38 @@
         )
     }
     if (nrow(raw) < specification$minimum_features) {
-        return(failure(sprintf(
+        reason <- sprintf(
             "Automatic cutoff requires at least %d feature blocks.",
             specification$minimum_features
-        )))
+        )
+        return(.automatic_cutoff_input_failure(reason, quality))
     }
     if (any(class_counts < specification$minimum_class_features)) {
-        return(failure(sprintf(
+        reason <- sprintf(
             paste0(
                 "Automatic cutoff requires at least %d missing and %d ",
                 "complete feature blocks."
             ),
             specification$minimum_class_features,
             specification$minimum_class_features
-        )))
+        )
+        return(.automatic_cutoff_input_failure(reason, quality))
     }
 
-    grid <- profile$grid
-    valid_grid <- is.numeric(grid$intensity) &&
+    list(ok = TRUE, raw = raw, quality = quality, warnings = character())
+}
+
+.valid_automatic_cutoff_grid <- function(grid) {
+    is.numeric(grid$intensity) &&
         is.numeric(grid$weighted_missing_density) &&
         is.numeric(grid$weighted_complete_density) &&
         is.numeric(grid$missing_proportion) &&
         is.logical(grid$supported)
-    if (!valid_grid) {
-        return(failure("The profile grid or smoothing metadata is invalid."))
-    }
-    total_density <- grid$weighted_missing_density +
-        grid$weighted_complete_density
-    observed_range <- quality$support$observed_mean_range
-    finite <- is.finite(grid$intensity) &
-        is.finite(grid$missing_proportion) &
-        is.finite(total_density) &
-        total_density > 0 &
-        !is.na(grid$supported) &
-        grid$supported &
-        grid$intensity >= observed_range[["minimum"]] &
-        grid$intensity <= observed_range[["maximum"]]
-    quality$support$supported_grid_points <- as.integer(sum(finite))
-    if (!any(finite)) {
-        return(failure(
-            "The profile has no supported observed-intensity grid."
-        ))
-    }
+}
 
+.automatic_density_keep <- function(total_density, finite, density_floor) {
     relative_density <- total_density / max(total_density[finite])
-    keep <- finite & relative_density >= specification$density_floor
+    keep <- finite & relative_density >= density_floor
     runs <- rle(keep)
     run_end <- cumsum(runs$lengths)
     run_start <- run_end - runs$lengths + 1L
@@ -387,6 +410,26 @@
         keep[] <- FALSE
         keep[seq.int(run_start[[peak_run]], run_end[[peak_run]])] <- TRUE
     }
+
+    list(relative_density = relative_density, keep = keep)
+}
+
+.finite_automatic_cutoff_grid <- function(
+    grid,
+    total_density,
+    observed_range
+) {
+    is.finite(grid$intensity) &
+        is.finite(grid$missing_proportion) &
+        is.finite(total_density) &
+        total_density > 0 &
+        !is.na(grid$supported) &
+        grid$supported &
+        grid$intensity >= observed_range[["minimum"]] &
+        grid$intensity <= observed_range[["maximum"]]
+}
+
+.record_density_support <- function(quality, grid, keep) {
     quality$support$density_supported_grid_points <- as.integer(sum(keep))
     if (sum(keep) > 0L) {
         quality$support$density_supported_range <- stats::setNames(
@@ -394,18 +437,68 @@
             c("minimum", "maximum")
         )
     }
+    quality
+}
+
+.automatic_cutoff_grid_support <- function(
+    profile,
+    quality,
+    specification
+) {
+    grid <- profile$grid
+    if (!.valid_automatic_cutoff_grid(grid)) {
+        return(.automatic_cutoff_input_failure(
+            "The profile grid or smoothing metadata is invalid.",
+            quality
+        ))
+    }
+    total_density <- grid$weighted_missing_density +
+        grid$weighted_complete_density
+    observed_range <- quality$support$observed_mean_range
+    finite <- .finite_automatic_cutoff_grid(
+        grid,
+        total_density,
+        observed_range
+    )
+    quality$support$supported_grid_points <- as.integer(sum(finite))
+    if (!any(finite)) {
+        return(.automatic_cutoff_input_failure(
+            "The profile has no supported observed-intensity grid.",
+            quality
+        ))
+    }
+    density <- .automatic_density_keep(
+        total_density,
+        finite,
+        specification$density_floor
+    )
+    keep <- density$keep
+    quality <- .record_density_support(quality, grid, keep)
     if (sum(keep) < specification$minimum_supported_grid_points) {
-        return(failure(
-            "The profile has too little density-supported grid coverage."
+        return(.automatic_cutoff_input_failure(
+            "The profile has too little density-supported grid coverage.",
+            quality
         ))
     }
 
-    x <- grid$intensity[keep]
-    y <- grid$missing_proportion[keep]
-    weight <- relative_density[keep]
-    spacing <- diff(x)
-    bandwidth <- profile$metadata$bandwidth
-    valid_numeric <- is.numeric(bandwidth) &&
+    list(
+        ok = TRUE,
+        grid = grid,
+        keep = keep,
+        relative_density = density$relative_density,
+        quality = quality,
+        warnings = character()
+    )
+}
+
+.valid_automatic_cutoff_numeric <- function(
+    x,
+    y,
+    weight,
+    spacing,
+    bandwidth
+) {
+    is.numeric(bandwidth) &&
         length(bandwidth) == 1L &&
         all(is.finite(c(x, y, weight, spacing, bandwidth))) &&
         all(weight > 0) &&
@@ -413,11 +506,13 @@
         all(spacing > 0) &&
         max(abs(spacing - stats::median(spacing))) <=
             100 * .Machine$double.eps * max(1, max(abs(x)))
-    if (!valid_numeric) {
-        return(failure("The profile grid or smoothing metadata is invalid."))
-    }
-    quality$support$bandwidth <- unname(as.numeric(bandwidth))
+}
 
+.automatic_cutoff_trend_quality <- function(
+    raw,
+    quality,
+    specification
+) {
     trend <- .automatic_cutoff_trend(
         raw$mean_intensity,
         raw$has_missing
@@ -427,10 +522,52 @@
         trend$p_value <= specification$trend_alpha
     trend$maximum_p_value <- specification$trend_alpha
     quality$trend <- trend
-    if (!trend$credible) {
-        return(failure(
-            "No statistically credible descending missingness trend was detected."
+    if (length(trend$warnings) > 0L) {
+        return(.automatic_cutoff_input_failure(
+            "The missingness-trend model emitted numerical warnings.",
+            quality,
+            trend$warnings
         ))
+    }
+    if (!trend$credible) {
+        return(.automatic_cutoff_input_failure(
+            paste0(
+                "No statistically credible descending missingness trend ",
+                "was detected."
+            ),
+            quality
+        ))
+    }
+
+    list(ok = TRUE, quality = quality, warnings = character())
+}
+
+.automatic_cutoff_numeric_candidate <- function(
+    profile,
+    raw,
+    support,
+    specification
+) {
+    keep <- support$keep
+    x <- support$grid$intensity[keep]
+    y <- support$grid$missing_proportion[keep]
+    weight <- support$relative_density[keep]
+    spacing <- diff(x)
+    bandwidth <- profile$metadata$bandwidth
+    if (!.valid_automatic_cutoff_numeric(
+        x, y, weight, spacing, bandwidth
+    )) {
+        return(.automatic_cutoff_input_failure(
+            "The profile grid or smoothing metadata is invalid.",
+            support$quality
+        ))
+    }
+
+    quality <- support$quality
+    quality$support$bandwidth <- unname(as.numeric(bandwidth))
+    trend <- .automatic_cutoff_trend_quality(raw, quality, specification)
+    if (!trend$ok) {
+        return(trend)
     }
 
     list(
@@ -440,8 +577,63 @@
         weight = weight,
         bandwidth = unname(as.numeric(bandwidth)),
         spacing = stats::median(spacing),
-        quality = quality
+        quality = trend$quality,
+        warnings = character()
     )
+}
+
+.prepare_automatic_cutoff_input <- function(profile, specification) {
+    quality <- .empty_automatic_cutoff_quality(specification)
+    validated <- .validate_automatic_cutoff_profile(profile, quality)
+    if (!validated$ok) {
+        return(validated)
+    }
+    evidence <- .automatic_cutoff_evidence(
+        profile,
+        validated$quality,
+        specification
+    )
+    if (!evidence$ok) {
+        return(evidence)
+    }
+    support <- .automatic_cutoff_grid_support(
+        profile,
+        evidence$quality,
+        specification
+    )
+    if (!support$ok) {
+        return(support)
+    }
+    .automatic_cutoff_numeric_candidate(
+        profile,
+        evidence$raw,
+        support,
+        specification
+    )
+}
+
+.fit_automatic_cutoff_trend <- function(scaled, has_missing) {
+    captured <- new.env(parent = emptyenv())
+    captured$warnings <- character()
+    fitted <- tryCatch(
+        withCallingHandlers(
+            stats::glm.fit(
+                x = cbind(intercept = 1, intensity = scaled),
+                y = as.integer(has_missing),
+                family = stats::binomial()
+            ),
+            warning = function(condition) {
+                captured$warnings <- c(
+                    captured$warnings,
+                    conditionMessage(condition)
+                )
+                invokeRestart("muffleWarning")
+            }
+        ),
+        error = function(...) NULL
+    )
+
+    list(fitted = fitted, warnings = unique(captured$warnings))
 }
 
 .automatic_cutoff_trend <- function(intensity, has_missing) {
@@ -455,29 +647,25 @@
             credible = FALSE,
             slope = NA_real_,
             likelihood_ratio = NA_real_,
-            p_value = NA_real_
+            p_value = NA_real_,
+            warnings = character()
         ))
     }
 
     scaled <- (intensity - mean(intensity)) / spread
-    fitted <- tryCatch(
-        suppressWarnings(stats::glm.fit(
-            x = cbind(intercept = 1, intensity = scaled),
-            y = as.integer(has_missing),
-            family = stats::binomial()
-        )),
-        error = function(...) NULL
-    )
-    if (is.null(fitted)) {
+    fit <- .fit_automatic_cutoff_trend(scaled, has_missing)
+    if (is.null(fit$fitted)) {
         return(list(
             descending = FALSE,
             credible = FALSE,
             slope = NA_real_,
             likelihood_ratio = NA_real_,
-            p_value = NA_real_
+            p_value = NA_real_,
+            warnings = fit$warnings
         ))
     }
 
+    fitted <- fit$fitted
     likelihood_ratio <- fitted$null.deviance - fitted$deviance
     p_value <- if (is.finite(likelihood_ratio) && likelihood_ratio >= 0) {
         stats::pchisq(likelihood_ratio, df = 1, lower.tail = FALSE)
@@ -490,7 +678,8 @@
         credible = FALSE,
         slope = slope,
         likelihood_ratio = likelihood_ratio,
-        p_value = p_value
+        p_value = p_value,
+        warnings = fit$warnings
     )
 }
 
@@ -529,42 +718,9 @@
         (level - y_pair[[1L]]) * diff(x_pair) / diff(y_pair)
 }
 
-.detect_automatic_cutoff <- function(profile) {
-    specification <- .automatic_cutoff_specification()
-    candidate <- .prepare_automatic_cutoff_input(profile, specification)
-    if (!candidate$ok) {
-        return(.automatic_cutoff_failure(
-            candidate$reason,
-            candidate$quality,
-            specification
-        ))
-    }
-
-    quality <- candidate$quality
-    half_window <- max(
-        specification$polynomial_degree,
-        as.integer(round(
-            specification$half_window_bandwidths *
-                candidate$bandwidth / candidate$spacing
-        ))
-    )
-    quality$derivative$half_window_points <- half_window
-    if (2L * half_window + 1L > length(candidate$y)) {
-        return(.automatic_cutoff_failure(
-            "The supported profile is too short for derivative smoothing.",
-            quality,
-            specification
-        ))
-    }
-
-    filtered <- .automatic_local_polynomial(
-        candidate$y,
-        candidate$spacing,
-        half_window,
-        specification$polynomial_degree
-    )
+.automatic_derivative_minima <- function(filtered) {
     valid <- filtered$indices
-    local_minimum <- valid[
+    valid[
         valid > min(valid) &
             valid < max(valid) &
             filtered$derivative[valid] <=
@@ -573,70 +729,118 @@
                 filtered$derivative[valid + 1L] &
             filtered$derivative[valid] < 0
     ]
-    lobes <- lapply(
-        local_minimum,
-        function(peak) {
-            peak_value <- filtered$derivative[[peak]]
-            recovery_level <- specification$recovery_fraction * peak_value
-            right_candidates <- valid[
-                valid > peak &
-                    filtered$derivative[valid] >= recovery_level
-            ]
-            left_candidates <- valid[
-                valid < peak &
-                    filtered$derivative[valid] >= recovery_level
-            ]
-            if (length(right_candidates) == 0L ||
-                length(left_candidates) == 0L) {
-                return(NULL)
-            }
+}
 
-            right <- right_candidates[[1L]]
-            left <- utils::tail(left_candidates, 1L)
-            outside <- valid[valid < left | valid > right]
-            noise <- stats::mad(
-                filtered$derivative[outside],
-                center = stats::median(filtered$derivative[outside]),
-                constant = 1.4826,
-                na.rm = TRUE
-            )
-            list(
-                peak = peak,
-                peak_value = peak_value,
-                recovery_level = recovery_level,
-                left = left,
-                right = right,
-                drop = filtered$smooth[[left]] - filtered$smooth[[right]],
-                peak_to_noise = abs(peak_value) /
-                    max(noise, .Machine$double.eps)
-            )
-        }
+.automatic_derivative_lobe <- function(peak, filtered, specification) {
+    valid <- filtered$indices
+    peak_value <- filtered$derivative[[peak]]
+    recovery_level <- specification$recovery_fraction * peak_value
+    right_candidates <- valid[
+        valid > peak & filtered$derivative[valid] >= recovery_level
+    ]
+    left_candidates <- valid[
+        valid < peak & filtered$derivative[valid] >= recovery_level
+    ]
+    if (length(right_candidates) == 0L ||
+        length(left_candidates) == 0L) {
+        return(NULL)
+    }
+
+    right <- right_candidates[[1L]]
+    left <- utils::tail(left_candidates, 1L)
+    outside <- valid[valid < left | valid > right]
+    noise <- stats::mad(
+        filtered$derivative[outside],
+        center = stats::median(filtered$derivative[outside]),
+        constant = 1.4826,
+        na.rm = TRUE
+    )
+    list(
+        peak = peak,
+        peak_value = peak_value,
+        recovery_level = recovery_level,
+        left = left,
+        right = right,
+        drop = filtered$smooth[[left]] - filtered$smooth[[right]],
+        peak_to_noise = abs(peak_value) /
+            max(noise, .Machine$double.eps)
+    )
+}
+
+.credible_automatic_derivative_lobe <- function(lobe, specification) {
+    is.finite(lobe$drop) &&
+        lobe$drop >= specification$minimum_drop &&
+        is.finite(lobe$peak_to_noise) &&
+        lobe$peak_to_noise >= specification$minimum_peak_to_noise
+}
+
+.automatic_derivative_half_window <- function(candidate, specification) {
+    max(
+        specification$polynomial_degree,
+        as.integer(round(
+            specification$half_window_bandwidths *
+                candidate$bandwidth / candidate$spacing
+        ))
+    )
+}
+
+.automatic_cutoff_derivative <- function(candidate, specification) {
+    quality <- candidate$quality
+    half_window <- .automatic_derivative_half_window(candidate, specification)
+    quality$derivative$half_window_points <- half_window
+    if (2L * half_window + 1L > length(candidate$y)) {
+        return(.automatic_cutoff_input_failure(
+            "The supported profile is too short for derivative smoothing.",
+            quality
+        ))
+    }
+    filtered <- .automatic_local_polynomial(
+        candidate$y,
+        candidate$spacing,
+        half_window,
+        specification$polynomial_degree
+    )
+    lobes <- lapply(
+        .automatic_derivative_minima(filtered),
+        .automatic_derivative_lobe,
+        filtered = filtered,
+        specification = specification
     )
     lobes <- Filter(Negate(is.null), lobes)
     quality$derivative$lobe_count <- as.integer(length(lobes))
     credible <- vapply(
         lobes,
-        function(lobe) {
-            is.finite(lobe$drop) &&
-                lobe$drop >= specification$minimum_drop &&
-                is.finite(lobe$peak_to_noise) &&
-                lobe$peak_to_noise >= specification$minimum_peak_to_noise
-        },
-        logical(1L)
+        .credible_automatic_derivative_lobe,
+        logical(1L),
+        specification = specification
     )
     lobes <- lobes[credible]
     quality$derivative$credible_lobe_count <- as.integer(length(lobes))
     if (length(lobes) == 0L) {
-        return(.automatic_cutoff_failure(
+        return(.automatic_cutoff_input_failure(
             paste0(
                 "No credible descending derivative lobe has an interior ",
                 "boundary."
             ),
-            quality,
-            specification
+            quality
         ))
     }
 
+    list(
+        ok = TRUE,
+        quality = quality,
+        filtered = filtered,
+        lobes = lobes,
+        warnings = character()
+    )
+}
+
+.select_automatic_cutoff_transition <- function(
+    candidate,
+    filtered,
+    lobes,
+    specification
+) {
     peak_intensity <- vapply(
         lobes,
         function(lobe) candidate$x[[lobe$peak]],
@@ -661,18 +865,54 @@
         specification$boundary_correction_bandwidths * candidate$bandwidth
     peak_offset_boundary <- candidate$x[[lobe$peak]] +
         specification$maximum_peak_offset_bandwidths * candidate$bandwidth
-    cutoff <- min(corrected_boundary, peak_offset_boundary)
-    quality$selected_transition <- list(
-        peak_intensity = candidate$x[[lobe$peak]],
-        left_half_depth_intensity = left_crossing,
-        right_half_depth_intensity = right_crossing,
-        peak_derivative = lobe$peak_value,
-        half_depth_derivative = lobe$recovery_level,
-        drop = lobe$drop,
-        peak_to_noise = lobe$peak_to_noise,
-        kde_corrected_boundary = corrected_boundary,
-        peak_offset_boundary = peak_offset_boundary
+    list(
+        cutoff = min(corrected_boundary, peak_offset_boundary),
+        quality = list(
+            peak_intensity = candidate$x[[lobe$peak]],
+            left_half_depth_intensity = left_crossing,
+            right_half_depth_intensity = right_crossing,
+            peak_derivative = lobe$peak_value,
+            half_depth_derivative = lobe$recovery_level,
+            drop = lobe$drop,
+            peak_to_noise = lobe$peak_to_noise,
+            kde_corrected_boundary = corrected_boundary,
+            peak_offset_boundary = peak_offset_boundary
+        )
     )
+}
+
+.detect_automatic_cutoff <- function(profile) {
+    specification <- .automatic_cutoff_specification()
+    candidate <- .prepare_automatic_cutoff_input(profile, specification)
+    if (!candidate$ok) {
+        return(.automatic_cutoff_failure(
+            candidate$reason,
+            candidate$quality,
+            specification,
+            candidate$warnings
+        ))
+    }
+    derivative <- .automatic_cutoff_derivative(candidate, specification)
+    if (!derivative$ok) {
+        return(.automatic_cutoff_failure(
+            derivative$reason,
+            derivative$quality,
+            specification,
+            derivative$warnings
+        ))
+    }
+
+    quality <- derivative$quality
+    filtered <- derivative$filtered
+    lobes <- derivative$lobes
+    transition <- .select_automatic_cutoff_transition(
+        candidate,
+        filtered,
+        lobes,
+        specification
+    )
+    cutoff <- transition$cutoff
+    quality$selected_transition <- transition$quality
     if (!is.finite(cutoff) ||
         cutoff <= min(candidate$x) ||
         cutoff >= max(candidate$x)) {
@@ -712,7 +952,8 @@
     message <- sprintf(
         paste0(
             "Automatic cutoff is unidentifiable for condition `%s`: %s ",
-            "Inspect `profile` on this error and supply a manual cutoff for `%s`."
+            "Inspect `profile` on this error and supply a manual cutoff ",
+            "for `%s`."
         ),
         condition,
         decision$reason,
@@ -742,7 +983,8 @@
     required <- c("condition", "missing_count", "mean_intensity")
     if (!is.data.frame(statistics) || !all(required %in% names(statistics))) {
         stop(
-            "`statistics` must contain condition, missing_count, and mean_intensity.",
+            "`statistics` must contain condition, missing_count, and ",
+            "mean_intensity.",
             call. = FALSE
         )
     }

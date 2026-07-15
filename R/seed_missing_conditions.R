@@ -21,32 +21,79 @@
 
     rescue_count <- sum(lengths(rescue_plan))
     if (rescue_count == 0L) {
-        return(
-            list(
-                data = surviving_data,
-                feature_status = feature_status,
-                condition_minima = condition_minima,
-                seed_log = .empty_seed_log()
-            )
-        )
+        return(.condition_rescue_result(
+            surviving_data,
+            feature_status,
+            condition_minima,
+            .empty_seed_log()
+        ))
     }
 
-    rescued <- .with_local_rescue_seed(seed, {
-        .apply_condition_rescue(
-            surviving_data,
-            groups_by_sample,
-            condition_minima,
-            rescue_plan,
-            seed,
-            rescue_count
-        )
-    })
+    rescued <- .apply_seeded_condition_rescue(
+        seed,
+        surviving_data,
+        groups_by_sample,
+        condition_minima,
+        rescue_plan,
+        rescue_count
+    )
 
+    .condition_rescue_result(
+        rescued$data,
+        feature_status,
+        condition_minima,
+        rescued$seed_log
+    )
+}
+
+.apply_seeded_condition_rescue <- function(
+    seed,
+    data,
+    groups_by_sample,
+    condition_minima,
+    rescue_plan,
+    rescue_count
+) {
+    withr::with_preserve_seed(
+        .with_preserved_rng_kind(
+            withr::with_seed(
+                seed,
+                .apply_condition_rescue(
+                    data,
+                    groups_by_sample,
+                    condition_minima,
+                    rescue_plan,
+                    seed,
+                    rescue_count
+                ),
+                .rng_kind = "Mersenne-Twister",
+                .rng_normal_kind = "Inversion",
+                .rng_sample_kind = "Rejection"
+            )
+        )
+    )
+}
+
+.with_preserved_rng_kind <- function(code) {
+    caller_kind <- RNGkind()
+    on.exit(
+        do.call(RNGkind, as.list(caller_kind)),
+        add = TRUE
+    )
+    force(code)
+}
+
+.condition_rescue_result <- function(
+    data,
+    feature_status,
+    condition_minima,
+    seed_log
+) {
     list(
-        data = rescued$data,
+        data = data,
         feature_status = feature_status,
         condition_minima = condition_minima,
-        seed_log = rescued$seed_log
+        seed_log = seed_log
     )
 }
 
@@ -78,13 +125,10 @@
             finite <- is.finite(condition_data)
             if (!any(finite)) {
                 stop(
-                    sprintf(
-                        paste0(
-                            "Condition `%s` has no finite intensity; ",
-                            "a rescue minimum is undefined."
-                        ),
-                        condition
-                    ),
+                    "Condition `",
+                    condition,
+                    "` has no finite intensity; ",
+                    "a rescue minimum is undefined.",
                     call. = FALSE
                 )
             }
@@ -126,39 +170,6 @@
     )
 
     stats::setNames(plan, conditions)
-}
-
-.with_local_rescue_seed <- function(seed, code) {
-    caller_has_seed <- exists(
-        ".Random.seed",
-        envir = globalenv(),
-        inherits = FALSE
-    )
-    if (caller_has_seed) {
-        caller_seed <- get(
-            ".Random.seed",
-            envir = globalenv(),
-            inherits = FALSE
-        )
-    }
-
-    on.exit(
-        {
-            if (caller_has_seed) {
-                assign(".Random.seed", caller_seed, envir = globalenv())
-            } else if (exists(
-                ".Random.seed",
-                envir = globalenv(),
-                inherits = FALSE
-            )) {
-                rm(".Random.seed", envir = globalenv())
-            }
-        },
-        add = TRUE
-    )
-
-    set.seed(seed)
-    force(code)
 }
 
 .apply_condition_rescue <- function(

@@ -70,26 +70,17 @@
 ) {
     groups_by_sample <- .validate_result_groups(data, groups_by_sample)
     conditions <- sort(unique(unname(groups_by_sample)), method = "radix")
-
-    if (is.null(groups)) {
-        groups <- .empty_condition_groups(conditions)
+    groups <- if (is.null(groups)) {
+        .empty_condition_groups(conditions)
+    } else {
+        groups
     }
-    if (is.null(cutoffs)) {
-        cutoffs <- stats::setNames(rep(NA_real_, length(conditions)), conditions)
-    }
-    if (is.null(cutoff_diagnostics)) {
-        cutoff_diagnostics <- stats::setNames(
-            vector("list", length(conditions)),
-            conditions
-        )
-    }
-    if (is.null(profiles)) {
-        profiles <- stats::setNames(
-            vector("list", length(conditions)),
-            conditions
-        )
-    }
-
+    cutoffs <- .default_result_cutoffs(cutoffs, conditions)
+    cutoff_diagnostics <- .default_condition_records(
+        cutoff_diagnostics,
+        conditions
+    )
+    profiles <- .default_condition_records(profiles, conditions)
     .validate_classification_states(classifications)
 
     structure(
@@ -107,6 +98,22 @@
         ),
         class = "imputefinder_result"
     )
+}
+
+.default_result_cutoffs <- function(cutoffs, conditions) {
+    if (is.null(cutoffs)) {
+        stats::setNames(rep(NA_real_, length(conditions)), conditions)
+    } else {
+        cutoffs
+    }
+}
+
+.default_condition_records <- function(records, conditions) {
+    if (is.null(records)) {
+        stats::setNames(vector("list", length(conditions)), conditions)
+    } else {
+        records
+    }
 }
 
 .validate_result_groups <- function(data, groups_by_sample) {

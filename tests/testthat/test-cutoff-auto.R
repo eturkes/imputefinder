@@ -131,6 +131,19 @@ test_that("flat and unsupported profiles fail without endpoint fallbacks", {
     )
 })
 
+test_that("automatic cutoff records numerical trend warnings", {
+    profile <- automatic_cutoff_profile(n = 200L)
+    profile$raw$has_missing <- profile$raw$mean_intensity <=
+        stats::median(profile$raw$mean_intensity)
+
+    decision <- imputefinder:::.detect_automatic_cutoff(profile)
+
+    expect_identical(decision$status, "unidentifiable")
+    expect_match(decision$reason, "numerical warnings", fixed = TRUE)
+    expect_true(any(grepl("glm.fit", decision$warnings, fixed = TRUE)))
+    expect_identical(decision$quality$trend$warnings, decision$warnings)
+})
+
 test_that("automatic cutoff decision is exact under evidence row order", {
     statistics <- automatic_cutoff_statistics()
     baseline <- imputefinder:::.detect_automatic_cutoff(
