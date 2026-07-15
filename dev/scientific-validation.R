@@ -1,9 +1,10 @@
 #!/usr/bin/env Rscript
 
-# M7 scientific-regression protocol. M7a freezes simulation truth, metrics,
-# gates, and the routine/long-run split before classifier results are inspected.
+# M7 scientific-regression protocol + benchmark. M7a freezes simulation truth,
+# metrics, gates, and the routine/long-run split before results are inspected.
 # Run from the repository root:
 # Rscript --vanilla dev/scientific-validation.R --verify
+# Rscript --vanilla dev/scientific-validation.R --benchmark
 
 .scientific_conditions <- c("A", "B")
 .scientific_states <- c("complete", "MNAR", "MAR", "insufficient")
@@ -864,30 +865,1688 @@ verify_scientific_validation <- function() {
     )
 }
 
-.scientific_validation_main <- function(
-    arguments = commandArgs(trailingOnly = TRUE)
-) {
-    if (!identical(arguments, "--verify")) {
+.scientific_public_classifier <- function() {
+    if (!requireNamespace("imputefinder", quietly = TRUE)) {
         stop(
             paste0(
-                "Usage: Rscript --vanilla dev/scientific-validation.R ",
-                "--verify (benchmark execution opens after the M7a freeze)"
+                "M7b requires an installed imputefinder package. Install the ",
+                "current source tree into the active library first."
             ),
             call. = FALSE
         )
     }
-    verified <- verify_scientific_validation()
-    print(verified$manifest, row.names = FALSE, digits = 4)
-    cat("\nRoutine subset:\n")
-    print(verified$routine, row.names = FALSE, digits = 4)
-    message(
-        sprintf(
-            "M7a verification passed: %d long scenarios; protocol MD5 %s.",
-            nrow(verified$manifest),
-            verified$hash
+
+    getExportedValue("imputefinder", "classify_missingness")
+}
+
+.scientific_rng_snapshot <- function() {
+    list(
+        kind = RNGkind(),
+        seed = if (exists(".Random.seed", globalenv(), inherits = FALSE)) {
+            get(".Random.seed", globalenv(), inherits = FALSE)
+        } else {
+            NULL
+        }
+    )
+}
+
+.restore_scientific_rng <- function(snapshot) {
+    do.call(RNGkind, as.list(snapshot$kind))
+    if (is.null(snapshot$seed)) {
+        if (exists(".Random.seed", globalenv(), inherits = FALSE)) {
+            rm(".Random.seed", envir = globalenv())
+        }
+    } else {
+        assign(".Random.seed", snapshot$seed, envir = globalenv())
+    }
+    invisible(snapshot)
+}
+
+.scientific_output_audit <- function(result, simulation, rescue_seed) {
+    fail <- function(...) {
+        list(ok = FALSE, detail = paste0(...))
+    }
+    required <- c("data", "feature_status", "seed_log", "groups_by_sample")
+    if (!is.list(result) || !all(required %in% names(result)) ||
+        !is.matrix(result$data) || !is.data.frame(result$feature_status) ||
+        !is.data.frame(result$seed_log)) {
+        return(fail("result schema is incomplete"))
+    }
+
+    input <- simulation$data
+    output <- result$data
+    status <- result$feature_status
+    retained <- status$feature[status$retained]
+    if (!identical(rownames(output), retained) ||
+        !identical(colnames(output), colnames(input)) ||
+        !identical(
+            result$groups_by_sample,
+            stats::setNames(
+                as.character(simulation$groups),
+                names(simulation$groups)
+            )
+        )) {
+        return(fail("output axes, retained order, or aligned groups changed"))
+    }
+
+    seed_log <- result$seed_log
+    seed_columns <- c(
+        "feature", "condition", "sample", "old_value", "inserted_value", "seed"
+    )
+    if (!identical(names(seed_log), seed_columns)) {
+        return(fail("seed log schema changed"))
+    }
+    seed_keys <- paste(seed_log$feature, seed_log$sample, sep = "\r")
+    if (anyDuplicated(seed_keys)) {
+        return(fail("seed log contains duplicate feature-sample cells"))
+    }
+
+    conditions <- sort(unique(unname(simulation$groups)), method = "radix")
+    condition_minima <- stats::setNames(
+        vapply(
+            conditions,
+            function(condition) {
+                min(input[, simulation$groups == condition, drop = FALSE], na.rm = TRUE)
+            },
+            numeric(1L)
+        ),
+        conditions
+    )
+    if (nrow(seed_log) > 0L) {
+        feature_index <- match(seed_log$feature, rownames(input))
+        sample_index <- match(seed_log$sample, colnames(input))
+        valid_reference <- !anyNA(feature_index) && !anyNA(sample_index)
+        original_values <- if (valid_reference) {
+            input[cbind(feature_index, sample_index)]
+        } else {
+            rep(NA_real_, nrow(seed_log))
+        }
+        expected_condition <- if (valid_reference) {
+            as.character(unname(simulation$groups[seed_log$sample]))
+        } else {
+            rep(NA_character_, nrow(seed_log))
+        }
+        expected_minimum <- unname(condition_minima[seed_log$condition])
+        valid_log <- valid_reference &&
+            all(is.na(original_values)) &&
+            all(is.na(seed_log$old_value)) &&
+            identical(seed_log$condition, expected_condition) &&
+            all(is.finite(seed_log$inserted_value)) &&
+            identical(seed_log$inserted_value, expected_minimum) &&
+            identical(seed_log$seed, rep(as.integer(rescue_seed), nrow(seed_log)))
+        if (!valid_log) {
+            return(fail("seed log does not match original cells or condition minima"))
+        }
+    }
+
+    if (nrow(output) > 0L) {
+        original <- input[rownames(output), colnames(output), drop = FALSE]
+        originally_observed <- !is.na(original)
+        if (!identical(
+            unname(output[originally_observed]),
+            unname(original[originally_observed])
+        )) {
+            return(fail("an original observed value changed"))
+        }
+
+        inserted <- is.na(original) & !is.na(output)
+        output_keys <- as.vector(outer(
+            rownames(output),
+            colnames(output),
+            paste,
+            sep = "\r"
+        ))
+        inserted_keys <- output_keys[as.vector(inserted)]
+        retained_seed <- seed_log$feature %in% rownames(output)
+        if (!setequal(inserted_keys, seed_keys[retained_seed])) {
+            return(fail("returned inserted cells and seed log disagree"))
+        }
+        if (any(inserted)) {
+            inserted_values <- stats::setNames(
+                as.vector(output)[as.vector(inserted)],
+                inserted_keys
+            )
+            logged_values <- stats::setNames(
+                seed_log$inserted_value[retained_seed],
+                seed_keys[retained_seed]
+            )
+            if (!identical(
+                unname(inserted_values[names(logged_values)]),
+                unname(logged_values)
+            )) {
+                return(fail("returned seed values differ from seed provenance"))
+            }
+        }
+    }
+
+    list(ok = TRUE, detail = "")
+}
+
+.invoke_scientific_classifier <- function(
+    classifier,
+    simulation,
+    cutoffs,
+    rescue_seed
+) {
+    original <- simulation$data
+    before_rng <- .scientific_rng_snapshot()
+    value <- tryCatch(
+        classifier(
+            x = simulation$data,
+            group = simulation$groups,
+            cutoffs = cutoffs,
+            seed = rescue_seed
+        ),
+        error = identity
+    )
+    after_rng <- .scientific_rng_snapshot()
+    input_unchanged <- identical(simulation$data, original)
+    rng_unchanged <- identical(after_rng, before_rng)
+    if (!rng_unchanged) {
+        .restore_scientific_rng(before_rng)
+    }
+    output_audit <- if (inherits(value, "error")) {
+        list(ok = inherits(value, "imputefinder_cutoff_error"), detail = "")
+    } else {
+        .scientific_output_audit(value, simulation, rescue_seed)
+    }
+
+    list(
+        value = value,
+        audit = list(
+            input_unchanged = input_unchanged,
+            rng_unchanged = rng_unchanged,
+            output_valid = output_audit$ok,
+            detail = output_audit$detail
         )
     )
-    invisible(verified)
+}
+
+.scientific_score_condition <- function(result, simulation, condition) {
+    selected_result <- result
+    selected_result$classifications <- result$classifications[
+        result$classifications$condition == condition,
+        ,
+        drop = FALSE
+    ]
+    selected_simulation <- simulation
+    selected_simulation$oracle$classifications <-
+        simulation$oracle$classifications[
+            simulation$oracle$classifications$condition == condition,
+            ,
+            drop = FALSE
+        ]
+
+    score_scientific_result(selected_result, selected_simulation)
+}
+
+.canonical_scientific_frame <- function(x, columns) {
+    if (nrow(x) == 0L) {
+        rownames(x) <- NULL
+        return(x)
+    }
+    order_arguments <- c(
+        lapply(columns, function(column) x[[column]]),
+        list(method = "radix")
+    )
+    ordered <- x[do.call(order, order_arguments), , drop = FALSE]
+    rownames(ordered) <- NULL
+    ordered
+}
+
+.canonical_scientific_profile <- function(profile) {
+    list(
+        raw = .canonical_scientific_frame(profile$raw, c("feature", "condition")),
+        grid = profile$grid,
+        metadata = profile$metadata
+    )
+}
+
+.canonical_scientific_groups <- function(groups) {
+    lapply(
+        groups[sort(names(groups), method = "radix")],
+        function(condition_groups) {
+            lapply(
+                condition_groups,
+                sort,
+                method = "radix"
+            )
+        }
+    )
+}
+
+.canonical_scientific_result <- function(
+    result,
+    include_data = FALSE,
+    include_seed_assignment = FALSE
+) {
+    profiles <- lapply(
+        result$profiles[sort(names(result$profiles), method = "radix")],
+        .canonical_scientific_profile
+    )
+    seed_columns <- if (include_seed_assignment) {
+        names(result$seed_log)
+    } else {
+        setdiff(names(result$seed_log), c("sample", "seed"))
+    }
+    seed_log <- result$seed_log[, seed_columns, drop = FALSE]
+    seed_log <- .canonical_scientific_frame(seed_log, c("feature", "condition"))
+    canonical <- list(
+        classifications = .canonical_scientific_frame(
+            result$classifications,
+            c("feature", "condition")
+        ),
+        groups = .canonical_scientific_groups(result$groups),
+        feature_status = .canonical_scientific_frame(
+            result$feature_status,
+            "feature"
+        ),
+        cutoffs = result$cutoffs[sort(names(result$cutoffs), method = "radix")],
+        cutoff_diagnostics = result$cutoff_diagnostics[
+            sort(names(result$cutoff_diagnostics), method = "radix")
+        ],
+        profiles = profiles,
+        seed_log = seed_log,
+        groups_by_sample = result$groups_by_sample[
+            sort(names(result$groups_by_sample), method = "radix")
+        ]
+    )
+    if (include_data) {
+        canonical$data <- result$data[
+            sort(rownames(result$data), method = "radix"),
+            sort(colnames(result$data), method = "radix"),
+            drop = FALSE
+        ]
+    }
+    canonical
+}
+
+.canonical_scientific_failure <- function(error) {
+    list(
+        class = class(error),
+        condition = error$condition,
+        reason = error$reason,
+        diagnostic = error$diagnostic,
+        profile = .canonical_scientific_profile(error$profile)
+    )
+}
+
+.canonical_scientific_outcome <- function(
+    outcome,
+    include_data = FALSE,
+    include_seed_assignment = FALSE
+) {
+    value <- outcome$value
+    if (inherits(value, "imputefinder_cutoff_error")) {
+        return(list(status = "unidentifiable", value =
+            .canonical_scientific_failure(value)))
+    }
+    if (inherits(value, "error")) {
+        return(list(
+            status = "error",
+            value = list(class = class(value), message = conditionMessage(value))
+        ))
+    }
+    list(
+        status = "ok",
+        value = .canonical_scientific_result(
+            value,
+            include_data = include_data,
+            include_seed_assignment = include_seed_assignment
+        )
+    )
+}
+
+.scientific_audit_row <- function(
+    scenario,
+    simulation_seed,
+    path,
+    rescue_seed,
+    invocation
+) {
+    data.frame(
+        scenario = scenario,
+        simulation_seed = as.integer(simulation_seed),
+        path = path,
+        rescue_seed = as.integer(rescue_seed),
+        input_unchanged = invocation$audit$input_unchanged,
+        rng_unchanged = invocation$audit$rng_unchanged,
+        output_valid = invocation$audit$output_valid,
+        detail = invocation$audit$detail,
+        stringsAsFactors = FALSE
+    )
+}
+
+.run_scientific_automatic <- function(
+    classifier,
+    simulation,
+    rescue_seed
+) {
+    conditions <- sort(unique(unname(simulation$groups)), method = "radix")
+    joint <- .invoke_scientific_classifier(
+        classifier,
+        simulation,
+        cutoffs = NULL,
+        rescue_seed = rescue_seed
+    )
+    invocations <- list(joint = joint)
+    outcomes <- stats::setNames(vector("list", length(conditions)), conditions)
+    if (!inherits(joint$value, "error")) {
+        for (condition in conditions) {
+            outcomes[[condition]] <- joint
+        }
+        return(list(outcomes = outcomes, invocations = invocations))
+    }
+
+    failed_condition <- if (
+        inherits(joint$value, "imputefinder_cutoff_error") &&
+            is.character(joint$value$condition) &&
+            length(joint$value$condition) == 1L &&
+            joint$value$condition %in% conditions
+    ) {
+        joint$value$condition
+    } else {
+        NA_character_
+    }
+    if (!is.na(failed_condition)) {
+        outcomes[[failed_condition]] <- joint
+    }
+
+    unresolved <- conditions[vapply(outcomes, is.null, logical(1L))]
+    for (condition in unresolved) {
+        manual_conditions <- setdiff(conditions, condition)
+        manual <- stats::setNames(
+            rep(simulation$scenario$cutoff, length(manual_conditions)),
+            manual_conditions
+        )
+        isolated <- .invoke_scientific_classifier(
+            classifier,
+            simulation,
+            cutoffs = manual,
+            rescue_seed = rescue_seed
+        )
+        invocations[[paste0("isolated_", condition)]] <- isolated
+        outcomes[[condition]] <- isolated
+    }
+
+    list(outcomes = outcomes, invocations = invocations)
+}
+
+.scientific_score_values <- function(score, metric_names) {
+    values <- stats::setNames(rep(NA_real_, length(metric_names)), metric_names)
+    if (is.numeric(score) && all(metric_names %in% names(score))) {
+        values[] <- score[metric_names]
+    }
+    values
+}
+
+.scientific_manual_row <- function(
+    scenario_name,
+    simulation,
+    condition,
+    result,
+    metric_names
+) {
+    score <- if (inherits(result, "error")) {
+        NULL
+    } else {
+        .scientific_score_condition(result, simulation, condition)
+    }
+    metrics <- .scientific_score_values(score, metric_names)
+    data.frame(
+        scenario = scenario_name,
+        family = simulation$scenario$family,
+        simulation_seed = simulation$simulation_seed,
+        condition = condition,
+        samples_per_condition = simulation$scenario$samples_per_condition,
+        mar_rate = simulation$scenario$mar_rate,
+        cutoff = simulation$scenario$cutoff,
+        as.list(metrics),
+        check.names = FALSE,
+        stringsAsFactors = FALSE
+    )
+}
+
+.scientific_automatic_evidence <- function(value, condition) {
+    if (inherits(value, "imputefinder_cutoff_error")) {
+        diagnostic <- value$diagnostic
+        profile <- value$profile
+    } else if (!inherits(value, "error")) {
+        diagnostic <- value$cutoff_diagnostics[[condition]]
+        profile <- value$profiles[[condition]]
+    } else {
+        return(list(
+            diagnostic = NULL,
+            profile = NULL,
+            feature_count = NA_integer_,
+            missing_count = NA_integer_,
+            complete_count = NA_integer_,
+            minimum_features = NA_integer_,
+            minimum_class_features = NA_integer_,
+            observed_range = c(minimum = NA_real_, maximum = NA_real_)
+        ))
+    }
+
+    evidence <- diagnostic$quality$evidence
+    feature_count <- evidence$feature_count
+    class_counts <- evidence$class_counts
+    observed_range <- diagnostic$quality$support$observed_mean_range
+    if (is.null(observed_range) && is.list(profile)) {
+        observed_range <- profile$metadata$observed_mean_range
+    }
+    list(
+        diagnostic = diagnostic,
+        profile = profile,
+        feature_count = as.integer(feature_count),
+        missing_count = as.integer(unname(class_counts[["missing"]])),
+        complete_count = as.integer(unname(class_counts[["complete"]])),
+        minimum_features = as.integer(evidence$minimum_feature_count),
+        minimum_class_features =
+            as.integer(evidence$minimum_class_feature_count),
+        observed_range = stats::setNames(
+            as.numeric(observed_range),
+            c("minimum", "maximum")
+        )
+    )
+}
+
+.scientific_automatic_row <- function(
+    scenario_name,
+    simulation,
+    condition,
+    outcome,
+    manual_result,
+    metric_names
+) {
+    value <- outcome$value
+    status <- if (inherits(value, "imputefinder_cutoff_error")) {
+        "unidentifiable"
+    } else if (inherits(value, "error")) {
+        "error"
+    } else {
+        "ok"
+    }
+    score <- if (identical(status, "ok")) {
+        .scientific_score_condition(value, simulation, condition)
+    } else {
+        NULL
+    }
+    metrics <- .scientific_score_values(score, metric_names)
+    manual_score <- if (inherits(manual_result, "error")) {
+        NULL
+    } else {
+        .scientific_score_condition(manual_result, simulation, condition)
+    }
+    manual_metrics <- .scientific_score_values(manual_score, metric_names)
+    evidence <- .scientific_automatic_evidence(value, condition)
+    cutoff <- if (identical(status, "ok")) {
+        unname(value$cutoffs[[condition]])
+    } else {
+        NA_real_
+    }
+    signed_error <- cutoff - simulation$scenario$cutoff
+    eligible <- is.finite(evidence$feature_count) &&
+        is.finite(evidence$missing_count) &&
+        is.finite(evidence$complete_count) &&
+        is.finite(evidence$minimum_features) &&
+        is.finite(evidence$minimum_class_features) &&
+        evidence$feature_count >= evidence$minimum_features &&
+        evidence$missing_count >= evidence$minimum_class_features &&
+        evidence$complete_count >= evidence$minimum_class_features
+    inside_support <- is.finite(cutoff) &&
+        is.finite(evidence$observed_range[["minimum"]]) &&
+        is.finite(evidence$observed_range[["maximum"]]) &&
+        cutoff > evidence$observed_range[["minimum"]] &&
+        cutoff < evidence$observed_range[["maximum"]]
+    reason <- if (inherits(value, "imputefinder_cutoff_error")) {
+        value$reason
+    } else if (inherits(value, "error")) {
+        conditionMessage(value)
+    } else {
+        ""
+    }
+    structured_condition_exact <- if (
+        inherits(value, "imputefinder_cutoff_error")
+    ) {
+        identical(value$condition, condition)
+    } else {
+        TRUE
+    }
+    structured_profile_available <- if (
+        inherits(value, "imputefinder_cutoff_error")
+    ) {
+        is.list(value$diagnostic) && is.list(value$profile) &&
+            identical(value$diagnostic$profile, value$profile$metadata)
+    } else {
+        TRUE
+    }
+
+    data.frame(
+        scenario = scenario_name,
+        family = simulation$scenario$family,
+        automatic_gate = simulation$scenario$automatic_gate,
+        simulation_seed = simulation$simulation_seed,
+        condition = condition,
+        samples_per_condition = simulation$scenario$samples_per_condition,
+        mar_rate = simulation$scenario$mar_rate,
+        true_cutoff = simulation$scenario$cutoff,
+        status = status,
+        structured_condition_exact = structured_condition_exact,
+        structured_profile_available = structured_profile_available,
+        cutoff = cutoff,
+        signed_cutoff_error = signed_error,
+        absolute_cutoff_error = abs(signed_error),
+        inside_observed_support = inside_support,
+        evidence_eligible = eligible,
+        feature_count = evidence$feature_count,
+        missing_feature_count = evidence$missing_count,
+        complete_feature_count = evidence$complete_count,
+        reason = reason,
+        as.list(metrics),
+        mnar_f1_delta_from_manual = metrics[["mnar_f1"]] -
+            manual_metrics[["mnar_f1"]],
+        retention_f1_delta_from_manual = metrics[["retention_f1"]] -
+            manual_metrics[["retention_f1"]],
+        check.names = FALSE,
+        stringsAsFactors = FALSE
+    )
+}
+
+.scientific_outcome_condition_signature <- function(outcome, condition) {
+    value <- outcome$value
+    if (inherits(value, "imputefinder_cutoff_error")) {
+        return(.canonical_scientific_outcome(outcome))
+    }
+    if (inherits(value, "error")) {
+        return(.canonical_scientific_outcome(outcome))
+    }
+    list(
+        status = "ok",
+        cutoff = unname(value$cutoffs[[condition]]),
+        diagnostic = value$cutoff_diagnostics[[condition]],
+        profile = .canonical_scientific_profile(value$profiles[[condition]]),
+        classification = .canonical_scientific_frame(
+            value$classifications[
+                value$classifications$condition == condition,
+                ,
+                drop = FALSE
+            ],
+            c("feature", "condition")
+        ),
+        feature_status = .canonical_scientific_frame(
+            value$feature_status,
+            "feature"
+        )
+    )
+}
+
+.scientific_comparison_row <- function(
+    audit,
+    scenario,
+    simulation_seed,
+    condition = NA_character_,
+    rescue_seed = NA_integer_,
+    passed,
+    detail = ""
+) {
+    data.frame(
+        audit = audit,
+        scenario = scenario,
+        simulation_seed = as.integer(simulation_seed),
+        condition = condition,
+        rescue_seed = as.integer(rescue_seed),
+        passed = isTRUE(passed),
+        detail = detail,
+        stringsAsFactors = FALSE
+    )
+}
+
+.scientific_sweep_snapshot <- function(
+    simulation,
+    manual_result,
+    automatic
+) {
+    manual <- if (inherits(manual_result, "error")) {
+        list(status = "error", message = conditionMessage(manual_result))
+    } else {
+        list(
+            status = "ok",
+            classifications = .canonical_scientific_frame(
+                manual_result$classifications[
+                    , c("feature", "condition", "state", "retained", "drop_reason"),
+                    drop = FALSE
+                ],
+                c("feature", "condition")
+            ),
+            feature_status = .canonical_scientific_frame(
+                manual_result$feature_status,
+                "feature"
+            )
+        )
+    }
+    conditions <- names(automatic$outcomes)
+    automatic_snapshot <- lapply(
+        conditions,
+        function(condition) {
+            value <- automatic$outcomes[[condition]]$value
+            if (inherits(value, "imputefinder_cutoff_error")) {
+                return(list(status = "unidentifiable"))
+            }
+            if (inherits(value, "error")) {
+                return(list(status = "error", message = conditionMessage(value)))
+            }
+            list(
+                status = "ok",
+                cutoff_error = unname(value$cutoffs[[condition]]) -
+                    simulation$scenario$cutoff,
+                classifications = .canonical_scientific_frame(
+                    value$classifications[
+                        value$classifications$condition == condition,
+                        c("feature", "condition", "state", "retained", "drop_reason"),
+                        drop = FALSE
+                    ],
+                    c("feature", "condition")
+                ),
+                feature_status = .canonical_scientific_frame(
+                    value$feature_status,
+                    "feature"
+                )
+            )
+        }
+    )
+    names(automatic_snapshot) <- conditions
+
+    list(
+        missing_mask = simulation$masks$missing,
+        manual = manual,
+        automatic = automatic_snapshot
+    )
+}
+
+.compare_scientific_sweep <- function(
+    reference,
+    candidate,
+    scenario,
+    simulation_seed,
+    tolerance
+) {
+    rows <- list(
+        .scientific_comparison_row(
+            "sweep_missing_mask",
+            scenario,
+            simulation_seed,
+            passed = identical(reference$missing_mask, candidate$missing_mask)
+        ),
+        .scientific_comparison_row(
+            "sweep_manual_state_retention",
+            scenario,
+            simulation_seed,
+            passed = identical(reference$manual, candidate$manual)
+        )
+    )
+    next_row <- length(rows) + 1L
+    for (condition in names(reference$automatic)) {
+        expected <- reference$automatic[[condition]]
+        observed <- candidate$automatic[[condition]]
+        status_exact <- identical(expected$status, observed$status)
+        state_exact <- status_exact
+        shift_exact <- status_exact
+        if (status_exact && identical(expected$status, "ok")) {
+            state_exact <- identical(
+                expected[c("classifications", "feature_status")],
+                observed[c("classifications", "feature_status")]
+            )
+            shift_exact <- isTRUE(
+                abs(expected$cutoff_error - observed$cutoff_error) <= tolerance
+            )
+        }
+        rows[[next_row]] <- .scientific_comparison_row(
+            "sweep_automatic_status",
+            scenario,
+            simulation_seed,
+            condition,
+            passed = status_exact
+        )
+        rows[[next_row + 1L]] <- .scientific_comparison_row(
+            "sweep_automatic_state_retention",
+            scenario,
+            simulation_seed,
+            condition,
+            passed = state_exact
+        )
+        rows[[next_row + 2L]] <- .scientific_comparison_row(
+            "sweep_automatic_shift_error",
+            scenario,
+            simulation_seed,
+            condition,
+            passed = shift_exact,
+            detail = if (
+                status_exact && identical(expected$status, "ok")
+            ) {
+                format(
+                    abs(expected$cutoff_error - observed$cutoff_error),
+                    digits = 17L
+                )
+            } else {
+                ""
+            }
+        )
+        next_row <- next_row + 3L
+    }
+    do.call(rbind, rows)
+}
+
+.scientific_permutation_audit <- function(
+    classifier,
+    protocol,
+    scenario_name
+) {
+    seed <- protocol$simulation_seeds[[1L]]
+    rescue_seed <- protocol$rescue_seeds[[1L]]
+    simulation <- simulate_scientific_scenario(
+        scenario_name,
+        seed,
+        catalog = protocol$catalog
+    )
+    permutation <- scientific_validation_permutation(simulation)
+    permuted <- simulation
+    permuted$data <- simulation$data[
+        permutation$features,
+        permutation$samples,
+        drop = FALSE
+    ]
+    permuted$groups <- stats::setNames(
+        factor(
+            unname(simulation$groups[permutation$samples]),
+            levels = c("B", "A")
+        ),
+        colnames(permuted$data)
+    )
+
+    manual_cutoffs <- stats::setNames(
+        rep(simulation$scenario$cutoff, length(protocol$conditions)),
+        rev(protocol$conditions)
+    )
+    baseline_manual <- .invoke_scientific_classifier(
+        classifier,
+        simulation,
+        manual_cutoffs,
+        rescue_seed
+    )
+    permuted_manual <- .invoke_scientific_classifier(
+        classifier,
+        permuted,
+        manual_cutoffs,
+        rescue_seed
+    )
+    manual_exact <- !inherits(baseline_manual$value, "error") &&
+        !inherits(permuted_manual$value, "error") &&
+        identical(
+            .canonical_scientific_result(
+                baseline_manual$value,
+                include_data = TRUE,
+                include_seed_assignment = TRUE
+            ),
+            .canonical_scientific_result(
+                permuted_manual$value,
+                include_data = TRUE,
+                include_seed_assignment = TRUE
+            )
+        )
+
+    baseline_automatic <- .run_scientific_automatic(
+        classifier,
+        simulation,
+        rescue_seed
+    )
+    permuted_automatic <- .run_scientific_automatic(
+        classifier,
+        permuted,
+        rescue_seed
+    )
+    automatic_rows <- lapply(
+        protocol$conditions,
+        function(condition) {
+            baseline <- .canonical_scientific_outcome(
+                baseline_automatic$outcomes[[condition]],
+                include_data = TRUE,
+                include_seed_assignment = TRUE
+            )
+            candidate <- .canonical_scientific_outcome(
+                permuted_automatic$outcomes[[condition]],
+                include_data = TRUE,
+                include_seed_assignment = TRUE
+            )
+            .scientific_comparison_row(
+                "permutation_automatic_exact",
+                scenario_name,
+                seed,
+                condition,
+                rescue_seed,
+                identical(baseline, candidate)
+            )
+        }
+    )
+
+    comparison <- do.call(
+        rbind,
+        c(
+            list(.scientific_comparison_row(
+                "permutation_manual_exact",
+                scenario_name,
+                seed,
+                rescue_seed = rescue_seed,
+                passed = manual_exact
+            )),
+            automatic_rows
+        )
+    )
+    invocations <- c(
+        list(
+            baseline_manual = baseline_manual,
+            permuted_manual = permuted_manual
+        ),
+        stats::setNames(
+            baseline_automatic$invocations,
+            paste0("baseline_automatic_", names(baseline_automatic$invocations))
+        ),
+        stats::setNames(
+            permuted_automatic$invocations,
+            paste0("permuted_automatic_", names(permuted_automatic$invocations))
+        )
+    )
+    audit <- do.call(
+        rbind,
+        lapply(
+            names(invocations),
+            function(path) {
+                .scientific_audit_row(
+                    scenario_name,
+                    seed,
+                    paste0("permutation_", path),
+                    rescue_seed,
+                    invocations[[path]]
+                )
+            }
+        )
+    )
+
+    list(comparison = comparison, invocations = audit)
+}
+
+.scientific_object_hash <- function(x) {
+    path <- tempfile("imputefinder-scientific-result-", fileext = ".rds")
+    on.exit(unlink(path), add = TRUE)
+    saveRDS(x, path, version = 2, compress = FALSE)
+    unname(tools::md5sum(path))
+}
+
+.scientific_record_automatic_audits <- function(
+    automatic,
+    scenario_name,
+    simulation_seed,
+    rescue_seed,
+    prefix = "automatic"
+) {
+    do.call(
+        rbind,
+        lapply(
+            names(automatic$invocations),
+            function(path) {
+                .scientific_audit_row(
+                    scenario_name,
+                    simulation_seed,
+                    paste(prefix, path, sep = "_"),
+                    rescue_seed,
+                    automatic$invocations[[path]]
+                )
+            }
+        )
+    )
+}
+
+run_scientific_validation_benchmark <- function(progress = TRUE) {
+    protocol <- scientific_validation_protocol()
+    manifest <- .validate_scientific_protocol(protocol)
+    protocol_hash <- scientific_validation_protocol_hash(protocol)
+    frozen_hash <- "4011e381bba2d0d747e91d277a45de5e"
+    if (!identical(protocol_hash, frozen_hash)) {
+        stop(
+            "M7b refuses to run because the frozen protocol-v1 hash changed.",
+            call. = FALSE
+        )
+    }
+    classifier <- .scientific_public_classifier()
+    caller_rng <- .scientific_rng_snapshot()
+    on.exit(.restore_scientific_rng(caller_rng), add = TRUE)
+    set.seed(7102026L)
+    started <- proc.time()[["elapsed"]]
+
+    manual_rows <- automatic_rows <- invocation_rows <- list()
+    comparison_rows <- list()
+    manual_index <- automatic_index <- invocation_index <- comparison_index <- 1L
+    sweep_reference <- list()
+
+    for (scenario_name in names(protocol$catalog)) {
+        if (progress) {
+            message(sprintf("M7b benchmark: %s", scenario_name))
+        }
+        for (simulation_seed in protocol$simulation_seeds) {
+            simulation <- simulate_scientific_scenario(
+                scenario_name,
+                simulation_seed,
+                catalog = protocol$catalog
+            )
+            rescue_seed <- protocol$rescue_seeds[[1L]]
+            manual_cutoffs <- stats::setNames(
+                rep(simulation$scenario$cutoff, length(protocol$conditions)),
+                protocol$conditions
+            )
+            manual <- .invoke_scientific_classifier(
+                classifier,
+                simulation,
+                manual_cutoffs,
+                rescue_seed
+            )
+            invocation_rows[[invocation_index]] <- .scientific_audit_row(
+                scenario_name,
+                simulation_seed,
+                "manual",
+                rescue_seed,
+                manual
+            )
+            invocation_index <- invocation_index + 1L
+            for (condition in protocol$conditions) {
+                manual_rows[[manual_index]] <- .scientific_manual_row(
+                    scenario_name,
+                    simulation,
+                    condition,
+                    manual$value,
+                    protocol$metrics
+                )
+                manual_index <- manual_index + 1L
+            }
+
+            automatic <- .run_scientific_automatic(
+                classifier,
+                simulation,
+                rescue_seed
+            )
+            invocation_rows[[invocation_index]] <-
+                .scientific_record_automatic_audits(
+                    automatic,
+                    scenario_name,
+                    simulation_seed,
+                    rescue_seed
+                )
+            invocation_index <- invocation_index + 1L
+            for (condition in protocol$conditions) {
+                automatic_rows[[automatic_index]] <- .scientific_automatic_row(
+                    scenario_name,
+                    simulation,
+                    condition,
+                    automatic$outcomes[[condition]],
+                    manual$value,
+                    protocol$metrics
+                )
+                automatic_index <- automatic_index + 1L
+            }
+
+            for (alternative_seed in protocol$rescue_seeds[-1L]) {
+                alternative_manual <- .invoke_scientific_classifier(
+                    classifier,
+                    simulation,
+                    manual_cutoffs,
+                    alternative_seed
+                )
+                invocation_rows[[invocation_index]] <- .scientific_audit_row(
+                    scenario_name,
+                    simulation_seed,
+                    "manual_alternative_seed",
+                    alternative_seed,
+                    alternative_manual
+                )
+                invocation_index <- invocation_index + 1L
+                comparison_rows[[comparison_index]] <-
+                    .scientific_comparison_row(
+                        "rescue_seed_manual_invariant",
+                        scenario_name,
+                        simulation_seed,
+                        rescue_seed = alternative_seed,
+                        passed = identical(
+                            .canonical_scientific_outcome(manual),
+                            .canonical_scientific_outcome(alternative_manual)
+                        )
+                    )
+                comparison_index <- comparison_index + 1L
+
+                alternative_automatic <- .run_scientific_automatic(
+                    classifier,
+                    simulation,
+                    alternative_seed
+                )
+                invocation_rows[[invocation_index]] <-
+                    .scientific_record_automatic_audits(
+                        alternative_automatic,
+                        scenario_name,
+                        simulation_seed,
+                        alternative_seed,
+                        prefix = "automatic_alternative_seed"
+                    )
+                invocation_index <- invocation_index + 1L
+                for (condition in protocol$conditions) {
+                    comparison_rows[[comparison_index]] <-
+                        .scientific_comparison_row(
+                            "rescue_seed_automatic_invariant",
+                            scenario_name,
+                            simulation_seed,
+                            condition,
+                            alternative_seed,
+                            identical(
+                                .scientific_outcome_condition_signature(
+                                    automatic$outcomes[[condition]],
+                                    condition
+                                ),
+                                .scientific_outcome_condition_signature(
+                                    alternative_automatic$outcomes[[condition]],
+                                    condition
+                                )
+                            )
+                        )
+                    comparison_index <- comparison_index + 1L
+                }
+            }
+
+            if (identical(simulation$scenario$family, "cutoff_sweep")) {
+                snapshot <- .scientific_sweep_snapshot(
+                    simulation,
+                    manual$value,
+                    automatic
+                )
+                seed_key <- as.character(simulation_seed)
+                if (identical(scenario_name, "sweep_c08")) {
+                    sweep_reference[[seed_key]] <- snapshot
+                } else {
+                    comparison_rows[[comparison_index]] <-
+                        .compare_scientific_sweep(
+                            sweep_reference[[seed_key]],
+                            snapshot,
+                            scenario_name,
+                            simulation_seed,
+                            protocol$gates$cutoff_sweep$maximum_shift_error
+                        )
+                    comparison_index <- comparison_index + 1L
+                }
+            }
+        }
+    }
+
+    for (scenario_name in protocol$permutation_scenarios) {
+        if (progress) {
+            message(sprintf("M7b permutation audit: %s", scenario_name))
+        }
+        permutation <- .scientific_permutation_audit(
+            classifier,
+            protocol,
+            scenario_name
+        )
+        comparison_rows[[comparison_index]] <- permutation$comparison
+        comparison_index <- comparison_index + 1L
+        invocation_rows[[invocation_index]] <- permutation$invocations
+        invocation_index <- invocation_index + 1L
+    }
+
+    raw <- list(
+        manual = do.call(rbind, manual_rows),
+        automatic = do.call(rbind, automatic_rows),
+        invocations = do.call(rbind, invocation_rows),
+        comparisons = do.call(rbind, comparison_rows)
+    )
+    rownames(raw$manual) <- rownames(raw$automatic) <- NULL
+    rownames(raw$invocations) <- rownames(raw$comparisons) <- NULL
+    summaries <- .summarise_scientific_benchmark(raw, protocol)
+    gates <- .evaluate_scientific_benchmark(raw, summaries, protocol)
+    deterministic <- list(
+        protocol_hash = protocol_hash,
+        manifest = manifest,
+        raw = raw,
+        summaries = summaries,
+        gates = gates
+    )
+    context <- list(
+        r = R.version.string,
+        platform = R.version$platform,
+        imputefinder_version = as.character(
+            utils::packageVersion("imputefinder")
+        ),
+        package_library = dirname(find.package("imputefinder")),
+        source_md5 = tools::md5sum(sort(list.files("R", full.names = TRUE))),
+        harness_md5 = unname(tools::md5sum("dev/scientific-validation.R")),
+        elapsed_seconds = unname(proc.time()[["elapsed"]] - started)
+    )
+
+    list(
+        protocol_hash = protocol_hash,
+        result_hash = .scientific_object_hash(deterministic),
+        raw = raw,
+        summaries = summaries,
+        gates = gates,
+        context = context
+    )
+}
+
+.scientific_quantile <- function(x, probability) {
+    x <- x[is.finite(x)]
+    if (length(x) == 0L) {
+        return(NA_real_)
+    }
+    unname(stats::quantile(x, probability, names = FALSE, type = 7L))
+}
+
+.summarise_scientific_manual <- function(rows) {
+    keys <- unique(rows[, c("scenario", "condition"), drop = FALSE])
+    summaries <- lapply(
+        seq_len(nrow(keys)),
+        function(index) {
+            key <- keys[index, , drop = FALSE]
+            selected <- rows$scenario == key$scenario &
+                rows$condition == key$condition
+            x <- rows[selected, , drop = FALSE]
+            data.frame(
+                scenario = key$scenario,
+                condition = key$condition,
+                runs = nrow(x),
+                mar_rate = x$mar_rate[[1L]],
+                q10_mnar_f1 = .scientific_quantile(x$mnar_f1, 0.1),
+                q10_mar_f1 = .scientific_quantile(x$mar_f1, 0.1),
+                q10_state_macro_f1 =
+                    .scientific_quantile(x$state_macro_f1, 0.1),
+                q10_retention_f1 =
+                    .scientific_quantile(x$retention_f1, 0.1),
+                stringsAsFactors = FALSE
+            )
+        }
+    )
+    do.call(rbind, summaries)
+}
+
+.summarise_scientific_automatic <- function(rows) {
+    keys <- unique(rows[, c("scenario", "condition"), drop = FALSE])
+    summaries <- lapply(
+        seq_len(nrow(keys)),
+        function(index) {
+            key <- keys[index, , drop = FALSE]
+            selected <- rows$scenario == key$scenario &
+                rows$condition == key$condition
+            x <- rows[selected, , drop = FALSE]
+            success <- x$status == "ok"
+            data.frame(
+                scenario = key$scenario,
+                condition = key$condition,
+                automatic_gate = x$automatic_gate[[1L]],
+                runs = nrow(x),
+                eligible_runs = sum(x$evidence_eligible),
+                successes = sum(success),
+                success_rate = mean(success),
+                median_absolute_cutoff_error = .scientific_quantile(
+                    x$absolute_cutoff_error,
+                    0.5
+                ),
+                q90_absolute_cutoff_error = .scientific_quantile(
+                    x$absolute_cutoff_error,
+                    0.9
+                ),
+                median_signed_cutoff_error = .scientific_quantile(
+                    x$signed_cutoff_error,
+                    0.5
+                ),
+                q10_mnar_f1_delta = .scientific_quantile(
+                    x$mnar_f1_delta_from_manual,
+                    0.1
+                ),
+                q10_retention_f1_delta = .scientific_quantile(
+                    x$retention_f1_delta_from_manual,
+                    0.1
+                ),
+                minimum_missing_features = min(x$missing_feature_count),
+                minimum_complete_features = min(x$complete_feature_count),
+                stringsAsFactors = FALSE
+            )
+        }
+    )
+    do.call(rbind, summaries)
+}
+
+.summarise_scientific_benchmark <- function(raw, protocol) {
+    comparison <- aggregate(
+        raw$comparisons$passed,
+        list(audit = raw$comparisons$audit),
+        function(x) c(passed = sum(x), total = length(x))
+    )
+    comparison <- data.frame(
+        audit = comparison$audit,
+        passed = comparison$x[, "passed"],
+        total = comparison$x[, "total"],
+        stringsAsFactors = FALSE
+    )
+    invocation <- data.frame(
+        audit = c("input_unchanged", "rng_unchanged", "output_valid"),
+        passed = c(
+            sum(raw$invocations$input_unchanged),
+            sum(raw$invocations$rng_unchanged),
+            sum(raw$invocations$output_valid)
+        ),
+        total = rep(nrow(raw$invocations), 3L),
+        stringsAsFactors = FALSE
+    )
+
+    list(
+        manual = .summarise_scientific_manual(raw$manual),
+        automatic = .summarise_scientific_automatic(raw$automatic),
+        audits = rbind(invocation, comparison),
+        automatic_failures = {
+            failures <- as.data.frame(table(
+                scenario = raw$automatic$scenario[
+                    raw$automatic$status != "ok"
+                ],
+                condition = raw$automatic$condition[
+                    raw$automatic$status != "ok"
+                ],
+                reason = raw$automatic$reason[
+                    raw$automatic$status != "ok"
+                ]
+            ), stringsAsFactors = FALSE)
+            failures[failures$Freq > 0L, , drop = FALSE]
+        }
+    )
+}
+
+.scientific_gate_row <- function(
+    gate,
+    scope,
+    passed,
+    observed,
+    required,
+    detail = ""
+) {
+    data.frame(
+        gate = gate,
+        scope = scope,
+        passed = isTRUE(passed),
+        observed = as.character(observed),
+        required = as.character(required),
+        detail = detail,
+        stringsAsFactors = FALSE
+    )
+}
+
+.scientific_format_number <- function(x) {
+    if (length(x) != 1L || !is.finite(x)) {
+        return("NA")
+    }
+    format(x, digits = 6L, trim = TRUE, scientific = FALSE)
+}
+
+.scientific_automatic_metric_gates <- function(
+    summary,
+    specification,
+    success_rate
+) {
+    scope <- paste(summary$scenario, summary$condition, sep = ":")
+    values <- list(
+        .scientific_gate_row(
+            "automatic_success_rate",
+            scope,
+            summary$success_rate >= success_rate,
+            .scientific_format_number(summary$success_rate),
+            paste0(">=", .scientific_format_number(success_rate))
+        ),
+        .scientific_gate_row(
+            "automatic_median_absolute_cutoff_error",
+            scope,
+            summary$median_absolute_cutoff_error <=
+                specification$median_absolute_cutoff_error,
+            .scientific_format_number(summary$median_absolute_cutoff_error),
+            paste0(
+                "<=",
+                .scientific_format_number(
+                    specification$median_absolute_cutoff_error
+                )
+            )
+        ),
+        .scientific_gate_row(
+            "automatic_q90_absolute_cutoff_error",
+            scope,
+            summary$q90_absolute_cutoff_error <=
+                specification$q90_absolute_cutoff_error,
+            .scientific_format_number(summary$q90_absolute_cutoff_error),
+            paste0(
+                "<=",
+                .scientific_format_number(
+                    specification$q90_absolute_cutoff_error
+                )
+            )
+        ),
+        .scientific_gate_row(
+            "automatic_median_signed_cutoff_error",
+            scope,
+            summary$median_signed_cutoff_error >=
+                specification$minimum_median_signed_error &&
+                summary$median_signed_cutoff_error <=
+                    specification$maximum_median_signed_error,
+            .scientific_format_number(summary$median_signed_cutoff_error),
+            sprintf(
+                "[%s,%s]",
+                .scientific_format_number(
+                    specification$minimum_median_signed_error
+                ),
+                .scientific_format_number(
+                    specification$maximum_median_signed_error
+                )
+            )
+        ),
+        .scientific_gate_row(
+            "automatic_q10_mnar_f1_delta",
+            scope,
+            summary$q10_mnar_f1_delta >=
+                specification$q10_mnar_f1_delta_from_manual,
+            .scientific_format_number(summary$q10_mnar_f1_delta),
+            paste0(
+                ">=",
+                .scientific_format_number(
+                    specification$q10_mnar_f1_delta_from_manual
+                )
+            )
+        ),
+        .scientific_gate_row(
+            "automatic_q10_retention_f1_delta",
+            scope,
+            summary$q10_retention_f1_delta >=
+                specification$q10_retention_f1_delta_from_manual,
+            .scientific_format_number(summary$q10_retention_f1_delta),
+            paste0(
+                ">=",
+                .scientific_format_number(
+                    specification$q10_retention_f1_delta_from_manual
+                )
+            )
+        )
+    )
+    do.call(rbind, values)
+}
+
+.evaluate_scientific_benchmark <- function(raw, summaries, protocol) {
+    gates <- list()
+    next_gate <- 1L
+    manual_specification <- protocol$gates$manual
+    for (index in seq_len(nrow(summaries$manual))) {
+        summary <- summaries$manual[index, , drop = FALSE]
+        specification <- manual_specification[
+            manual_specification$mar_rate == summary$mar_rate,
+            ,
+            drop = FALSE
+        ]
+        scope <- paste(summary$scenario, summary$condition, sep = ":")
+        for (metric in c(
+            "q10_mnar_f1", "q10_mar_f1", "q10_state_macro_f1",
+            "q10_retention_f1"
+        )) {
+            observed <- summary[[metric]]
+            required <- specification[[metric]]
+            gates[[next_gate]] <- .scientific_gate_row(
+                paste0("manual_", metric),
+                scope,
+                observed >= required,
+                .scientific_format_number(observed),
+                paste0(">=", .scientific_format_number(required))
+            )
+            next_gate <- next_gate + 1L
+        }
+    }
+
+    for (metric in c("on_off_retention_recall", "on_off_seed_recall")) {
+        values <- raw$manual[[metric]]
+        failed <- paste(
+            paste(
+                raw$manual$scenario[values != 1],
+                raw$manual$simulation_seed[values != 1],
+                raw$manual$condition[values != 1],
+                sep = ":"
+            ),
+            collapse = ","
+        )
+        gates[[next_gate]] <- .scientific_gate_row(
+            paste0("manual_individual_", metric),
+            "all",
+            length(values) > 0L && all(values == 1),
+            .scientific_format_number(min(values)),
+            "=1",
+            failed
+        )
+        next_gate <- next_gate + 1L
+    }
+
+    automatic_specification <- protocol$gates$automatic
+    for (index in seq_len(nrow(summaries$automatic))) {
+        summary <- summaries$automatic[index, , drop = FALSE]
+        gate_type <- summary$automatic_gate
+        if (identical(gate_type, "evidence_sensitivity")) {
+            rows <- raw$automatic$scenario == summary$scenario &
+                raw$automatic$condition == summary$condition
+            selected <- raw$automatic[rows, , drop = FALSE]
+            ineligible <- !selected$evidence_eligible
+            ineligible_pass <- all(
+                selected$status[ineligible] == "unidentifiable"
+            )
+            gates[[next_gate]] <- .scientific_gate_row(
+                "evidence_ineligible_structured_failure",
+                paste(summary$scenario, summary$condition, sep = ":"),
+                ineligible_pass,
+                sprintf(
+                    "%d/%d",
+                    sum(selected$status[ineligible] == "unidentifiable"),
+                    sum(ineligible)
+                ),
+                "all"
+            )
+            next_gate <- next_gate + 1L
+            finite <- is.finite(selected$absolute_cutoff_error)
+            maximum_error <- if (any(finite)) {
+                max(selected$absolute_cutoff_error[finite])
+            } else {
+                NA_real_
+            }
+            gates[[next_gate]] <- .scientific_gate_row(
+                "evidence_finite_cutoff_error",
+                paste(summary$scenario, summary$condition, sep = ":"),
+                !any(finite) || maximum_error <=
+                    protocol$gates$evidence_sensitivity$
+                        maximum_finite_cutoff_error,
+                .scientific_format_number(maximum_error),
+                paste0(
+                    "<=",
+                    .scientific_format_number(
+                        protocol$gates$evidence_sensitivity$
+                            maximum_finite_cutoff_error
+                    )
+                )
+            )
+            next_gate <- next_gate + 1L
+            eligible <- selected[selected$evidence_eligible, , drop = FALSE]
+            if (nrow(eligible) == 0L) {
+                next
+            }
+            eligible_summary <- .summarise_scientific_automatic(eligible)
+            gates[[next_gate]] <- .scientific_automatic_metric_gates(
+                eligible_summary,
+                automatic_specification,
+                automatic_specification$required_success_rate
+            )
+            next_gate <- next_gate + 1L
+            next
+        }
+
+        required_rate <- if (identical(gate_type, "stress")) {
+            automatic_specification$stress_success_rate
+        } else {
+            automatic_specification$required_success_rate
+        }
+        gates[[next_gate]] <- .scientific_automatic_metric_gates(
+            summary,
+            automatic_specification,
+            required_rate
+        )
+        next_gate <- next_gate + 1L
+    }
+
+    successes <- raw$automatic$status == "ok"
+    gates[[next_gate]] <- .scientific_gate_row(
+        "automatic_structured_status",
+        "all",
+        all(raw$automatic$status %in% c("ok", "unidentifiable")),
+        paste(sort(unique(raw$automatic$status)), collapse = ","),
+        "ok|unidentifiable"
+    )
+    next_gate <- next_gate + 1L
+    gates[[next_gate]] <- .scientific_gate_row(
+        "automatic_cutoff_inside_observed_support",
+        "all successful runs",
+        all(raw$automatic$inside_observed_support[successes]),
+        sprintf(
+            "%d/%d",
+            sum(raw$automatic$inside_observed_support[successes]),
+            sum(successes)
+        ),
+        "all"
+    )
+    next_gate <- next_gate + 1L
+    structured <- raw$automatic$status == "unidentifiable"
+    gates[[next_gate]] <- .scientific_gate_row(
+        "automatic_structured_condition",
+        "all structured failures",
+        all(raw$automatic$structured_condition_exact[structured]),
+        sprintf(
+            "%d/%d",
+            sum(raw$automatic$structured_condition_exact[structured]),
+            sum(structured)
+        ),
+        "all"
+    )
+    next_gate <- next_gate + 1L
+    gates[[next_gate]] <- .scientific_gate_row(
+        "automatic_structured_profile",
+        "all structured failures",
+        all(raw$automatic$structured_profile_available[structured]),
+        sprintf(
+            "%d/%d",
+            sum(raw$automatic$structured_profile_available[structured]),
+            sum(structured)
+        ),
+        "all"
+    )
+    next_gate <- next_gate + 1L
+
+    invocation_metrics <- c(
+        input_unchanged = "input exact",
+        rng_unchanged = "caller RNG exact",
+        output_valid = "observed values + seed provenance exact"
+    )
+    for (metric in names(invocation_metrics)) {
+        values <- raw$invocations[[metric]]
+        gates[[next_gate]] <- .scientific_gate_row(
+            paste0("invocation_", metric),
+            "all public calls",
+            all(values),
+            sprintf("%d/%d", sum(values), length(values)),
+            "all",
+            paste(raw$invocations$detail[!values], collapse = ";")
+        )
+        next_gate <- next_gate + 1L
+    }
+    for (audit in unique(raw$comparisons$audit)) {
+        selected <- raw$comparisons$audit == audit
+        values <- raw$comparisons$passed[selected]
+        gates[[next_gate]] <- .scientific_gate_row(
+            audit,
+            "all",
+            all(values),
+            sprintf("%d/%d", sum(values), length(values)),
+            "all",
+            paste(raw$comparisons$detail[selected & !raw$comparisons$passed],
+                collapse = ";")
+        )
+        next_gate <- next_gate + 1L
+    }
+
+    result <- do.call(rbind, gates)
+    rownames(result) <- NULL
+    result
+}
+
+print_scientific_validation_benchmark <- function(benchmark) {
+    cat("\nManual true-cutoff q10 summaries:\n")
+    print(benchmark$summaries$manual, row.names = FALSE, digits = 4)
+    cat("\nAutomatic per-condition summaries:\n")
+    print(benchmark$summaries$automatic, row.names = FALSE, digits = 4)
+    cat("\nExact audit summaries:\n")
+    print(benchmark$summaries$audits, row.names = FALSE)
+    failures <- benchmark$gates[!benchmark$gates$passed, , drop = FALSE]
+    cat(sprintf(
+        "\nGates: %d/%d passed; %d failed.\n",
+        sum(benchmark$gates$passed),
+        nrow(benchmark$gates),
+        nrow(failures)
+    ))
+    if (nrow(failures) > 0L) {
+        print(failures, row.names = FALSE)
+    }
+    cat(sprintf(
+        "\nProtocol MD5: %s\nResult MD5: %s\nElapsed: %.3f seconds\n",
+        benchmark$protocol_hash,
+        benchmark$result_hash,
+        benchmark$context$elapsed_seconds
+    ))
+    invisible(benchmark)
+}
+
+.scientific_validation_main <- function(
+    arguments = commandArgs(trailingOnly = TRUE)
+) {
+    if (identical(arguments, "--verify")) {
+        verified <- verify_scientific_validation()
+        print(verified$manifest, row.names = FALSE, digits = 4)
+        cat("\nRoutine subset:\n")
+        print(verified$routine, row.names = FALSE, digits = 4)
+        message(
+            sprintf(
+                "M7 protocol verification passed: %d long scenarios; MD5 %s.",
+                nrow(verified$manifest),
+                verified$hash
+            )
+        )
+        return(invisible(verified))
+    }
+    if (identical(arguments, "--benchmark")) {
+        benchmark <- run_scientific_validation_benchmark()
+        print_scientific_validation_benchmark(benchmark)
+        failed <- sum(!benchmark$gates$passed)
+        if (failed > 0L) {
+            stop(
+                sprintf("M7b scientific benchmark failed %d frozen gates.", failed),
+                call. = FALSE
+            )
+        }
+        message("M7b scientific benchmark passed every frozen gate.")
+        return(invisible(benchmark))
+    }
+
+    stop(
+        paste0(
+            "Usage: Rscript --vanilla dev/scientific-validation.R ",
+            "--verify|--benchmark"
+        ),
+        call. = FALSE
+    )
 }
 
 if (sys.nframe() == 0L) {

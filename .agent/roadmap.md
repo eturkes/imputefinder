@@ -27,7 +27,7 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [x] M6c obsolete code/import + compatibility cleanup
 - [ ] M7 scientific regression suite
   - [x] M7a independent simulation protocol + frozen gates
-  - [ ] M7b full scientific benchmark + assessment
+  - [x] M7b full scientific benchmark + assessment
   - [ ] M7c compact routine regressions + gate closure
 - [ ] M8 documentation + package metadata
 - [ ] M9 CI + Bioconductor hardening
@@ -669,5 +669,73 @@ public-path manual/automatic benchmark runner, invariant + alternative-rescue-
 seed + exact permutation assessors, and deterministic summaries; run all 13 × 8
 simulations, append every outcome/failed gate to the report, and correct the
 runtime method only when evidence identifies a real implementation defect.
+
+Blockers → none.
+
+### 2026-07-15 - M7b full scientific benchmark + assessment
+
+Scope → execute protocol v1 unchanged through the installed public classifier,
+audit scientific performance + all invariants, and publish deterministic
+scenario/condition evidence without adding long stochastic work to package
+tests.
+
+Implementation + assessment:
+
+- `--benchmark` now runs all 13 scenarios × 8 simulation seeds through paired
+  true-manual and automatic paths; a partial manual override isolates the other
+  condition when a joint automatic call raises its structured first failure;
+- every public invocation audits input/RNG immutability, original observed
+  values, inserted cells, seed-log provenance, pre-seed minima, output axes, and
+  aligned groups; structured failures audit target condition + profile evidence;
+- alternative rescue seeds 7/29 compare statistics/states/retention/profiles/
+  cutoffs with seed 1; translated sweeps compare masks, manual/automatic states,
+  retention, status, and cutoff error; four B-first/factor-level permutations
+  compare complete canonical named results including chosen seed samples;
+- deterministic summaries + gate evaluator preserve raw per-seed regeneration,
+  report every scenario/condition outcome, list failures, hash the result and
+  harness, and fail the command on any gate;
+- first pass found only a harness type mismatch: permutation truth held group
+  labels as a factor while the public seed log correctly returned characters;
+  normalizing that audit comparison changed provenance from 656/664 to 664/664
+  without changing classifier output or a scientific metric;
+- no runtime-method defect found; production R files remain unchanged.
+
+Scientific outcome:
+
+- all 270 gates pass; manual worst q10 MNAR/MAR/macro/retention F1 =
+  `.9659/.9473/.9140/.9863` at 5% MAR and
+  `.9316/.9606/.9620/.9564` at 25% MAR;
+- all required/stress automatic cases succeed 8/8 per condition; maximum median
+  absolute cutoff error = `.14755`, maximum q90 = `.33788`, signed medians span
+  `[-.13456,.14755]`, worst q10 MNAR/retention delta =
+  `-.04793/-.01076`, and all 192 estimates are interior;
+- all 16 `group_n20_mar25` condition profiles contain only 1-7 complete blocks,
+  remain below the 12-block evidence floor, and fail with the correct structured
+  condition-specific error rather than a fabricated cutoff;
+- exact audits → 664/664 public-call provenance, 208/208 manual + 416/416
+  automatic rescue-seed invariants, 48/48 sweep masks/manual states, 96/96 each
+  automatic sweep status/state/shift comparison, and 4/4 manual + 8/8 automatic
+  permutations;
+- protocol MD5 remains `4011e381bba2d0d747e91d277a45de5e`; deterministic
+  result MD5 = `72142402979a25eccead24b5af4bba11`; harness MD5 =
+  `e2e755fa36f69055e8acb23ce638816e`.
+
+Verification + completion evidence:
+
+- red baseline → `--benchmark` rejected because M7b execution was absent;
+- fresh project-local `R CMD INSTALL --preclean .` → pass;
+- fresh-installed full benchmark → 270/270 gates pass in 24.390 s; repeated
+  deterministic result + harness hashes exact;
+- package-wide source suite → 489/489 expectations pass;
+- `R CMD build . --no-manual --no-build-vignettes` → pass;
+- source-tarball `R CMD check --no-manual --no-build-vignettes` → tests,
+  installation, namespace, code, Rd, and examples checks pass; only the known M8
+  placeholder-licence WARNING remains;
+- `git diff --check` → pass.
+
+Exact next task after M7b → M7c: encode the frozen `manual_on_off` and
+`automatic_cliff` routine cases in ordinary package tests with their predeclared
+scientific thresholds + exact named permutation assertion; keep the long runner
+in `dev/`, rerun broad checks, mark PLAN M7 coverage complete, and close M7.
 
 Blockers → none.

@@ -1,8 +1,8 @@
 # Scientific-regression validation protocol
 
-Status → M7a pre-result contract. This report and
-`dev/scientific-validation.R` freeze simulation truth, metrics, gates, seeds,
-and the routine/long-run split before any ImputeFinder result is inspected.
+Status → protocol v1 frozen in M7a; full M7b assessment appended below. This
+report and `dev/scientific-validation.R` freeze simulation truth, metrics, gates,
+seeds, and the routine/long-run split before any ImputeFinder result is inspected.
 Protocol version = `1`; later scientific corrections must record rationale and
 old/new outcomes. Result-specific threshold relaxation is invalid.
 
@@ -204,6 +204,101 @@ condition rescue, reconciliation, automatic placement, and order stability.
 
 The full 13-scenario × 8-seed manual/automatic benchmark, alternative rescue-seed
 audit, and four-scenario permutation audit remain in `dev/`; they do not burden
-routine package checks. M7b will add the benchmark runner and append concise
-deterministic summaries, all failed gates, R/package context, hashes, and elapsed
-time here. Raw stochastic rows remain regenerable and untracked.
+routine package checks. M7b adds the benchmark runner and the concise summaries,
+failed-gate ledger, R/package context, hashes, and elapsed time below. Raw
+stochastic rows remain regenerable and untracked.
+
+## M7b full assessment
+
+Run from a current project-local installation:
+
+```sh
+R_LIBS_USER="$PWD/.agent/R-library" R CMD INSTALL --preclean .
+R_LIBS_USER="$PWD/.agent/R-library" \
+  Rscript --vanilla dev/scientific-validation.R --benchmark
+```
+
+Outcome → all `270/270` frozen gates pass. No threshold, generator, oracle, or
+production-method change followed result inspection. The only first-pass
+failure was a harness-only character/factor comparison in the permutation
+provenance audit; normalizing the simulated factor label to character changed
+that audit from `656/664` to `664/664` and changed no classifier output or
+scientific metric.
+
+### Manual true-cutoff results
+
+Each cell is condition `A / B`; values are q10 across eight simulation seeds.
+The translated sweep has exactly the same outcome at every cutoff 8-14.
+
+| Scenario | MNAR F1 | MAR F1 | Macro-F1 | Retention F1 |
+|---|---:|---:|---:|---:|
+| `group_n04_mar05` | .9727 / .9765 | .9473 / .9486 | .9474 / .9587 | .9921 / .9921 |
+| `group_n08_mar05` | .9771 / .9749 | .9683 / .9651 | .9584 / .9140 | .9904 / .9904 |
+| `group_n20_mar05` | .9659 / .9677 | .9722 / .9737 | .9794 / .9805 | .9863 / .9863 |
+| `group_n04_mar25` | .9333 / .9316 | .9639 / .9606 | .9629 / .9620 | .9564 / .9564 |
+| `group_n08_mar25` | .9553 / .9540 | .9776 / .9778 | .9754 / .9706 | .9756 / .9756 |
+| `group_n20_mar25` | .9638 / .9620 | .9812 / .9795 | .9740 / .9725 | .9854 / .9854 |
+| `sweep_c08`-`sweep_c14` | .9695 / .9744 | .9586 / .9651 | .9760 / .9650 | .9890 / .9890 |
+
+Worst q10 margins remain well inside the frozen gates: at 5% MAR, MNAR/MAR/
+macro/retention F1 minima = `.9659/.9473/.9140/.9863` against
+`.72/.72/.76/.94`; at 25% MAR, minima = `.9316/.9606/.9620/.9564` against
+`.60/.60/.66/.90`. Every one of 208 condition-level manual summaries has
+eligible on/off retention and structural off-block rescue recall = `1`.
+
+### Automatic results
+
+Each cell is condition `A / B`. Success is out of eight seeds; errors and deltas
+summarize successful runs. `MedAE`/`q90AE` = absolute cutoff error; `MedSE` =
+signed error; `ΔMNAR`/`Δretain` = q10 F1 delta from the paired manual result.
+
+| Scenario | Success | MedAE | q90AE | MedSE | ΔMNAR | Δretain |
+|---|---:|---:|---:|---:|---:|---:|
+| `group_n04_mar05` | 8/8 / 8/8 | .06792 / .04734 | .11705 / .09660 | -.06792 / -.04734 | -.00399 / -.00718 | -.00189 / -.00189 |
+| `group_n08_mar05` | 8/8 / 8/8 | .06491 / .05629 | .12277 / .15006 | .06491 / .01847 | -.00379 / -.00320 | -.00147 / -.00147 |
+| `group_n20_mar05` | 8/8 / 8/8 | .11741 / .14755 | .22364 / .25216 | .11741 / .14755 | -.00016 / -.00633 | -.00148 / -.00148 |
+| `group_n04_mar25` | 8/8 / 8/8 | .13476 / .04945 | .29373 / .22908 | -.13456 / -.04062 | -.01245 / -.00349 | -.00248 / -.00248 |
+| `group_n08_mar25` | 8/8 / 8/8 | .11676 / .08150 | .17972 / .33788 | -.04819 / .04182 | -.00954 / -.04793 | -.01076 / -.01076 |
+| `group_n20_mar25` | 0/8 / 0/8 | NA / NA | NA / NA | NA / NA | NA / NA | NA / NA |
+| `sweep_c08`-`sweep_c14` | 8/8 / 8/8 | .04437 / .04889 | .07606 / .08457 | .01830 / .04889 | -.00548 / -.00104 | -.00087 / -.00087 |
+
+Every one of 192 finite cutoffs is strictly inside observed feature-mean
+support. Across eligible profiles, maximum median absolute error = `.14755`,
+maximum q90 absolute error = `.33788`, signed medians span
+`[-.13456, .14755]`, worst q10 MNAR-F1 delta = `-.04793`, and worst q10
+retention-F1 delta = `-.01076`. All clear/stress coverage is `8/8` per
+condition, exceeding required `7/8` and stress `6/8` gates.
+
+The predeclared evidence-sensitivity case behaves structurally: all 16
+condition profiles have fewer than 12 complete blocks and return the exact
+condition-specific unidentifiable-cutoff error. Complete-block counts by seed,
+shown as `A/B`, are `4/1, 3/2, 5/3, 3/6, 7/2, 5/2, 7/6, 2/5`; no cutoff is
+fabricated.
+
+### Exact audits + provenance
+
+- 664/664 public calls preserve input, caller RNG kind/state, observed values,
+  and seed provenance exactly.
+- Rescue-seed invariance: 208/208 manual and 416/416 condition-specific
+  automatic comparisons exact for seeds 7/29 versus seed 1.
+- Translation sweep: 48/48 masks, 48/48 manual state/retention comparisons,
+  and 96/96 automatic statuses, state/retention comparisons, and cutoff-shift
+  errors within the frozen `1e-10` exactness tolerance.
+- Name-aligned permutation: 4/4 manual and 8/8 condition-specific automatic
+  results exact, including cutoffs, diagnostics, profiles, classifications,
+  retention, groups, data, and seed assignments.
+- Structured automatic failures report the target condition and carry matching
+  diagnostic/profile evidence in 16/16 cases.
+
+Execution context → R `4.6.1`, `x86_64-pc-linux-gnu`; installed imputefinder
+`0.0.0.9000` from `.agent/R-library`. Protocol MD5 =
+`4011e381bba2d0d747e91d277a45de5e`; deterministic result MD5 =
+`72142402979a25eccead24b5af4bba11`; benchmark-harness MD5 =
+`e2e755fa36f69055e8acb23ce638816e`. Final measured elapsed time = `24.390 s`.
+Raw rows remain intentionally untracked and regenerate to the same result hash.
+
+Conclusion → protocol-v1 evidence supports the manual classifier, automatic
+boundary detector, safe evidence-floor failure, condition-specific on/off
+retention, order invariance, and seed provenance across the frozen scope. No
+runtime defect was identified. M7c should encode only the two predeclared
+routine cases in package tests, rerun broad checks, and close the M7 gate.
