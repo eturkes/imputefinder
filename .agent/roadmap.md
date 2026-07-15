@@ -25,10 +25,10 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [x] M6a result presentation + installed S3 dispatch
   - [x] M6b representation/order integration audit
   - [x] M6c obsolete code/import + compatibility cleanup
-- [ ] M7 scientific regression suite
+- [x] M7 scientific regression suite
   - [x] M7a independent simulation protocol + frozen gates
   - [x] M7b full scientific benchmark + assessment
-  - [ ] M7c compact routine regressions + gate closure
+  - [x] M7c compact routine regressions + gate closure
 - [ ] M8 documentation + package metadata
 - [ ] M9 CI + Bioconductor hardening
 - [ ] M10 release-candidate adversarial review
@@ -737,5 +737,57 @@ Exact next task after M7b → M7c: encode the frozen `manual_on_off` and
 `automatic_cliff` routine cases in ordinary package tests with their predeclared
 scientific thresholds + exact named permutation assertion; keep the long runner
 in `dev/`, rerun broad checks, mark PLAN M7 coverage complete, and close M7.
+
+Blockers → none.
+
+### 2026-07-15 - M7c routine scientific regressions
+
+Scope → move the two predeclared protocol-v1 routine cases into ordinary package
+tests, preserve the long benchmark in `dev/`, and close the scientific-regression
+gate without changing the runtime classifier.
+
+Implementation + evidence:
+
+- test-only protocol mirror regenerates `manual_on_off` (320 features, 4 samples
+  per condition, 25% uniform MAR) and `automatic_cliff` (800 features, 8 samples
+  per condition, 5% MAR) at simulation seed 104677; causal truth remains derived
+  from independent MAR/MNAR masks + strict-majority/on-off reconciliation;
+- mirror matrices, aligned groups, oracle states, and feature retention are exact
+  against the frozen M7a generator; compact scores are exact against the M7b
+  scorer while remaining self-contained when `dev/` is excluded from a source
+  package;
+- manual routine MNAR/MAR/macro/retention F1 =
+  `.94382/.96736/.96805/.95094`; eligible on/off retention + off-block rescue =
+  `1/1`, clearing all frozen 25%-MAR thresholds;
+- automatic routine cutoffs A/B = `11.97274/11.88546`; automatic
+  MNAR/MAR/macro/retention F1 = `.97770/.96703/.98158/.98983`, paired
+  manual deltas = `-.00385/-.00082` for MNAR/retention F1, and both on/off gates
+  = `1`; all frozen routine gates clear;
+- even/odd feature order + B-first/reversed samples + reversed factor levels
+  preserve the complete canonical named automatic result exactly, including
+  filtered/seeded data, cutoffs, diagnostics, profiles, classifications,
+  retention, groups, and seed assignments;
+- production R files remain unchanged; the long 13-scenario × 8-seed benchmark,
+  alternative rescue seeds, sweeps, and four-case permutation audit remain only
+  in `dev/`.
+
+Verification + completion evidence:
+
+- focused red → 2 expected missing-helper errors;
+- focused green → 16/16 expectations pass;
+- package-wide source suite → 505/505 expectations pass;
+- `Rscript --vanilla dev/scientific-validation.R --verify` → protocol v1 + MD5
+  `4011e381bba2d0d747e91d277a45de5e` unchanged;
+- `R CMD build . --no-manual --no-build-vignettes` → pass;
+- source-tarball `R CMD check --no-manual --no-build-vignettes` → package tests,
+  installation, namespace, code, Rd, and dependency checks pass; only the known
+  M8 placeholder-licence WARNING remains;
+- `git diff --check` → pass.
+
+Exact next task after M7c → M8a: verify current official R/Bioconductor metadata
+guidance, then replace `DESCRIPTION` identity/licence placeholders, audit runtime
+and suggested dependencies + minimum platform fields + `biocViews`, and add the
+package-level documentation needed to make that metadata checkable. Keep the
+README/vignette workflow rewrite as the next cohesive documentation slice.
 
 Blockers → none.

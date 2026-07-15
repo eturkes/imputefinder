@@ -583,12 +583,12 @@ Gate: the installed package's public API works from a clean R session and expose
 
 ### M7 - Scientific regression suite
 
-- [ ] Add compact simulations of uniform MAR plus intensity-dependent MNAR.
-- [ ] Add condition-specific on/off simulations.
-- [ ] Test classification accuracy, retention, and cutoff error across seeds and permutations.
-- [ ] Test sensitivity to group sizes 4, 8, and 20.
-- [ ] Test a known cliff near intensity 12 and cutoff sweeps analogous to 8-14.
-- [ ] Keep long benchmarks outside routine unit tests; store concise deterministic summaries.
+- [x] Add compact simulations of uniform MAR plus intensity-dependent MNAR.
+- [x] Add condition-specific on/off simulations.
+- [x] Test classification accuracy, retention, and cutoff error across seeds and permutations.
+- [x] Test sensitivity to group sizes 4, 8, and 20.
+- [x] Test a known cliff near intensity 12 and cutoff sweeps analogous to 8-14.
+- [x] Keep long benchmarks outside routine unit tests; store concise deterministic summaries.
 
 Gate: the package has evidence for its central scientific behavior, not only code-path coverage.
 

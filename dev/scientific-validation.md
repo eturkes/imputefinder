@@ -300,5 +300,25 @@ Raw rows remain intentionally untracked and regenerate to the same result hash.
 Conclusion → protocol-v1 evidence supports the manual classifier, automatic
 boundary detector, safe evidence-floor failure, condition-specific on/off
 retention, order invariance, and seed provenance across the frozen scope. No
-runtime defect was identified. M7c should encode only the two predeclared
-routine cases in package tests, rerun broad checks, and close the M7 gate.
+runtime defect was identified.
+
+## M7c routine regression closure
+
+Ordinary package tests now regenerate only the two predeclared seed-104677 cases
+from a compact test-only protocol mirror. The mirror's matrices, aligned groups,
+oracle states, retention truth, and scores were checked exact against this
+harness; `dev/` remains excluded from the source package and owns every long run.
+
+| Case/path | MNAR F1 | MAR F1 | Macro-F1 | Retention F1 | Cutoff A/B |
+|---|---:|---:|---:|---:|---:|
+| `manual_on_off`, manual | .94382 | .96736 | .96805 | .95094 | 12 / 12 |
+| `automatic_cliff`, manual | .98155 | .97222 | .98459 | .99065 | 12 / 12 |
+| `automatic_cliff`, automatic | .97770 | .96703 | .98158 | .98983 | 11.97274 / 11.88546 |
+
+Both cases retain every eligible on/off feature and rescue every structural off
+block. Automatic-minus-manual MNAR/retention F1 = `-.00385/-.00082`; the full
+canonical automatic result is exact after the frozen even/odd-feature,
+B-first/reversed-sample permutation. All 16 routine expectations, 505 package
+expectations, protocol verification, build, and source-tarball tests pass. The
+only package-check warning is the pre-existing licence placeholder assigned to
+M8. M7 is closed.
