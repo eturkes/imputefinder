@@ -37,7 +37,9 @@ jobs:
       - name: Install package and check dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck
+          extra-packages: |
+            any::rcmdcheck
+            bioc::BiocCheck
           needs: check
 
       - name: Verify the R and Bioconductor environment
@@ -60,3 +62,34 @@ jobs:
           args: 'c("--as-cran")'
           build_args: '"--no-manual"'
           error-on: '"warning"'
+
+      - name: Run Bioconductor submission gates
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          clone_dir="${RUNNER_TEMP}/imputefinder-git-clone"
+          build_dir="${RUNNER_TEMP}/imputefinder-build"
+          git clone --quiet --no-hardlinks "${GITHUB_WORKSPACE}" "${clone_dir}"
+          git -C "${clone_dir}" checkout --quiet --detach \
+            "$(git -C "${GITHUB_WORKSPACE}" rev-parse HEAD)"
+          test -z "$(git -C "${clone_dir}" status --porcelain)"
+          mkdir "${build_dir}"
+
+          (
+            cd "${build_dir}"
+            R CMD build "${clone_dir}" --no-manual
+          )
+
+          tarball_name=$(Rscript --vanilla -e '
+            description <- read.dcf(file.path(commandArgs(TRUE)[[1L]], "DESCRIPTION"))
+            cat(sprintf(
+              "%s_%s.tar.gz",
+              description[1L, "Package"],
+              description[1L, "Version"]
+            ))
+          ' "${clone_dir}")
+          tarball="${build_dir}/${tarball_name}"
+          test -f "${tarball}"
+
+          Rscript --vanilla dev/bioc-gates.R "${clone_dir}" "${tarball}"

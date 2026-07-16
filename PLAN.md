@@ -836,9 +836,9 @@ The work is complete only when all of the following are true:
 - [x] The normative fixture and all required tests pass.
 - [x] README, Rd help, and vignette are sufficient without thesis access.
 - [x] Runtime dependencies are minimal and justified.
-- [ ] `R CMD check --as-cran`, package examples, vignette build, and `BiocCheck` pass from a clean checkout.
+- [x] `R CMD check --as-cran`, package examples, vignette build, and `BiocCheck` pass from a clean checkout.
 - [x] Claims in documentation do not exceed repository evidence.
-- [ ] `.agent/roadmap.md` contains no unresolved P0/P1 item for this release.
+- [x] `.agent/roadmap.md` contains no unresolved P0/P1 item for this release.
 
 ## 16. Deferred roadmap after first correct release
 

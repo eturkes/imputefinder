@@ -33,11 +33,11 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
   - [x] M8a metadata + package overview
   - [x] M8b README + runnable public examples
   - [x] M8c vignette + NEWS + documentation gate
-- [ ] M9 CI + Bioconductor hardening
+- [x] M9 CI + Bioconductor hardening
   - [x] M9a maintained Bioconductor-aware CI
   - [x] M9b submission checks + clean `--as-cran`
-  - [ ] M9c `BiocCheck` findings + hardening gate closure
-- [ ] M10 release-candidate adversarial review
+  - [x] M9c `BiocCheck` findings + hardening gate closure
+- [x] M10 release-candidate adversarial review
   - [x] M10a public-claim + boundary-case audit
   - [x] M10b side-effect + invariance audit
   - [x] M10c performance + release cleanup
@@ -1368,3 +1368,35 @@ the two remaining Definition of Done items.
 External blocker → authenticated Support Site profile correction. M9/M10
 remain deliberately open; adding a CI check known to fail would not close the
 release gate.
+
+### 2026-07-16 - M9/M10 release-candidate closure
+
+Scope → verify the corrected Support Site state through the same public API
+used by `BiocCheck`, execute the complete clean-check sequence, and make both
+Bioconductor checks fatal CI gates.
+
+Evidence:
+
+- live watched-tags API returned `genefunnel,imputefinder` at 00:19 UTC;
+- clean committed-source clone → clean worktree; `BiocCheckGitClone()` reports
+  0 errors, 0 warnings, 0 notes;
+- vignette-bearing source build → pass; 489,554-byte tarball;
+- clean-clone source-tarball `R CMD check --as-cran` → status OK, including
+  examples, installed tests, vignette rebuild, and PDF/HTML manuals; sole note
+  is the expected `New submission` incoming-feasibility note;
+- new-package `BiocCheck` → 0 errors, 0 warnings, 2 already-reviewed notes:
+  optional ORCID and locally unverifiable mailing-list subscription;
+- Support Site check now explicitly reports that `imputefinder` is registered
+  in Watched Tags;
+- CI installs current devel `BiocCheck`, rebuilds a clean detached clone, and
+  runs both checks through `dev/bioc-gates.R`; either error or warning is fatal;
+- exact CI shell/R gate executed locally against the release candidate → pass;
+  workflow YAML + gate-script parse checks and `git diff --check` → pass.
+
+M9/M10 and both remaining Definition of Done items are complete. ImputeFinder
+0.99.2 is the first release candidate.
+
+Exact next external step → push the release-candidate commit, observe the
+hosted devel workflow, then begin Bioconductor new-package submission.
+
+Blockers → none.
