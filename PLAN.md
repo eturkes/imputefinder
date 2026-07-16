@@ -610,7 +610,7 @@ Gate: a user with no thesis can understand and correctly use the package from in
 - [x] Add current R package CI using maintained actions and an appropriate Bioconductor environment.
 - [x] Run unit tests, `R CMD build`, and `R CMD check --as-cran` from a clean source tarball.
 - [x] Run `BiocCheck` using current official guidance.
-- [ ] Fix all errors and warnings; resolve actionable notes rather than suppressing them.
+- [x] Fix all errors and warnings; resolve actionable notes rather than suppressing them.
 - [x] Verify licence files, line endings, generated documentation, file sizes, examples, and vignette build.
 - [x] Review code coverage; omit it because existing focused gates diagnose failures without fragile infrastructure.
 

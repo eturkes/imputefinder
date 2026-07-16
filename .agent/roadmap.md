@@ -1400,3 +1400,28 @@ Exact next external step → push the release-candidate commit, observe the
 hosted devel workflow, then begin Bioconductor new-package submission.
 
 Blockers → none.
+
+### 2026-07-16 - PLAN status reconciliation
+
+Scope → reconcile the milestone checklist with the completed M9/M10 release
+gate; identify whether any in-scope implementation work remains.
+
+Evidence:
+
+- `PLAN.md`'s sole open box was M9's aggregate errors/warnings/actionable-notes
+  item;
+- the immediately preceding clean-clone gate recorded `R CMD check --as-cran`
+  status OK, `BiocCheckGitClone()` at 0 errors/warnings/notes, and new-package
+  `BiocCheck()` at 0 errors/warnings with only reviewed optional/admin notes;
+- M9, M10, the Definition of Done, and the full required test matrix were
+  already closed from that same evidence;
+- no other open checklist item exists in `PLAN.md` or this ledger.
+
+The stale M9 aggregate box is now closed. Core PLAN work is complete; Section
+16 remains intentionally deferred until the maintainer promotes a specific
+item.
+
+Exact next external step → push `main`, observe the hosted devel workflow, then
+begin Bioconductor new-package submission.
+
+Blockers → none.
