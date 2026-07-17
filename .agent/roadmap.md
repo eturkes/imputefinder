@@ -17,10 +17,10 @@ delayed backend; J1 standards QC; J2 atlas. Parked work has no active checkbox
 or release obligation.
 
 Exact method, dependency graph, falsification gates, and Definition of Done →
-`PLAN.md` Sections 2-14. Exact next implementation task → M11: freeze the stable
-rail through internal/sidecar identifiers + differential fixtures; define the
-minimum typed design + input-first sidecar schema; preserve
-`imputefinder_result` exactly.
+`PLAN.md` Sections 2-14. Exact next implementation task → M11b: run the API
+naming experiment, then define the minimum typed `missingness_design` roles,
+alignment, validation, and experimental lifecycle without changing the stable
+classifier signature.
 
 ## Completed v1 release path
 
@@ -1487,5 +1487,45 @@ Exact next implementation task → M11: add stable method/schema/profile/cutoff/
 rescue/policy identifiers as internal/companion metadata plus differential
 fixtures, then introduce the companion analysis-object seam with identical
 `imputefinder_result` behavior.
+
+Blockers → none.
+
+### 2026-07-17 - M11a stable identifiers + sidecar spec
+
+Scope → freeze machine-readable v1 scientific/component identities and the
+minimum experimental companion `spec` while proving the stable result remains
+structurally and scientifically unchanged.
+
+Implementation:
+
+- internal method/profile/cutoff/rescue/policy identifiers name the exact v1
+  rail without adding a field, attribute, or class to `imputefinder_result`;
+- the minimum deterministic sidecar `spec` records analysis-schema, lifecycle,
+  sentinel/stability module, scientific-component, package, and live namespace-
+  version identifiers;
+- spec construction is dependency-free, has no global state, and is absent from
+  the stable classifier execution path;
+- an exact serialized differential fixture locks the ten-field/one-class v1
+  boundary around sidecar-spec construction.
+
+Verification + completion evidence:
+
+- focused red baseline → 3 expected errors from absent identifier/spec helpers;
+- focused green suite → 3 tests / 13 expectations;
+- package-wide source suite → 91 tests / 555 expectations, 0 failures,
+  warnings, errors, or skips;
+- frozen M7 scientific protocol verification → pass; 13 long scenarios, routine
+  subset, and protocol MD5 unchanged;
+- 10,000 x 50 manual/automatic performance gate → all runtime, allocation,
+  result-size, RSS, cutoff-error, unchanged-input, and seed-cell checks pass;
+- vignette-bearing source build + source-tarball `R CMD check --as-cran` →
+  status OK;
+- new-package `BiocCheck` → 0 errors, 0 warnings, 2 previously reviewed
+  optional/admin notes;
+- `git diff --check` → pass.
+
+Exact next task → M11b: run the public/internal API naming experiment, add red
+alignment/role/lifecycle tests, then implement the minimum typed
+`missingness_design` without changing `classify_missingness()`.
 
 Blockers → none.

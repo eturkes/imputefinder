@@ -674,7 +674,7 @@ M13 + M14 + M15 → M15P release confirmation + promotion review
 
 ### M11 - Stable seam + minimum sidecar schema
 
-- [ ] Add internal stable method/profile/cutoff/rescue/policy identifiers and
+- [x] Add internal stable method/profile/cutoff/rescue/policy identifiers and
       sidecar `spec`; preserve every v1 field, attribute, class, and output.
 - [ ] Define minimum `missingness_design` roles, validation, and lifecycle.
 - [ ] Define `imputefinder_analysis` schema with inline original mask,
