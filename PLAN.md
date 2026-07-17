@@ -1,381 +1,128 @@
-# ImputeFinder completion plan
-
-Status: canonical implementation plan for Codex
-
-Baseline reviewed: `eturkes/imputefinder` `main` at commit `50c8154` (2026-07-14). Re-check the live repository before editing because this snapshot may become stale.
-
-Source constraint: Codex will not receive the thesis. This document is intentionally self-contained. Treat the normative behavior below as the source of truth; thesis page references are provenance for the maintainer, not an implementation dependency.
-
-## 1. Operating rules for multi-session work
-
-`PLAN.md` defines stable product behavior and completion gates. Use `.agent/roadmap.md` as the live session ledger required by `AGENTS.md`; create it if absent. Do not weaken or reinterpret a normative requirement here merely to fit the current code.
-
-At the start of every session:
-
-1. Read `AGENTS.md`, `PLAN.md`, `.agent/roadmap.md`, and `.agent/memory.md` if present.
-2. Run `git status`; inspect tracked source, package metadata, tests, and the latest commits.
-3. Select one cohesive milestone or sub-milestone. Split work rather than combining unrelated changes.
-4. Establish the failing test or explicit verification that defines the session outcome.
-
-At the end of every session:
-
-1. Run the narrow tests for the changed behavior, then the broadest affordable package checks.
-2. Update `.agent/roadmap.md` with completed work, remaining blockers, commands run, and the exact next task.
-3. Update this file only for status checkboxes, approved decisions, or genuinely improved acceptance criteria. Preserve its role as the method specification.
-4. Make one scoped commit for the cohesive change. Leave the working tree clean unless a blocker is explicitly recorded.
-
-If a requirement remains ambiguous after reading this plan and the tests, stop and ask the maintainer. Record the resulting decision here or in a short tracked decision record. Do not use the current prototype's behavior as an implicit answer where it conflicts with this plan.
-
-## 2. Target outcome
-
-Deliver a usable, tested R/Bioconductor package that implements ImputeFinder as a condition-aware missingness classifier and workflow coordinator for quantitative proteomics.
-
-The package must:
-
-- accept unnormalised log2 protein-intensity data plus sample-to-condition assignments;
-- preserve biologically plausible condition-specific "on/off" proteins;
-- classify each feature separately in each experimental condition;
-- distinguish likely MNAR from MAR-or-complete cases using an intensity/missingness cutoff;
-- apply the majority-observed rule only to MAR candidates;
-- reconcile classifications across any number of conditions without losing condition-specific state;
-- return filtered, seed-modified data plus auditable classifications, cutoffs, diagnostics, and seed provenance;
-- leave normalisation and actual imputation to downstream tools;
-- run cleanly from a fresh installation, with documentation and checks suitable for Bioconductor preparation.
-
-Priority order:
-
-1. Scientific and logical correctness.
-2. Reproducibility and auditability.
-3. Stable, clear public API.
-4. Robust automatic cutoff selection.
-5. Packaging, documentation, and release polish.
-
-## 3. Explicit non-goals
-
-The core package does not perform kNN, MinProb, MinDet, QRILC, BPCA, normalisation, differential-abundance testing, or method recommendation. It classifies and prepares data so users can apply those methods per condition.
-
-The first release does not need:
-
-- built-in normalisation pipelines;
-- built-in imputation implementations;
-- a web application;
-- instrument-specific learned models;
-- a universal/global cutoff shared across conditions;
-- exact reproduction of unpublished or unavailable thesis datasets;
-- broad support for every matrix backend before ordinary numeric matrices and `SummarizedExperiment` objects are correct.
-
-Keep these as future work, not reasons to delay a correct classifier.
-
-## 4. Reviewed baseline and defects replaced
-
-The repository at baseline commit `50c8154` was a partial prototype, not a safe base for incremental patching without tests. The milestone ledger records the tested replacements.
-
-Known baseline defects:
-
-- `classify_missingness()` calls an absent `plot_detect_custom()`.
-- `ggplot_build()` is unimported and is incorrectly used as an algorithmic data source.
-- the final MAR expression references `final_MAR` while defining it and uses an undefined `%||%` operator;
-- the fixed `min_non_na = 5` only matches an eight-sample condition and is not a general majority rule;
-- the function returns global MAR/MNAR unions, discarding the condition-specific classification that downstream mixed imputation requires;
-- the fully missing-condition rescue/seed step is absent;
-- proteins classified MNAR in every condition are retained rather than excluded;
-- the `condition` metadata column is hard-coded;
-- row order is repeatedly mutated inside the condition loop;
-- automatic cutoff detection can produce empty candidates, `Inf`, division by zero, and unstable derivative results;
-- input validation is minimal;
-- package metadata is placeholder text and the declared licence is invalid;
-- several imported packages are unused;
-- there is no test suite, CI, vignette, worked example, or scientific validation fixture.
-
-Disposition of prototype pieces:
-
-| Prototype element | Required disposition |
-|---|---|
-| `classify_missingness` function name | Retain unless a documented API review finds a materially better name; preserving it minimizes needless churn. |
-| Single 97-line implementation | Replace with small, pure helpers and one public orchestration function. |
-| `plot_detect_custom` concept | Reimplement internally from explicit profile data; do not copy plot-built coordinates back into the algorithm. |
-| Public `threshold` derivative parameter | Remove. Automatic selection must not expose an arbitrary second-derivative tuning knob. |
-| Public fixed `min_non_na` default | Remove or deprecate. Derive strict majority from each condition's sample count. |
-| Global `MAR`/`MNAR` output vectors | Replace with per-condition output plus an all-feature audit table. |
-| `Reduce`/union reconciliation | Delete and replace with an explicit feature-by-condition state matrix. |
-
-The package is unreleased and the current function is not cleanly executable, so correctness takes precedence over preserving broken behavior. Before deliberately breaking arguments, search public dependent code; add a concise deprecation shim only when real usage justifies it.
-
-## 5. Normative method specification
-
-### 5.1 Terminology
-
-A feature is a protein row. A sample is a matrix column. A condition is an experimental group assigned to one or more samples.
-
-ImputeFinder's MAR/MNAR labels are evidence-based heuristics, not proof of the true missingness mechanism. Human-facing documentation must use wording such as "likely MNAR" and "likely MAR" and expose the diagnostics behind the classification.
-
-### 5.2 Input contract
-
-Canonical data:
-
-- numeric matrix-like object with features in rows and samples in columns;
-- values are unnormalised log2 protein intensities;
-- missing observations are `NA`;
-- rows and columns have non-empty, unique names;
-- condition labels align one-to-one with columns;
-- condition labels contain no missing values;
-- at least two conditions are expected for the complete ImputeFinder workflow;
-- each condition must contain at least one finite intensity somewhere in the matrix, otherwise its minimum replacement value is undefined and the call must fail clearly.
-
-Do not transform, log, normalise, centre, scale, or reinterpret zeros. The package cannot reliably infer whether input is log2 transformed; document the requirement rather than silently guessing.
-
-Reject or clearly normalize unsupported special values:
-
-- reject `Inf` and `-Inf`;
-- reject `NaN` rather than silently treating it as a conventional `NA`;
-- reject duplicated or absent feature/sample names;
-- reject group/data mismatches;
-- reject a missing requested assay or ambiguous multiple-assay selection.
-
-Required interfaces:
-
-1. A primary matrix interface accepting a group vector or an aligned design data frame and group column.
-2. A `SummarizedExperiment` adapter with configurable assay selection and configurable group column; no hard-coded `condition` requirement.
-3. Both interfaces must call the same pure matrix core and produce equivalent classifications.
-
-The input object must not be modified by reference or through side effects.
-
-### 5.3 Stable state vocabulary
-
-For every feature `i` and condition `g`, calculate state after the rescue step:
-
-- `complete`: zero missing values in the condition. Complete cases need no missingness mechanism, regardless of mean intensity.
-- `MNAR`: at least one value is missing and the observed mean intensity is strictly below the condition cutoff.
-- `MAR`: at least one value is missing, the observed mean is greater than or equal to the cutoff, and a strict majority of samples are observed.
-- `insufficient`: at least one value is missing, the observed mean is greater than or equal to the cutoff, and no strict majority is observed.
-
-This explicit `complete` state resolves an ambiguity in the original shorthand. MNAR is a missingness mechanism; a fully observed low-intensity feature must not be discarded merely because its mean lies below the cutoff.
-
-For a condition with `n_g` samples, strict majority means:
-
-```text
-minimum observed = floor(n_g / 2) + 1
-```
-
-Examples: 3/4, 5/8, and 11/20 pass; 2/4, 4/8, and 10/20 fail.
-
-### 5.4 Step A - remove globally absent features
-
-Before any replacement, identify features missing in every sample across every condition.
-
-- Mark them `all_missing` in the feature audit.
-- Exclude them from all later calculations.
-- Never seed them: the method requires evidence that the feature was detected in at least one condition.
-
-### 5.5 Step B - rescue a feature fully missing within one condition
-
-This is the defining "on/off protein" behavior and is mandatory.
-
-For each condition `g`:
-
-1. Compute `condition_min[g]` once as the minimum finite intensity in that condition before any seed values are inserted.
-2. Find every non-globally-absent feature whose values are all `NA` in `g`.
-3. For each such feature, choose one sample column from condition `g` uniformly at random. Sampling is with replacement across features, so the same sample may be selected for several features.
-4. Replace exactly that one cell with `condition_min[g]`; leave the other cells in the feature-condition block as `NA`.
-
-Required reproducibility behavior:
-
-- default reproducibility seed is `1L`, matching the original analysis intent;
-- use a local RNG scope: the caller's global RNG state must be identical before and after the function call;
-- process condition labels, feature identifiers, and candidate sample identifiers in stable order so row/column permutation does not change classification or seed assignment by sample name under the same seed;
-- return a seed log containing feature, condition, selected sample, old value, inserted value, and seed;
-- preserve all original observed values exactly.
-
-The old ad hoc script reset `set.seed(1)` while processing conditions. Exact old random cell choices are not a compatibility target; uniform selection, reproducibility, order stability, and provenance are.
-
-### 5.6 Step C - calculate condition-specific feature statistics
-
-After rescue, calculate for every non-globally-absent feature and condition:
-
-- sample count;
-- observed count;
-- missing count;
-- missing fraction;
-- `has_missing` boolean;
-- arithmetic mean of observed intensities;
-- whether a seed was inserted.
-
-Use the arithmetic mean, not the median. A high observed intensity in one sample is intended to pull the summary upward and make a MAR classification more likely.
-
-No surviving feature-condition block may have a non-finite mean: globally absent features were removed and condition-specific all-missing blocks were seeded.
-
-### 5.7 Step D - construct the missingness/intensity profile
-
-The cutoff diagnostic is calculated independently for every condition.
-
-The profile corresponding to the thesis figure is a stacked density of feature mean intensity split by whether the feature has any missing values in that condition. It is not computed from rendered plot coordinates.
-
-For condition `g`:
-
-1. Split feature means into `has_missing = TRUE` and `FALSE` groups.
-2. Estimate count-weighted density curves on a common intensity grid.
-3. Let `n_1`, `f_1(x)` describe features with missing values and `n_0`, `f_0(x)` complete features.
-4. Calculate the plotted missing proportion explicitly:
-
-```text
-p_missing(x) = n_1 * f_1(x) / (n_1 * f_1(x) + n_0 * f_0(x))
-```
-
-This is the explicit equivalent of mapping density count and using a filled stacked density plot. The low-intensity region should generally be dominated by features with missing values; the profile then falls toward a noisier low-missing region at higher intensity.
-
-Store the raw per-feature statistics and the derived profile grid. The plot is a presentation of those data, not a source of truth for them.
-
-Diagnostics should also expose raw missing fractions, seeded features, feature counts in each class, density/smoothing choices, and any cutoff-quality warnings.
-
-### 5.8 Step E - determine a cutoff per condition
-
-Manual and automatic paths are both required.
-
-Manual path:
-
-- accept a named numeric cutoff for any condition with incomplete features;
-- names must match condition labels exactly;
-- validate finite values and report suspicious values outside the observed feature-mean range;
-- record source as `manual`.
-
-Automatic path:
-
-- is the default only after the validation milestone in this plan passes;
-- operates on the explicit `p_missing(x)` profile, never on `ggplot_build()` output;
-- finds the dominant descending "MNAR cliff" and selects the right-hand/bottom boundary of that transition, not the first noisy curvature point;
-- derives each condition independently;
-- exposes no arbitrary public derivative threshold;
-- records method version, quality statistics, and warnings;
-- never silently returns `Inf`, an endpoint caused by no candidate, or a cutoff from a flat/unidentifiable profile.
-
-When automatic selection is not credible, raise a structured, condition-specific error that tells the user to inspect the diagnostic profile and supply a manual cutoff. A deterministic failure is preferable to a plausible-looking fabricated cutoff.
-
-A condition with no missing values requires no cutoff; mark it `NA` with source `not_needed`, and classify every feature as complete in that condition.
-
-### 5.9 Step F - assign per-condition states
-
-For every feature-condition block:
-
-```text
-if missing_count == 0:
-    state = complete
-else if mean_intensity < cutoff:
-    state = MNAR
-else if observed_count > sample_count / 2:
-    state = MAR
-else:
-    state = insufficient
-```
-
-Boundary rule: a mean exactly equal to the cutoff is on the MAR side.
-
-Sparse MNAR is valid. A single observed value can be sufficient for an MNAR feature because the intended downstream methods can operate from a low-value anchor. Do not apply the majority rule to MNAR.
-
-### 5.10 Step G - reconcile across conditions
-
-Generalize to any number of conditions using the full feature-by-condition state matrix. Do not write pairwise `Neg`/`Pos` special cases.
-
-Retain feature `i` if and only if both conditions hold:
-
-```text
-1. Every condition state is one of complete, MAR, or MNAR.
-2. At least one condition state is complete or MAR.
-```
-
-Equivalent interpretation:
-
-- drop a feature if any condition is `insufficient`;
-- drop a feature if it is MNAR in every condition;
-- retain complete/MAR features when all other conditions are complete, MAR, or MNAR;
-- retain condition-specific on/off features, such as MNAR in disease and complete/MAR in control.
-
-Record an auditable drop reason:
-
-- `all_missing`;
-- `insufficient:<condition labels>`;
-- `MNAR_all_conditions`.
-
-If multiple reasons could apply, use deterministic precedence: `all_missing`, then `insufficient`, then `MNAR_all_conditions`.
-
-### 5.11 Step H - return condition-specific classifications
-
-For every condition, return disjoint retained-feature sets:
-
-- `MNAR`;
-- `MAR`;
-- `complete`;
-- `MAR_or_complete = union(MAR, complete)`.
-
-For every retained feature in every condition, exactly one of `MNAR` and `MAR_or_complete` must be true. These are the lists a downstream mixed-imputation workflow needs.
-
-Never collapse these lists into global unions as the primary result. A feature may be MNAR in one condition and MAR/complete in another.
-
-### 5.12 Pipeline order after ImputeFinder
-
-Document the intended external workflow:
-
-1. Run ImputeFinder on unnormalised log2 intensities.
-2. Use the returned filtered, seed-modified data.
-3. Apply the user's chosen normalisation.
-4. Split columns by condition.
-5. Within each condition, apply an MNAR method to rows in that condition's `MNAR` set and a MAR method to rows in its `MAR_or_complete` set.
-6. Recombine conditions without changing sample order.
-
-The package may show examples using kNN for MAR and MinProb for MNAR, but these are examples, not imposed defaults or runtime dependencies.
-
-## 6. Required public result contract
-
-Return a documented list or lightweight S3 object, provisionally classed `imputefinder_result`, with at least:
-
-```text
-data
-    Filtered, seed-modified object in the same broad representation as input:
-    matrix in -> matrix out; SummarizedExperiment in -> SummarizedExperiment out.
-
-classifications
-    Long data frame with one row per original feature x condition, where applicable:
-    feature, condition, sample_count, observed_count, missing_count,
-    missing_fraction, mean_intensity, cutoff, state, seeded, retained, drop_reason.
-
-groups
-    Named list by condition. Each entry contains retained feature names:
-    MNAR, MAR, complete, MAR_or_complete.
-
-feature_status
-    One row per original feature with retained flag and deterministic drop reason.
-
-cutoffs
-    Named numeric vector by condition.
-
-cutoff_diagnostics
-    Named list by condition containing source (manual/automatic/not_needed),
-    method identifier/version, quality measures, warnings, and profile metadata.
-
-profiles
-    Named list by condition containing raw feature statistics and explicit profile grid.
-
-seed_log
-    Data frame of all artificial seed insertions.
-
-groups_by_sample
-    Named condition vector aligned to output columns.
-
-call
-    Matched call and relevant reproducibility metadata.
-```
-
-Recommended methods:
-
-- `print.imputefinder_result()` - concise feature/group/cutoff summary;
-- `summary.imputefinder_result()` - state and drop counts by condition;
-- `plot_missingness(result, condition)` or a `plot()` method - reconstruct plot from stored profile data and add cutoff line.
-
-Do not store a second full copy of the original matrix merely for convenience. The caller's input remains unchanged, while `seed_log` and `feature_status` provide provenance.
-
-Public signature decided in M0:
+# ImputeFinder plan - stable rules + evidence horizon
+
+Status: canonical scientific contract and active Codex implementation plan
+
+Reviewed baseline: clean `main` at `30618e1` (2026-07-17).
+
+The first-release completion plan is finished. Its full historical specification
+remains in git at `30618e1:PLAN.md`; completed session evidence remains in
+`.agent/roadmap.md`; validation evidence remains under `dev/`. This successor
+plan keeps the stable scientific contract self-contained while concentrating
+active work on the next shippable horizon.
+
+## 1. Operating model
+
+`PLAN.md` owns stable scientific behavior, promoted successor scope, and gates.
+`.agent/roadmap.md` owns live status, session evidence, blockers, and exact next
+work. `.agent/memory.md` holds only durable facts that earn repetition beyond
+code, tests, this plan, and git history.
+
+At session start:
+
+1. Read `AGENTS.md`, Sections 1-5 here, the active direction/milestone, the
+   roadmap head + latest ledger entry, and memory.
+2. Run `git status`; inspect relevant tracked source, tests, metadata, and recent
+   commits.
+3. Select one cohesive milestone/sub-milestone and define its failing test or
+   explicit verification.
+4. Re-check current primary sources before a new method, dependency, standard,
+   or dataset decision.
+
+At session close:
+
+1. Run narrow tests, then the broadest proportional package/scientific gates.
+2. Update the roadmap with evidence, failures, blockers, and exact next task.
+3. Update this plan only for approved scope, improved gates, promotion state, or
+   durable scientific decisions.
+4. Make one scoped commit; record an intentional dirty tree as a blocker.
+
+Ambiguous scientific behavior, estimands, or scope → stop and ask. A failed
+research direction is a valid result. Preserve failed candidates and frozen
+holdout misses rather than weakening gates.
+
+## 2. Stable `rules_v1` contract
+
+`classify_missingness()` is a released-shape, deterministic heuristic for
+condition-aware quantitative-proteomics missingness. The stable rail classifies
+and prepares data; it neither proves a causal mechanism nor normalises or
+imputes values.
+
+### 2.1 Input
+
+Canonical input:
+
+- ordinary numeric matrix data: features × samples;
+- unnormalised log2 protein intensities; missing observations = `NA`;
+- finite observed values, unique non-empty row/column names;
+- condition labels aligned one-to-one with samples; the full comparative
+  workflow expects at least two conditions;
+- each condition contains at least one finite intensity somewhere;
+- matrix + atomic group vector or aligned design data frame; or
+  `SummarizedExperiment` + explicit `group_col`, with `assay` optional only when
+  exactly one assay exists.
+
+Reject `NaN`, infinities, duplicate/absent identifiers, missing group labels,
+ambiguous assays, and alignment mismatches. Preserve finite zeros and negative
+log2 values. Trust the documented scale; the package cannot infer whether data
+were transformed correctly.
+
+### 2.2 Algorithm
+
+For every call:
+
+1. **Global absence** - mark features missing in every sample `all_missing`;
+   exclude them before later calculations and never seed them.
+2. **Condition rescue** - compute each condition's minimum finite intensity
+   before insertion. For each surviving feature fully missing in a condition,
+   choose one condition sample uniformly and insert that minimum in exactly one
+   cell. Default seed = `1L`; sampling uses stable feature/condition/sample-name
+   order and local RNG scope. Log feature, condition, sample, old value,
+   inserted value, and seed.
+3. **Block statistics** - after rescue, calculate sample/observed/missing counts,
+   missing fraction, arithmetic observed mean, and seeded flag for each
+   feature-condition block.
+4. **Missingness profile** - independently by condition, estimate complete and
+   incomplete feature-mean densities on one grid. The explicit plotted profile
+   is:
+
+   ```text
+   p_missing(x) = n_missing f_missing(x)
+                  -----------------------------------------------
+                  n_missing f_missing(x) + n_complete f_complete(x)
+   ```
+
+   Store raw statistics, grid, density metadata, support, and warnings. Plots
+   consume stored data; rendered graphics never become algorithmic input.
+5. **Cutoff** - use a finite named manual cutoff when supplied. Otherwise locate
+   the right/bottom boundary of the dominant descending profile transition.
+   Record method/version/quality; raise a structured condition-specific failure
+   for weak, flat, or ambiguous evidence. A complete-only condition needs no
+   cutoff.
+6. **State** - for feature `i`, condition `g`:
+
+   ```text
+   missing_count == 0                         → complete
+   mean_intensity < cutoff                    → MNAR
+   mean_intensity >= cutoff and
+     observed_count > sample_count / 2        → MAR
+   otherwise                                  → insufficient
+   ```
+
+   Thus equality lies on the MAR side; strict majority =
+   `floor(sample_count / 2) + 1`; sparse MNAR remains eligible.
+7. **Reconciliation** - retain a feature exactly when every condition is
+   `complete`, `MAR`, or `MNAR`, and at least one condition is `complete` or
+   `MAR`. Drop precedence: `all_missing` → `insufficient:<conditions>` →
+   `MNAR_all_conditions`.
+
+Labels mean evidence-compatible **likely MAR/MNAR**, not identified truth.
+
+### 2.3 Public API and result
+
+Stable signature:
 
 ```r
-classify_missingness <- function(
+classify_missingness(
     x,
     group = NULL,
     group_col = NULL,
@@ -385,472 +132,874 @@ classify_missingness <- function(
 )
 ```
 
-Argument routing is explicit:
+Stable `imputefinder_result` fields, in order:
 
-- matrix `x` + atomic `group`: unnamed groups align positionally; named groups must have exactly the sample names and are aligned by name; `group_col` and `assay` must be `NULL`;
-- matrix `x` + data-frame `group`: unique row names must equal the sample names, rows are aligned by name, `group_col` selects exactly one column, and `assay` must be `NULL`;
-- `SummarizedExperiment` `x`: `group` is omitted, `group_col` explicitly selects `colData(x)`, and `assay` is optional only when exactly one assay exists;
-- `cutoffs` is `NULL` for automatic selection or a named, optionally partial numeric vector of manual condition cutoffs; automatic selection fills conditions without a manual value;
-- `seed` is one non-missing integer and defaults to `1L`.
+1. `data` - retained, seed-modified data in the input's broad representation;
+2. `classifications` - long block evidence/state/retention table;
+3. `groups` - retained `MNAR`, `MAR`, `complete`, `MAR_or_complete` per condition;
+4. `feature_status` - one original-feature retention/drop record;
+5. `cutoffs`;
+6. `cutoff_diagnostics`;
+7. `profiles`;
+8. `seed_log`, including rescues later dropped;
+9. `groups_by_sample` aligned to output columns;
+10. `call`.
 
-`threshold`, `min_non_na`, and `return_plot` are removed. Stored profiles plus the plot method replace `return_plot`. M0 found no public dependent usage, releases, tags, or forks, so no compatibility shim is warranted.
+Public helpers: `print()`, `summary()`, `plot_missingness()`.
 
-Illustrative use:
+### 2.4 Invariants and maintenance
 
-```r
-fit <- classify_missingness(
-    x = intensity_matrix,
-    group = design$condition,
-    cutoffs = c(Neg = 12.4, Pos = 12.4)
-)
+- Input object remains unchanged. On returned retained rows, originally observed
+  values remain exact; only logged rescue cells differ.
+- Caller RNG kind/state, options, graphics state, and working directory remain
+  unchanged.
+- Named scientific results survive feature/sample/condition permutation.
+- Matrix and `SummarizedExperiment` paths share one matrix core and agree.
+- Manual/automatic failures are explicit; automatic selection never fabricates
+  an endpoint or non-finite cutoff.
+- The normative fixture, full unit suite, scientific regressions, 10,000 × 50
+  performance gate, source check, and Bioconductor gates remain the v1 oracle.
 
-fit$groups$Neg$MNAR
-fit$groups$Neg$MAR_or_complete
-plot_missingness(fit, "Neg")
-```
+`rules_v1` freezes scientific semantics, result fields/order/class, named
+discrete outputs, masks, and rescue assignments. Versioned `rules_v1.x`
+maintenance may improve messages, structured condition metadata, security, or
+performance while preserving fixture behavior and documented meaning.
 
-For `SummarizedExperiment`, users must be able to select the assay and metadata column explicitly.
+Comparison vocabulary for future tests:
 
-## 7. Normative worked fixture
+- **exact** - names, masks, rescue assignments, discrete states, retained rows,
+  result components/class, and calls;
+- **canonical** - stored plot data, layer roles, labels, and diagnostics rather
+  than environment-bearing plot object identity;
+- **tolerance** - continuous fits, probabilities, intervals, and floating-point
+  backend reductions;
+- **threshold/noninferiority** - runtime, allocation, RSS, and scientific rates;
+- **semantic parity** - equivalent scientific contents when representations
+  intentionally differ.
 
-Use this fixture in tests and documentation so the central semantics cannot drift. Conditions A and B each have four samples; manual cutoffs are `A = 12`, `B = 12`.
+### 2.5 Stable downstream handoff
 
-```r
-x <- rbind(
-    on_off = c(NA, NA, NA, NA, 15, 16, 15, 17),
-    mar_both = c(14, 15, NA, 16, 14, NA, 15, 16),
-    sparse_mar = c(20, NA, NA, NA, 20, 21, 22, 23),
-    sparse_mnar = c(8, NA, NA, NA, 14, 15, 16, 17),
-    all_mnar = c(8, NA, NA, NA, 9, NA, NA, NA),
-    globally_absent = rep(NA, 8),
-    complete_low = c(8, 8, 8, 8, 9, 9, 9, 9)
-)
-colnames(x) <- paste0("s", seq_len(ncol(x)))
-group <- rep(c("A", "B"), each = 4)
-```
-
-Expected outcome:
-
-| Feature | A state | B state | Retained | Reason |
-|---|---|---|---:|---|
-| `on_off` | MNAR after one A seed | complete | yes | condition-specific on/off protein |
-| `mar_both` | MAR (3/4 observed) | MAR (3/4 observed) | yes | adequate MAR in both |
-| `sparse_mar` | insufficient (1/4 observed, high mean) | complete | no | insufficient:A |
-| `sparse_mnar` | MNAR (1/4 observed, low mean) | complete | yes | sparse MNAR allowed |
-| `all_mnar` | MNAR | MNAR | no | MNAR_all_conditions |
-| `globally_absent` | not seeded | not seeded | no | all_missing |
-| `complete_low` | complete | complete | yes | complete overrides low-intensity mechanism shorthand |
-
-Additional assertions:
-
-- A strict majority for four samples is three.
-- `on_off` receives exactly one seed in A, equal to A's pre-seed condition minimum.
-- the original matrix remains byte-for-byte unchanged;
-- output row/column order follows the original order, minus dropped rows;
-- condition-specific lists agree with the state table.
-
-## 8. Implementation architecture
-
-Prefer small, pure functions and base R matrix operations. Avoid a tidyverse dependency for simple reshaping or aggregation.
-
-Suggested source split:
+The v1 workflow remains:
 
 ```text
-R/
-  classify_missingness.R       public orchestration
-  input.R                      validation + matrix/SE adapters
-  seed_missing_conditions.R    global-absence and rescue logic
-  profile_missingness.R        feature statistics + density profile
-  detect_cutoff.R              manual validation + automatic detector
-  reconcile.R                  state matrix + retention rules
-  result.R                     constructor, print, summary
-  plot.R                       plots generated from stored profile data
-  package.R                    package-level documentation
+classify unnormalised log2 data
+  → use retained seed-modified data
+  → user-chosen normalisation
+  → split by condition
+  → route condition MNAR vs MAR_or_complete sets
+  → external imputation/analysis
 ```
 
-Suggested tests:
+Actual normalisation, imputation, differential testing, and method selection
+remain outside the stable rail.
+
+## 3. Successor brief
+
+### 3.1 First persona and regime
+
+Primary user: an R/Bioconductor analyst with bulk label-free protein-level
+intensities, a biological condition, and optional batch and/or subject metadata.
+
+Initial successor claims cover only validation-backed bulk LFQ regimes. DDA and
+DIA are recorded as separate acquisition strata. TMT, precursor/peptide
+hierarchies, single-cell proteomics, multi-omics, cross-study priors, and delayed
+backends remain parked until their option cards are promoted. Stable
+`classify_missingness()` retains its current documented input contract.
+
+### 3.2 Program target and release floor
+
+Build one opt-in sidecar workflow that attempts to answer:
+
+1. Which biological and technical design effects are estimable, aliased, or
+   inseparable from missingness?
+2. Which classic states/retention decisions are stable to sampling, cutoff
+   estimation, and declared assumption changes?
+3. Does detection frequency differ by condition after declared design terms,
+   and how is that distinct from observed-abundance change?
+
+The guaranteed release floor is the sidecar seam plus validated typed-design/
+estimability core. The A association panel, B, and C ship only when their frozen
+development and confirmation gates pass; killed/parked tracks remain documented
+negative results. The active program studies three directions:
+
+- **A - design/confounding sentinel**;
+- **B - robustness certificate**;
+- **C - detectability contrast**.
+
+### 3.3 Scientific boundary
+
+Observed intensities plus missing indicators generally do not identify the true
+causal missingness mechanism. Biological absence, abundance-dependent detection,
+stochastic identification, interference, processing failure, and batch coverage
+can overlap.
+
+Therefore the successor:
+
+- reports association, estimability, model-conditional evidence, stability, and
+  unresolved cases;
+- reserves causal/structural-absence claims for designs or auxiliary-variable
+  assumptions sufficient to identify the stated estimand;
+- treats abstention/`unavailable` as valid outcomes;
+- keeps evidence separate from versioned decision policy;
+- freezes protocols, metrics, thresholds, and holdouts before final candidate
+  results;
+- distinguishes synthetic truth, experimental abundance/detection truth, and
+  naturally missing cells whose causal labels remain unknown.
+
+## 4. Portfolio governance
+
+Track states:
+
+| State | Meaning |
+|---|---|
+| `stable` | Supported contract; compatibility rules apply |
+| `active` | Approved implementation path with roadmap milestone + release gate |
+| `candidate` | Bounded research proposal awaiting promotion evidence |
+| `parked` | Valuable horizon; absent from current release/DoD |
+| `killed` | Frozen evidence rejected the direction; negative result retained |
+| `shipped` | Active gate passed and release evidence closed |
+
+Current portfolio:
+
+| ID | Direction | State | Dependency |
+|---|---|---|---|
+| v1 | Condition-aware hard-state classifier | `stable` | complete |
+| A | Design/confounding sentinel | `active` | M11-M12 |
+| B | Robustness certificate | `active` | mandatory A design core + M12 |
+| C | Detectability contrast | `active` | mandatory A design core + M12 |
+| D | Censor-aware continuous evidence | `parked` | A design core + B + identification study |
+| E | Leakage-safe workflow stress-test lab | `parked` | release 1 + bounded adapter contract |
+| F | Distributional uncertainty handoff | `parked` | promoted D or E distributional path |
+| G | Precursor/peptide/protein evidence graph | `parked` | modality-specific validation |
+| H1 | Acquisition calibration | `parked` | B-D + transfer evidence |
+| H2 | Value-of-information feedback | `parked` | H1 + action-specific evidence |
+| I | Delayed/on-disk backend | `parked` | explicit stable/research adapter decision |
+| J1 | Standards-aware QC exchange | `parked` | A + standards lifecycle decision |
+| J2 | Cross-study atlas | `parked` | J1 + dataset governance + transfer evidence |
+
+WIP cap: one active implementation milestone plus its validation work. Parallel
+agents may research/review independent pieces inside that milestone. After the
+M13-M15 studies close, M15P may activate at most one of D or E; every other card
+stays parked until a later explicit decision. Parked cards never block the active
+release Definition of Done.
+
+## 5. Sidecar product and architecture
+
+### 5.1 Golden path
+
+Provisional API; M11 runs the naming experiment before export:
+
+```r
+design <- missingness_design(
+    sample_data,
+    condition = "condition",
+    nuisance = "batch",
+    block = "subject",
+    acquisition = "acquisition_mode"
+)
+
+analysis <- analyze_missingness(
+    x,
+    design,
+    assay = NULL,
+    base_fit = NULL,
+    cutoffs = NULL,
+    seed = 1L,
+    modules = c("sentinel", "stability")
+)
+
+detectability <- test_detectability(
+    analysis,
+    x = x,
+    contrast = list(condition = c(treated = 1, control = -1))
+)
+```
+
+`analyze_missingness()` owns the original `x` during computation and either
+attempts the classic fit or checks an optional `base_fit` for scientific and
+structural compatibility with `x`, design, cutoff-source policy, and seed. This
+check recomputes the classic path and compares the defined exact/canonical/
+tolerance components; it establishes compatibility, not historical provenance.
+Conflicting `base_fit`/`cutoffs` specifications fail. `test_detectability()`
+rechecks the supplied `x` fingerprint because the sidecar does not retain numeric
+intensities. A fit-only call cannot reconstruct dropped-row cells, the original
+mask, or pre-rescue sample evidence; any limited fit-only accessor must return
+structured `unavailable` for analyses needing them.
+
+For matrix input, the typed design supplies the aligned condition. For
+`SummarizedExperiment`, `assay` follows the stable routing rule and the design's
+named condition column must exist in, align with, and equal `colData(x)`; users
+with external-only condition metadata pass the selected assay as a matrix.
+
+### 5.2 Execution
 
 ```text
-tests/testthat/
-  helper-fixtures.R
-  test-input.R
-  test-seeding.R
-  test-profile.R
-  test-cutoff-manual.R
-  test-cutoff-auto.R
-  test-classification.R
-  test-reconciliation.R
-  test-output.R
-  test-summarizedexperiment.R
-  test-plot.R
-  test-invariants.R
+x + typed design
+  ├─→ immutable pre-rescue evidence + original mask
+  ├─→ stable `rules_v1` attempt: result | structured failure
+  ├─→ A: estimability/association diagnostics
+  └─→ B: named perturbation runs of the stable evidence/decision path
+          ↓
+     companion analysis + provenance
+          + fingerprint-matched x + contrast
+          ↓
+     C: standalone detection + observed-abundance result
 ```
 
-Architecture requirements:
+Stable output stays untouched. Shared A/B evidence lives in an experimental
+companion class, provisionally `imputefinder_analysis`:
+
+```text
+classic
+    Exact `imputefinder_result` on success; otherwise a portable structured
+    failure record with stage/class/message/call. Never a partial v1 result.
+spec
+    Sidecar schema/module/policy/software identifiers and lifecycle status.
+design
+    Aligned supplied roles, declared terms, estimability, and unavailable roles.
+input
+    Dimensions, ordered names, deterministic fingerprint, original mask,
+    scale/acquisition declarations; no duplicate full numeric matrix.
+sentinel
+    A outputs or NULL.
+stability
+    B outputs or NULL, separated by uncertainty family.
+provenance
+    Call, seeds/streams, hashes, warnings, failures, assumptions, training scope.
+```
+
+The caller owns numeric `x`; serialized sidecars retain computed evidence and
+the original mask, not a second full intensity matrix. Re-running a new module
+requires `x` again and verifies its fingerprint. M11 chooses and records the
+fingerprint algorithm and mask representation after a current tooling review.
+Missing/mismatched input artifacts fail explicitly.
+
+Pre-rescue evidence is constructed before the classic attempt. Supported A/C
+work may therefore continue after an automatic cutoff failure; B records the
+failure frequency rather than requiring a fabricated fit. Modules that truly
+depend on a successful classic result return structured `unavailable`.
+
+`test_detectability()` returns an immutable standalone
+`imputefinder_detectability` object referencing the sidecar schema/input
+fingerprint, design hash, contrast, and its own provenance. Multiple contrasts
+therefore neither mutate nor ambiguously overwrite the sidecar.
+
+### 5.3 Design object
+
+One row per sample, names exactly aligned to `x`. Roles:
+
+- required `condition`;
+- optional declared `nuisance` terms such as batch/plate/run order;
+- optional `block` for subject/pair/repeated measures;
+- optional acquisition mode;
+- optional explicitly declared interactions;
+- resampling unit derived from block/biological replicate semantics.
+
+The sidecar audits every supplied and estimand-required role. Absent optional
+metadata is recorded as unavailable and constrains claims; it does not invalidate
+an otherwise supported analysis. Automatic interaction search, sample exclusion,
+batch correction, or data mutation is outside A-C.
+
+The design/estimability core in A is mandatory shared infrastructure for B/C.
+A's statistical missingness-association panel remains an independently
+falsifiable release track; its failure cannot remove the validated design core.
+
+### 5.4 Lifecycle and exactness
+
+- Research class/schema is experimental from M11; schema ID and upgrade/error
+  behavior ship with the first object.
+- M11 identifiers live only in internal constants + sidecar `spec`; v1 receives
+  no new field, attribute, or class.
+- Inline artifacts only for the first sidecar schema. External content-addressed
+  references await a separate lifecycle design.
+- Exact/canonical/tolerance/threshold/semantic comparisons follow Section 2.4.
+- Sidecar modules read stored scientific data, never rendered plot coordinates.
+- Local RNG scopes and stable instance IDs preserve caller state and auditability.
+
+## 6. Active direction A - design/confounding sentinel
+
+### 6.1 Hypothesis and output
+
+Retaining declared design context will reveal missingness associations, aliasing,
+and non-estimable biological/technical separation before users over-interpret a
+condition label.
+
+Report, without automatic correction:
+
+- design rank, contrast estimability, exact aliasing, singleton levels, and
+  condition-nuisance overlap;
+- sample detection rate, intensity support, feature overlap, and pre-rescue
+  coverage;
+- condition × declared nuisance/block coverage tables;
+- missingness association with declared main effects/interactions;
+- practical overlap/uncertainty diagnostics for near-confounding;
+- unsupported acquisition/metadata claims and actionable wording.
+
+Language: “associated with,” “aliased with,” “cannot be separated under this
+design.” The sentinel never claims which factor caused missingness.
+
+### 6.2 Method constraints
+
+- Algebraic design/contrast checks precede statistical association.
+- Statistical terms are user-declared; multiplicity and low support are visible.
+- Pre-rescue evidence drives QC; rescue anchors remain separately marked.
+- A owns static summaries. Perturbation-based influence belongs to B.
+- DDA and DIA evidence stays stratified until validation supports pooling.
+
+### 6.3 Gate
 
-- one internal matrix core;
-- no feature reordering during condition loops;
-- stable named indexing rather than implicit positional joins;
-- no extraction of scientific data from ggplot internals;
-- no undefined convenience operators;
-- no mutable global state;
-- no silent fallbacks on invalid cutoffs;
-- no condition-name special cases;
-- all generated `NAMESPACE` and Rd files maintained through roxygen2;
-- runtime dependencies kept minimal and justified.
+M12 freezes numeric entries in the gate registry before implementation results:
 
-Target runtime dependencies should normally be limited to base/recommended R, `ggplot2`, and Bioconductor infrastructure needed for `SummarizedExperiment`. Remove `dplyr`, `tidyr`, and `assertthat` unless later work proves a real, documented need.
+Mandatory design-core gates:
 
-## 9. Milestones and suggested Codex sessions
+- exact detection of constructed rank deficiency, perfect aliasing, and
+  non-estimable contrasts;
+- correct block/paired and unequal-replication accounting;
+- label-preserving order/re-encoding invariance;
+- no mutation of input, classic result/failure, or global state.
 
-The session boundaries below are suggestions. Split any milestone further when that produces a cleaner test-driven commit.
+Independently disposable association-panel gates:
 
-### M0 - Baseline, tests, and API decision record
+- predeclared false-flag/error behavior on null simulations;
+- one frozen multi-batch public case meeting its predeclared aliasing/coverage
+  finding and wording rubric, with zero causal attribution or unsupported
+  correction claims;
+- calibrated uncertainty/multiplicity behavior under the frozen alternatives.
 
-- [x] Re-audit current `main`; run the existing package build/check and record actual failures.
-- [x] Add `testthat` edition 3 infrastructure and the normative fixture.
-- [x] Add red tests for the central current failures: absent plot helper, fully missing condition, dynamic majority, per-condition output, and all-MNAR exclusion.
-- [x] Decide and document the exact public function signature while preserving all capabilities required in Sections 5-6.
-- [x] Decide whether to add a temporary deprecation shim after searching public dependent code.
-- [x] Create `.agent/roadmap.md` and map the remaining milestones.
+## 7. Active direction B - robustness certificate
 
-Gate: tests express the intended method even though implementation tests are still red; package baseline failures are documented rather than guessed.
+### 7.1 Three distinct quantities
 
-### M1 - Input core and result skeleton
+Every output is assigned to exactly one family:
 
-- [x] Implement matrix validation and aligned group handling.
-- [x] Implement `SummarizedExperiment` extraction/reconstruction with configurable assay and group column.
-- [x] Reject unsupported values and ambiguous inputs with specific messages.
-- [x] Create the internal state vocabulary and result constructor.
-- [x] Guarantee input immutability and original order preservation.
+1. **Sampling stability** - biological/block resampling and leave-one-unit-out.
+2. **Estimator uncertainty** - automatic profile/cutoff feature resampling and
+   structured cutoff failure frequency.
+3. **Assumption/policy sensitivity** - fixed versus re-estimated cutoff, cutoff
+   sweep, and predeclared summary/rule scenarios.
 
-Gate: matrix and `SummarizedExperiment` adapters feed identical matrices/groups into the core; validation tests pass.
+The sidecar never pools these into a single “confidence” score. Resampling
+frequencies are not posterior probabilities. Classic rescue sample placement is
+classification-invariant because the inserted value/count are unchanged;
+downstream placement sensitivity belongs to parked workflow Direction E.
 
-### M2 - Global absence and condition-specific rescue
+### 7.2 Perturbation contract
 
-- [x] Implement `all_missing` detection and audit status.
-- [x] Compute pre-seed condition minima.
-- [x] Insert exactly one condition-minimum value for each fully missing feature-condition block that is observed elsewhere.
-- [x] Implement local seeded randomness, stable processing order, and a complete seed log.
-- [x] Verify the caller's RNG state is unchanged.
+A manifest records:
 
-Gate: normative `on_off` and `globally_absent` tests pass; row/column permutations preserve named results under the same seed.
+- perturbation family, ID, seed stream, source sample/feature IDs;
+- draw-instance IDs, multiplicities or weights, and resampling unit;
+- fixed/re-estimated parameters and policy version;
+- success/failure class and canonical alignment back to original names.
 
-### M3 - Manual-cutoff classification and reconciliation
+Internal weighted/instance evidence handles bootstrap multiplicity; duplicate-
+named matrices never pass through the v1 public validator.
+Feature resampling uses cluster/block structure when declared dependence makes
+ordinary exchangeability implausible. Its output is finite-dataset stability
+unless a frozen sampling model justifies inferential coverage.
 
-- [x] Calculate per-feature/per-condition statistics after seeding.
-- [x] Validate named manual cutoffs.
-- [x] Implement `complete`, `MNAR`, `MAR`, and `insufficient` states exactly as specified.
-- [x] Derive strict majority separately for every condition.
-- [x] Implement n-condition reconciliation and deterministic drop reasons.
-- [x] Populate per-condition `MNAR`, `MAR`, `complete`, and `MAR_or_complete` lists.
-- [x] Remove the broken global union logic.
+### 7.3 Outputs
 
-Gate: all normative fixture expectations pass using manual cutoffs, including unequal group sizes and more than two conditions.
+By feature-condition and retained feature:
 
-### M4 - Explicit profile data and plotting
+- classic intensity and strict-majority margins;
+- sampling state/retention frequencies + transition counts;
+- cutoff empirical resampling distribution/quantile range + failure frequency;
+- assumption scenario matrix and decision boundaries;
+- influential biological/block units from leave-one-unit-out;
+- structured `unavailable` when support/design cannot estimate the quantity.
 
-- [x] Recreate the stacked missing-vs-complete density profile from explicit calculations.
-- [x] Store raw statistics and profile grids in the result.
-- [x] Implement plotting from those stored data, including condition title, percentage axis, and cutoff line.
-- [x] Mark seeded features and warnings in diagnostics where useful without cluttering the default plot.
-- [x] Remove all algorithmic use of `ggplot_build()`.
+Any `stable`/`fragile` display policy is derived only after M12 calibration and
+retains the continuous components beside the label.
 
-Gate: profile calculations are unit tested numerically; plots build without missing functions or namespace leaks.
+### 7.4 Gate
 
-### M5 - Automatic cutoff research and implementation
+- Where the frozen sampling model supports it, cutoff quantile-range coverage of
+  the generating boundary + false-confidence thresholds from M12 pass;
+  otherwise the output stays explicitly descriptive.
+- Flat/no-cliff controls trigger weak-identification/failure in the cutoff panel;
+  sparse designs return `unavailable` for unsupported quantities. Other panels
+  retain their independently measured stability.
+- Perturbation instance order, input order, and seed stream reproduce canonical
+  named outputs.
+- Caller RNG/global state is unchanged.
+- Stable default calls incur zero sidecar work; v1 performance gates still pass.
 
-- [x] Build deterministic synthetic profiles covering clear, noisy, weak, absent, and multi-transition cliffs.
-- [x] Benchmark at least segmented/change-point and derivative-based candidates against the criteria in Section 11.
-- [x] Select the simplest method that reliably locates the right-hand/bottom cliff boundary.
-- [x] Implement quality scoring and structured failure.
-- [x] Record algorithm identity/version in results.
-- [x] Remove the public `threshold` argument.
-- [x] Keep manual cutoffs as a permanent reproducibility override.
-
-Gate: automatic selection passes the scientific/stability acceptance tests and never fabricates a cutoff for an unidentifiable profile.
+## 8. Active direction C - detectability contrast
 
-### M6 - Public API integration and compatibility cleanup
+### 8.1 Estimands
 
-- [x] Integrate manual/automatic paths into the public function.
-- [x] Implement `print`, `summary`, and missingness plot methods/helpers.
-- [x] Ensure matrix and `SummarizedExperiment` outputs preserve metadata and order.
-- [x] Remove obsolete prototype code and unused imports.
-- [x] Add any justified deprecation behavior with tests and clear messages (none
-  justified by the M0 public-usage audit).
-
-Gate: the installed package's public API works from a clean R session and exposes no unqualified/missing symbols.
-
-### M7 - Scientific regression suite
+Condition-associated non-detection can carry predictive or inferential signal.
+Preserve two distinct effects per feature:
 
-- [x] Add compact simulations of uniform MAR plus intensity-dependent MNAR.
-- [x] Add condition-specific on/off simulations.
-- [x] Test classification accuracy, retention, and cutoff error across seeds and permutations.
-- [x] Test sensitivity to group sizes 4, 8, and 20.
-- [x] Test a known cliff near intensity 12 and cutoff sweeps analogous to 8-14.
-- [x] Keep long benchmarks outside routine unit tests; store concise deterministic summaries.
-
-Gate: the package has evidence for its central scientific behavior, not only code-path coverage.
-
-### M8 - Documentation and package metadata
-
-- [x] Replace all `DESCRIPTION` placeholders with accurate title, author, description, GPL metadata, URLs, bug tracker, and current Bioconductor fields.
-- [x] Audit `Imports`, `Suggests`, `biocViews`, and minimum R/Bioconductor versions against current guidance.
-- [x] Rewrite README with method rationale, installation, minimal example, result interpretation, and limitations.
-- [x] Add a vignette covering manual and automatic cutoffs, the on/off fixture, plotting, filtering, and per-condition downstream imputation.
-- [x] Document that input is unnormalised log2 intensity and that classification is heuristic.
-- [x] Document seed provenance and pipeline order before normalisation/imputation.
-- [x] Add package-level help and `NEWS.md`.
-- [x] Ensure every example runs offline or is explicitly non-evaluated for optional downstream packages.
-
-Gate: a user with no thesis can understand and correctly use the package from installed documentation alone.
-
-### M9 - CI and Bioconductor hardening
-
-- [x] Add current R package CI using maintained actions and an appropriate Bioconductor environment.
-- [x] Run unit tests, `R CMD build`, and `R CMD check --as-cran` from a clean source tarball.
-- [x] Run `BiocCheck` using current official guidance.
-- [x] Fix all errors and warnings; resolve actionable notes rather than suppressing them.
-- [x] Verify licence files, line endings, generated documentation, file sizes, examples, and vignette build.
-- [x] Review code coverage; omit it because existing focused gates diagnose failures without fragile infrastructure.
-
-Gate: clean package checks in CI and locally, with any unavoidable note documented precisely.
-
-### M10 - Release-candidate adversarial review
-
-- [x] Review every guarantee in README/Rd/vignette against tests and implementation.
-- [x] Re-test no-missing data, one-class profiles, flat profiles, duplicated means, tiny groups, and all-special-value failures.
-- [x] Verify no global RNG, options, graphics, or working-directory side effects.
-- [x] Verify output invariance under row, column, and condition ordering by names.
-- [x] Verify observed cells never change except logged seed insertions.
-- [x] Benchmark a representative matrix (for example 10,000 features x 50 samples) for avoidable copying or pathological runtime.
-- [x] Remove dead development artefacts and stale comments.
-- [x] Set the usable Bioconductor prerelease version to `0.99.2`; Bioconductor promotes the `0.99.z` series to `1.0.0` at release.
-
-Gate: all Definition of Done items pass from a fresh checkout and clean library.
-
-## 10. Required test matrix
-
-At minimum, tests must cover the following behavior.
-
-### Input and adapter tests
-
-- [x] matrix + vector groups;
-- [x] matrix + aligned design data frame;
-- [x] `SummarizedExperiment` + explicit group column;
-- [x] one assay vs multiple assays requiring explicit choice;
-- [x] missing, duplicate, and mismatched feature/sample names;
-- [x] missing group labels;
-- [x] nonnumeric assay;
-- [x] `Inf`, `-Inf`, and `NaN` rejection;
-- [x] zeros and negative finite log2 intensities preserved;
-- [x] input object unchanged.
-
-### Rescue tests
-
-- [x] feature all missing globally is dropped and never seeded;
-- [x] feature all missing in one condition but observed elsewhere gets exactly one seed;
-- [x] seed equals the condition-wide minimum computed before any seeds;
-- [x] different rescued features may select the same sample;
-- [x] seed assignments are reproducible and logged;
-- [x] caller RNG state is unchanged;
-- [x] a condition with no finite value anywhere errors clearly;
-- [x] sample/feature permutation retains assignments by name under the same seed.
-
-### Classification tests
-
-- [x] complete overrides low mean;
-- [x] incomplete mean below cutoff is MNAR;
-- [x] incomplete mean equal to cutoff is on the MAR side;
-- [x] incomplete mean above cutoff with strict majority is MAR;
-- [x] incomplete mean above cutoff at exactly half observed is insufficient;
-- [x] sparse MNAR with one observation remains eligible;
-- [x] arithmetic mean, not median, drives boundary behavior;
-- [x] no-missing condition produces complete states and needs no cutoff.
-
-### Reconciliation tests
-
-- [x] complete/MAR in all groups retained;
-- [x] MNAR in one group and complete/MAR in another retained;
-- [x] MNAR in every group dropped;
-- [x] insufficient in any group dropped;
-- [x] globally absent drop reason has precedence;
-- [x] rules generalize to 3+ conditions;
-- [x] convenience lists contain retained features only and agree with the long table;
-- [x] no retained feature is simultaneously in `MNAR` and `MAR_or_complete` within a condition;
-- [x] every retained feature appears in exactly one of those two sets per condition.
-
-### Profile and cutoff tests
+1. **Model-adjusted detection contrast** - condition difference in
+   probability/odds of detection after declared nuisance/block structure.
+2. **Conditional observed-abundance contrast** - condition intensity difference
+   conditional on detection, with its selection limitation explicit.
 
-- [x] explicit profile matches the count-weighted density formula;
-- [x] profile computation handles repeated means without division-by-zero artifacts;
-- [x] manual cutoff validation and source metadata;
-- [x] automatic clear-cliff accuracy;
-- [x] automatic condition-specific cutoffs;
-- [x] automatic stability under permutations and modest bootstrap noise;
-- [x] flat/unidentifiable profile returns structured failure;
-- [x] only-complete and only-missing profile behavior is explicit;
-- [x] no candidate ever becomes `Inf`, `-Inf`, or silent endpoint fallback;
-- [x] plot is generated from stored profile data and includes the recorded cutoff.
-
-### Package tests
-
-- [x] fresh-session namespace contains every called symbol;
-- [x] examples run;
-- [x] vignette builds;
-- [x] matrix and `SummarizedExperiment` core results are equivalent;
-- [x] result print/summary methods are concise and accurate;
-- [x] source tarball check is clean.
-
-## 11. Automatic cutoff validation protocol
-
-Automatic cutoff selection is the least settled part of the original method. Treat it as a scientific component requiring comparative evidence, not a cosmetic refactor.
-
-### 11.1 Candidate methods
-
-Evaluate at least:
-
-1. Segmented or piecewise regression/change-point detection on `p_missing(x)`.
-2. A robust derivative/curvature method on the explicit profile, with smoothing and boundary rules fixed internally.
-3. Optionally, monotone/isotonic smoothing followed by dominant transition-boundary detection when it materially improves robustness.
-
-Reject an approach that only works because of an exposed hand-tuned threshold.
-
-### 11.2 Synthetic scenarios
-
-Generate deterministic scenarios with known ground truth:
-
-- sharp single cliff;
-- broad cliff;
-- low-amplitude cliff;
-- noisy right tail;
-- heavy MAR background (approximately 25% random missingness);
-- sparse MAR background (approximately 5%);
-- no cliff/flat random missingness;
-- two apparent transitions;
-- unequal class counts;
-- duplicate feature means;
-- different cutoffs by condition;
-- small feature count near the method's minimum viable input.
-
-MNAR amputation should become more probable as intensity falls below a known boundary. MAR amputation should be independent of intensity.
-
-### 11.3 Selection metrics
-
-Measure:
-
-- absolute cutoff error from the known right-hand cliff boundary;
-- bias toward the left/top vs right/bottom of the transition;
-- MNAR/MAR classification precision and recall on missing feature-condition blocks;
-- retained-feature precision/recall under the cross-condition rule;
-- stability across seeds, row order, column order, and bootstrap resampling;
-- false confidence rate on no-cliff data;
-- runtime and complexity.
-
-### 11.4 Acceptance criteria
-
-The chosen method must:
-
-- select the right/bottom region on clear simulated cliffs;
-- remain within a predeclared tolerance across realistic noise, with tolerance defined in the validation report before final comparison;
-- fail explicitly on unidentifiable profiles rather than guessing;
-- produce condition-specific results;
-- use fixed internal behavior with no public derivative threshold;
-- be simpler than a competing method when performance is materially equivalent;
-- preserve a manual override for exact reproducibility.
-
-Store the experiment and conclusion in a concise tracked development report, for example `dev/cutoff-validation.md` plus reproducible script. Do not put long stochastic benchmarks in ordinary package checks.
-
-## 12. Scientific validation beyond cutoff placement
-
-Create a compact, independent simulation inspired by the intended use case; no thesis file or private data may be required.
-
-Recommended generator:
-
-1. Generate complete log2 intensities with realistic feature-specific means/variances and multiple conditions.
-2. Introduce condition-specific abundance differences, including suppressed "off" features.
-3. Add intensity-independent MAR at 5% and 25% scenarios.
-4. Add intensity-dependent MNAR below known condition cutoffs, with probability increasing as intensity decreases.
-5. Run ImputeFinder with known manual cutoffs and automatic cutoffs.
-6. Measure missingness classification and retained-feature behavior.
-7. Optionally, in a non-core validation script with suggested packages, compare downstream differential-abundance recovery after per-condition kNN/MinProb against unimputed and complete-case analyses.
-
-Do not hard-code or advertise the thesis's exact benchmark percentages unless the exact source data and full analysis are reproducibly included. Claims in package documentation must match evidence available in the repository.
-
-## 13. Documentation requirements
-
-README and vignette must explain, without relying on the thesis:
-
-- why proteomics can contain both MAR-like and MNAR-like missingness;
-- why classification is condition-specific;
-- why a protein fully absent in one condition can be biologically informative;
-- exactly how the one-cell condition-minimum seed works and why it is logged;
-- what the stacked density profile means;
-- how manual and automatic cutoffs differ;
-- why arithmetic mean is used;
-- why MAR requires strict majority but MNAR does not;
-- why all-MNAR and insufficient-MAR features are excluded;
-- the result structure and per-condition lists;
-- how to normalize and impute separately by condition after classification;
-- that the package does not prove missingness mechanisms or perform imputation itself;
-- limitations of intensity-cutoff assumptions and automatic breakpoint selection.
-
-At least one vignette example must show a feature that is MNAR in A and complete/MAR in B and then use different downstream imputation branches by condition.
-
-## 14. Package and Bioconductor requirements
-
-Complete and verify:
-
-- valid `DESCRIPTION` fields and GPL declaration consistent with `COPYING`;
-- accurate author/maintainer data without invented identifiers;
-- concise title and description focused on condition-aware proteomics missingness classification;
-- `URL` and `BugReports` pointing to the repository;
-- current, valid `biocViews` selected from official vocabulary;
-- minimal imports and complete namespace qualification;
-- package-level documentation;
-- unit tests and vignette in standard locations;
-- installation from source without development-only files leaking into the tarball;
-- `R CMD check --as-cran` and `BiocCheck` under current supported R/Bioconductor versions;
-- maintained CI configuration rather than copied obsolete action versions.
-
-Codex must consult current official R/Bioconductor documentation when choosing version fields, CI actions, and submission checks because these requirements change over time.
-
-## 15. Definition of Done
-
-The work is complete only when all of the following are true:
-
-- [x] The fully missing-condition rescue behavior is implemented exactly and audited.
-- [x] Globally absent features are never rescued.
-- [x] State is calculated per feature per condition and retained in output.
-- [x] Complete, MNAR, MAR, and insufficient semantics match Section 5.3.
-- [x] Majority is derived from each condition size.
-- [x] Cross-condition reconciliation works for arbitrary condition counts.
-- [x] All-MNAR features are excluded.
-- [x] Condition-specific output supports separate downstream MAR/MNAR imputation.
-- [x] Manual cutoffs work and automatic cutoffs satisfy Section 11.
-- [x] No algorithm reads data back from a ggplot build object.
-- [x] No missing/undefined namespace symbols remain.
-- [x] Input data and global RNG state are unchanged.
-- [x] Observed values are unchanged except for explicitly logged seeds in returned data.
-- [x] Output order and named results are stable under input permutation.
-- [x] The normative fixture and all required tests pass.
-- [x] README, Rd help, and vignette are sufficient without thesis access.
-- [x] Runtime dependencies are minimal and justified.
-- [x] `R CMD check --as-cran`, package examples, vignette build, and `BiocCheck` pass from a clean checkout.
-- [x] Claims in documentation do not exceed repository evidence.
-- [x] `.agent/roadmap.md` contains no unresolved P0/P1 item for this release.
-
-## 16. Deferred roadmap after first correct release
-
-Do not mix these into the core completion work unless the maintainer explicitly promotes them:
-
-- optional helpers that execute common MAR/MNAR imputation methods;
-- optional normalisation orchestration;
-- data-driven imputation-method recommendation;
-- global vs per-condition cutoff comparison;
-- instrument-specific cutoff calibration;
-- probabilistic feature-level missingness models beyond a hard cutoff;
-- richer HTML reports;
-- web/server workflow;
-- broader matrix backends and very large delayed arrays;
-- independent validation on additional public proteomics datasets.
+The first release reports both components separately. A combined decision is
+allowed only if M12 predeclares the estimand and M15 validates its error control.
+Neither component alone proves structural biological absence.
+
+### 8.2 Candidate study
+
+Before implementation, compare the simplest viable exact, penalized,
+beta-binomial/quasi-binomial, block-aware, or Bayesian candidates needed for:
+
+- unequal groups and paired/repeated designs;
+- overdispersion/correlation across replicates;
+- complete/quasi separation;
+- effect size + interval, rather than only a p-value;
+- thousands of correlated feature tests.
+
+A current primary-source/tooling review precedes the decision. Package
+availability alone does not choose the method.
+
+### 8.3 Support, multiplicity, and abstention
+
+- Contrast must be algebraically estimable under A.
+- M12 freezes per-group/block evidence floors by estimand.
+- Sparse or separated cases use the selected valid estimator or return
+  `unavailable`; infinite silent coefficients are invalid.
+- Family definition and FDR/false-sign control are explicit; adjusted and raw
+  evidence remain distinguishable.
+- Naturally missing cells receive no invented abundance.
+- Batch-exclusive coverage yields non-estimability, not a biological hit.
+
+### 8.4 Outputs and gate
+
+Standalone output: analysis/input/design references, design/contrast,
+model-adjusted detection contrast + interval/test evidence, conditional
+observed-abundance contrast + interval/test evidence, support, separation
+status, multiplicity adjustment, assumptions, abstention reason, and provenance.
+
+Gate registry must include:
+
+- null rejection/FDR and false-sign behavior under correlated features;
+- effect bias and interval coverage;
+- power/precision-recall on frozen alternatives;
+- paired, unequal, separated, low-support, and confounded cases;
+- experimentally identified reference detection/recovery quantities from
+  dilution, spike-in, mixed-species, or replicate data;
+- untouched development test data and named-order invariance;
+- wording audit separating differential detection, observed abundance, and
+  causal absence.
+
+## 9. Initial validation charter
+
+### 9.1 Scope for M12-A-C
+
+Initial generator/data scope:
+
+- bulk LFQ protein-level matrices and `SummarizedExperiment` equivalents;
+- 2-4 conditions, balanced/unequal replication, small-to-moderate cohorts;
+- independent and paired/subject-blocked designs;
+- declared batch/run effects, partial and perfect confounding;
+- intensity-independent, monotone abundance-associated, mixed, blockwise,
+  batch-associated, structural-off-compatible, and no-cliff patterns;
+- outliers, heteroscedasticity, differing intensity support, and low evidence;
+- DDA and DIA as distinct strata.
+
+TMT, single-cell, peptide hierarchy, multi-omics, transfer priors, and delayed
+storage add their own validation versions only after promotion. M12 does not
+simulate contracts that have not been designed.
+
+### 9.2 Evidence tiers
+
+| Tier | Evidence | Claim supported |
+|---:|---|---|
+| 0 | Existing normative fixture + v1 tests/reports | Compatibility |
+| 1 | Deterministic latent-truth simulation | Method behavior/failure |
+| 2 | Several semi-synthetic mask generators | Misspecification robustness |
+| 3 | Controlled dilution/spike-in/mixed-species/replicates | Abundance/detection recovery |
+| 4 | Public bulk LFQ studies with design/batch metadata | External behavior/shift |
+
+Tier 1-2 causal labels are generator-specific. Tier 3 truth is used only for
+quantities the experiment identifies. Tier 4 naturally missing cells remain
+causally unlabeled.
+
+### 9.3 Split and holdout ownership
+
+Each dataset card declares deployment target, unit, related samples, licence,
+checksum, acquisition, truth, exclusions, and split hash.
+
+Separate data roles:
+
+- training/resampling data for fit/tuning;
+- frozen development test data opened for a milestone's candidate decision;
+- independently sourced, sealed release-confirmation data reserved for M15P.
+
+All learned preprocessing fits inside training data. Related subject/technical
+units stay together when deployment requires unseen units. A sealed-holdout miss
+is a failed claim. A later holdout requires a materially revised hypothesis or
+method plus independently sourced data, never another split chosen from the
+exhausted dataset.
+
+### 9.4 Gate registry
+
+Before candidate results, freeze for every gate:
+
+```text
+claim + metric + unit + comparator + strata + sample size
++ uncertainty method + numeric threshold + failure treatment + data/protocol hash
+```
+
+Report distributions and strata. Reconstruction error alone cannot support a
+mechanism, contrast, or workflow recommendation.
+
+### 9.5 Evidence package
+
+Each method milestone produces:
+
+- executable `dev/` script;
+- frozen protocol + gate registry;
+- concise tracked report with all candidates/negative controls/failures;
+- dependency/session provenance and data manifest;
+- lightweight deterministic regression distilled into routine tests.
+
+Long stochastic/external runs stay outside routine package checks; summaries and
+hashes remain tracked.
+
+## 10. Active milestones
+
+Dependency:
+
+```text
+M11 sidecar seam
+  → M12 frozen initial validation
+      → M13 design core + sentinel study ─┬→ M14 robustness study
+                                          └→ M15 detectability study
+M13 + M14 + M15 → M15P release confirmation + promotion review
+```
+
+### M11 - Stable seam + minimum sidecar schema
+
+- [ ] Add internal stable method/profile/cutoff/rescue/policy identifiers and
+      sidecar `spec`; preserve every v1 field, attribute, class, and output.
+- [ ] Define minimum `missingness_design` roles, validation, and lifecycle.
+- [ ] Define `imputefinder_analysis` schema with inline original mask,
+      fingerprint, provenance, empty module slots, `classic` result/failure sum
+      type, and explicit upgrade/error behavior.
+- [ ] Implement input-first construction + optional compatible `base_fit`;
+      pre-rescue evidence survives classic cutoff failure and fit-only
+      limitations return structured `unavailable`.
+- [ ] Add differential fixtures for exact/canonical/tolerance/performance
+      categories and run the API naming experiment.
+- [ ] Research and record fingerprint/mask implementation choice before use.
+
+Gate: all v1 unit/scientific/package gates pass; existing performance thresholds
+remain satisfied; no component/attribute/class drift; sidecar round-trip and
+mismatched-input failures pass.
+
+### M12 - Frozen validation + gate registry
+
+- [ ] Extend generators only across Section 9.1 initial scope.
+- [ ] Select the minimum controlled + public datasets needed for A-C; record
+      cards, licences, checksums, and data roles.
+- [ ] Freeze development and sealed release-confirmation identities.
+- [ ] Freeze numeric gate registry for A-C before candidate implementation.
+- [ ] Freeze candidate protocols for A association and C contrast estimators,
+      plus B resampling units/counts/replacement, weighting, seed streams,
+      cutoff-range definition, failure handling, and display calibration.
+- [ ] Assign sealed confirmation artifacts per track/claim. Declare shared
+      artifacts up front; their synchronized opening retires them for every
+      linked claim.
+- [ ] Add null/confounded/leakage/low-support negative controls.
+
+Gate: protocol hashes exist; every A-C claim has an executable numeric gate and
+failure rule; v1 behavior/limitations reproduce on the expanded harness.
+
+### M13 - A: design core + confounding sentinel study
+
+- [ ] Implement typed design alignment and algebraic estimability/aliasing.
+- [ ] Implement pre-rescue sample/condition/nuisance coverage summaries.
+- [ ] Implement only predeclared association terms and uncertainty.
+- [ ] Add stored diagnostic data, concise print/summary, and human wording.
+- [ ] Run all A gates; retain failures and assign the association panel
+      `confirmation_candidate`, `killed`, or `parked`.
+
+Gate: the algebraic design/estimability core must pass because B/C depend on it.
+The association panel closes through a recorded disposition; only a passing
+panel becomes a confirmation candidate. Neither component mutates data or makes
+causal attribution/automatic correction.
+
+### M14 - B: robustness certificate
+
+- [ ] Implement weighted/instance perturbation manifests + deterministic streams.
+- [ ] Implement sampling, cutoff-estimator, and assumption/policy panels
+      separately.
+- [ ] Add margins, state transitions, retention/cutoff summaries, failures, and
+      influence outputs.
+- [ ] Calibrate optional display labels through risk-coverage analysis.
+- [ ] Run the frozen B study; retain failures, distill passing regressions, and
+      assign `confirmation_candidate`, `killed`, or `parked`.
+
+Gate: the study and disposition are complete. Only a Section 7.4 pass becomes a
+confirmation candidate; no disposition permits a pooled confidence score or
+global side effect, and stable calls retain existing performance.
+
+### M15 - C: detectability contrast
+
+- [ ] Complete frozen estimator comparison; select simplest passing method.
+- [ ] Implement estimability/support/separation/abstention behavior.
+- [ ] Implement detection + conditional-observed-abundance contrasts and
+      multiplicity.
+- [ ] Add effect/interval diagnostics and wording tests.
+- [ ] Run the frozen C study; retain disagreement/failures and assign
+      `confirmation_candidate`, `killed`, or `parked`.
+
+Gate: the study and disposition are complete. Only a Section 8.4 development
+pass becomes a confirmation candidate. No result is called structural absence
+or unconditional differential abundance.
+
+### M15P - Release confirmation + next promotion
+
+- [ ] Open only confirmation-candidate artifacts under their per-track registry;
+      open shared artifacts synchronously and retire them for every linked claim.
+- [ ] Adversarially map each public claim to code, test, dataset, and interval.
+- [ ] Complete docs/vignette/NEWS, privacy/redaction, accessibility, and failure
+      UX reviews.
+- [ ] Run unit tests, build, examples, vignette, `R CMD check --as-cran`,
+      `BiocCheck`, minimal-library/optional-dependency-absence, and performance
+      gates.
+- [ ] Mark the A association panel, B, and C `shipped`, `killed`, or still
+      `candidate` independently; preserve the mandatory design core separately.
+- [ ] Use evidence/user need to promote at most one of D or E, or pause.
+
+Gate: Section 14 passes for shipped tracks. A failed optional track does not
+weaken or block a validated one.
+
+## 11. Parked option cards
+
+These are innovative horizons, not active commitments or release gates.
+Before promotion, every card receives a Section 9.4 registry whose numeric gate
+and comparator directly test its stated hypothesis.
+
+### D - Censor-aware continuous evidence
+
+Hypothesis: a monotone detection/selection model with explicit sensitivity and
+abstention can outperform one hard cutoff in low-information compatible strata.
+
+- Candidate outputs: abundance-associated detection evidence, residual pattern,
+  calibration, support, drift, sensitivity; “structural” only under designs or
+  auxiliary-variable assumptions sufficient to identify the stated estimand.
+- Compare logistic detection curves, selection likelihoods, hierarchical factor
+  models, and simple calibrated baselines.
+- First gate: measurable calibration/selective-risk gain over the v1 hard cutoff
+  in a frozen compatible low-information stratum, external-shift refusal, and v1
+  noninferiority on its home scenarios.
+- Promotion requires the A design core, B shipped, and a focused identification
+  study.
+
+### E - Leakage-safe workflow stress-test lab
+
+Hypothesis: dataset/task-specific comparison of complete workflows can beat a
+universal imputation recipe.
+
+- Candidates include no-imputation/direct models and external imputation
+  adapters; evaluate effect bias, coverage, FDR/power, rank stability, runtime,
+  and cell error by evidence tier.
+- Training-fold-only fit applies to cutoff, normalisation, masking, feature
+  selection, batch handling, and imputation.
+- Registered adapters can be audited. Arbitrary callbacks are `unverified` and
+  cannot support package recommendations without restricted/replayable proof.
+- First gate: nested held-out regret (excess frozen loss versus the best member
+  of the frozen candidate set) + intentional leakage detection + abstention when
+  candidates tie. Masked observed cells never become truth for naturally
+  missing cells; one benchmark reports FDP/TPR, while FDR/power require repeated
+  studies or simulations.
+
+### F - Distributional uncertainty handoff
+
+Hypothesis: draws, precision weights, or direct missingness-aware contracts yield
+better calibrated downstream inference than one completed matrix.
+
+- Preserve original mask, draws/distribution, typed predictive/credible/
+  confidence intervals or estimator SEs, method/seed/scope, within/between-
+  imputation variance, and selective unfilled cells.
+- Support Rubin-style pooling only for proper imputations + a congenial analysis;
+  mark one-matrix views explicitly lossy.
+- First gate: latent-value coverage in simulation and reference-value/effect
+  coverage in experiments, accounting for reference measurement error, by
+  intensity and mask stratum, versus frozen single-matrix and no-imputation
+  baselines.
+- Depends on a promoted distributional D/E path.
+
+### G - Precursor/peptide/protein evidence graph
+
+Hypothesis: lower-level support, sibling covariance, and mapping ambiguity improve
+protein missingness decisions.
+
+- Prototype `QFeatures`/long-table input in `dev/`; preserve shared/ambiguous
+  peptide edges and singleton warnings.
+- Optional transcript evidence requires paired-data and negative-transfer tests.
+- First gate: held-out or genuinely external lower-level reference evidence
+  improves detection decisions without degraded calibration/retention.
+- Modality-specific validation precedes package-facing API/dependency decisions.
+
+### H1 - Acquisition calibration
+
+Hypothesis: compatible reference runs can stabilize small studies.
+
+- Transfer artifact records acquisition, intensity support, training population,
+  curve/uncertainty, version, and drift.
+- First transfer gate: leave-lab/instrument-out benefit + refusal outside support.
+
+### H2 - Value-of-information feedback
+
+Hypothesis: an explicit utility/cost and acquisition-outcome model can rank a
+useful next acquisition action.
+
+- First gate: hidden-replicate replay beats random/coverage-only action
+  for the same hidden action type. Biological-replicate recommendations require
+  their own utility/cost and acquisition-outcome model.
+- Depends on validated H1 calibration in the target acquisition regime.
+
+### I - Delayed/on-disk backend
+
+Hypothesis: an internal block contract can preserve scientific semantics with
+bounded memory on large matrices.
+
+- Promotion first decides: additive stable adapter in `rules_v1.x` or research-
+  rail-only input.
+- Candidate: `DelayedArray`; `HDF5Array` only as optional benchmark backend.
+- Serial named rescue plan stays independent of chunks/workers.
+- First gate: semantic matrix parity, no full realization, bounded RSS, backing
+  file immutability, chunk/worker invariance within numeric tolerance.
+
+### J1 - Standards-aware QC exchange
+
+Hypothesis: versioned SDRF/mzQC exchange can preserve package evidence losslessly
+across conforming tools and improve auditability.
+
+- Static offline reports redact cell values/local paths by default.
+- First gate: round-trip/version/controlled-vocabulary conformance without loss
+  of package-native evidence; experimental metrics remain namespaced until
+  accepted by the relevant standard.
+
+### J2 - Cross-study atlas
+
+Hypothesis: curated experimental truth can support guarded transfer across
+compatible studies.
+
+- Dataset cards: source, licence, checksum, acquisition, truth, split, claim,
+  exclusions.
+- Atlas prior uploads no user data and requires leave-study/lab/instrument-out
+  validation + shift refusal.
+- Depends on J1 provenance exchange plus explicit dataset governance.
+
+## 12. Risk register
+
+| Risk | Consequence | Control / kill rule |
+|---|---|---|
+| Mechanism non-identifiability | False causal certainty | Association/model-conditional wording, sensitivity, abstention |
+| V1 drift | Existing analyses break | Dual rail + differential oracle + internal/sidecar-only IDs |
+| Fit-only reconstruction assumption | Invalid QC/resampling | Input-first sidecar; structured unavailable |
+| Confounding attribution | Batch called biology | Algebraic estimability + “inseparable” output |
+| Bootstrap false precision | Fragile decisions look stable | Three separate panels + null calibration |
+| Multiplicity/low support | Detectability false discoveries | Frozen family/FDR/support/abstention rules |
+| Generator favoritism | Method wins its simulated world | Several generators + controlled + external truth |
+| Holdout shopping | Inflated evidence | Sealed independent confirmation; a miss remains failure |
+| Scope explosion | No shippable release | A-C only + WIP cap + one-card promotion checkpoint |
+| Dependency expansion | Fragile Bioconductor release | `dev/` research → boundary decision → `Suggests`/companion/import |
+| Artifact/privacy leakage | Nonportable or sensitive result | Inline mask only, caller-owned values, redacted reports |
+| Acquisition overgeneralisation | Invalid TMT/single-cell claims | Initial LFQ persona + modality-specific promotion |
+
+## 13. Research anchors
+
+Sources motivate questions and gates; they do not preselect implementations.
+Re-check current versions, licences, follow-up evidence, and official guidance
+at the implementing milestone.
+
+Core scientific boundary and detection models:
+
+- [Nonignorable missingness in label-free proteomics](https://doi.org/10.1214/18-AOAS1144)
+  motivates mechanism-aware interval evaluation and cautions against single
+  imputation as complete truth.
+- [protDP](https://doi.org/10.1093/bioinformatics/btad200) estimates
+  intensity-dependent detection probability beyond a pure random/censored split.
+- [Sequential identification of nonignorable
+  mechanisms](https://doi.org/10.5705/ss.202016.0328) shows that observed data
+  alone require identifying restrictions for MNAR models.
+- [limpa](https://smythlab.github.io/limpa/) uses a detection-probability curve,
+  recovers complete protein estimates with uncertainty, and carries precision
+  information rather than treating filled values as observed.
+- [Pirat](https://doi.org/10.1093/biostatistics/kxaf006) fits an assumed global
+  instrument-censoring model using peptide covariance and optional transcript
+  evidence.
+- [msBayesImpute](https://doi.org/10.1038/s42004-026-02106-3) combines
+  protein-specific dropout with Bayesian factorisation and current controlled
+  benchmark designs.
+
+Active A-C rationale:
+
+- [Batch-associated missing values](https://doi.org/10.1093/bib/bbaf168)
+  motivate design/coverage diagnostics before interpretation or imputation.
+- [Missingness as disease-discriminative signal](https://doi.org/10.1093/bioinformatics/btz898)
+  shows condition-associated missingness was disease-discriminative in one
+  longitudinal rheumatoid-arthritis SWATH cohort; it is not proof of causation.
+- [MSqRob's missing hurdle](https://doi.org/10.1021/acs.analchem.9b04375)
+  directly motivates paired detection/intensity components for label-free DDA,
+  with associational interpretation and empirical FDP/power evaluation on a
+  controlled spike-in benchmark.
+- [Downstream-centric imputation criteria](https://doi.org/10.1021/acs.jproteome.3c00205)
+  show that reconstruction error could mislead downstream method choice in the
+  evaluated benchmarks.
+
+Parked workflow/uncertainty/hierarchy rationale:
+
+- [mi4p](https://doi.org/10.1371/journal.pcbi.1010420) propagates multiple-
+  imputation variability into moderated differential analysis.
+- [PEPerMINT](https://doi.org/10.1093/bioinformatics/btae389) uses a peptide-
+  protein graph; predicted uncertainty ranked errors and supported filtering,
+  without establishing nominal interval coverage.
+- [Doubly robust post-imputation inference](https://doi.org/10.1214/25-AOAS2012)
+  motivates bias-aware inference around flexible imputers under its MAR,
+  positivity, independence, rank, and nuisance-rate assumptions.
+- [Proteomics workflow interactions](https://doi.org/10.1038/s41467-024-47899-w)
+  motivate whole-workflow rather than isolated-step evaluation.
+- [DataSAIL](https://doi.org/10.1038/s41467-025-58606-8) shows in molecular-
+  property and drug-target tasks that random splits can overestimate OOD
+  performance when similar entities cross folds, motivating deployment-matched
+  grouping/similarity audits where that risk applies.
+- [`QFeatures`](https://bioconductor.org/packages/release/bioc/html/QFeatures.html),
+  [SDRF-Proteomics v1.1.0](https://sdrf.quantms.org/specification.html), and
+  [HUPO-PSI mzQC](https://hupo-psi.github.io/mzQC/) are current candidate
+  infrastructure/standards for parked G/J1/J2.
+
+## 14. Active-release Definition of Done
+
+Evaluate only `stable`, `active`, or explicitly promoted tracks. Parked/killed
+cards close through recorded disposition and never count as unresolved P0/P1.
+
+- [ ] Every v1 exact/canonical/tolerance/performance/package gate passes.
+- [ ] V1 result fields, attributes, class, discrete decisions, rescue assignments,
+      and scientific semantics remain compatible.
+- [ ] The sidecar starts from original `x` + typed design, preserves the original
+      mask without duplicating the numeric matrix, and rejects mismatched input.
+- [ ] Supplied/estimand-required roles align; unavailable optional metadata is
+      recorded and constrains claims.
+- [ ] The mandatory design core reports estimability/aliasing and supports B/C;
+      any shipped A panel reports declared association without causal
+      attribution, mutation, or automatic correction.
+- [ ] Any shipped B reports sampling stability, cutoff-estimator uncertainty,
+      and assumption/policy sensitivity separately, with structured unavailable.
+- [ ] Any shipped C reports detection and conditional-observed-abundance
+      estimands separately, with support, separation, multiplicity,
+      FDR/false-sign, and abstention.
+- [ ] All learned operations fit only on their declared training data.
+- [ ] Gate registries, protocol/data hashes, negative controls, candidate
+      failures, and sealed-holdout misses remain tracked.
+- [ ] Claims name evidence tier, acquisition/design scope, estimand, uncertainty,
+      and limitations.
+- [ ] Static output is offline, auditable, accessible, and redaction-aware.
+- [ ] Routine tests hold compact scientific regressions; long external/stochastic
+      reports remain reproducible under `dev/`.
+- [ ] Unit tests, source build, examples, vignette, `R CMD check --as-cran`,
+      `BiocCheck`, minimal-library optional-dependency, and performance gates pass.
+- [ ] Documentation explains non-identifiability, fit-only limits, abstention,
+      design confounding, and exact downstream handoff without overclaim.
+- [ ] The A association panel, B, and C each has an independent shipped/killed/
+      candidate disposition; the validated design core is tracked separately.
+- [ ] Promotion review activates at most one next card or records a pause.
+- [ ] `.agent/roadmap.md` has no unresolved P0/P1 item for the shipped active slice.

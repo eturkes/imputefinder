@@ -2,7 +2,27 @@
 
 Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence, blockers, and exact next work.
 
-## Current release path
+## Current innovation path
+
+- [ ] M11 freeze v1 + extension seams
+- [ ] M12 frozen A-C validation + gate registry
+- [ ] M13 design core + confounding-sentinel study
+- [ ] M14 robustness certificates
+- [ ] M15 detectability contrast engine
+- [ ] M15P release confirmation + next-card promotion review
+
+Parked after review: D censor-aware evidence; E workflow stress-test lab; F
+distributional handoff; G peptide-protein graph; H1 calibration; H2 feedback; I
+delayed backend; J1 standards QC; J2 atlas. Parked work has no active checkbox
+or release obligation.
+
+Exact method, dependency graph, falsification gates, and Definition of Done →
+`PLAN.md` Sections 2-14. Exact next implementation task → M11: freeze the stable
+rail through internal/sidecar identifiers + differential fixtures; define the
+minimum typed design + input-first sidecar schema; preserve
+`imputefinder_result` exactly.
+
+## Completed v1 release path
 
 - [x] M0 baseline + red contract + API decision
 - [x] M1 input core + result skeleton
@@ -57,7 +77,7 @@ Baseline at `1ae9106`:
   - NOTE: unused `assertthat`, `dplyr`, `methods`, `tidyr` imports.
   - NOTE: undefined `plot_detect_custom` + unimported `ggplot_build`.
 - Direct installed-package call → `could not find function "plot_detect_custom"`.
-- Prototype also contains an undefined `%||%`, self-referential `final_MAR`, fixed `min_non_na = 5`, global MAR/MNAR unions, row mutation, and no rescue path; see `PLAN.md` Section 4.
+- Prototype also contains an undefined `%||%`, self-referential `final_MAR`, fixed `min_non_na = 5`, global MAR/MNAR unions, row mutation, and no rescue path; see the historical completion spec at `30618e1:PLAN.md`, Section 4.
 
 API decision:
 
@@ -72,7 +92,12 @@ classify_missingness(
 )
 ```
 
-Routing + behavior are normative in `PLAN.md` Section 6. Compatibility shim → none: GitHub code searches for package/function/install reference returned zero; repository has no releases, tags, forks, or stars; CRAN registry lookup returned 404. Search performed 2026-07-14. Broken, unreleased prototype arguments provide no observed compatibility value.
+Routing + behavior are normative in the historical completion spec at
+`30618e1:PLAN.md`, Section 6. Compatibility shim → none: GitHub code searches
+for package/function/install reference returned zero; repository has no
+releases, tags, forks, or stars; CRAN registry lookup returned 404. Search
+performed 2026-07-14. Broken, unreleased prototype arguments provide no
+observed compatibility value.
 
 Expected-red gate:
 
@@ -1423,5 +1448,44 @@ item.
 
 Exact next external step → push `main`, observe the hosted devel workflow, then
 begin Bioconductor new-package submission.
+
+Blockers → none.
+
+### 2026-07-17 - successor innovation plan
+
+Scope → promote the completed v1 frontier into a research-backed, falsifiable
+successor program while preserving the release-candidate classifier as an exact
+stable rail.
+
+Evidence:
+
+- clean baseline at `30618e1`; M0-M10 and the v1 Definition of Done remain
+  complete;
+- repository audit found the principal limits: one biological grouping axis,
+  hard point states, synthetic-first validation, no design-confounding audit,
+  no downstream workflow comparison, and no uncertainty propagation;
+- current primary research supports continuous detection models, condition-
+  associated non-detection endpoints, downstream-centric workflow evaluation,
+  multiple-imputation/post-imputation uncertainty, peptide hierarchy, batch-
+  associated missingness, and explicit workflow-step interaction studies;
+- `PLAN.md` now contains a compact self-contained v1 contract, one input-first
+  sidecar architecture, active A-C method/gate cards, an initial LFQ-only
+  validation charter, M11-M15P dependency path, parked
+  D-G/H1-H2/I/J1-J2 option cards,
+  risk/kill controls, research anchors, and active-slice Definition of Done;
+- the historical completion specification remains recoverable at
+  `30618e1:PLAN.md`; current sessions route directly to the active method;
+- `.agent/roadmap.md` exposes only M11-M15P as active. Every option card remains
+  parked and cannot block the first successor release.
+
+Verification → primary-source DOI/title checks; link probes resolved to source
+targets or expected publisher access controls (one legacy journal host verified
+separately after its DOI redirect timed out); `git diff --check` pass; no runtime
+code changed, so package tests are unchanged and intentionally not rerun.
+
+Exact next implementation task → M11: add stable method/schema/profile/cutoff/
+rescue/policy identifiers as internal/companion metadata plus differential
+fixtures, then introduce the companion analysis-object seam with identical
+`imputefinder_result` behavior.
 
 Blockers → none.
