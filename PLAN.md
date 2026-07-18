@@ -727,18 +727,18 @@ mismatched-input failures pass.
 
 ### M12 - Frozen validation + gate registry
 
-- [ ] Extend generators only across Section 9.1 initial scope.
-- [ ] Select the minimum controlled + public datasets needed for A-C; record
+- [x] Extend generators only across Section 9.1 initial scope.
+- [x] Select the minimum controlled + public datasets needed for A-C; record
       cards, licences, checksums, and data roles.
-- [ ] Freeze development and sealed release-confirmation identities.
+- [x] Freeze development and sealed release-confirmation identities.
 - [ ] Freeze numeric gate registry for A-C before candidate implementation.
 - [ ] Freeze candidate protocols for A association and C contrast estimators,
       plus B resampling units/counts/replacement, weighting, seed streams,
       cutoff-range definition, failure handling, and display calibration.
-- [ ] Assign sealed confirmation artifacts per track/claim. Declare shared
+- [x] Assign sealed confirmation artifacts per track/claim. Declare shared
       artifacts up front; their synchronized opening retires them for every
       linked claim.
-- [ ] Add null/confounded/leakage/low-support negative controls.
+- [x] Add null/confounded/leakage/low-support negative controls.
 
 Gate: protocol hashes exist; every A-C claim has an executable numeric gate and
 failure rule; v1 behavior/limitations reproduce on the expanded harness.

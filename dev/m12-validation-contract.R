@@ -1,11 +1,11 @@
 #!/usr/bin/env Rscript
 
-# M12a metadata-only validation contract. This file freezes scope/schema rails;
-# it neither downloads nor reads candidate result artifacts.
+# M12b validation contract. This file freezes scope, generator linkage, and
+# whole-family evidence roles; it neither downloads nor reads result artifacts.
 # Run from the repository root:
 # Rscript --vanilla dev/m12-validation-contract.R --verify
 
-.M12_CONTRACT_VERSION <- "m12_validation_contract_v1"
+.M12_CONTRACT_VERSION <- "m12_validation_contract_v2"
 .M12_CHECKED_ON <- "2026-07-18"
 
 .m12_schema_catalog <- function() {
@@ -30,7 +30,18 @@
             negative_controls = "character:token-set|none",
             required_tracks = "character:A/B/C-token-set",
             seed_stream = "character:id",
-            implementation_state = "character:specified_unimplemented"
+            implementation_state = "character:implemented_verified"
+        ),
+        generator_protocol = c(
+            protocol_id = "character:id,unique",
+            generator_version = "character:id",
+            seed_stream = "character:id",
+            development_replicates = "integer:positive",
+            implementation_file = "character:repository-path",
+            protocol_hash = "character:sha256",
+            generator_audit_hash = "character:sha256",
+            stable_v1_audit_hash = "character:sha256",
+            implementation_state = "character:implemented_verified"
         ),
         claim_inventory = c(
             claim_id = "character:id,unique",
@@ -91,6 +102,20 @@
             role = "character:unassigned|training|development|confirmation",
             split_hash = "character:sha256-or-NA",
             checked_on = "character:YYYY-MM-DD"
+        ),
+        data_roles = c(
+            dataset_id = "character:dataset-foreign-key,unique",
+            protocol_id = "character:id",
+            role = "character:development|confirmation",
+            included_artifacts = "character:artifact-token-set",
+            included_conditions = "character:condition-token-set",
+            excluded_conditions = "character:condition-token-set|none",
+            grouping_rule = "character:nonempty",
+            analysis_unit = "character:nonempty",
+            linked_tracks = "character:A/B/C-token-set",
+            linked_claims = "character:claim-token-set",
+            opening_stage = "character:nonempty",
+            licence_snapshot = "character:nonempty"
         ),
         artifact_manifest = c(
             artifact_id = "character:id,unique",
@@ -244,7 +269,25 @@
             "A;B;C", "A;B;C", "A;C", "B;C", "B", "A;B;C", "A;B;C"
         ),
         seed_stream = rep("m12_sim_seed_stream_v1", 13L),
-        implementation_state = rep("specified_unimplemented", 13L),
+        implementation_state = rep("implemented_verified", 13L),
+        stringsAsFactors = FALSE
+    )
+}
+
+.m12_generator_protocol <- function() {
+    data.frame(
+        protocol_id = "m12_generator_protocol_v1",
+        generator_version = "m12_generator_v1",
+        seed_stream = "m12_sim_seed_stream_v1",
+        development_replicates = 64L,
+        implementation_file = "dev/m12-generator-validation.R",
+        protocol_hash =
+            "cdea1bf874152e63fba08c49e390da1dd18690105e43a2dc7a03fc6866d0d080",
+        generator_audit_hash =
+            "4d216966c8cc54b1b23685d8801c7c65b2afcc5879dd15430d57a88f765e8a00",
+        stable_v1_audit_hash =
+            "8463f4306fe9b6192336487e4ca365c8c7e3525dc06aeca5b66b1a99b1a10250",
+        implementation_state = "implemented_verified",
         stringsAsFactors = FALSE
     )
 }
@@ -300,106 +343,245 @@
     )
 }
 
-.m12_data_cards <- function() {
+.m12_data_roles <- function() {
     data.frame(
         dataset_id = c(
-            "multipro_hcc_pxd041391", "msdap_hy_pxd036134",
-            "ups1_yeast_pxd002099", "lfqbench_pxd002952"
+            "harmonizr_mouse_pxd027467", "multipro_hcc_pxd041391",
+            "msdap_hy_pxd036134", "ups1_yeast_pxd002099",
+            "lfqbench_pxd002952"
         ),
-        card_version = rep("m12_data_card_v1", 4L),
+        protocol_id = rep("m12_data_role_protocol_v1", 5L),
+        role = c(
+            "development", "confirmation", "development",
+            "confirmation", "confirmation"
+        ),
+        included_artifacts = c(
+            paste(c(
+                "harmonizr_mouse_metadata", "harmonizr_mouse_ffpe_2018",
+                "harmonizr_mouse_ff_2018", "harmonizr_mouse_ffpe_2020",
+                "harmonizr_mouse_ff_2020"
+            ), collapse = ";"),
+            "multipro_hcc_dda_fragpipe;multipro_hcc_dia_diann",
+            "msdap_hy_dda_maxquant;msdap_hy_dia_diann",
+            "ups1_yeast_nonnormalized",
+            "lfqbench_hye124_6600_64var"
+        ),
+        included_conditions = c(
+            "tumor;control", "HCC1806;HS578T",
+            "yeast_12.5ng;yeast_15.625ng;yeast_18.75ng",
+            "UPS1_2fmol;UPS1_4fmol;UPS1_10fmol;UPS1_25fmol",
+            "HYE124_A;HYE124_B"
+        ),
+        excluded_conditions = c(
+            "none", "related_PXD041421_family", "none", "UPS1_50fmol",
+            "none"
+        ),
+        grouping_rule = c(
+            "whole four-batch family; animals and batch siblings never split",
+            "whole HCC1806/HS578T DDA+DIA family; biological, instrument, and technical siblings synchronized",
+            "whole matched DDA+DIA concentration family; mixtures and technical replicates synchronized",
+            "whole protein artifact under one role; selected concentration triplicates synchronized",
+            "whole inventoried instrument/software family; master-mixture derivatives synchronized"
+        ),
+        analysis_unit = c(
+            "mouse within declared preservation/timepoint batch",
+            "cell-culture biological replicate",
+            "prepared concentration mixture",
+            "prepared concentration mixture",
+            "master species mixture"
+        ),
+        linked_tracks = c("A", "A", "B;C", "B;C", "B;C"),
+        linked_claims = c(
+            "a_assoc_public",
+            "a_assoc_public",
+            paste(c(
+                "b_cutoff_coverage", "b_false_confidence", "c_effect_bias",
+                "c_interval_coverage", "c_alternative_utility",
+                "c_reference_recovery"
+            ), collapse = ";"),
+            paste(c(
+                "b_cutoff_coverage", "b_false_confidence", "c_effect_bias",
+                "c_interval_coverage", "c_alternative_utility",
+                "c_reference_recovery"
+            ), collapse = ";"),
+            paste(c(
+                "b_cutoff_coverage", "b_false_confidence", "c_effect_bias",
+                "c_interval_coverage", "c_alternative_utility",
+                "c_reference_recovery"
+            ), collapse = ";")
+        ),
+        opening_stage = c(
+            "after linked numeric gates and A candidate protocol hashes freeze",
+            "M15P only after A association becomes a confirmation candidate",
+            "after linked numeric gates and B/C candidate protocol hashes freeze",
+            "M15P only after linked B/C tracks become confirmation candidates",
+            "M15P only after linked B/C tracks become confirmation candidates"
+        ),
+        licence_snapshot = c(
+            rep("PRIDE project licence=CC0; checked 2026-07-18", 4L),
+            "EMBL-EBI terms revised 2024-02-05; owner-rights caveat retained; checked 2026-07-18"
+        ),
+        stringsAsFactors = FALSE
+    )
+}
+
+.m12_role_hashes <- function(roles = .m12_data_roles()) {
+    stats::setNames(
+        vapply(seq_len(nrow(roles)), function(index) {
+            .m12_hash_frame(roles[index, , drop = FALSE])
+        }, character(1L)),
+        roles$dataset_id
+    )
+}
+
+.m12_data_cards <- function() {
+    role_hashes <- .m12_role_hashes()
+    data.frame(
+        dataset_id = c(
+            "harmonizr_mouse_pxd027467", "multipro_hcc_pxd041391",
+            "msdap_hy_pxd036134", "ups1_yeast_pxd002099",
+            "lfqbench_pxd002952"
+        ),
+        card_version = rep("m12_data_card_v2", 5L),
         title = c(
+            "HarmonizR mouse tumour/control four-batch DDA study",
             "MultiPro HCC1806/HS578T deliberate-batch benchmark",
             "MS-DAP HeLa/yeast matched DDA/DIA spike-in",
             "UPS1-in-yeast DDA concentration series",
             "LFQbench HYE124 DIA benchmark"
         ),
-        accession = c("PXD041391", "PXD036134", "PXD002099", "PXD002952"),
-        repository = rep("PRIDE Archive", 4L),
+        accession = c(
+            "PXD027467", "PXD041391", "PXD036134", "PXD002099",
+            "PXD002952"
+        ),
+        repository = rep("PRIDE Archive", 5L),
         metadata_url = paste0(
             "https://www.ebi.ac.uk/pride/ws/archive/v3/projects/",
-            c("PXD041391", "PXD036134", "PXD002099", "PXD002952")
+            c(
+                "PXD027467", "PXD041391", "PXD036134", "PXD002099",
+                "PXD002952"
+            )
         ),
-        evidence_tiers = c("tier3;tier4", "tier3", "tier3", "tier3"),
-        acquisition = c("DDA;DIA", "DDA;DIA", "DDA", "DIA"),
+        evidence_tiers = c("tier4", "tier3;tier4", "tier3", "tier3", "tier3"),
+        acquisition = c("DDA", "DDA;DIA", "DDA;DIA", "DDA", "DIA"),
         deployment_target = c(
+            "two-condition bulk LFQ DDA across four declared preservation/timepoint batches",
             "balanced two-class bulk LFQ with declared machine, biological, and technical replication",
             "three-condition bulk LFQ technical benchmark with matched acquisition modes",
-            "bulk LFQ DDA concentration benchmark after a pre-role <=4-level contrast freeze",
+            "four-level bulk LFQ DDA concentration benchmark using a pre-role <=4-level subset",
             "two-condition bulk LFQ DIA mixed-species benchmark"
         ),
         experimental_unit = c(
+            "mouse",
             "cell-culture biological replicate",
             "prepared concentration mixture; available repeats are technical",
             "prepared concentration mixture; available repeats are technical",
             "master species mixture; available repeats are technical"
         ),
         related_sample_rule = c(
+            "keep the complete four-batch family together; use mouse as the biological unit within batch",
             "keep every injection, machine, and acquisition output from one biological replicate together",
             "keep DDA/DIA runs and technical replicates from one mixture together; treat the whole family as one role",
             "keep triplicates and every selected concentration together; treat the whole artifact as one role",
             "keep instruments, software outputs, and triplicates derived from each A/B master mixture together"
         ),
-        n_runs = as.integer(c(72, 18, 15, 6)),
-        n_conditions = as.integer(c(2, 3, 5, 2)),
+        n_runs = as.integer(c(25, 72, 18, 15, 6)),
+        n_conditions = as.integer(c(2, 2, 3, 4, 2)),
         condition_layout = c(
+            "tumour/control across four DDA batches: n=6,5,7,7 animals with preservation and analysis-time variation",
             "2 cell lines x 3 biological replicates x 3 technical replicates x 2 machines x 2 acquisition modes",
             "3 yeast spike levels x 3 technical replicates x 2 acquisition modes",
-            "5 UPS1 levels x 3 technical replicates",
+            "selected 2/4/10/25 fmol UPS1 levels x 3 technical replicates; 50 fmol excluded before role assignment",
             "2 HYE mixtures x 3 technical replicates for the inventoried 6600/64-variable-window artifact"
         ),
-        nuisance_roles = c("instrument;technical_replicate", "acquisition_mode", "run_order", "instrument;software"),
-        block_roles = c("biological_replicate", "mixture", "concentration", "master_mixture"),
+        nuisance_roles = c(
+            "preservation;analysis_timepoint;batch", "instrument;technical_replicate",
+            "acquisition_mode", "run_order", "instrument;software"
+        ),
+        block_roles = c(
+            "mouse", "biological_replicate", "mixture", "concentration",
+            "master_mixture"
+        ),
         truth_scope = c(
+            "declared tumour/control phenotype and four preservation/timepoint batches",
             "declared cell class, deliberate machine batch, and replicate hierarchy",
             "fixed human background plus known 12.5/15.625/18.75 ng yeast inputs",
-            "fixed yeast background plus known 2/4/10/25/50 fmol UPS1 inputs",
+            "fixed yeast background plus selected known 2/4/10/25 fmol UPS1 inputs",
             "known species composition and A:B abundance ratios"
         ),
         truth_limit = c(
+            "natural missing cells and causal mechanisms are unlabeled; phenotype and technical effects remain associational",
             "individual natural missing cells and causal mechanisms are unlabeled; cell-line abundance is not a spike-in truth",
             "technical repeats do not identify biological-unit generalization or cell-level missingness mechanisms",
-            "technical repeats do not identify biological-unit generalization; full five-level artifact exceeds initial 2-4-condition scope",
+            "technical repeats do not identify biological-unit generalization; excluded 50 fmol level receives no claim",
             "technical repeats and shared master mixtures preclude biological-unit or software-independent confirmation claims"
         ),
         metadata_scope = c(
+            "primary paper plus PRIDE project/file metadata; result archives unopened",
             "PRIDE project protocol plus file metadata; result archives unopened",
             "PRIDE project protocol plus file metadata; result archives unopened",
             "PRIDE project protocol plus file metadata; CSV unopened",
             "PRIDE project protocol plus file metadata; result archive unopened"
         ),
-        licence_id = c("CC0-1.0", "CC0-1.0", "CC0-1.0", "EMBL-EBI-terms"),
+        licence_id = c(
+            "CC0-1.0", "CC0-1.0", "CC0-1.0", "CC0-1.0",
+            "EMBL-EBI-terms"
+        ),
         licence_url = c(
-            rep("https://creativecommons.org/publicdomain/zero/1.0/", 3L),
+            rep("https://creativecommons.org/publicdomain/zero/1.0/", 4L),
             "https://www.ebi.ac.uk/about/terms-of-use/"
         ),
-        licence_status = c("verified_open", "verified_open", "verified_open", "terms_reviewed"),
+        licence_status = c(
+            rep("verified_open", 4L),
+            "terms_reviewed"
+        ),
         exclusions = c(
+            "protein-level DDA outputs only; whole family is development-only; no causal missing-cell label",
             "protein-level outputs only; no peptide-hierarchy claim; PXD041421 is related and cannot supply independent confirmation",
             "protein-level outputs only; no random run split; DDA and DIA are linked artifacts",
-            "freeze an exact <=4-level subset or pairwise contrast before role assignment; no peptide-level claim",
+            "exact <=4-level subset = 2/4/10/25 fmol; exclude 50 fmol; no peptide-level claim",
             "one software/instrument artifact only after role freeze; no causal label for naturally missing cells"
         ),
-        split_feasibility = c("grouped_unit_only", "whole_family_only", "whole_family_only", "whole_family_only"),
+        split_feasibility = c(
+            "whole_family_only", "grouped_unit_only", "whole_family_only",
+            "whole_family_only", "whole_family_only"
+        ),
         split_unit = c(
+            "entire PXD027467 four-batch mouse family",
             "biological replicate across all technical siblings",
             "entire PXD036134 matched-acquisition family",
-            "entire selected concentration artifact",
+            "entire 2/4/10/25 fmol selected concentration artifact",
             "entire PXD002952 family of master-mixture derivatives"
         ),
-        related_dataset_ids = c("PXD041421", "none", "none", "PXD020529"),
-        role = rep("unassigned", 4L),
-        split_hash = rep(NA_character_, 4L),
-        checked_on = rep(.M12_CHECKED_ON, 4L),
+        related_dataset_ids = c(
+            "none", "PXD041421", "none", "none", "PXD020529"
+        ),
+        role = c(
+            "development", "confirmation", "development", "confirmation",
+            "confirmation"
+        ),
+        split_hash = unname(role_hashes[c(
+            "harmonizr_mouse_pxd027467", "multipro_hcc_pxd041391",
+            "msdap_hy_pxd036134", "ups1_yeast_pxd002099",
+            "lfqbench_pxd002952"
+        )]),
+        checked_on = rep(.M12_CHECKED_ON, 5L),
         stringsAsFactors = FALSE
     )
 }
 
 .m12_artifact_manifest <- function() {
     accessions <- c(
+        rep("PXD027467", 5L),
         "PXD041391", "PXD041391", "PXD036134", "PXD036134",
         "PXD002099", "PXD002952"
     )
     files <- c(
+        "Mouse_Metadata.xlsx",
+        "Mouse_FFPE_2018_SEARCH.zip",
+        "Mouse_FF_2018_SEARCH.zip",
+        "Mouse_FFPE_2020_SEARCH.zip",
+        "Mouse_FF_2020_SEARCH.zip",
         "HCC1806_HS578T_DDA_FragPipe_Output.zip",
         "HCC1806_HS578T_DIA_DIANN_Output.zip",
         "timstofpro2_30SPD_two-proteome_spike-in_series_DDA.zip",
@@ -409,16 +591,22 @@
     )
     data.frame(
         artifact_id = c(
+            "harmonizr_mouse_metadata", "harmonizr_mouse_ffpe_2018",
+            "harmonizr_mouse_ff_2018", "harmonizr_mouse_ffpe_2020",
+            "harmonizr_mouse_ff_2020",
             "multipro_hcc_dda_fragpipe", "multipro_hcc_dia_diann",
             "msdap_hy_dda_maxquant", "msdap_hy_dia_diann",
             "ups1_yeast_nonnormalized", "lfqbench_hye124_6600_64var"
         ),
         dataset_id = c(
+            rep("harmonizr_mouse_pxd027467", 5L),
             "multipro_hcc_pxd041391", "multipro_hcc_pxd041391",
             "msdap_hy_pxd036134", "msdap_hy_pxd036134",
             "ups1_yeast_pxd002099", "lfqbench_pxd002952"
         ),
-        acquisition = c("DDA", "DIA", "DDA", "DIA", "DDA", "DIA"),
+        acquisition = c(
+            rep("DDA", 5L), "DDA", "DIA", "DDA", "DIA", "DDA", "DIA"
+        ),
         file_name = files,
         source_url = paste0(
             "https://www.ebi.ac.uk/pride/ws/archive-file-downloader/files/s3/",
@@ -427,10 +615,16 @@
             files
         ),
         file_bytes = c(
+            12361, 97768338, 168611708, 184092139, 304630271,
             2942612390, 3083089287, 101116244, 127676636, 273919, 263968636
         ),
-        checksum_algorithm = rep("sha1", 6L),
+        checksum_algorithm = rep("sha1", 11L),
         upstream_checksum = c(
+            "8392a710eeeff2b801336697d2134ec74e85ea01",
+            "d6788a617342ffc676dcc7a81ce371e40e67e3b5",
+            "634314ff9fa1bf5eb4c53aa22fac91ecf863d4c4",
+            "8379e4c92ce2bcdabcc6f8d264efe38681d1a604",
+            "3fc9ee403270c9e6b147ee8ac279c3469f83d71d",
             "4e372285a6ee8c8301ee3f1e7ff9bc548e0ee4bd",
             "d027d5f89b2eea04f6c90b8189760856f70f039b",
             "9113637ddfdcd9c97d10ab0358bc918e948eee19",
@@ -440,9 +634,14 @@
         ),
         checksum_source = rep(
             paste0("PRIDE Archive v3 file record, checked ", .M12_CHECKED_ON),
-            6L
+            11L
         ),
         content_scope = c(
+            "mouse sample and four-batch design metadata workbook",
+            "2018 FFPE DDA search and protein-quantification output archive",
+            "2018 fresh-frozen DDA search and protein-quantification output archive",
+            "2020 FFPE DDA search and protein-quantification output archive",
+            "2020 fresh-frozen DDA search and protein-quantification output archive",
             "FragPipe DDA search and protein-quantification output archive",
             "DIA-NN DIA search and protein-quantification output archive",
             "MaxQuant DDA processed spike-in output archive",
@@ -450,9 +649,12 @@
             "non-normalized protein quantitative CSV",
             "LFQbench analysis archive for HYE124 TripleTOF 6600 64-variable-window runs"
         ),
-        role = rep("unassigned", 6L),
-        open_state = rep("metadata_only", 6L),
-        local_sha256 = rep(NA_character_, 6L),
+        role = c(
+            rep("development", 5L), rep("confirmation", 2L),
+            rep("development", 2L), rep("confirmation", 2L)
+        ),
+        open_state = rep("metadata_only", 11L),
+        local_sha256 = rep(NA_character_, 11L),
         stringsAsFactors = FALSE
     )
 }
@@ -493,13 +695,15 @@
 .m12_source_manifest <- function() {
     data.frame(
         source_id = c(
-            "pride_api", "pride_checksum", "ebi_terms", "multipro_paper",
+            "pride_api", "pride_checksum", "ebi_terms", "harmonizr_paper",
+            "harmonizr_record", "multipro_paper",
             "multipro_record", "msdap_paper", "msdap_record", "ups1_record",
             "ups1_paper", "lfqbench_paper", "lfqbench_record"
         ),
         scope = c(
             "repository metadata interface", "repository checksum algorithm",
-            "reuse terms", "MultiPro design", "MultiPro licence/files",
+            "reuse terms", "HarmonizR mouse batch design",
+            "HarmonizR licence/files", "MultiPro design", "MultiPro licence/files",
             "MS-DAP design", "MS-DAP licence/files", "UPS1 design/licence/files",
             "UPS1 scientific truth", "LFQbench design/truth",
             "LFQbench licence/files"
@@ -508,6 +712,8 @@
             "https://www.ebi.ac.uk/pride/markdownpage/prideapi",
             "https://github.com/PRIDE-Archive/pride-checksum",
             "https://www.ebi.ac.uk/about/terms-of-use/",
+            "https://doi.org/10.1038/s41467-022-31007-x",
+            "https://www.ebi.ac.uk/pride/ws/archive/v3/projects/PXD027467",
             "https://doi.org/10.1038/s41597-023-02779-8",
             "https://www.ebi.ac.uk/pride/ws/archive/v3/projects/PXD041391",
             "https://doi.org/10.1021/acs.jproteome.2c00513",
@@ -517,10 +723,12 @@
             "https://doi.org/10.1038/nbt.3685",
             "https://www.ebi.ac.uk/pride/ws/archive/v3/projects/PXD002952"
         ),
-        checked_on = rep(.M12_CHECKED_ON, 11L),
+        checked_on = rep(.M12_CHECKED_ON, 13L),
         note = c(
             "official project/file metadata API", "official SHA-1 checksum generator",
             "repository adds no owner-independent restrictions; attribution expected",
+            "two-condition mouse DDA study across four preservation/timepoint batches",
+            "CC0 record and four processed-batch archive identities",
             "balanced DDA/DIA deliberate-batch replicate design",
             "CC0 record and processed archive identities",
             "matched DDA/DIA three-level spike-in design",
@@ -538,9 +746,11 @@ m12_validation_contract <- function() {
     list(
         schema_catalog = .m12_schema_catalog(),
         generator_manifest = .m12_generator_manifest(),
+        generator_protocol = .m12_generator_protocol(),
         claim_inventory = .m12_claim_inventory(),
         gate_registry = .m12_empty_gate_registry(),
         data_cards = .m12_data_cards(),
+        data_roles = .m12_data_roles(),
         artifact_manifest = .m12_artifact_manifest(),
         candidate_exclusions = .m12_candidate_exclusions(),
         source_manifest = .m12_source_manifest()
@@ -595,7 +805,7 @@ m12_validation_contract <- function() {
         !all(x$block_role %in% c("none", "subject")) ||
         !all(x$confounding %in% c("none", "partial", "perfect")) ||
         !all(x$evidence_support %in% c("adequate", "low")) ||
-        !all(x$implementation_state == "specified_unimplemented")) {
+        !all(x$implementation_state == "implemented_verified")) {
         .m12_fail("generator manifest contains an invalid vocabulary value")
     }
     if (!is.integer(x$n_features) || any(x$n_features <= 0L) ||
@@ -634,6 +844,24 @@ m12_validation_contract <- function() {
         !all(c("independent", "paired") %in% x$sampling_design) ||
         !all(c("partial", "perfect") %in% x$confounding)) {
         .m12_fail("generator manifest does not cover required design/stress axes")
+    }
+    invisible(TRUE)
+}
+
+.m12_validate_generator_protocol <- function(x, generator, catalog) {
+    .m12_require_columns(x, "generator_protocol", catalog)
+    if (nrow(x) != 1L || !.m12_id(x$protocol_id) ||
+        !.m12_id(x$generator_version) || !.m12_id(x$seed_stream) ||
+        !identical(x$generator_version, unique(generator$generator_version)) ||
+        !identical(x$seed_stream, unique(generator$seed_stream)) ||
+        !is.integer(x$development_replicates) ||
+        x$development_replicates <= 0L ||
+        !identical(x$implementation_file, "dev/m12-generator-validation.R") ||
+        !.m12_sha(x$protocol_hash, 64L) ||
+        !.m12_sha(x$generator_audit_hash, 64L) ||
+        !.m12_sha(x$stable_v1_audit_hash, 64L) ||
+        !identical(x$implementation_state, "implemented_verified")) {
+        .m12_fail("generator protocol linkage is incomplete or malformed")
     }
     invisible(TRUE)
 }
@@ -708,6 +936,67 @@ m12_validation_contract <- function() {
     invisible(TRUE)
 }
 
+.m12_validate_roles <- function(x, cards, artifacts, claims, catalog) {
+    .m12_require_columns(x, "data_roles", catalog)
+    if (nrow(x) != nrow(cards) || !identical(x$dataset_id, cards$dataset_id) ||
+        !.m12_id(x$dataset_id) || anyDuplicated(x$dataset_id) ||
+        !.m12_id(x$protocol_id) ||
+        !all(x$role %in% c("development", "confirmation")) ||
+        !all(x$role == cards$role) ||
+        !all(vapply(x, .m12_nonempty, logical(1L)))) {
+        .m12_fail("data-role protocol violates identity/assignment rails")
+    }
+    artifact_references <- unlist(lapply(x$included_artifacts, .m12_tokens))
+    artifact_ids <- unique(artifact_references)
+    claim_ids <- unique(unlist(lapply(x$linked_claims, .m12_tokens)))
+    tracks <- unique(unlist(lapply(x$linked_tracks, .m12_tokens)))
+    if (anyDuplicated(artifact_references) ||
+        length(artifact_references) != nrow(artifacts) ||
+        !setequal(artifact_ids, artifacts$artifact_id) ||
+        !all(claim_ids %in% claims$claim_id) ||
+        !all(tracks %in% c("A", "B", "C"))) {
+        .m12_fail("data-role protocol references unknown/omitted artifacts or claims")
+    }
+    for (index in seq_len(nrow(x))) {
+        row_artifacts <- .m12_tokens(x$included_artifacts[[index]])
+        row_claims <- .m12_tokens(x$linked_claims[[index]])
+        row_tracks <- .m12_tokens(x$linked_tracks[[index]])
+        artifact_rows <- artifacts$artifact_id %in% row_artifacts
+        if (!all(artifacts$dataset_id[artifact_rows] == x$dataset_id[[index]]) ||
+            !all(artifacts$role[artifact_rows] == x$role[[index]]) ||
+            !all(claims$track[match(row_claims, claims$claim_id)] %in% row_tracks) ||
+            !identical(
+                unname(cards$split_hash[[index]]),
+                unname(.m12_hash_frame(x[index, , drop = FALSE]))
+            )) {
+            .m12_fail("data-role artifact/split hash linkage is inconsistent")
+        }
+    }
+    ups1 <- x[x$dataset_id == "ups1_yeast_pxd002099", , drop = FALSE]
+    if (nrow(ups1) != 1L ||
+        !identical(
+            ups1$included_conditions,
+            "UPS1_2fmol;UPS1_4fmol;UPS1_10fmol;UPS1_25fmol"
+        ) || !identical(ups1$excluded_conditions, "UPS1_50fmol")) {
+        .m12_fail("UPS1 role must freeze the exact four-level subset")
+    }
+    role_track <- paste(
+        rep(x$role, lengths(lapply(x$linked_tracks, .m12_tokens))),
+        unlist(lapply(x$linked_tracks, .m12_tokens)),
+        sep = "\r"
+    )
+    required_role_track <- as.vector(outer(
+        c("development", "confirmation"),
+        c("A", "B", "C"),
+        paste,
+        sep = "\r"
+    ))
+    if (!all(required_role_track %in% role_track)) {
+        .m12_fail("data roles must cover development + confirmation for A-C")
+    }
+    invisible(TRUE)
+}
+
 .m12_validate_artifacts <- function(x, cards, catalog) {
     .m12_require_columns(x, "artifact_manifest", catalog)
     chars <- setdiff(names(x), c("file_bytes", "local_sha256"))
@@ -765,8 +1054,9 @@ m12_validation_contract <- function() {
 
 m12_validate_contract <- function(contract = m12_validation_contract()) {
     expected_names <- c(
-        "schema_catalog", "generator_manifest", "claim_inventory",
-        "gate_registry", "data_cards", "artifact_manifest",
+        "schema_catalog", "generator_manifest", "generator_protocol",
+        "claim_inventory", "gate_registry", "data_cards", "data_roles",
+        "artifact_manifest",
         "candidate_exclusions", "source_manifest"
     )
     if (!identical(names(contract), expected_names)) {
@@ -782,9 +1072,21 @@ m12_validate_contract <- function(contract = m12_validation_contract()) {
         .m12_fail("schema catalog is malformed")
     }
     .m12_validate_generator(contract$generator_manifest, catalog)
+    .m12_validate_generator_protocol(
+        contract$generator_protocol,
+        contract$generator_manifest,
+        catalog
+    )
     .m12_validate_claims(contract$claim_inventory, catalog)
     .m12_validate_cards(contract$data_cards, catalog)
     .m12_validate_artifacts(contract$artifact_manifest, contract$data_cards, catalog)
+    .m12_validate_roles(
+        contract$data_roles,
+        contract$data_cards,
+        contract$artifact_manifest,
+        contract$claim_inventory,
+        catalog
+    )
     .m12_validate_gates(
         contract$gate_registry,
         contract$claim_inventory,
@@ -793,11 +1095,12 @@ m12_validate_contract <- function(contract = m12_validation_contract()) {
     )
     .m12_validate_simple(contract$candidate_exclusions, "candidate_exclusions", catalog)
     .m12_validate_simple(contract$source_manifest, "source_manifest", catalog)
-    if (!all(contract$data_cards$role == "unassigned") ||
-        !all(contract$artifact_manifest$role == "unassigned") ||
+    if (any(contract$data_cards$role == "unassigned") ||
+        any(contract$artifact_manifest$role == "unassigned") ||
         !all(contract$artifact_manifest$open_state == "metadata_only") ||
+        any(!is.na(contract$artifact_manifest$local_sha256)) ||
         nrow(contract$gate_registry) != 0L) {
-        .m12_fail("M12a must remain unassigned, metadata-only, and result-free")
+        .m12_fail("M12b must be role-assigned, metadata-only, and result-free")
     }
     invisible(TRUE)
 }
@@ -867,15 +1170,17 @@ m12_contract_hashes <- function(contract = m12_validation_contract()) {
 }
 
 .M12_EXPECTED_HASHES <- c(
-    schema_catalog = "70e8953371cd81f2d189e08c975a201dee8420236daa9df18cc43b074ad7e8a6",
-    generator_manifest = "aba19431f8c4f4a51f29df8471596b274d157f56f5dd6fb9218d8c09907f1e49",
+    schema_catalog = "24e4aa3c93f5b0d87ff5ed4f92e70b08d0e258359a57b7c88fd1bd931c8b18f3",
+    generator_manifest = "9d1381833cd59e8775bd99e730d5c783b98c5a82afff6d52276e83a46a8be76a",
+    generator_protocol = "9f2166bc7a31112d5529d81adcd68cae70b99d12374f3d77bc45844d3d16bd7a",
     claim_inventory = "c6265115e6e2abb9ed30ef52a93d1605427de6869beed70f642a358bb9e3ce40",
     gate_registry = "0f10cd353879c95a851be3925a3c2f9570179cdf4592134215cccfdc58d80305",
-    data_cards = "b27e2c64e6e2190ead46e6534616444bb83875ac1ddd3de7d778916363c46ecd",
-    artifact_manifest = "58cd567e81e36e2c9af611bf65596b49e43a45524172e2d6116fc80e14153ddd",
+    data_cards = "ea8605fe7f0b5c0765cb13eecb9851fee53ea527038984a44b8839d20d576188",
+    data_roles = "650b6492d2f2a8d5542bc7097602c67f1f68db71d706a18e0bfd4dcfb4637aa7",
+    artifact_manifest = "7c3267020d484ad9bc1bf4b8ac442cf0916d554e9e467e5c696ab2a20fb1c652",
     candidate_exclusions = "7ef14dd357171ffaad2e3793dfd1e038d1cc4108d56d052a2f751e4061e71af8",
-    source_manifest = "65f29787525ff4420c1820ecab86cd8879b4402ebe7d5f3a35492a7ef470543b",
-    contract = "3f9a53d73495b0b7e3ce9ccf6a36ddcbabe4928f39cd5297e9a7cf79848b9e77"
+    source_manifest = "b56898ee3ce5cd8ad2f2656a0b1cfb94792d8f1fb7f51b54472555279d8033ed",
+    contract = "bb5624fecd9cd52980bd901c1b75eac0d58dcb1869d95f92014e0d9e086a53ed"
 )
 
 .m12_expect_error <- function(code) {
@@ -885,17 +1190,25 @@ m12_contract_hashes <- function(contract = m12_validation_contract()) {
 .m12_self_tests <- function(contract) {
     out_of_scope <- contract
     out_of_scope$generator_manifest$n_conditions[[1L]] <- 5L
-    promoted <- contract
-    promoted$data_cards$role[[1L]] <- "development"
+    missing_split <- contract
+    missing_split$data_cards$split_hash[[1L]] <- NA_character_
+    role_mismatch <- contract
+    role_mismatch$artifact_manifest$role[[1L]] <- "confirmation"
     opened <- contract
     opened$artifact_manifest$open_state[[1L]] <- "opened"
     wrong_checksum <- contract
     wrong_checksum$artifact_manifest$upstream_checksum[[1L]] <- "bad"
+    wrong_subset <- contract
+    ups1 <- wrong_subset$data_roles$dataset_id == "ups1_yeast_pxd002099"
+    wrong_subset$data_roles$included_conditions[ups1] <-
+        "UPS1_2fmol;UPS1_4fmol;UPS1_10fmol;UPS1_50fmol"
     c(
         generator_scope = .m12_expect_error(m12_validate_contract(out_of_scope)),
-        role_requires_split = .m12_expect_error(m12_validate_contract(promoted)),
+        role_requires_split = .m12_expect_error(m12_validate_contract(missing_split)),
+        role_artifact_agreement = .m12_expect_error(m12_validate_contract(role_mismatch)),
         opening_requires_role_hash = .m12_expect_error(m12_validate_contract(opened)),
-        checksum_shape = .m12_expect_error(m12_validate_contract(wrong_checksum))
+        checksum_shape = .m12_expect_error(m12_validate_contract(wrong_checksum)),
+        exact_subset = .m12_expect_error(m12_validate_contract(wrong_subset))
     )
 }
 
@@ -918,7 +1231,7 @@ m12_contract_hashes <- function(contract = m12_validation_contract()) {
         .m12_fail("M12 frozen hash mismatch: ", paste(mismatch, collapse = ", "))
     }
     cat("contract_version: ", .M12_CONTRACT_VERSION, "\n", sep = "")
-    cat("state: metadata_only; roles=unassigned; gates=0\n")
+    cat("state: metadata_only; roles=assigned; gates=0\n")
     cat("self_tests: ", paste(names(self_tests), self_tests, sep = "=", collapse = "; "), "\n", sep = "")
     cat(paste(names(hashes), hashes, sep = ": "), sep = "\n")
     cat("\n")

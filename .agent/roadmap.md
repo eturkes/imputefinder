@@ -17,13 +17,13 @@ delayed backend; J1 standards QC; J2 atlas. Parked work has no active checkbox
 or release obligation.
 
 Exact method, dependency graph, falsification gates, and Definition of Done →
-`PLAN.md` Sections 2-14. Exact next implementation task → M12b: freeze numeric
-generator parameters/seeds and implement only the manifest's Section 9.1
-simulation/semi-synthetic + negative-control scope; assign each minimum data
-family one whole/grouped development or sealed-confirmation role with exact
-split/protocol hashes after a licence/metadata recheck. Evaluate only generator
-truth + v1 reproduction in this slice. Keep every external result artifact
-unopened until the linked A-C numeric gates and candidate protocols are frozen.
+`PLAN.md` Sections 2-14. Exact next implementation task → M12c: populate every
+retained A-C claim with complete numeric Section 9.4 gate rows + explicit
+failure treatment, then freeze the A association/C estimator candidate
+protocols and B perturbation units/counts/replacement/weighting/seed streams,
+cutoff-range/failure policy, and display calibration. Keep all external result
+artifacts unopened until their linked gate + candidate-protocol hashes pass;
+confirmation artifacts remain sealed through M15P.
 
 ## Completed v1 release path
 
@@ -1944,5 +1944,78 @@ only the manifest scenarios/negative controls, and assign whole/grouped data
 families to development vs sealed confirmation with exact split/protocol hashes
 after rechecking terms. Validate generator truth + unchanged v1 behavior only;
 external results remain unopened until the A-C numeric registry/protocol freeze.
+
+Blockers → none.
+
+### 2026-07-18 - M12b executable generators + sealed evidence roles
+
+Scope → freeze numeric Section 9.1 generators/seed streams, validate generator
+truth + unchanged stable-v1 behavior, and assign indivisible public families to
+development or sealed confirmation before any external result bytes open.
+
+Generator protocol:
+
+- dependency-free `dev/m12-generator-validation.R` implements exactly the 13
+  manifest scenarios with separate synthetic DDA/DIA parameter strata; latent
+  complete intensities, component/union masks, generating probabilities,
+  condition/design truth, and descriptive rule oracle remain explicit;
+- model axes → 2-4 balanced/unequal conditions, independent/paired/technical-
+  sibling units, correlated feature modules, run/batch/subject effects,
+  crossed/partial/perfect confounding, intensity-independent/monotone/mixed/
+  block/batch/structural-off-compatible/no-cliff masks, heteroscedasticity,
+  outliers, differing support, and all predeclared negative controls;
+- 64 explicit SHA-256-derived development seeds/scenario = 832 unique streams;
+  local RNG kind = `Mersenne-Twister/Inversion/Rejection`, rescue seeds cycle
+  `1/7/29`; endpoints 1/64 receive exact full-output fingerprints;
+- generator protocol SHA-256 =
+  `cdea1bf874152e63fba08c49e390da1dd18690105e43a2dc7a03fc6866d0d080`;
+  endpoint audit =
+  `4d216966c8cc54b1b23685d8801c7c65b2afcc5879dd15430d57a88f765e8a00`;
+  all-832 compact audit =
+  `a9f05c4b2beea35fbd2ac7729f10c95bb93a38c4494f24a4e8b7bb221ad70671`;
+- all 832 seeds satisfy design/mask/probability/truth/RNG invariants; realized
+  missingness stays within each frozen family (`.0300-.3619` overall); no
+  generator result chooses or evaluates an A-C method.
+
+Data-role freeze:
+
+- live PRIDE v3 recheck confirms all project licences and every inventoried
+  byte/SHA-1 identity; EMBL-EBI terms remain revised 2024-02-05 with
+  attribution + owner-rights caveats; metadata-only inspection added the
+  independently sourced HarmonizR mouse four-batch family PXD027467;
+- A association: HarmonizR PXD027467 whole-family `development`; MultiPro HCC
+  PXD041391 whole DDA/DIA family `confirmation`;
+- B/C: MS-DAP PXD036134 matched DDA/DIA family `development`; UPS1/yeast
+  PXD002099 DDA and LFQbench PXD002952 DIA `confirmation`;
+- UPS1 exact initial-scope subset = 2/4/10/25 fmol triplicates; 50 fmol excluded
+  before role assignment; each card's canonical role row supplies its exact
+  split SHA-256;
+- all 11 artifacts remain `metadata_only`, local SHA-256 absent; no archive,
+  CSV, workbook, or confirmation result bytes were downloaded, listed, or
+  parsed; shared-family opening remains synchronized per linked claims;
+- v2 aggregate validation-contract SHA-256 =
+  `bb5624fecd9cd52980bd901c1b75eac0d58dcb1869d95f92014e0d9e086a53ed`;
+  six adversarial role/split/open/checksum/subset/scope rejection rails pass.
+
+Stable compatibility + verification:
+
+- all 13 first-seed simulations pass exact repeat, input/RNG preservation,
+  reversed named-order, observed-value/rescue-log, and matrix/SE semantic gates;
+  stable-v1 audit SHA-256 =
+  `8463f4306fe9b6192336487e4ca365c8c7e3525dc06aeca5b66b1a99b1a10250`;
+- package-wide source suite → 137 tests / 918 expectations, 0 failures, errors,
+  warnings, or skips;
+- frozen M5 protocol → 12 scenarios / 13 target profiles pass; frozen M7
+  protocol → 13 long scenarios + routine subset pass, MD5 unchanged at
+  `4011e381bba2d0d747e91d277a45de5e`;
+- vignette-bearing source build succeeds; source-tarball
+  `R CMD check --as-cran --no-manual` → only expected new-submission note;
+  `git diff --check` passes.
+
+Exact next task → M12c: populate complete numeric Section 9.4 rows for every
+retained A-C claim, including explicit failure treatment, then freeze A/C
+candidate comparisons + B perturbation protocol. Development bytes remain
+closed until their linked hashes pass; confirmation remains sealed through
+M15P.
 
 Blockers → none.
