@@ -321,7 +321,7 @@
     invisible(classic)
 }
 
-.new_sidecar_provenance <- function(input, classic, call) {
+.new_sidecar_provenance <- function(input, classic, call, seeds = list()) {
     failures <- if (inherits(classic, "imputefinder_classic_failure")) {
         list(classic = classic)
     } else {
@@ -330,7 +330,7 @@
 
     list(
         call = call,
-        seeds = list(),
+        seeds = seeds,
         hashes = list(input = input$fingerprint),
         warnings = list(),
         failures = failures,
@@ -393,7 +393,15 @@
     invisible(provenance)
 }
 
-.new_imputefinder_analysis <- function(classic, design, input, call = NULL) {
+.new_imputefinder_analysis <- function(
+    classic,
+    design,
+    input,
+    call = NULL,
+    sentinel = NULL,
+    stability = NULL,
+    seeds = list()
+) {
     if (!(is.null(call) || is.language(call))) {
         .abort_sidecar(
             "Analysis provenance call must be language or NULL.",
@@ -405,6 +413,14 @@
     design_record <- .new_sidecar_design_record(design, input)
     .validate_classic_branch(classic)
     .validate_classic_design_alignment(classic, design_record, input)
+    .validate_sidecar_sentinel(sentinel, input, design_record)
+    if (!(is.null(stability) || is.list(stability)) || !is.list(seeds)) {
+        .abort_sidecar(
+            "Analysis module output or seed provenance is malformed.",
+            "imputefinder_analysis_schema_error",
+            field = "analysis"
+        )
+    }
 
     analysis <- structure(
         list(
@@ -412,9 +428,14 @@
             spec = .new_sidecar_spec(),
             design = design_record,
             input = input,
-            sentinel = NULL,
-            stability = NULL,
-            provenance = .new_sidecar_provenance(input, classic, call)
+            sentinel = sentinel,
+            stability = stability,
+            provenance = .new_sidecar_provenance(
+                input,
+                classic,
+                call,
+                seeds
+            )
         ),
         class = "imputefinder_analysis"
     )
@@ -444,6 +465,11 @@
     .validate_sidecar_spec(analysis$spec)
     .validate_sidecar_input(analysis$input)
     .validate_sidecar_design(analysis$design, analysis$input)
+    .validate_sidecar_sentinel(
+        analysis$sentinel,
+        analysis$input,
+        analysis$design
+    )
     .validate_classic_branch(analysis$classic)
     .validate_classic_design_alignment(
         analysis$classic,

@@ -17,12 +17,12 @@ delayed backend; J1 standards QC; J2 atlas. Parked work has no active checkbox
 or release obligation.
 
 Exact method, dependency graph, falsification gates, and Definition of Done →
-`PLAN.md` Sections 2-14. Exact next implementation task → M11d: define the
-pre-rescue evidence schema + red matrix/`SummarizedExperiment`, classic-failure,
-alignment, and unchanged-input tests; then implement original-`x` input-first
-construction. Keep the future public analyzer unexported until its complete
-signature and behavior exist; compatible `base_fit` reuse remains the next
-bounded slice.
+`PLAN.md` Sections 2-14. Exact next implementation task → M11e: freeze the
+`base_fit` compatibility comparator + red success/mismatch/conflicting-cutoff/
+unchanged-object tests, then implement recomputation-backed optional reuse and
+structured fit-only `unavailable`. Keep the future public analyzer unexported
+until its complete signature, module routing, and behavior exist; differential
+comparison fixtures remain the following bounded slice.
 
 ## Completed v1 release path
 
@@ -1669,5 +1669,63 @@ matrix/SE/failure/alignment/unchanged-input behavior, then implement original-x
 construction behind the internal API. Defer compatible `base_fit` reuse to the
 following bounded slice and export only when the selected public signature is
 complete.
+
+Blockers → none.
+
+### 2026-07-18 - M11d input-first analysis + pre-rescue evidence
+
+Scope → freeze the smallest immutable evidence record available before rescue;
+construct the sidecar from original matrix/`SummarizedExperiment` input and a
+typed design; preserve that record when the stable classic attempt fails.
+Compatible `base_fit` reuse and the public analyzer remain deferred.
+
+Schema + implementation:
+
+- `pre_rescue_evidence_v1` lives under the existing sentinel seam and stores
+  exact feature-condition/sample counts, missing fractions, and observed means;
+  zero-observation blocks retain explicit counts + `NA` means, and no original
+  numeric matrix is serialized;
+- matrix designs align by exact sample-name set before their condition drives
+  the shared core; `SummarizedExperiment` designs additionally require their
+  named condition role to exist in and equal selected-assay `colData` sample by
+  sample; typed failures identify absent/mismatched conditions without values;
+- original mask/fingerprint/acquisition declarations are built before the
+  stable attempt; classic success remains a complete `imputefinder_result`,
+  while rescue/cutoff failures become portable stage/class/message/call records
+  and remain mirrored in provenance;
+- one extracted prepared-input core now drives both stable and sidecar paths;
+  stage observation is local, and stable calls/results/RNG behavior remain
+  isolated;
+- the internal constructor records the normalized classic rescue seed and stays
+  unexported until `base_fit` + module routing complete the selected public API.
+
+Verification + completion evidence:
+
+- focused red baseline → 6 expected absent-constructor errors; focused green
+  matrix/SE/failure/alignment/schema/side-effect suite → 7 tests / 71
+  expectations;
+- package-wide source suite → 119 tests / 772 expectations, 0 failures,
+  warnings, errors, or skips;
+- exact matrix + SE classic parity, serialized sidecar round-trip, automatic
+  cutoff + no-finite-condition failure survival, original-mask equality,
+  unchanged source objects, caller RNG restoration, and byte-exact v1 fixture
+  regressions pass;
+- frozen M5 protocol → 12 scenarios / 13 profiles pass; frozen M7 protocol →
+  13 long scenarios + routine subset pass, MD5 unchanged;
+- frozen 10,000 x 50 v1 performance gate → every runtime, allocation,
+  result-size, RSS, cutoff-error, unchanged-input, and seed-cell check passes;
+  two input-first manual sidecar probes elapsed `.424/.957` s, with a `2.717`
+  MiB pre-rescue record versus the `4.505` MiB original matrix;
+- vignette-bearing build + source-tarball `R CMD check --as-cran` → status OK
+  apart from the expected new-submission note; new-package `BiocCheck` → 0
+  errors, 0 warnings, 2 previously reviewed optional/admin notes;
+- no future public symbol/export or stable-v1 result/schema change;
+  `git diff --check` passes.
+
+Exact next task → M11e: define compatibility categories + red tests for exact
+compatible reuse, every identity/scientific mismatch family, conflicting
+`base_fit`/`cutoffs`, source-object immutability, and fit-only limitations; then
+implement recomputation-backed optional `base_fit` acceptance + portable
+`unavailable` without exporting `analyze_missingness()` yet.
 
 Blockers → none.

@@ -67,17 +67,28 @@ classify_missingness <- function(
 ) {
     matched_call <- match.call()
     prepared <- .prepare_input(x, group, group_col, assay)
-    rescued <- .seed_missing_conditions(
-        prepared$data,
-        prepared$groups_by_sample,
+    .classify_prepared_missingness(
+        prepared,
+        x,
+        matched_call,
+        cutoffs,
         seed
     )
-    statistics <- .feature_condition_statistics(
-        rescued$data,
-        prepared$groups_by_sample,
-        rescued$seed_log
-    )
-    profiles <- .build_missingness_profiles(statistics)
+}
+
+.observe_classic_stage <- function(stage_observer, stage) {
+    if (!is.null(stage_observer)) {
+        stage_observer(stage)
+    }
+    invisible(stage)
+}
+
+.resolve_prepared_cutoffs <- function(
+    prepared,
+    statistics,
+    profiles,
+    cutoffs
+) {
     conditions <- sort(
         unique(unname(prepared$groups_by_sample)),
         method = "radix"
@@ -92,14 +103,50 @@ classify_missingness <- function(
         resolved$diagnostics[[condition]]$profile <-
             profiles[[condition]]$metadata
     }
+
+    resolved
+}
+
+.classify_prepared_missingness <- function(
+    prepared,
+    original,
+    matched_call,
+    cutoffs,
+    seed,
+    stage_observer = NULL
+) {
+    .observe_classic_stage(stage_observer, "rescue")
+    rescued <- .seed_missing_conditions(
+        prepared$data,
+        prepared$groups_by_sample,
+        seed
+    )
+    .observe_classic_stage(stage_observer, "block_statistics")
+    statistics <- .feature_condition_statistics(
+        rescued$data,
+        prepared$groups_by_sample,
+        rescued$seed_log
+    )
+    .observe_classic_stage(stage_observer, "profile")
+    profiles <- .build_missingness_profiles(statistics)
+    .observe_classic_stage(stage_observer, "cutoff")
+    resolved <- .resolve_prepared_cutoffs(
+        prepared,
+        statistics,
+        profiles,
+        cutoffs
+    )
+    .observe_classic_stage(stage_observer, "state")
     classified <- .assign_condition_states(statistics, resolved$cutoffs)
+    .observe_classic_stage(stage_observer, "reconciliation")
     reconciled <- .reconcile_condition_states(
         classified,
         rescued$feature_status
     )
+    .observe_classic_stage(stage_observer, "result")
     .finalise_missingness_result(
         prepared,
-        x,
+        original,
         matched_call,
         rescued,
         resolved,

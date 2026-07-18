@@ -362,7 +362,9 @@ input
     Dimensions, ordered names, deterministic fingerprint, original mask,
     scale/acquisition declarations; no duplicate full numeric matrix.
 sentinel
-    A outputs or NULL.
+    A outputs or NULL. Input-first objects begin with a schema-tagged
+    `pre_rescue` record: feature-condition + sample counts, missing fractions,
+    and observed means computed before any rescue/classic attempt.
 stability
     B outputs or NULL, separated by uncertainty family.
 provenance
@@ -382,6 +384,8 @@ Pre-rescue evidence is constructed before the classic attempt. Supported A/C
 work may therefore continue after an automatic cutoff failure; B records the
 failure frequency rather than requiring a fabricated fit. Modules that truly
 depend on a successful classic result return structured `unavailable`.
+`pre_rescue_evidence_v1` preserves zero-observation blocks as explicit counts
+with `NA` observed means; it stores summaries rather than cell intensities.
 
 `test_detectability()` returns an immutable standalone
 `imputefinder_detectability` object referencing the sidecar schema/input
