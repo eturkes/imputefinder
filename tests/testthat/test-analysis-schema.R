@@ -342,7 +342,16 @@ test_that("the minimum analysis schema round-trips exactly", {
         c("declared", "estimability", "unavailable_roles")
     )
     expect_s3_class(analysis$design$declared, "missingness_design")
-    expect_null(analysis$design$estimability)
+    expect_identical(
+        analysis$design$estimability,
+        imputefinder:::.new_design_estimability(
+            analysis$design$declared
+        )
+    )
+    expect_identical(
+        analysis$design$estimability$schema,
+        "design_estimability_v1"
+    )
     expect_identical(
         analysis$design$unavailable_roles,
         c("nuisance", "block", "acquisition")

@@ -1,3 +1,9 @@
+# imputefinder 0.99.5 (2026-07-18)
+
+- Adds the validated mandatory sidecar design core: canonical declared model
+  matrices, SVD rank and null-space aliases, row-space contrast estimability,
+  and block-aware independent-unit accounting.
+
 # imputefinder 0.99.4 (2026-07-18)
 
 - Adds experimental `analyze_missingness()` input-first sidecars with exact

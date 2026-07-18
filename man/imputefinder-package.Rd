@@ -35,8 +35,9 @@ and apply the chosen MNAR and MAR methods using the corresponding retained
 feature groups.
 
 The experimental \code{\link[=analyze_missingness]{analyze_missingness()}} sidecar starts from the original
-input and a typed \code{\link[=missingness_design]{missingness_design()}}. It records identity and pre-rescue
-evidence without changing the stable classifier result.
+input and a typed \code{\link[=missingness_design]{missingness_design()}}. It records identity, canonical
+design rank/aliasing and declared units, and pre-rescue evidence without
+changing the stable classifier result.
 }
 
 \seealso{

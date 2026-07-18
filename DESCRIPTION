@@ -1,6 +1,6 @@
 Package: imputefinder
 Title: Condition-Aware Missingness Classification for Proteomics
-Version: 0.99.4
+Version: 0.99.5
 Authors@R:
     person("Emir", "Turkes", email = "emir.turkes@eturkes.com",
            role = c("aut", "cre", "cph"))
@@ -15,7 +15,9 @@ Description: Classifies protein-intensity missingness independently within
     auditable classifications, cutoff diagnostics, and seed provenance for
     downstream normalisation and imputation. An experimental input-first
     sidecar records typed design context, original missingness evidence, input
-    identity, classic-fit compatibility, and explicit unavailable modules.
+    identity, classic-fit compatibility, canonical model rank and aliasing,
+    a row-space contrast-estimability basis, declared resampling units, and
+    explicit unavailable modules.
 License: GPL (>= 3)
 Encoding: UTF-8
 URL: https://github.com/eturkes/imputefinder

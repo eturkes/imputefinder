@@ -3,7 +3,8 @@
 #' Construct an input-first companion analysis without changing the stable
 #' [classify_missingness()] result contract. The sidecar records the original
 #' missingness mask, a deterministic input fingerprint, aligned typed design,
-#' pre-rescue evidence, classic result or structured failure, and provenance.
+#' algebraic design/estimability evidence, pre-rescue evidence, classic result
+#' or structured failure, and provenance.
 #'
 #' @param x An ordinary numeric matrix or a `SummarizedExperiment` containing
 #'   unnormalised log2 protein intensities with features in rows and samples in
@@ -27,14 +28,20 @@
 #'
 #' @return An experimental `imputefinder_analysis` with seven fields:
 #'   `classic`, `spec`, `design`, `input`, `sentinel`, `stability`, and
-#'   `provenance`. It retains computed evidence and a packed missingness mask,
-#'   but does not retain a second copy of the original numeric matrix.
+#'   `provenance`. `design$estimability` stores the canonical declared model,
+#'   SVD rank/null-space aliases, and block-aware independent-unit accounting.
+#'   The sidecar retains computed evidence and a packed missingness mask, but
+#'   does not retain a second copy of the original numeric matrix.
 #'
 #' @details
 #' The sidecar reports observed evidence, compatibility, and unavailable
 #' quantities. It does not identify a causal missingness mechanism. Serialized
 #' objects carry an experimental versioned schema and unknown schemas fail
 #' explicitly instead of being silently upgraded.
+#'
+#' The mandatory design core runs independently of `modules`. It reports
+#' algebraic separability and declared units; it performs no association test,
+#' automatic correction, sample exclusion, or causal attribution.
 #'
 #' @examples
 #' x <- matrix(

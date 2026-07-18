@@ -241,8 +241,9 @@ fit_se <- classify_missingness(
 
 `analyze_missingness()` keeps the stable classifier result intact while
 recording the original missingness mask, deterministic input identity,
-pre-rescue coverage, typed sample-design roles, and provenance in a companion
-object. Declare only metadata roles that should participate in later analysis:
+pre-rescue coverage, typed sample-design roles, algebraic estimability, and
+provenance in a companion object. Declare only metadata roles that should
+participate in analysis:
 
 ```r
 design <- missingness_design(
@@ -263,6 +264,11 @@ analysis <- analyze_missingness(
     modules = "sentinel"
 )
 analysis
+analysis$design$estimability$rank[
+    c("rank", "nullity", "full_column_rank")
+]
+analysis$design$estimability$aliasing$affected_terms
+analysis$design$estimability$units$condition
 analysis$sentinel$pre_rescue$sample
 ```
 
@@ -271,13 +277,16 @@ cutoff-source policy and retained byte-for-byte only when every exact,
 canonical, and numeric-tolerance comparison passes. Supplying both `base_fit`
 and `cutoffs` is an error.
 
-The default module request is `c("sentinel", "stability")`. The current
-sentinel output is the schema-tagged pre-rescue evidence record. Robustness
-certificates remain behind a frozen validation milestone, so selected
-`stability` returns a structured `imputefinder_unavailable` record rather than
-an invented result; an unselected module is `NULL`. The sidecar is experimental
-and does not infer a causal missingness mechanism or retain a second copy of the
-original numeric matrix.
+The mandatory design core is computed independently of module selection. It
+uses canonical treatment encoding to report SVD rank, null-space aliases,
+row-space estimability, and block-aware independent units; it neither tests
+missingness association nor corrects the data. The default module request is
+`c("sentinel", "stability")`. The current sentinel output is the schema-tagged
+pre-rescue evidence record. Robustness certificates remain behind a frozen
+validation milestone, so selected `stability` returns a structured
+`imputefinder_unavailable` record rather than an invented result; an unselected
+module is `NULL`. The sidecar is experimental and does not infer a causal
+missingness mechanism or retain a second copy of the original numeric matrix.
 
 ## Downstream normalisation and imputation
 
@@ -345,7 +354,10 @@ records the deterministic 10,000-feature, 50-sample runtime and allocation
 gate. The tracked `dev/sidecar-differential-validation.md` report separately
 freezes exact, canonical, tolerance, and overhead gates. These synthetic
 results support the tested behavior; they are not a claim of performance on
-every proteomics dataset.
+every proteomics dataset. The tracked
+[`dev/m13-design-core-validation.md`](dev/m13-design-core-validation.md) report
+binds the algebraic design core to its frozen rank, alias, estimability, unit,
+order, and side-effect gates.
 
 The normative behavior and release gates are maintained in
 [PLAN.md](https://github.com/eturkes/imputefinder/blob/main/PLAN.md).

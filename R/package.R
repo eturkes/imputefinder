@@ -25,8 +25,9 @@
 #' feature groups.
 #'
 #' The experimental [analyze_missingness()] sidecar starts from the original
-#' input and a typed [missingness_design()]. It records identity and pre-rescue
-#' evidence without changing the stable classifier result.
+#' input and a typed [missingness_design()]. It records identity, canonical
+#' design rank/aliasing and declared units, and pre-rescue evidence without
+#' changing the stable classifier result.
 #'
 #' @seealso [classify_missingness()], [analyze_missingness()],
 #'   [plot_missingness()], and `vignette("imputefinder")`.

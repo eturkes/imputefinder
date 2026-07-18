@@ -217,6 +217,10 @@ analysis <- analyze_missingness(
     seed = 1L
 )
 analysis
+analysis$design$estimability$rank[
+    c("rank", "nullity", "full_column_rank")
+]
+analysis$design$estimability$aliasing$affected_terms
 head(analysis$sentinel$pre_rescue$feature_condition)
 analysis$stability
 ```
@@ -226,8 +230,12 @@ exact/canonical/tolerance comparison. The sidecar stores a packed original
 mask and deterministic fingerprint, not a second original intensity matrix.
 Its current sentinel output is pre-rescue coverage evidence. Stability remains
 pending its frozen validation milestone and therefore returns a structured
-`imputefinder_unavailable` record. These records report availability and
-observed evidence; they do not identify a causal missingness mechanism.
+`imputefinder_unavailable` record. Independently of module selection, the
+sidecar's mandatory design core stores a canonical model matrix, SVD rank and
+null-space aliases, and declared block-aware units. It reports algebraic
+separability without testing association or correcting data. These records
+report availability and observed evidence; they do not identify a causal
+missingness mechanism.
 
 # The stored missingness profile
 

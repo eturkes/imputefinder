@@ -111,7 +111,7 @@
 
     list(
         declared = aligned,
-        estimability = NULL,
+        estimability = .new_design_estimability(aligned),
         unavailable_roles = .design_unavailable_roles(aligned)
     )
 }
@@ -148,6 +148,12 @@
 .validate_sidecar_design <- function(record, input) {
     .validate_sidecar_design_shape(record)
     .validate_missingness_design(record$declared)
+    if (!is.null(record$estimability)) {
+        .validate_design_estimability(
+            record$estimability,
+            record$declared
+        )
+    }
     aligned <- .align_missingness_design(
         record$declared,
         input$sample_names

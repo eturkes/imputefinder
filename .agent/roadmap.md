@@ -17,12 +17,12 @@ delayed backend; J1 standards QC; J2 atlas. Parked work has no active checkbox
 or release obligation.
 
 Exact method, dependency graph, falsification gates, and Definition of Done →
-`PLAN.md` Sections 2-14. Exact next implementation task → M13a: encode red
-mandatory-core tests from the frozen rank/alias/contrast/block/order/state
-gates, then implement the canonical declared model matrix, SVD rank/null-space
-alias report, contrast row-space estimability, and block/technical-unit
-accounting. Keep A association candidates and development artifacts closed
-until the mandatory core is green; confirmation remains sealed through M15P.
+`PLAN.md` Sections 2-14. Exact next implementation task → M13b: encode red
+coverage-schema tests, then implement pre-rescue sample/condition/nuisance/block
+coverage summaries, including singleton levels, explicit empty overlap cells,
+sample detection/intensity support, feature overlap, and condition × declared
+role tables. Fit no association candidate yet; confirmation remains sealed
+through M15P.
 
 ## Completed v1 release path
 
@@ -2102,5 +2102,89 @@ implement the canonical declared model matrix, SVD rank/null-space alias report,
 contrast row-space estimability, and block/technical-unit accounting. Keep A
 association candidates + development bytes closed until the mandatory core is
 green; confirmation remains sealed through M15P.
+
+Blockers → none.
+
+### 2026-07-18 - M13a mandatory algebraic design core
+
+Scope → implement and validate only the mandatory shared algebraic core needed
+by A-C: canonical declared model, SVD rank/null-space aliases, row-space
+contrast estimability, and declared block/technical-unit accounting. A
+association candidates and every external result artifact remain closed.
+
+Implementation:
+
+- every new sidecar populates its existing `design$estimability` seam with
+  schema `design_estimability_v1`; older experimental objects with the prior
+  `NULL` placeholder remain structurally readable;
+- canonical model rows sort sample identities; observed categorical labels sort
+  independently of factor levels/character encoding; integer/double nuisance
+  re-encoding agrees; intercept + treatment contrasts cover condition,
+  declared nuisance main effects, block fixed effects, and only explicit
+  interactions; acquisition is retained as declared metadata and enters only
+  an explicit interaction;
+- exact variable/term/coefficient maps accompany the numeric matrix; no formula
+  environment or ambient contrast option enters the stored result;
+- SVD rank threshold = `max(nrow, ncol) * .Machine$double.eps * d[1]`;
+  null projector = `I - V_r V_r^T`; canonical null basis scans coefficient
+  axes with modified Gram-Schmidt + fixed first-nonzero sign; affected
+  coefficients/terms retain alias magnitudes;
+- declared-level and raw coefficient contrasts use the frozen row-space
+  residual rule `L2 <= sqrt(.Machine$double.eps) * max(1, contrast_L2)` and
+  return named affected terms for non-estimable directions;
+- declared block = independent unit; otherwise sample = unit; sample weights,
+  unit/condition multiplicities, and within-condition technical siblings stay
+  explicit and name-aligned;
+- sidecar validation recomputes the core with continuous tolerance, rejecting
+  schema drift or inconsistent model/rank/alias/unit evidence; inputs, stable
+  classic branches, RNG, options, and working directory remain untouched;
+- package version advances to `0.99.5`; README, vignette, NEWS, package help,
+  and `analyze_missingness()` help document the always-on algebraic core and
+  its non-association/non-correction boundary.
+
+Frozen development evidence:
+
+- dependency-free `dev/m13-design-core-validation.R` binds only the 11 M12
+  mandatory gate rows and regenerates all 13 DDA/DIA scenarios at untouched
+  replicates `33-64` = 416 instances plus the normative v1 parity case;
+- all required sensitivity/specificity/retention/accounting/invariance
+  estimates = `1`; exact-alias false-positive fraction = `0`; global-state
+  mutation and classic exact-content drift counts = `0`;
+- complete audit SHA-256 =
+  `37528216590dcfff3338501ef61b766697ea63c14b7324912fcb00f84d58790e`;
+  registry-bound gate-result SHA-256 =
+  `cb72a69301100287cee569ae7a0d709f42edc10e3b10a62dbff3a86ab88aec6f`;
+- verifier asserts the upstream generator hash plus candidate/external sealed
+  state before running; A association remains `frozen_unrun`, all 11 external
+  artifacts remain `metadata_only`, and no external byte was downloaded,
+  listed, parsed, or assigned a new role;
+- `dev/m13-design-core-validation.md` records exact denominators, comparison
+  normalization, evidence identities, boundaries, and reproduction command.
+
+Adversarial review + verification:
+
+- red M13a suite initially failed on the absent core; final package-wide source
+  suite → 144 tests / 996 expectations, 0 failures, errors, warnings, or skips;
+- constructed crossed vs perfect condition-batch designs, `p > n` null spaces,
+  one-sample/one-condition support, multi-level contrasts, paired technical
+  siblings, unequal replication, schema mutation, and factor/sample/role-order
+  variants pass;
+- frozen M13 verifier reproduced both hashes after install and after the final
+  helper refactor; all 11 numeric registry gates pass exactly;
+- frozen M5 → 12 scenarios / 13 target profiles pass; frozen M7 → 13 long +
+  routine scenarios pass, MD5 unchanged at
+  `4011e381bba2d0d747e91d277a45de5e`;
+- vignette-bearing source build succeeds; source-tarball
+  `R CMD check --as-cran --no-manual` → status OK;
+- staged-tree synthetic commit `BiocCheckGitClone` → 0 errors, 0 warnings, 0
+  notes; new-package tarball `BiocCheck` → 0 errors, 0 warnings, only the two
+  reviewed external/admin notes; initial function-length/line-width notes were
+  removed by helper extraction and source wrapping;
+- `git diff --check` passes.
+
+Exact next task → M13b: write red coverage-schema/order/zero-cell tests, then
+implement static pre-rescue sample/condition/nuisance/block summaries from the
+typed design + stored original evidence. Keep association fitting and all
+external result bytes closed until the static sentinel schema is green.
 
 Blockers → none.
