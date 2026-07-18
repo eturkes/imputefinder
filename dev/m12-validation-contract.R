@@ -1,11 +1,12 @@
 #!/usr/bin/env Rscript
 
-# M12b validation contract. This file freezes scope, generator linkage, and
-# whole-family evidence roles; it neither downloads nor reads result artifacts.
+# M12c validation contract. This file freezes scope, generator/data roles,
+# A-C candidate protocols, and numeric gates; it neither downloads nor reads
+# external result artifacts.
 # Run from the repository root:
 # Rscript --vanilla dev/m12-validation-contract.R --verify
 
-.M12_CONTRACT_VERSION <- "m12_validation_contract_v2"
+.M12_CONTRACT_VERSION <- "m12_validation_contract_v3"
 .M12_CHECKED_ON <- "2026-07-18"
 
 .m12_schema_catalog <- function() {
@@ -52,6 +53,25 @@
             required_strata = "character:token-set",
             disposition = "character:mandatory|independent"
         ),
+        protocol_registry = c(
+            protocol_id = "character:id,unique",
+            track = "character:A|B|C",
+            purpose = "character:nonempty",
+            implementation_file = "character:repository-path",
+            protocol_hash = "character:sha256",
+            result_state = "character:frozen_unrun"
+        ),
+        internal_evidence = c(
+            data_id = "character:id,unique",
+            evidence_tier = "character:tier0",
+            role = "character:compatibility",
+            scope = "character:nonempty",
+            unit = "character:nonempty",
+            sample_size = "integer:positive",
+            source_path = "character:repository-path",
+            content_sha256 = "character:sha256",
+            state = "character:frozen"
+        ),
         gate_registry = c(
             gate_id = "character:id,unique",
             registry_version = "character:id",
@@ -71,6 +91,20 @@
             protocol_id = "character:id",
             data_hash = "character:sha256",
             protocol_hash = "character:sha256"
+        ),
+        gate_results = c(
+            gate_id = "character:gate-foreign-key,unique",
+            registry_version = "character:id",
+            metric = "character:id",
+            estimate = "numeric:finite-if-measured-else-NA",
+            numerator = "numeric:finite-if-measured-else-NA",
+            denominator = "numeric:finite-positive-if-measured-else-NA",
+            lower = "numeric:finite-or-NA-if-measured;NA-otherwise",
+            upper = "numeric:finite-or-NA-if-measured;NA-otherwise",
+            status = "character:measured|failed|unavailable",
+            gate_binding_hash = "character:sha256",
+            evidence_hash = "character:sha256",
+            note = "character:nonempty"
         ),
         data_cards = c(
             dataset_id = "character:id,unique",
@@ -310,11 +344,13 @@
         c("B_reproducibility", "B", "all_families", "Instance/input order and seed streams reproduce canonical named output.", "tier1", "DDA;DIA", "independent"),
         c("B_side_effects", "B", "all_families", "Perturbations leave caller RNG and global state unchanged.", "tier0;tier1", "DDA;DIA", "independent"),
         c("B_stable_overhead", "B", "execution", "Stable default calls perform zero sidecar work and retain v1 gates.", "tier0", "stable", "independent"),
-        c("C_null_error", "C", "detection", "Correlated-feature null rejection and FDR satisfy frozen bounds.", "tier1;tier2", "DDA;DIA", "independent"),
-        c("C_false_sign", "C", "detection", "False-sign behavior satisfies its frozen bound.", "tier1;tier2", "DDA;DIA", "independent"),
+        c("B_external_behavior", "B", "all_families", "Controlled public matrices produce complete stratified panels without an inferential cutoff-coverage claim.", "tier3", "DDA;DIA", "independent"),
+        c("B_display_calibration", "B", "communication", "Optional stability labels pass frozen held-out risk-coverage gates or remain disabled.", "tier1;tier2", "DDA;DIA", "independent"),
+        c("C_null_error", "C", "detection_abundance", "Correlated-feature null rejection and FDR satisfy separate component bounds.", "tier1;tier2", "DDA;DIA", "independent"),
+        c("C_false_sign", "C", "detection_abundance", "Component-specific false-sign behavior satisfies frozen bounds.", "tier1;tier2", "DDA;DIA", "independent"),
         c("C_effect_bias", "C", "detection_abundance", "Detection and observed-abundance effect bias satisfy separate gates.", "tier1;tier2;tier3", "DDA;DIA", "independent"),
         c("C_interval_coverage", "C", "detection_abundance", "Intervals meet estimand-specific coverage gates where licensed.", "tier1;tier2;tier3", "DDA;DIA", "independent"),
-        c("C_alternative_utility", "C", "detection", "Frozen alternatives meet power and precision-recall gates.", "tier1;tier2;tier3", "DDA;DIA", "independent"),
+        c("C_alternative_utility", "C", "detection_abundance", "Frozen alternatives meet component-specific power and precision-recall gates.", "tier1;tier2;tier3", "DDA;DIA", "independent"),
         c("C_edge_cases", "C", "design_support", "Paired, unequal, separated, low-support, and confounded cases follow frozen outcomes.", "tier1;tier2", "DDA;DIA", "independent"),
         c("C_reference_recovery", "C", "detection_abundance", "Controlled reference detection and recovery meet experimental gates.", "tier3", "DDA;DIA", "independent"),
         c("C_order_invariance", "C", "execution", "Untouched development data and named-order invariance gates pass.", "tier1;tier3", "DDA;DIA", "independent"),
@@ -341,6 +377,288 @@
         data_hash = character(), protocol_hash = character(),
         stringsAsFactors = FALSE
     )
+}
+
+.m12_protocol_registry <- function() {
+    data.frame(
+        protocol_id = c(
+            "m12_a_candidate_protocol_v1",
+            "m12_b_perturbation_protocol_v1",
+            "m12_c_candidate_protocol_v1"
+        ),
+        track = c("A", "B", "C"),
+        purpose = c(
+            "algebraic design core plus association candidate comparison",
+            "separated perturbation families cutoff policy streams and display calibration",
+            "detection plus conditional-observed-abundance estimator comparison"
+        ),
+        implementation_file = rep("dev/m12-candidate-protocol.R", 3L),
+        protocol_hash = c(
+            "e20bdcc8e040eed65457480be7ae2ce2542761165c3d27161b953f86f39e5edc",
+            "57ffa1220c740dcb69508d3ad1b9beb05e7013c3a92af528293211e41a13f256",
+            "58b6e3c6d7f35f5561549a3a52420e49b0f3eb296752353d1bb3c9d433cf9d96"
+        ),
+        result_state = rep("frozen_unrun", 3L),
+        stringsAsFactors = FALSE
+    )
+}
+
+.m12_internal_evidence <- function() {
+    data.frame(
+        data_id = c(
+            "v1_normative_fixture",
+            "v1_scientific_oracle",
+            "v1_performance_10000x50"
+        ),
+        evidence_tier = rep("tier0", 3L),
+        role = rep("compatibility", 3L),
+        scope = c(
+            "released-shape normative matrix/result fixture",
+            "frozen M7 scientific protocol and routine oracle",
+            "10,000 feature x 50 sample stable-call performance fixture"
+        ),
+        unit = c("fixture", "scenario", "benchmark repetition"),
+        sample_size = c(1L, 13L, 7L),
+        source_path = c(
+            "tests/testthat/helper-fixtures.R",
+            "dev/scientific-validation.R",
+            "dev/performance-validation.R"
+        ),
+        content_sha256 = c(
+            "856b62f23c41140f07ac7965f4afe62f7dc23e25036a7769306f8bdd4a731d4f",
+            "5b6b2f861d867378fa950a7f79857711b1a8056f29b557505194090214d5dc47",
+            "74c53ccaf0f0c400693ac76607c575f686012c5b3980ae4d758a5dc4893fc2c2"
+        ),
+        state = rep("frozen", 3L),
+        stringsAsFactors = FALSE
+    )
+}
+
+.m12_ids <- function(...) {
+    paste(sort(unique(c(...)), method = "radix"), collapse = ";")
+}
+
+.m12_gate_specs <- function() {
+    scenario_ids <- .m12_generator_manifest()$scenario_id
+    all_sim <- .m12_ids(scenario_ids)
+    full_design <- .m12_ids(
+        "dda_batch_crossed", "dia_batch_partial", "dia_monotone_paired"
+    )
+    paired <- .m12_ids(
+        "dda_grouped_leakage_trap", "dia_blockwise_paired",
+        "dia_monotone_paired"
+    )
+    unequal <- .m12_ids(
+        "dda_monotone_unequal", "dia_batch_partial", "dia_null_unequal"
+    )
+    nulls <- .m12_ids("dda_null_balanced", "dia_null_unequal")
+    no_cliff <- .m12_ids("dda_no_cliff", "dia_no_cliff_low_support")
+    assoc_alt <- .m12_ids(
+        "dda_batch_crossed", "dda_monotone_unequal",
+        "dia_batch_partial", "dia_monotone_paired"
+    )
+    c_detection_alt <- .m12_ids(
+        "dda_mixed_outlier", "dda_monotone_unequal", "dia_batch_partial",
+        "dia_monotone_paired", "dia_structural_off"
+    )
+    c_abundance_alt <- .m12_ids(
+        "dda_grouped_leakage_trap", "dda_mixed_outlier",
+        "dda_monotone_unequal", "dia_batch_partial",
+        "dia_blockwise_paired", "dia_monotone_paired", "dia_structural_off"
+    )
+    g <- function(
+        gate_id,
+        claim_id,
+        metric,
+        unit,
+        comparator,
+        strata,
+        sample_size,
+        uncertainty_method,
+        threshold_operator,
+        threshold_value,
+        threshold_scale,
+        failure_treatment,
+        data_ids
+    ) {
+        data.frame(
+            gate_id = gate_id,
+            claim_id = claim_id,
+            metric = metric,
+            unit = unit,
+            comparator = comparator,
+            strata = strata,
+            sample_size = as.integer(sample_size),
+            uncertainty_method = uncertainty_method,
+            threshold_operator = threshold_operator,
+            threshold_value = as.numeric(threshold_value),
+            threshold_scale = threshold_scale,
+            failure_treatment = failure_treatment,
+            data_ids = data_ids,
+            stringsAsFactors = FALSE
+        )
+    }
+    exact <- "complete enumeration of frozen development-test scenario-replicates"
+    mandatory <- "any miss blocks the mandatory design core and therefore M13-M15"
+    kill_a <- "miss kills or parks the A association panel; mandatory design core remains"
+    kill_b <- "miss kills or parks the affected B claim without weakening another panel"
+    disable_b_display <- "miss disables stable/fragile labels; continuous B panels remain eligible and thresholds stay frozen"
+    kill_c <- "miss kills or parks the affected C component/track; threshold stays frozen"
+    rows <- list(
+        g("a_rank_deficient_sensitivity", "a_design_rank", "rank_deficiency_detection_fraction", "scenario-replicate", "constructed SVD rank oracle", "DDA perfect confounding", 32L, exact, "==", 1, "fraction", mandatory, "dda_batch_perfect"),
+        g("a_rank_full_specificity", "a_design_rank", "full_rank_retention_fraction", "scenario-replicate", "constructed full-rank SVD oracle", "DDA crossed; DIA partial; DIA paired", 96L, exact, "==", 1, "fraction", mandatory, full_design),
+        g("a_alias_exact_sensitivity", "a_design_alias", "perfect_alias_detection_fraction", "scenario-replicate", "condition=batch constructed alias", "DDA perfect confounding", 32L, exact, "==", 1, "fraction", mandatory, "dda_batch_perfect"),
+        g("a_alias_false_positive", "a_design_alias", "false_exact_alias_fraction", "scenario-replicate", "crossed/partial nonalias oracle", "DDA crossed; DIA partial", 64L, exact, "==", 0, "fraction", mandatory, .m12_ids("dda_batch_crossed", "dia_batch_partial")),
+        g("a_contrast_nonestimable_rejection", "a_contrast_estimability", "nonestimable_rejection_fraction", "scenario-replicate", "row-space projection oracle", "DDA perfect confounding", 32L, exact, "==", 1, "fraction", mandatory, "dda_batch_perfect"),
+        g("a_contrast_estimable_retention", "a_contrast_estimability", "estimable_retention_fraction", "scenario-replicate", "row-space projection oracle", "crossed; partial; paired", 96L, exact, "==", 1, "fraction", mandatory, full_design),
+        g("a_block_unit_accounting", "a_block_accounting", "block_resampling_unit_match_fraction", "scenario-replicate", "generator subject/technical-sibling oracle", "DDA/DIA paired", 96L, exact, "==", 1, "fraction", mandatory, paired),
+        g("a_unequal_design_accounting", "a_block_accounting", "design_row_and_weight_match_fraction", "scenario-replicate", "generator named unequal-count oracle", "DDA/DIA unequal", 96L, exact, "==", 1, "fraction", mandatory, unequal),
+        g("a_named_order_invariance", "a_order_invariance", "canonical_named_hash_match_fraction", "scenario-replicate", "baseline versus row/column/label/re-encoding permutations", "all 13 DDA/DIA scenarios", 416L, exact, "==", 1, "fraction", mandatory, all_sim),
+        g("a_side_effect_global", "a_side_effects", "caller_state_mutation_count", "scenario-replicate", "input/RNG/options/working-directory snapshots", "all 13 DDA/DIA scenarios", 416L, exact, "==", 0, "count", mandatory, all_sim),
+        g("a_side_effect_classic", "a_side_effects", "classic_exact_hash_drift_count", "scenario-replicate", "stable result/failure before versus after sentinel", "all scenarios plus normative fixture", 417L, exact, "==", 0, "count", mandatory, .m12_ids(scenario_ids, "v1_normative_fixture")),
+        g("a_assoc_null_upper", "a_assoc_null", "family_false_flag_clopper_pearson_upper95", "scenario-replicate association family", "Holm-adjusted alpha=0.05", "pooled DDA+DIA nulls; strata also reported", 64L, "one-sided exact binomial 95 percent bound", "<=", 0.15, "probability", kill_a, nulls),
+        g("a_assoc_null_stratum", "a_assoc_null", "maximum_acquisition_false_flag_fraction", "scenario-replicate association family", "Holm-adjusted alpha=0.05", "DDA and DIA separately n=32", 64L, "exact binomial intervals reported per acquisition", "<=", 0.125, "fraction", kill_a, nulls),
+        g("a_public_development_coverage", "a_assoc_public", "eligible_declared_term_completion_fraction", "mouse", "all algebraically estimable condition/batch terms return effect+interval+raw/adjusted evidence", "HarmonizR DDA four-batch development", 25L, "whole-family descriptive audit; no cross-dataset inference", ">=", 0.95, "fraction", kill_a, "harmonizr_mouse_pxd027467"),
+        g("a_public_development_wording", "a_assoc_public", "causal_or_correction_wording_violation_count", "wording rubric item", "associated/aliased/cannot-separate vocabulary", "HarmonizR development", 12L, "exact adversarial wording rubric", "==", 0, "count", kill_a, "harmonizr_mouse_pxd027467"),
+        g("a_public_confirmation_coverage", "a_assoc_public", "eligible_declared_term_completion_fraction", "biological-replicate family", "all estimable condition/instrument/acquisition terms return complete evidence", "MultiPro DDA+DIA sealed confirmation", 6L, "whole-family confirmation audit after synchronized opening", ">=", 0.95, "fraction", kill_a, "multipro_hcc_pxd041391"),
+        g("a_public_confirmation_wording", "a_assoc_public", "causal_or_correction_wording_violation_count", "wording rubric item", "associated/aliased/cannot-separate vocabulary", "MultiPro sealed confirmation", 12L, "exact adversarial wording rubric", "==", 0, "count", kill_a, "multipro_hcc_pxd041391"),
+        g("a_assoc_interval_coverage", "a_assoc_calibration", "median_replicate_95_interval_coverage", "scenario-replicate", "generator expected sample-detection-fraction contrast", "DDA/DIA condition/batch alternatives", 128L, "feature-module-aware scenario bootstrap interval", ">=", 0.90, "fraction", kill_a, assoc_alt),
+        g("a_assoc_alternative_power", "a_assoc_calibration", "holm_alternative_detection_fraction", "scenario-replicate declared term", "nonzero generator expected detection-fraction term", "DDA/DIA condition/batch alternatives", 128L, "scenario-replicate clustered 95 percent interval", ">=", 0.70, "fraction", kill_a, assoc_alt),
+        g("a_assoc_effect_bias", "a_assoc_calibration", "median_absolute_effect_bias", "scenario-replicate declared term", "generator expected detection-fraction contrast", "DDA/DIA condition/batch alternatives", 128L, "scenario-replicate percentile interval", "<=", 0.03, "probability points", kill_a, assoc_alt),
+
+        g("b_cutoff_range_coverage", "b_cutoff_coverage", "type8_95_range_boundary_coverage", "scenario-replicate condition", "single-monotone generating midpoint", "DDA unequal; DIA paired", 64L, "scenario-replicate clustered 95 percent interval", ">=", 0.90, "fraction", kill_b, .m12_ids("dda_monotone_unequal", "dia_monotone_paired")),
+        g("b_cutoff_median_error", "b_cutoff_coverage", "median_absolute_cutoff_error", "scenario-replicate condition", "single-monotone generating midpoint", "DDA unequal; DIA paired", 64L, "scenario-replicate percentile 95 percent interval", "<=", 0.35, "log2 intensity", kill_b, .m12_ids("dda_monotone_unequal", "dia_monotone_paired")),
+        g("b_false_confidence_upper", "b_false_confidence", "false_confidence_clopper_pearson_upper95", "scenario-replicate", "frozen success/range-width event", "DDA/DIA no-cliff", 64L, "one-sided exact binomial 95 percent bound", "<=", 0.10, "probability", kill_b, no_cliff),
+        g("b_no_cliff_abstention", "b_no_cliff", "weak_identification_or_failure_fraction", "scenario-replicate condition", "flat/no-cliff generator control", "pooled DDA+DIA", 64L, "exact binomial interval", ">=", 0.95, "fraction", kill_b, no_cliff),
+        g("b_no_cliff_stratum", "b_no_cliff", "minimum_acquisition_abstention_fraction", "scenario-replicate condition", "flat/no-cliff generator control", "DDA and DIA separately n=32", 64L, "exact binomial intervals by acquisition", ">=", 0.90, "fraction", kill_b, no_cliff),
+        g("b_sparse_correct_abstention", "b_sparse_abstention", "sampling_panel_unavailable_match_fraction", "scenario-replicate", "frozen low-support rule/code", "DIA low support", 32L, exact, "==", 1, "fraction", kill_b, "dia_no_cliff_low_support"),
+        g("b_sparse_panel_independence", "b_sparse_abstention", "independent_panel_completion_fraction", "scenario-replicate panel", "unsupported sampling leaves other eligible panels measured", "DIA low support", 32L, exact, ">=", 0.95, "fraction", kill_b, "dia_no_cliff_low_support"),
+        g("b_reproducibility_exact", "b_reproducibility", "canonical_perturbation_hash_match_fraction", "scenario-replicate", "instance/input/draw order and seed-stream permutations", "all 13 DDA/DIA scenarios", 416L, exact, "==", 1, "fraction", kill_b, all_sim),
+        g("b_side_effects_exact", "b_side_effects", "caller_state_mutation_count", "scenario-replicate", "input/RNG/options/working-directory snapshots", "all 13 DDA/DIA scenarios", 416L, exact, "==", 0, "count", kill_b, all_sim),
+        g("b_stable_zero_work", "b_stable_overhead", "stable_default_sidecar_invocation_count", "normative call", "instrumented stable classify_missingness default", "v1 normative fixture", 1L, "exact call-path counter", "==", 0, "count", kill_b, "v1_normative_fixture"),
+        g("b_stable_runtime", "b_stable_overhead", "median_runtime_ratio", "benchmark repetition", "stable default after/before frozen M10 baseline", "10000x50 performance fixture", 7L, "paired repetition ratios with full distribution reported", "<=", 1.05, "ratio", kill_b, "v1_performance_10000x50"),
+        g("b_external_development_schema", "b_external_behavior", "required_panel_field_completion_fraction", "DDA/DIA run", "all supported B continuous fields/failures/provenance present", "MS-DAP linked development family", 18L, "whole-family descriptive audit", "==", 1, "fraction", kill_b, "msdap_hy_pxd036134"),
+        g("b_external_development_wording", "b_external_behavior", "inferential_cutoff_coverage_wording_violation_count", "wording rubric item", "public ranges labelled finite-dataset descriptive", "MS-DAP development", 12L, "exact adversarial wording rubric", "==", 0, "count", kill_b, "msdap_hy_pxd036134"),
+        g("b_external_confirmation_schema", "b_external_behavior", "required_panel_field_completion_fraction", "selected technical run", "all supported B continuous fields/failures/provenance present", "UPS1 DDA + LFQbench DIA sealed confirmation", 18L, "synchronized whole-family confirmation audit", "==", 1, "fraction", kill_b, .m12_ids("lfqbench_pxd002952", "ups1_yeast_pxd002099")),
+        g("b_external_confirmation_wording", "b_external_behavior", "inferential_cutoff_coverage_wording_violation_count", "wording rubric item", "public ranges labelled finite-dataset descriptive", "UPS1/LFQbench sealed confirmation", 12L, "exact adversarial wording rubric", "==", 0, "count", kill_b, .m12_ids("lfqbench_pxd002952", "ups1_yeast_pxd002099")),
+        g("b_display_heldout_risk", "b_display_calibration", "maximum_family_wilson_upper95_instability_risk", "scenario-replicate", "held-out draws 500-999 after threshold learned on 1-499", "sampling and estimator; DDA/DIA", 416L, "Wilson one-sided 95 percent by family", "<=", 0.15, "probability", disable_b_display, all_sim),
+        g("b_display_heldout_coverage", "b_display_calibration", "minimum_family_label_coverage", "supported feature-condition", "frozen risk-qualified threshold", "sampling and estimator; DDA/DIA", 416L, "feature modules clustered within scenario-replicate", ">=", 0.10, "fraction", disable_b_display, all_sim),
+        g("b_display_no_cliff", "b_display_calibration", "false_stable_label_clopper_pearson_upper95", "scenario-replicate", "no-cliff negative control", "DDA/DIA no-cliff", 64L, "one-sided exact binomial 95 percent bound", "<=", 0.10, "probability", disable_b_display, no_cliff),
+
+        g("c_null_fdr_upper", "c_null_error", "empirical_fdr_upper95", "scenario-replicate detection family", "BY q=0.05; all-null FDR equals family false-flag probability", "pooled correlated-feature DDA+DIA nulls", 64L, "one-sided exact binomial 95 percent bound", "<=", 0.10, "probability", kill_c, nulls),
+        g("c_null_fdr_stratum", "c_null_error", "maximum_acquisition_empirical_fdr", "scenario-replicate detection family", "BY q=0.05", "DDA and DIA separately n=32", 64L, "exact binomial intervals by acquisition", "<=", 0.10, "fraction", kill_c, nulls),
+        g("c_abundance_null_fdr_upper", "c_null_error", "empirical_abundance_fdr_upper95", "scenario-replicate observed-abundance family", "BY q=0.05; all-null FDR equals family false-flag probability", "pooled correlated-feature DDA+DIA nulls", 64L, "one-sided exact binomial 95 percent bound", "<=", 0.10, "probability", kill_c, nulls),
+        g("c_abundance_null_fdr_stratum", "c_null_error", "maximum_acquisition_abundance_empirical_fdr", "scenario-replicate observed-abundance family", "BY q=0.05", "DDA and DIA separately n=32", 64L, "exact binomial intervals by acquisition", "<=", 0.10, "fraction", kill_c, nulls),
+        g("c_false_sign_upper", "c_false_sign", "false_sign_proportion_upper95", "scenario-replicate discovery family", "nonzero generator standardized detection-effect sign", "five detection-contrast DDA/DIA alternatives", 160L, "feature-module clustered percentile 95 percent bound", "<=", 0.10, "fraction", kill_c, c_detection_alt),
+        g("c_abundance_false_sign_upper", "c_false_sign", "abundance_false_sign_proportion_upper95", "scenario-replicate discovery family", "nonzero generator conditional-observed-abundance effect sign", "seven abundance-contrast DDA/DIA alternatives", 224L, "feature-module clustered percentile 95 percent bound", "<=", 0.10, "fraction", kill_c, c_abundance_alt),
+        g("c_detection_effect_bias", "c_effect_bias", "median_absolute_detection_risk_difference_bias", "scenario-replicate true detection-alternative feature", "nonzero generator standardized marginal detection difference", "five detection-contrast DDA/DIA alternatives", 160L, "feature-module clustered percentile 95 percent interval", "<=", 0.075, "probability points", kill_c, c_detection_alt),
+        g("c_abundance_effect_bias", "c_effect_bias", "median_absolute_observed_abundance_bias", "scenario-replicate true abundance-alternative feature", "nonzero generator conditional-observed-abundance contrast", "seven abundance-contrast DDA/DIA alternatives", 224L, "feature-module clustered percentile 95 percent interval", "<=", 0.25, "log2 intensity", kill_c, c_abundance_alt),
+        g("c_detection_effect_rmse", "c_effect_bias", "detection_risk_difference_rmse", "scenario-replicate true detection-alternative feature", "nonzero generator standardized marginal detection difference", "five detection-contrast DDA/DIA alternatives", 160L, "feature-module clustered percentile 95 percent interval", "<=", 0.15, "probability points", kill_c, c_detection_alt),
+        g("c_detection_interval_coverage", "c_interval_coverage", "median_replicate_detection_interval_coverage", "scenario-replicate eligible feature", "generator standardized marginal detection difference", "five detection-contrast DDA/DIA alternatives", 160L, "feature-module clustered percentile 95 percent interval", ">=", 0.90, "fraction", kill_c, c_detection_alt),
+        g("c_abundance_interval_coverage", "c_interval_coverage", "median_replicate_abundance_interval_coverage", "scenario-replicate eligible feature", "generator conditional-observed-abundance contrast", "seven abundance-contrast DDA/DIA alternatives", 224L, "feature-module clustered percentile 95 percent interval", ">=", 0.90, "fraction", kill_c, c_abundance_alt),
+        g("c_alternative_power", "c_alternative_utility", "by_detection_power", "scenario-replicate true detection-alternative feature", "BY q=0.05 and correct nonzero generator detection-effect sign", "five detection-contrast DDA/DIA alternatives", 160L, "feature-module clustered percentile 95 percent interval", ">=", 0.50, "fraction", kill_c, c_detection_alt),
+        g("c_alternative_precision", "c_alternative_utility", "detection_discovery_precision", "scenario-replicate discovery", "nonzero generator standardized detection effect", "five detection-contrast DDA/DIA alternatives", 160L, "feature-module clustered percentile 95 percent interval", ">=", 0.90, "fraction", kill_c, c_detection_alt),
+        g("c_abundance_alternative_power", "c_alternative_utility", "by_abundance_power", "scenario-replicate true abundance-alternative feature", "BY q=0.05 and correct nonzero generator conditional-abundance sign", "seven abundance-contrast DDA/DIA alternatives", 224L, "feature-module clustered percentile 95 percent interval", ">=", 0.50, "fraction", kill_c, c_abundance_alt),
+        g("c_abundance_alternative_precision", "c_alternative_utility", "abundance_discovery_precision", "scenario-replicate discovery", "nonzero generator conditional-observed-abundance effect", "seven abundance-contrast DDA/DIA alternatives", 224L, "feature-module clustered percentile 95 percent interval", ">=", 0.90, "fraction", kill_c, c_abundance_alt),
+        g("c_edge_paired", "c_edge_cases", "paired_supported_completion_fraction", "scenario-replicate eligible feature", "frozen paired support + finite/structured outcome", "three paired DDA/DIA scenarios", 96L, exact, ">=", 0.90, "fraction", kill_c, paired),
+        g("c_edge_unequal", "c_edge_cases", "unequal_supported_completion_fraction", "scenario-replicate eligible feature", "frozen unequal support + finite/structured outcome", "three unequal DDA/DIA scenarios", 96L, exact, ">=", 0.90, "fraction", kill_c, unequal),
+        g("c_edge_separation", "c_edge_cases", "separated_finite_or_unavailable_fraction", "scenario-replicate eligible feature", "finite selected estimator or named separation code", "DIA structural-off-compatible", 32L, exact, "==", 1, "fraction", kill_c, "dia_structural_off"),
+        g("c_edge_low_support", "c_edge_cases", "low_support_code_match_fraction", "scenario-replicate", "frozen component-specific support/code", "DIA low support", 32L, exact, "==", 1, "fraction", kill_c, "dia_no_cliff_low_support"),
+        g("c_edge_confounding", "c_edge_cases", "nonestimable_contrast_rejection_fraction", "scenario-replicate", "A row-space oracle before fitting", "DDA perfect confounding", 32L, exact, "==", 1, "fraction", kill_c, "dda_batch_perfect"),
+        g("c_reference_development_direction", "c_reference_recovery", "known_direction_agreement_fraction", "acquisition x yeast-level contrast", "12.5/15.625/18.75 ng known ordering", "MS-DAP linked DDA+DIA development", 18L, "technical-family bootstrap; no biological generalization", ">=", 0.90, "fraction", kill_c, "msdap_hy_pxd036134"),
+        g("c_reference_development_ratio", "c_reference_recovery", "median_absolute_log2_ratio_error", "acquisition x yeast-level contrast", "known MS-DAP mixture ratios", "MS-DAP linked DDA+DIA development", 18L, "technical-family percentile interval", "<=", 0.50, "log2 ratio", kill_c, "msdap_hy_pxd036134"),
+        g("c_reference_confirmation_ups1", "c_reference_recovery", "median_absolute_log2_slope_error", "selected UPS1 concentration contrast", "2/4/10/25 fmol known DDA series", "UPS1 sealed confirmation", 12L, "technical-family percentile interval", "<=", 0.35, "log2 ratio", kill_c, "ups1_yeast_pxd002099"),
+        g("c_reference_confirmation_lfqbench", "c_reference_recovery", "median_absolute_species_ratio_error", "species x A/B contrast", "HYE124 human 1:1 yeast 2:1 E_coli 1:4", "LFQbench DIA sealed confirmation", 6L, "technical-family percentile interval", "<=", 0.50, "log2 ratio", kill_c, "lfqbench_pxd002952"),
+        g("c_reference_confirmation_direction", "c_reference_recovery", "known_direction_agreement_fraction", "controlled species/concentration contrast", "UPS1 and HYE124 known direction", "DDA+DIA sealed confirmation", 18L, "whole-family descriptive interval", ">=", 0.90, "fraction", kill_c, .m12_ids("lfqbench_pxd002952", "ups1_yeast_pxd002099")),
+        g("c_order_invariance_synthetic", "c_order_invariance", "canonical_named_result_hash_match_fraction", "scenario-replicate contrast", "feature/sample/condition/term order permutations", "all 13 DDA/DIA scenarios", 416L, exact, "==", 1, "fraction", kill_c, all_sim),
+        g("c_order_invariance_external", "c_order_invariance", "canonical_named_result_hash_match_fraction", "development technical run", "original versus named-order permutations", "MS-DAP linked DDA+DIA development", 18L, "exact whole-family comparison", "==", 1, "fraction", kill_c, "msdap_hy_pxd036134"),
+        g("c_wording_rubric", "c_wording", "estimand_wording_violation_count", "wording rubric item", "detection/conditional-abundance/causal-absence separation", "synthetic plus development external outputs", 18L, "exact adversarial wording rubric", "==", 0, "count", kill_c, .m12_ids("dda_batch_perfect", "dia_structural_off", "msdap_hy_pxd036134"))
+    )
+    out <- do.call(rbind, rows)
+    row.names(out) <- NULL
+    out
+}
+
+.m12_evidence_hash <- function(
+    data_ids,
+    generator,
+    generator_protocol,
+    internal,
+    cards,
+    roles,
+    artifacts
+) {
+    ids <- sort(.m12_tokens(data_ids), method = "radix")
+    pieces <- vapply(ids, function(id) {
+        if (id %in% generator$scenario_id) {
+            frames <- list(
+                generator[generator$scenario_id == id, , drop = FALSE],
+                generator_protocol
+            )
+        } else if (id %in% internal$data_id) {
+            frames <- list(internal[internal$data_id == id, , drop = FALSE])
+        } else if (id %in% cards$dataset_id) {
+            frames <- list(
+                cards[cards$dataset_id == id, , drop = FALSE],
+                roles[roles$dataset_id == id, , drop = FALSE],
+                artifacts[artifacts$dataset_id == id, , drop = FALSE]
+            )
+        } else {
+            .m12_fail("unknown evidence ID while hashing: ", id)
+        }
+        hashes <- vapply(frames, .m12_hash_frame, character(1L))
+        unname(tools::sha256sum(bytes = charToRaw(enc2utf8(paste(
+            seq_along(hashes), hashes, sep = "\t", collapse = "\n"
+        )))))
+    }, character(1L))
+    unname(tools::sha256sum(bytes = charToRaw(enc2utf8(paste(
+        ids, pieces, sep = "\t", collapse = "\n"
+    )))))
+}
+
+.m12_gate_registry <- function(
+    claims,
+    protocols,
+    generator,
+    generator_protocol,
+    internal,
+    cards,
+    roles,
+    artifacts
+) {
+    specs <- .m12_gate_specs()
+    track <- claims$track[match(specs$claim_id, claims$claim_id)]
+    protocol_index <- match(track, protocols$track)
+    out <- data.frame(
+        gate_id = specs$gate_id,
+        registry_version = rep("m12_gate_registry_v1", nrow(specs)),
+        claim_id = specs$claim_id,
+        track = track,
+        metric = specs$metric,
+        unit = specs$unit,
+        comparator = specs$comparator,
+        strata = specs$strata,
+        sample_size = specs$sample_size,
+        uncertainty_method = specs$uncertainty_method,
+        threshold_operator = specs$threshold_operator,
+        threshold_value = specs$threshold_value,
+        threshold_scale = specs$threshold_scale,
+        failure_treatment = specs$failure_treatment,
+        data_ids = specs$data_ids,
+        protocol_id = protocols$protocol_id[protocol_index],
+        data_hash = vapply(specs$data_ids, .m12_evidence_hash, character(1L),
+            generator = generator,
+            generator_protocol = generator_protocol,
+            internal = internal,
+            cards = cards,
+            roles = roles,
+            artifacts = artifacts
+        ),
+        protocol_hash = protocols$protocol_hash[protocol_index],
+        stringsAsFactors = FALSE
+    )
+    row.names(out) <- NULL
+    out
 }
 
 .m12_data_roles <- function() {
@@ -395,17 +713,17 @@
             "a_assoc_public",
             "a_assoc_public",
             paste(c(
-                "b_cutoff_coverage", "b_false_confidence", "c_effect_bias",
+                "b_external_behavior", "c_effect_bias",
                 "c_interval_coverage", "c_alternative_utility",
                 "c_reference_recovery"
             ), collapse = ";"),
             paste(c(
-                "b_cutoff_coverage", "b_false_confidence", "c_effect_bias",
+                "b_external_behavior", "c_effect_bias",
                 "c_interval_coverage", "c_alternative_utility",
                 "c_reference_recovery"
             ), collapse = ";"),
             paste(c(
-                "b_cutoff_coverage", "b_false_confidence", "c_effect_bias",
+                "b_external_behavior", "c_effect_bias",
                 "c_interval_coverage", "c_alternative_utility",
                 "c_reference_recovery"
             ), collapse = ";")
@@ -693,7 +1011,7 @@
 }
 
 .m12_source_manifest <- function() {
-    data.frame(
+    data_sources <- data.frame(
         source_id = c(
             "pride_api", "pride_checksum", "ebi_terms", "harmonizr_paper",
             "harmonizr_record", "multipro_paper",
@@ -740,18 +1058,85 @@
         ),
         stringsAsFactors = FALSE
     )
+    method_sources <- data.frame(
+        source_id = c(
+            "r_p_adjust", "r_quantile", "brglm2_current",
+            "bias_reduction_2020", "survival_clogit", "geepack_current",
+            "gee_small_sample_md", "limma_current", "limma_manual",
+            "permutation_glm_2014", "cluster_bootstrap_2013",
+            "cluster_cr2_2018",
+            "selective_risk_coverage_2010"
+        ),
+        scope = c(
+            "Holm/BY multiplicity", "sample quantile definition",
+            "finite bias-reduced binomial implementation",
+            "adjusted-score bias reduction", "conditional logistic likelihood",
+            "clustered binary GEE implementation", "small-cluster GEE covariance",
+            "omics linear-model implementation", "missing/blocked linear models",
+            "nuisance-aware permutation", "cluster bootstrap",
+            "small-sample cluster-robust fixed-effect inference",
+            "risk-coverage display calibration"
+        ),
+        url = c(
+            "https://stat.ethz.ch/R-manual/R-devel/library/stats/html/p.adjust.html",
+            "https://stat.ethz.ch/R-manual/R-devel/library/stats/html/quantile.html",
+            "https://cran.r-project.org/package=brglm2",
+            "https://doi.org/10.1007/s11222-019-09860-6",
+            "https://stat.ethz.ch/R-manual/R-devel/library/survival/html/clogit.html",
+            "https://cran.r-project.org/package=geepack",
+            "https://doi.org/10.1111/j.0006-341X.2001.00126.x",
+            "https://bioconductor.org/packages/release/bioc/html/limma.html",
+            "https://bioconductor.org/packages/release/bioc/manuals/limma/man/limma.pdf",
+            "https://doi.org/10.1016/j.neuroimage.2014.01.060",
+            "https://doi.org/10.1016/j.jmva.2012.10.006",
+            "https://doi.org/10.1080/07350015.2016.1247004",
+            "https://www.jmlr.org/papers/v11/el-yaniv10a.html"
+        ),
+        checked_on = rep(.M12_CHECKED_ON, 13L),
+        note = c(
+            "Holm strong FWER and BY arbitrary-dependence FDR definitions",
+            "type 8 approximately median-unbiased and Hyndman-Fan recommended",
+            "mean bias reduction returns finite full-rank logistic estimates",
+            "adjusted-score framework and frequency properties",
+            "exact conditional likelihood with explicit large-tie limits",
+            "current GEE solver; standard sandwich remains asymptotic",
+            "small-sample robust covariance can inflate type-I error; MD correction",
+            "current maintained Bioconductor linear-model engine",
+            "lmFit accepts missing values and declared block/correlation structures",
+            "permutation validity depends on exchangeability/restricted design",
+            "resampling subjects preserves within-subject dependence",
+            "CR2 with Satterthwaite tests corrects small-cluster fixed-effect inference",
+            "abstention labels require explicit risk-coverage tradeoff"
+        ),
+        stringsAsFactors = FALSE
+    )
+    rbind(data_sources, method_sources)
 }
 
 m12_validation_contract <- function() {
+    generator <- .m12_generator_manifest()
+    generator_protocol <- .m12_generator_protocol()
+    claims <- .m12_claim_inventory()
+    protocols <- .m12_protocol_registry()
+    internal <- .m12_internal_evidence()
+    roles <- .m12_data_roles()
+    cards <- .m12_data_cards()
+    artifacts <- .m12_artifact_manifest()
+    gates <- .m12_gate_registry(
+        claims, protocols, generator, generator_protocol, internal,
+        cards, roles, artifacts
+    )
     list(
         schema_catalog = .m12_schema_catalog(),
-        generator_manifest = .m12_generator_manifest(),
-        generator_protocol = .m12_generator_protocol(),
-        claim_inventory = .m12_claim_inventory(),
-        gate_registry = .m12_empty_gate_registry(),
-        data_cards = .m12_data_cards(),
-        data_roles = .m12_data_roles(),
-        artifact_manifest = .m12_artifact_manifest(),
+        generator_manifest = generator,
+        generator_protocol = generator_protocol,
+        claim_inventory = claims,
+        protocol_registry = protocols,
+        internal_evidence = internal,
+        gate_registry = gates,
+        data_cards = cards,
+        data_roles = roles,
+        artifact_manifest = artifacts,
         candidate_exclusions = .m12_candidate_exclusions(),
         source_manifest = .m12_source_manifest()
     )
@@ -882,10 +1267,54 @@ m12_validation_contract <- function() {
     invisible(TRUE)
 }
 
-.m12_validate_gates <- function(x, claims, data_ids, catalog) {
+.m12_validate_protocols <- function(x, catalog) {
+    .m12_require_columns(x, "protocol_registry", catalog)
+    if (nrow(x) != 3L || !.m12_id(x$protocol_id) ||
+        anyDuplicated(x$protocol_id) || !identical(x$track, c("A", "B", "C")) ||
+        !.m12_nonempty(x$purpose) ||
+        !all(x$implementation_file == "dev/m12-candidate-protocol.R") ||
+        !.m12_sha(x$protocol_hash, 64L) ||
+        !all(x$result_state == "frozen_unrun")) {
+        .m12_fail("candidate protocol registry is malformed or results are open")
+    }
+    invisible(TRUE)
+}
+
+.m12_validate_internal <- function(x, catalog) {
+    .m12_require_columns(x, "internal_evidence", catalog)
+    if (!.m12_id(x$data_id) || anyDuplicated(x$data_id) ||
+        !all(x$evidence_tier == "tier0") ||
+        !all(x$role == "compatibility") || !.m12_nonempty(x$scope) ||
+        !.m12_nonempty(x$unit) || !is.integer(x$sample_size) ||
+        any(x$sample_size <= 0L) || !.m12_nonempty(x$source_path) ||
+        !.m12_sha(x$content_sha256, 64L) || !all(x$state == "frozen")) {
+        .m12_fail("internal evidence registry is malformed")
+    }
+    if (any(!file.exists(x$source_path))) {
+        .m12_fail("internal evidence source path is absent")
+    }
+    live <- unname(tools::sha256sum(x$source_path))
+    if (!identical(live, x$content_sha256)) {
+        .m12_fail("internal evidence content hash drifted")
+    }
+    invisible(TRUE)
+}
+
+.m12_validate_gates <- function(
+    x,
+    claims,
+    protocols,
+    generator,
+    generator_protocol,
+    internal,
+    cards,
+    roles,
+    artifacts,
+    catalog
+) {
     .m12_require_columns(x, "gate_registry", catalog)
     if (!nrow(x)) {
-        return(invisible(TRUE))
+        .m12_fail("numeric gate registry must be populated before candidates run")
     }
     character_fields <- setdiff(names(x), c("sample_size", "threshold_value"))
     if (!all(vapply(x[character_fields], .m12_nonempty, logical(1L))) ||
@@ -900,9 +1329,41 @@ m12_validation_contract <- function() {
         !.m12_sha(x$data_hash, 64L) || !.m12_sha(x$protocol_hash, 64L)) {
         .m12_fail("gate registry accepts only complete, numeric, hash-frozen rows")
     }
-    referenced <- unique(unlist(lapply(x$data_ids, .m12_tokens)))
+    if (!setequal(unique(x$claim_id), claims$claim_id)) {
+        .m12_fail("every retained A-C claim needs at least one numeric gate")
+    }
+    protocol_index <- match(x$protocol_id, protocols$protocol_id)
+    if (anyNA(protocol_index) ||
+        any(x$track != protocols$track[protocol_index]) ||
+        any(x$protocol_hash != protocols$protocol_hash[protocol_index])) {
+        .m12_fail("gate rows do not match their frozen track protocol")
+    }
+    if (any(grepl("tbd|pending|provisional", x$failure_treatment,
+                  ignore.case = TRUE))) {
+        .m12_fail("gate failure treatment must be final and explicit")
+    }
+    token_lists <- lapply(x$data_ids, .m12_tokens)
+    canonical <- vapply(token_lists, function(ids) {
+        identical(ids, sort(unique(ids), method = "radix"))
+    }, logical(1L))
+    if (!all(canonical)) {
+        .m12_fail("gate data IDs must be unique canonical sorted token sets")
+    }
+    data_ids <- c(generator$scenario_id, internal$data_id, cards$dataset_id)
+    referenced <- unique(unlist(token_lists))
     if (!all(referenced %in% data_ids)) {
         .m12_fail("gate registry references unknown generator/dataset IDs")
+    }
+    expected_data_hash <- unname(vapply(x$data_ids, .m12_evidence_hash, character(1L),
+        generator = generator,
+        generator_protocol = generator_protocol,
+        internal = internal,
+        cards = cards,
+        roles = roles,
+        artifacts = artifacts
+    ))
+    if (!identical(x$data_hash, expected_data_hash)) {
+        .m12_fail("gate data hashes do not match frozen evidence bindings")
     }
     invisible(TRUE)
 }
@@ -1055,12 +1516,12 @@ m12_validation_contract <- function() {
 m12_validate_contract <- function(contract = m12_validation_contract()) {
     expected_names <- c(
         "schema_catalog", "generator_manifest", "generator_protocol",
-        "claim_inventory", "gate_registry", "data_cards", "data_roles",
-        "artifact_manifest",
+        "claim_inventory", "protocol_registry", "internal_evidence",
+        "gate_registry", "data_cards", "data_roles", "artifact_manifest",
         "candidate_exclusions", "source_manifest"
     )
     if (!identical(names(contract), expected_names)) {
-        .m12_fail("contract components/order differ from v1")
+        .m12_fail("contract components/order differ from v3")
     }
     catalog <- contract$schema_catalog
     if (!identical(
@@ -1078,6 +1539,8 @@ m12_validate_contract <- function(contract = m12_validation_contract()) {
         catalog
     )
     .m12_validate_claims(contract$claim_inventory, catalog)
+    .m12_validate_protocols(contract$protocol_registry, catalog)
+    .m12_validate_internal(contract$internal_evidence, catalog)
     .m12_validate_cards(contract$data_cards, catalog)
     .m12_validate_artifacts(contract$artifact_manifest, contract$data_cards, catalog)
     .m12_validate_roles(
@@ -1090,7 +1553,13 @@ m12_validate_contract <- function(contract = m12_validation_contract()) {
     .m12_validate_gates(
         contract$gate_registry,
         contract$claim_inventory,
-        c(contract$generator_manifest$scenario_id, contract$data_cards$dataset_id),
+        contract$protocol_registry,
+        contract$generator_manifest,
+        contract$generator_protocol,
+        contract$internal_evidence,
+        contract$data_cards,
+        contract$data_roles,
+        contract$artifact_manifest,
         catalog
     )
     .m12_validate_simple(contract$candidate_exclusions, "candidate_exclusions", catalog)
@@ -1099,10 +1568,114 @@ m12_validate_contract <- function(contract = m12_validation_contract()) {
         any(contract$artifact_manifest$role == "unassigned") ||
         !all(contract$artifact_manifest$open_state == "metadata_only") ||
         any(!is.na(contract$artifact_manifest$local_sha256)) ||
-        nrow(contract$gate_registry) != 0L) {
-        .m12_fail("M12b must be role-assigned, metadata-only, and result-free")
+        !all(contract$protocol_registry$result_state == "frozen_unrun") ||
+        !setequal(unique(contract$gate_registry$claim_id),
+                  contract$claim_inventory$claim_id)) {
+        .m12_fail("M12c must be gate-complete, metadata-only, and result-free")
     }
     invisible(TRUE)
+}
+
+m12_gate_binding_hashes <- function(
+    gate_registry = m12_validation_contract()$gate_registry
+) {
+    frozen_registry <- m12_validation_contract()$gate_registry
+    if (!identical(gate_registry, frozen_registry)) {
+        .m12_fail("gate bindings require the canonical frozen registry")
+    }
+    stats::setNames(
+        vapply(seq_len(nrow(gate_registry)), function(index) {
+            .m12_hash_frame(gate_registry[index, , drop = FALSE])
+        }, character(1L)),
+        gate_registry$gate_id
+    )
+}
+
+m12_evaluate_gate_results <- function(
+    results,
+    gate_registry = m12_validation_contract()$gate_registry,
+    gate_ids = gate_registry$gate_id
+) {
+    frozen_registry <- m12_validation_contract()$gate_registry
+    if (!identical(gate_registry, frozen_registry)) {
+        .m12_fail("gate evaluation requires the canonical frozen registry")
+    }
+    catalog <- .m12_schema_catalog()
+    .m12_require_columns(results, "gate_results", catalog)
+    if (!length(gate_ids) || !.m12_id(gate_ids) || anyDuplicated(gate_ids) ||
+        !all(gate_ids %in% gate_registry$gate_id)) {
+        .m12_fail("requested gate IDs are unknown or duplicated")
+    }
+    registry <- gate_registry[match(gate_ids, gate_registry$gate_id), , drop = FALSE]
+    if (nrow(results) != length(gate_ids) ||
+        anyDuplicated(results$gate_id) || !setequal(results$gate_id, gate_ids)) {
+        .m12_fail("gate results must contain every requested gate exactly once")
+    }
+    results <- results[match(gate_ids, results$gate_id), , drop = FALSE]
+    row.names(results) <- NULL
+    numeric_required <- c("estimate", "numerator", "denominator")
+    measured <- results$status == "measured"
+    numeric_values <- as.matrix(results[numeric_required])
+    if (!all(vapply(results[numeric_required], is.numeric, logical(1L))) ||
+        !all(results$status %in% c("measured", "failed", "unavailable")) ||
+        any(!is.finite(numeric_values[measured, , drop = FALSE])) ||
+        any(results$denominator[measured] <= 0) ||
+        any(!is.na(numeric_values[!measured, , drop = FALSE])) ||
+        !is.numeric(results$lower) ||
+        !is.numeric(results$upper) ||
+        any(!is.na(results$lower[measured]) &
+            !is.finite(results$lower[measured])) ||
+        any(!is.na(results$upper[measured]) &
+            !is.finite(results$upper[measured])) ||
+        any(!is.na(results$lower[measured]) &
+            results$lower[measured] > results$estimate[measured]) ||
+        any(!is.na(results$upper[measured]) &
+            results$upper[measured] < results$estimate[measured]) ||
+        any(!is.na(results$lower[!measured])) ||
+        any(!is.na(results$upper[!measured])) ||
+        !.m12_sha(results$gate_binding_hash, 64L) ||
+        !.m12_sha(results$evidence_hash, 64L) || !.m12_nonempty(results$note)) {
+        .m12_fail("gate result values/status/bounds violate the result schema")
+    }
+    bindings <- unname(m12_gate_binding_hashes(gate_registry)[gate_ids])
+    if (any(results$registry_version != registry$registry_version) ||
+        any(results$metric != registry$metric) ||
+        any(results$gate_binding_hash != bindings)) {
+        .m12_fail("gate results are detached from their frozen registry rows")
+    }
+    compare <- function(value, operator, threshold) {
+        switch(operator,
+            "<=" = value <= threshold,
+            ">=" = value >= threshold,
+            "==" = value == threshold,
+            "<" = value < threshold,
+            ">" = value > threshold,
+            .m12_fail("unknown threshold operator: ", operator)
+        )
+    }
+    numeric_pass <- rep(FALSE, nrow(results))
+    numeric_pass[measured] <- mapply(
+        compare,
+        results$estimate[measured],
+        registry$threshold_operator[measured],
+        registry$threshold_value[measured],
+        USE.NAMES = FALSE
+    )
+    passed <- measured & numeric_pass
+    data.frame(
+        gate_id = registry$gate_id,
+        claim_id = registry$claim_id,
+        track = registry$track,
+        metric = registry$metric,
+        estimate = results$estimate,
+        operator = registry$threshold_operator,
+        threshold = registry$threshold_value,
+        status = results$status,
+        passed = passed,
+        failure_treatment = registry$failure_treatment,
+        evidence_hash = results$evidence_hash,
+        stringsAsFactors = FALSE
+    )
 }
 
 .m12_escape <- function(x) {
@@ -1170,21 +1743,116 @@ m12_contract_hashes <- function(contract = m12_validation_contract()) {
 }
 
 .M12_EXPECTED_HASHES <- c(
-    schema_catalog = "24e4aa3c93f5b0d87ff5ed4f92e70b08d0e258359a57b7c88fd1bd931c8b18f3",
+    schema_catalog = "3c117b427cda433a58548855d25ebe7b6bed0f235cbae7a12aab69a3b2e1689c",
     generator_manifest = "9d1381833cd59e8775bd99e730d5c783b98c5a82afff6d52276e83a46a8be76a",
     generator_protocol = "9f2166bc7a31112d5529d81adcd68cae70b99d12374f3d77bc45844d3d16bd7a",
-    claim_inventory = "c6265115e6e2abb9ed30ef52a93d1605427de6869beed70f642a358bb9e3ce40",
-    gate_registry = "0f10cd353879c95a851be3925a3c2f9570179cdf4592134215cccfdc58d80305",
-    data_cards = "ea8605fe7f0b5c0765cb13eecb9851fee53ea527038984a44b8839d20d576188",
-    data_roles = "650b6492d2f2a8d5542bc7097602c67f1f68db71d706a18e0bfd4dcfb4637aa7",
+    claim_inventory = "c31032238677acc5e57478057852481f29dd24bc3f6fb88d629653be5ba8d296",
+    protocol_registry = "61f7c1d9c42e80e1dafb13693e7a1818c7835ee9fd219e8a953167fe0c84ab6d",
+    internal_evidence = "7c2deb16729dc06720bea8ce14b1ed4024dcc51f836c03e00b3ccc7696464a1a",
+    gate_registry = "12e1fb5f9886b4ca6a4accb18909b3aa40cf33ac220800d970d79d456d9fcd87",
+    data_cards = "0ba7fa86286afd4cc72dfea6eda4b0bc1324553229c2a3b7c412d41c777d684c",
+    data_roles = "500d08b89b44c3adde9782176ae1065bf20c2eb135b89e666c8623ec2c83665c",
     artifact_manifest = "7c3267020d484ad9bc1bf4b8ac442cf0916d554e9e467e5c696ab2a20fb1c652",
     candidate_exclusions = "7ef14dd357171ffaad2e3793dfd1e038d1cc4108d56d052a2f751e4061e71af8",
-    source_manifest = "b56898ee3ce5cd8ad2f2656a0b1cfb94792d8f1fb7f51b54472555279d8033ed",
-    contract = "bb5624fecd9cd52980bd901c1b75eac0d58dcb1869d95f92014e0d9e086a53ed"
+    source_manifest = "e413eb42bb5f173dde1f994664b2dd9b081eee304323cea3cf8ac390ac2651b4",
+    contract = "2cd5ecd8bf5763da1c5d9e1d8994207e701bcea9a7efcf4ae539dfd9b52d7431"
 )
 
 .m12_expect_error <- function(code) {
     inherits(try(force(code), silent = TRUE), "try-error")
+}
+
+.m12_gate_evaluator_self_tests <- function(contract) {
+    registry <- contract$gate_registry
+    estimate <- registry$threshold_value
+    estimate[registry$threshold_operator == "<"] <-
+        estimate[registry$threshold_operator == "<"] - 1e-8
+    estimate[registry$threshold_operator == ">"] <-
+        estimate[registry$threshold_operator == ">"] + 1e-8
+    results <- data.frame(
+        gate_id = registry$gate_id,
+        registry_version = registry$registry_version,
+        metric = registry$metric,
+        estimate = estimate,
+        numerator = estimate,
+        denominator = rep(1, nrow(registry)),
+        lower = rep(NA_real_, nrow(registry)),
+        upper = rep(NA_real_, nrow(registry)),
+        status = rep("measured", nrow(registry)),
+        gate_binding_hash = unname(m12_gate_binding_hashes(registry)),
+        evidence_hash = rep(paste(rep("0", 64L), collapse = ""), nrow(registry)),
+        note = rep("synthetic evaluator boundary self-test", nrow(registry)),
+        stringsAsFactors = FALSE
+    )
+    baseline <- m12_evaluate_gate_results(results, registry)
+    subset_ids <- registry$gate_id[1:2]
+    subset_report <- m12_evaluate_gate_results(
+        results[results$gate_id %in% subset_ids, , drop = FALSE],
+        registry,
+        subset_ids
+    )
+    omitted <- results[-1L, , drop = FALSE]
+    detached <- results
+    detached$gate_binding_hash[[1L]] <- paste0(
+        "1", substr(detached$gate_binding_hash[[1L]], 2L, 64L)
+    )
+    unavailable <- results
+    unavailable$status[[1L]] <- "unavailable"
+    unavailable[1L, c(
+        "estimate", "numerator", "denominator", "lower", "upper"
+    )] <- NA_real_
+    unavailable_report <- m12_evaluate_gate_results(unavailable, registry)
+    fabricated_unavailable <- results
+    fabricated_unavailable$status[[1L]] <- "unavailable"
+    wrong_side <- results
+    first <- 1L
+    wrong_side$estimate[[first]] <- switch(
+        registry$threshold_operator[[first]],
+        "<=" = registry$threshold_value[[first]] + 1,
+        ">=" = registry$threshold_value[[first]] - 1,
+        "==" = registry$threshold_value[[first]] + 1,
+        "<" = registry$threshold_value[[first]],
+        ">" = registry$threshold_value[[first]]
+    )
+    wrong_report <- m12_evaluate_gate_results(wrong_side, registry)
+    altered_registry <- registry
+    altered_registry$threshold_value[[1L]] <-
+        altered_registry$threshold_value[[1L]] + 1
+    altered_results <- results
+    altered_results$estimate[[1L]] <- altered_registry$threshold_value[[1L]]
+    altered_results$numerator[[1L]] <- altered_results$estimate[[1L]]
+    altered_results$gate_binding_hash <- vapply(
+        seq_len(nrow(altered_registry)),
+        function(index) {
+            .m12_hash_frame(altered_registry[index, , drop = FALSE])
+        },
+        character(1L)
+    )
+    c(
+        boundary_pass = all(baseline$passed),
+        staged_subset_pass = all(subset_report$passed),
+        empty_subset_rejected = .m12_expect_error(
+            m12_evaluate_gate_results(
+                results[FALSE, , drop = FALSE],
+                registry,
+                character()
+            )
+        ),
+        omission_rejected = .m12_expect_error(
+            m12_evaluate_gate_results(omitted, registry)
+        ),
+        binding_rejected = .m12_expect_error(
+            m12_evaluate_gate_results(detached, registry)
+        ),
+        unavailable_fails = !unavailable_report$passed[[1L]],
+        unavailable_endpoint_rejected = .m12_expect_error(
+            m12_evaluate_gate_results(fabricated_unavailable, registry)
+        ),
+        wrong_side_fails = !wrong_report$passed[[1L]],
+        altered_registry_rejected = .m12_expect_error(
+            m12_evaluate_gate_results(altered_results, altered_registry)
+        )
+    )
 }
 
 .m12_self_tests <- function(contract) {
@@ -1202,14 +1870,38 @@ m12_contract_hashes <- function(contract = m12_validation_contract()) {
     ups1 <- wrong_subset$data_roles$dataset_id == "ups1_yeast_pxd002099"
     wrong_subset$data_roles$included_conditions[ups1] <-
         "UPS1_2fmol;UPS1_4fmol;UPS1_10fmol;UPS1_50fmol"
-    c(
+    missing_claim_gate <- contract
+    missing_claim_gate$gate_registry <- missing_claim_gate$gate_registry[
+        missing_claim_gate$gate_registry$claim_id != "a_design_rank",
+        ,
+        drop = FALSE
+    ]
+    protocol_drift <- contract
+    protocol_drift$gate_registry$protocol_hash[[1L]] <- paste0(
+        "0", substr(protocol_drift$gate_registry$protocol_hash[[1L]], 2L, 64L)
+    )
+    data_drift <- contract
+    data_drift$gate_registry$data_hash[[1L]] <- paste0(
+        "0", substr(data_drift$gate_registry$data_hash[[1L]], 2L, 64L)
+    )
+    nonnumeric_gate <- contract
+    nonnumeric_gate$gate_registry$threshold_value[[1L]] <- Inf
+    results_open <- contract
+    results_open$protocol_registry$result_state[[1L]] <- "results_opened"
+    contract_tests <- c(
         generator_scope = .m12_expect_error(m12_validate_contract(out_of_scope)),
         role_requires_split = .m12_expect_error(m12_validate_contract(missing_split)),
         role_artifact_agreement = .m12_expect_error(m12_validate_contract(role_mismatch)),
         opening_requires_role_hash = .m12_expect_error(m12_validate_contract(opened)),
         checksum_shape = .m12_expect_error(m12_validate_contract(wrong_checksum)),
-        exact_subset = .m12_expect_error(m12_validate_contract(wrong_subset))
+        exact_subset = .m12_expect_error(m12_validate_contract(wrong_subset)),
+        every_claim_gated = .m12_expect_error(m12_validate_contract(missing_claim_gate)),
+        protocol_hash_link = .m12_expect_error(m12_validate_contract(protocol_drift)),
+        data_hash_link = .m12_expect_error(m12_validate_contract(data_drift)),
+        numeric_threshold = .m12_expect_error(m12_validate_contract(nonnumeric_gate)),
+        results_sealed = .m12_expect_error(m12_validate_contract(results_open))
     )
+    c(contract_tests, .m12_gate_evaluator_self_tests(contract))
 }
 
 .m12_main <- function(args) {
@@ -1231,7 +1923,7 @@ m12_contract_hashes <- function(contract = m12_validation_contract()) {
         .m12_fail("M12 frozen hash mismatch: ", paste(mismatch, collapse = ", "))
     }
     cat("contract_version: ", .M12_CONTRACT_VERSION, "\n", sep = "")
-    cat("state: metadata_only; roles=assigned; gates=0\n")
+    cat("state: metadata_only; roles=assigned; protocols=frozen_unrun; gates=", nrow(contract$gate_registry), "\n", sep = "")
     cat("self_tests: ", paste(names(self_tests), self_tests, sep = "=", collapse = "; "), "\n", sep = "")
     cat(paste(names(hashes), hashes, sep = ": "), sep = "\n")
     cat("\n")

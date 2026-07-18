@@ -5,7 +5,7 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
 ## Current innovation path
 
 - [x] M11 freeze v1 + extension seams
-- [ ] M12 frozen A-C validation + gate registry
+- [x] M12 frozen A-C validation + gate registry
 - [ ] M13 design core + confounding-sentinel study
 - [ ] M14 robustness certificates
 - [ ] M15 detectability contrast engine
@@ -17,13 +17,12 @@ delayed backend; J1 standards QC; J2 atlas. Parked work has no active checkbox
 or release obligation.
 
 Exact method, dependency graph, falsification gates, and Definition of Done →
-`PLAN.md` Sections 2-14. Exact next implementation task → M12c: populate every
-retained A-C claim with complete numeric Section 9.4 gate rows + explicit
-failure treatment, then freeze the A association/C estimator candidate
-protocols and B perturbation units/counts/replacement/weighting/seed streams,
-cutoff-range/failure policy, and display calibration. Keep all external result
-artifacts unopened until their linked gate + candidate-protocol hashes pass;
-confirmation artifacts remain sealed through M15P.
+`PLAN.md` Sections 2-14. Exact next implementation task → M13a: encode red
+mandatory-core tests from the frozen rank/alias/contrast/block/order/state
+gates, then implement the canonical declared model matrix, SVD rank/null-space
+alias report, contrast row-space estimability, and block/technical-unit
+accounting. Keep A association candidates and development artifacts closed
+until the mandatory core is green; confirmation remains sealed through M15P.
 
 ## Completed v1 release path
 
@@ -2017,5 +2016,91 @@ retained A-C claim, including explicit failure treatment, then freeze A/C
 candidate comparisons + B perturbation protocol. Development bytes remain
 closed until their linked hashes pass; confirmation remains sealed through
 M15P.
+
+Blockers → none.
+
+### 2026-07-18 - M12c numeric gates + frozen candidate protocols
+
+Scope → populate every retained A-C claim with executable numeric Section 9.4
+gates/failure treatment, then freeze A/C candidate comparisons and B
+perturbation/calibration mechanics before any candidate or external-result run.
+
+Frozen evaluation contract:
+
+- simulation replicates `1-32` = candidate selection/calibration; `33-64` =
+  untouched development; all protocol states remain `frozen_unrun`;
+- 27 claims map to 66 numeric rows (`A=20`, `B=18`, `C=28`), each binding the
+  exact metric/unit/comparator/strata/n/uncertainty/operator/threshold/failure,
+  canonical evidence hash, and track-protocol hash;
+- result evaluator requires every requested gate exactly once + exact frozen-row
+  hash; measured endpoints are finite, while failed/unavailable rows carry
+  `NA` endpoints and fail - fabricated unavailable measurements are rejected;
+- 20 contract/result rails pass, including nonempty staged subsets +
+  adversarial drift;
+  aggregate validation-contract SHA-256 =
+  `2cd5ecd8bf5763da1c5d9e1d8994207e701bcea9a7efcf4ae539dfd9b52d7431`.
+
+Candidate/perturbation freeze:
+
+- A canonicalizes labels/terms, uses SVD rank + an ordered null-projector basis
+  for rotation-invariant aliases + contrast row-space estimability, preserves
+  biological/block units, and compares
+  OLS-HC3/CR2, studentized restricted Freedman-Lane, and independent-unit
+  quasibinomial association; support/permutation-resolution floors, exact vs
+  `9999`-draw tails, Holm families, ranking, and no-winner outcome are explicit;
+- B separates 999 biological/block bootstraps + exhaustive leave-one-unit-out,
+  999 module/feature bootstraps with cutoff refit, and six deterministic policy
+  scenarios; multiplicity weights preserve names; cutoff success floor =
+  `900/999`, range = type-8 `.025/.975`; display labels use draws `1-499` for
+  scoring and `500-999` for validation, remain optional, and cannot kill
+  continuous panels;
+- C separates empirical-row standardized detection-risk difference from
+  conditional observed-abundance contrast; component truth/nonzero alternatives
+  are distinct (five detection vs seven abundance scenarios), preventing
+  abundance-only generators from inflating detection power; detection candidates
+  = GLM-HC3, mean bias reduction, GEE+Mancl-DeRouen, and odds-only exact
+  conditional auxiliary; abundance = OLS-HC3/CR2 + ordinary/robust `limma`;
+  BY families, support/separation rules, and 999 whole-block bootstrap mechanics
+  are frozen separately;
+- track-specific SHA-256 seed keys exactly match executable stream generation;
+  eight candidate-protocol mutation/input rails pass; A/B/C/bundle hashes =
+  `e20bdcc8e040eed65457480be7ae2ce2542761165c3d27161b953f86f39e5edc` /
+  `57ffa1220c740dcb69508d3ad1b9beb05e7013c3a92af528293211e41a13f256` /
+  `58b6e3c6d7f35f5561549a3a52420e49b0f3eb296752353d1bb3c9d433cf9d96` /
+  `8eb5592131407ae48d4b4caa06ef13eea84371471215eae41997faf0e5ec0821`.
+
+Evidence boundary + review:
+
+- public B evidence was corrected to finite-dataset external behavior -
+  controlled abundance ratios do not identify a true automatic cutoff; C alone
+  retains ratio/direction recovery truth;
+- all 11 external artifacts remain `metadata_only`, local SHA-256 absent; no
+  result archive/CSV/workbook bytes were downloaded, listed, or parsed;
+- primary/current review covers Holm/BY, type-8 quantiles, mean bias reduction,
+  exact conditional likelihood, GEE + Mancl-DeRouen, `limma`, restricted
+  permutation, cluster bootstrap, CR2/Satterthwaite, and risk-coverage;
+  package availability selects no winner.
+
+Verification + completion evidence:
+
+- M12 contract/candidate verifiers → 66 frozen rows; all 20 + 8 protocol rails
+  pass; generator protocol/audit unchanged at
+  `cdea1bf874152e63fba08c49e390da1dd18690105e43a2dc7a03fc6866d0d080` /
+  `4d216966c8cc54b1b23685d8801c7c65b2afcc5879dd15430d57a88f765e8a00`;
+- expanded stable-v1 audit passes unchanged at
+  `8463f4306fe9b6192336487e4ca365c8c7e3525dc06aeca5b66b1a99b1a10250`;
+- package-wide source suite → 137 tests / 918 expectations, 0 failures,
+  errors, warnings, or skips;
+- frozen M5 → 12 scenarios / 13 target profiles pass; frozen M7 → 13 long +
+  routine scenarios pass, MD5 unchanged at
+  `4011e381bba2d0d747e91d277a45de5e`;
+- vignette-bearing source build + source-tarball
+  `R CMD check --as-cran --no-manual` → status OK; `git diff --check` passes.
+
+M12 is complete. Exact next task → M13a: write red mandatory-core tests, then
+implement the canonical declared model matrix, SVD rank/null-space alias report,
+contrast row-space estimability, and block/technical-unit accounting. Keep A
+association candidates + development bytes closed until the mandatory core is
+green; confirmation remains sealed through M15P.
 
 Blockers → none.

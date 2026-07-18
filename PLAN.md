@@ -731,14 +731,22 @@ mismatched-input failures pass.
 - [x] Select the minimum controlled + public datasets needed for A-C; record
       cards, licences, checksums, and data roles.
 - [x] Freeze development and sealed release-confirmation identities.
-- [ ] Freeze numeric gate registry for A-C before candidate implementation.
-- [ ] Freeze candidate protocols for A association and C contrast estimators,
+- [x] Freeze numeric gate registry for A-C before candidate implementation.
+- [x] Freeze candidate protocols for A association and C contrast estimators,
       plus B resampling units/counts/replacement, weighting, seed streams,
       cutoff-range definition, failure handling, and display calibration.
 - [x] Assign sealed confirmation artifacts per track/claim. Declare shared
       artifacts up front; their synchronized opening retires them for every
       linked claim.
 - [x] Add null/confounded/leakage/low-support negative controls.
+
+Frozen M12 allocation = simulation replicates `1-32` candidate
+selection/calibration, `33-64` untouched development. Registry = 27 retained
+claims + 66 numeric gates bound to exact data/protocol hashes. Track protocols
+`m12_a_candidate_protocol_v1`, `m12_b_perturbation_protocol_v1`, and
+`m12_c_candidate_protocol_v1` remain `frozen_unrun`; external artifacts remain
+`metadata_only`. `dev/m12-validation-contract.md` owns thresholds, hashes, and
+the exact candidate/perturbation summary.
 
 Gate: protocol hashes exist; every A-C claim has an executable numeric gate and
 failure rule; v1 behavior/limitations reproduce on the expanded harness.
