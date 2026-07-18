@@ -24,7 +24,11 @@
 #' and apply the chosen MNAR and MAR methods using the corresponding retained
 #' feature groups.
 #'
-#' @seealso [classify_missingness()], [plot_missingness()], and
-#'   `vignette("imputefinder")`.
+#' The experimental [analyze_missingness()] sidecar starts from the original
+#' input and a typed [missingness_design()]. It records identity and pre-rescue
+#' evidence without changing the stable classifier result.
+#'
+#' @seealso [classify_missingness()], [analyze_missingness()],
+#'   [plot_missingness()], and `vignette("imputefinder")`.
 #' @keywords internal
 "_PACKAGE"

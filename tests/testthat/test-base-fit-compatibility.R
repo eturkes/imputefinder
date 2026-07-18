@@ -49,9 +49,18 @@ test_that("a recomputed compatible base fit is reused exactly", {
 
     expect_identical(
         names(formals(imputefinder:::.analyze_missingness_input_first)),
-        c("x", "design", "assay", "base_fit", "cutoffs", "seed", "call")
+        c(
+            "x",
+            "design",
+            "assay",
+            "base_fit",
+            "cutoffs",
+            "seed",
+            "modules",
+            "call"
+        )
     )
-    expect_false("analyze_missingness" %in% getNamespaceExports("imputefinder"))
+    expect_true("analyze_missingness" %in% getNamespaceExports("imputefinder"))
     expect_identical(analysis$classic, candidate$fit)
     expect_identical(analysis$provenance$seeds, list(classic_rescue = 19L))
     expect_identical(

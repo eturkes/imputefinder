@@ -414,7 +414,8 @@
     .validate_classic_branch(classic)
     .validate_classic_design_alignment(classic, design_record, input)
     .validate_sidecar_sentinel(sentinel, input, design_record)
-    if (!(is.null(stability) || is.list(stability)) || !is.list(seeds)) {
+    .validate_sidecar_stability(stability)
+    if (!is.list(seeds)) {
         .abort_sidecar(
             "Analysis module output or seed provenance is malformed.",
             "imputefinder_analysis_schema_error",
@@ -470,6 +471,7 @@
         analysis$input,
         analysis$design
     )
+    .validate_sidecar_stability(analysis$stability)
     .validate_classic_branch(analysis$classic)
     .validate_classic_design_alignment(
         analysis$classic,

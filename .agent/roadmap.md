@@ -4,7 +4,7 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
 
 ## Current innovation path
 
-- [ ] M11 freeze v1 + extension seams
+- [x] M11 freeze v1 + extension seams
 - [ ] M12 frozen A-C validation + gate registry
 - [ ] M13 design core + confounding-sentinel study
 - [ ] M14 robustness certificates
@@ -17,11 +17,12 @@ delayed backend; J1 standards QC; J2 atlas. Parked work has no active checkbox
 or release obligation.
 
 Exact method, dependency graph, falsification gates, and Definition of Done →
-`PLAN.md` Sections 2-14. Exact next implementation task → M11f: freeze compact
-differential fixtures for exact/canonical/tolerance/performance categories,
-including comparator and sidecar overhead gates; then add red full-signature +
-module-selection/routing tests and export `analyze_missingness()` only when its
-documented default and structured `unavailable` behavior are complete.
+`PLAN.md` Sections 2-14. Exact next implementation task → M12a: freeze the
+Section 9.1 generator-extension manifest plus executable gate-registry/data-card
+schemas; inventory the minimum controlled + public LFQ DDA/DIA candidates with
+licence, checksum, acquisition, metadata, truth, exclusion, and split
+feasibility before assigning development or sealed-confirmation roles. Open no
+candidate result or confirmation artifact before its role + gate are frozen.
 
 ## Completed v1 release path
 
@@ -1786,5 +1787,76 @@ Exact next task → M11f: freeze compact differential fixtures + overhead gates
 for the four comparison categories; add the complete `modules` argument routing
 and public-wrapper red contract, then export/document `analyze_missingness()`
 only when selected and unavailable module behavior is explicit.
+
+Blockers → none.
+
+### 2026-07-18 - M11f differential gate + public sidecar
+
+Scope → freeze the four-category compatibility/performance oracle; complete the
+golden-path analyzer signature and honest module router; export the experimental
+sidecar only after selected/skipped/pending behavior is executable and
+documented.
+
+Contract + implementation:
+
+- exported `analyze_missingness(x, design, assay = NULL, base_fit = NULL,
+  cutoffs = NULL, seed = 1L, modules = c("sentinel", "stability"))` is a thin
+  matched-call wrapper around the input-first core; stable classifier signature,
+  result schema, attributes, and execution path remain unchanged;
+- `modules` requires a unique exact subset of `sentinel`/`stability`,
+  canonicalizes routing order, and accepts `character()` as an explicit skip;
+  unselected slots are `NULL`, selected sentinel stores schema-validated
+  pre-rescue evidence, and selected stability returns portable
+  `module_pending_validation` requiring `robustness_certificate_v1`;
+- stability validation accepts only the exact pending record until an actual
+  validated module schema ships; corrupted status and invented output fail at
+  the typed analysis-schema boundary;
+- compact `print.imputefinder_analysis()` reports schema, dimensions, classic
+  branch, and module availability without dumping retained evidence;
+- public help, README/vignette path, package metadata/NEWS, version 0.99.4, and
+  the accurate `ExperimentalDesign` Bioconductor view complete the exported
+  seam;
+- compact routine fixtures freeze exact discrete, canonical profile-warning,
+  within/beyond-tolerance, and byte-exact stable-isolation cases;
+  `dev/sidecar-differential-validation.*` freezes the representative overhead
+  protocol before first measurement.
+
+Differential/performance evidence:
+
+- harness SHA-256 =
+  `63c4a943efccfe81e1c6445f363c6db0941ae99b087a6ab7ec91f7684332b471`;
+  unchanged M10 harness SHA-256 remains
+  `74c53ccaf0f0c400693ac76607c575f686012c5b3980ae4d758a5dc4893fc2c2`;
+- unchanged 10,000 x 50 stable gate → manual/automatic medians `.146/.168` s,
+  allocation `45.37x/66.53x`, result `4.70x/4.72x`, peak RSS `176.57` MiB,
+  maximum automatic cutoff error `.282`; every gate passes;
+- compatible-base-fit default sidecar median `.426` s (`2.92x` stable),
+  allocation `465.55` MiB = `103.34x` input / `2.28x` stable, largest allocation
+  `.90x` input, result `5.48x` input / `1.16x` embedded classic; every frozen
+  exact/input/mask/comparator/runtime/allocation/object-size gate passes.
+
+Verification + completion evidence:
+
+- focused red baseline → 6 expected absent-public-symbol errors; focused schema,
+  analyzer, compatibility, input-first, spec, and differential suites green;
+- package-wide source suite → 137 tests / 918 expectations, 0 failures, errors,
+  warnings, or skips;
+- frozen M5 protocol → 12 scenarios / 13 target profiles pass; frozen M7
+  protocol → 13 long scenarios + routine subset pass, MD5 unchanged at
+  `4011e381bba2d0d747e91d277a45de5e`;
+- vignette-bearing source build succeeds; source-tarball `R CMD check --as-cran`
+  completes with only the expected new-submission note; an initial unpublished
+  report-link note was removed before the clean terminal rerun;
+- new-package `BiocCheck` → 0 errors, 0 warnings, 2 previously reviewed
+  optional/admin notes; its new actionable `ExperimentalDesign` suggestion was
+  adopted before the terminal rerun;
+- exact classic reuse, stable-v1 byte isolation, round-trip/schema corruption,
+  caller-object immutability, generated documentation, harness hashes, and
+  `git diff --check` pass.
+
+M11 is complete. Exact next task → M12a: freeze generator-extension and
+gate/data-card schemas, then inventory the minimum controlled + public LFQ
+DDA/DIA candidates and their legal/scientific split feasibility before any data
+role or numeric candidate result is opened.
 
 Blockers → none.

@@ -237,6 +237,48 @@ fit_se <- classify_missingness(
 )
 ```
 
+## Experimental input-first sidecar
+
+`analyze_missingness()` keeps the stable classifier result intact while
+recording the original missingness mask, deterministic input identity,
+pre-rescue coverage, typed sample-design roles, and provenance in a companion
+object. Declare only metadata roles that should participate in later analysis:
+
+```r
+design <- missingness_design(
+    data.frame(
+        condition = condition,
+        batch = rep(c("one", "two"), 4),
+        row.names = colnames(x)
+    ),
+    condition = "condition",
+    nuisance = "batch"
+)
+
+analysis <- analyze_missingness(
+    x,
+    design,
+    base_fit = fit,
+    seed = 1L,
+    modules = "sentinel"
+)
+analysis
+analysis$sentinel$pre_rescue$sample
+```
+
+A compatible `base_fit` is recomputed under its recorded manual/automatic
+cutoff-source policy and retained byte-for-byte only when every exact,
+canonical, and numeric-tolerance comparison passes. Supplying both `base_fit`
+and `cutoffs` is an error.
+
+The default module request is `c("sentinel", "stability")`. The current
+sentinel output is the schema-tagged pre-rescue evidence record. Robustness
+certificates remain behind a frozen validation milestone, so selected
+`stability` returns a structured `imputefinder_unavailable` record rather than
+an invented result; an unselected module is `NULL`. The sidecar is experimental
+and does not infer a causal missingness mechanism or retain a second copy of the
+original numeric matrix.
+
 ## Downstream normalisation and imputation
 
 The intended pipeline is:
@@ -300,8 +342,10 @@ report](https://github.com/eturkes/imputefinder/blob/main/dev/cutoff-validation.
 records the automatic-method comparison and failure criteria. The
 [release-candidate performance report](https://github.com/eturkes/imputefinder/blob/main/dev/performance-validation.md)
 records the deterministic 10,000-feature, 50-sample runtime and allocation
-gate. These synthetic results support the tested behavior; they are not a
-claim of performance on every proteomics dataset.
+gate. The tracked `dev/sidecar-differential-validation.md` report separately
+freezes exact, canonical, tolerance, and overhead gates. These synthetic
+results support the tested behavior; they are not a claim of performance on
+every proteomics dataset.
 
 The normative behavior and release gates are maintained in
 [PLAN.md](https://github.com/eturkes/imputefinder/blob/main/PLAN.md).

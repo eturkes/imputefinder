@@ -12,6 +12,7 @@
     sentinel = "design_confounding_sentinel_v1",
     stability = "robustness_certificate_v1"
 )
+.SIDECAR_MODULE_NAMES <- names(.SIDECAR_MODULE_IDENTIFIERS)
 
 .stable_scientific_identifiers <- function() {
     .STABLE_SCIENTIFIC_IDENTIFIERS

@@ -192,6 +192,43 @@ fit$classifications[
 - `groups_by_sample` - aligned condition label for every output sample.
 - `call` - matched classifier call for provenance.
 
+## Experimental input-first sidecar
+
+The stable result deliberately knows only the condition labels required by its
+scientific rule. The experimental sidecar accepts a typed sample design and
+retains original missingness evidence before rescue. This creates an extension
+seam without adding a field, attribute, or class to `fit`.
+
+```{r input-first-sidecar}
+sample_data <- data.frame(
+    condition = condition,
+    batch = rep(c("one", "two"), 4),
+    row.names = colnames(x)
+)
+design <- missingness_design(
+    sample_data,
+    condition = "condition",
+    nuisance = "batch"
+)
+analysis <- analyze_missingness(
+    x,
+    design,
+    base_fit = fit,
+    seed = 1L
+)
+analysis
+head(analysis$sentinel$pre_rescue$feature_condition)
+analysis$stability
+```
+
+The compatible `base_fit` is retained exactly only after recomputation and
+exact/canonical/tolerance comparison. The sidecar stores a packed original
+mask and deterministic fingerprint, not a second original intensity matrix.
+Its current sentinel output is pre-rescue coverage evidence. Stability remains
+pending its frozen validation milestone and therefore returns a structured
+`imputefinder_unavailable` record. These records report availability and
+observed evidence; they do not identify a causal missingness mechanism.
+
 # The stored missingness profile
 
 For each condition, ImputeFinder estimates missing and complete feature-mean

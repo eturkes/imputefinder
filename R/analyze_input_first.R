@@ -1,3 +1,81 @@
+#' Build an Experimental Missingness Analysis Sidecar
+#'
+#' Construct an input-first companion analysis without changing the stable
+#' [classify_missingness()] result contract. The sidecar records the original
+#' missingness mask, a deterministic input fingerprint, aligned typed design,
+#' pre-rescue evidence, classic result or structured failure, and provenance.
+#'
+#' @param x An ordinary numeric matrix or a `SummarizedExperiment` containing
+#'   unnormalised log2 protein intensities with features in rows and samples in
+#'   columns.
+#' @param design A [missingness_design()] with sample names exactly matching
+#'   `x`. For `SummarizedExperiment` input, its condition role must also name an
+#'   equal `colData` column.
+#' @param assay Assay name for `SummarizedExperiment` input. It may be omitted
+#'   only when exactly one assay exists. It must be `NULL` for matrix input.
+#' @param base_fit Optional complete `imputefinder_result`. Its cutoff-source
+#'   policy is recomputed against `x`, `design`, and `seed`; reuse occurs only
+#'   when exact, canonical, and tolerance comparisons all pass.
+#' @param cutoffs Optional named numeric vector of manual condition cutoffs,
+#'   with automatic selection filling omitted conditions. `base_fit` and
+#'   `cutoffs` are conflicting specifications.
+#' @param seed Integer seed for the classic condition-rescue path.
+#' @param modules Unique subset of `"sentinel"` and `"stability"`. The default
+#'   constructs pre-rescue sentinel evidence and requests stability. Stability
+#'   currently returns a structured `imputefinder_unavailable` record pending
+#'   its frozen validation milestone. Use `character()` to skip both modules.
+#'
+#' @return An experimental `imputefinder_analysis` with seven fields:
+#'   `classic`, `spec`, `design`, `input`, `sentinel`, `stability`, and
+#'   `provenance`. It retains computed evidence and a packed missingness mask,
+#'   but does not retain a second copy of the original numeric matrix.
+#'
+#' @details
+#' The sidecar reports observed evidence, compatibility, and unavailable
+#' quantities. It does not identify a causal missingness mechanism. Serialized
+#' objects carry an experimental versioned schema and unknown schemas fail
+#' explicitly instead of being silently upgraded.
+#'
+#' @examples
+#' x <- matrix(
+#'     seq_len(16),
+#'     nrow = 4,
+#'     dimnames = list(paste0("protein", 1:4), paste0("sample", 1:4))
+#' )
+#' design <- missingness_design(
+#'     data.frame(
+#'         condition = c("control", "control", "treated", "treated"),
+#'         row.names = colnames(x)
+#'     ),
+#'     condition = "condition"
+#' )
+#'
+#' analysis <- analyze_missingness(x, design, modules = "sentinel")
+#' analysis
+#'
+#' @seealso [missingness_design()] and [classify_missingness()].
+#' @export
+analyze_missingness <- function(
+    x,
+    design,
+    assay = NULL,
+    base_fit = NULL,
+    cutoffs = NULL,
+    seed = 1L,
+    modules = c("sentinel", "stability")
+) {
+    .analyze_missingness_input_first(
+        x = x,
+        design = design,
+        assay = assay,
+        base_fit = base_fit,
+        cutoffs = cutoffs,
+        seed = seed,
+        modules = modules,
+        call = match.call()
+    )
+}
+
 .abort_design_condition <- function(
     message,
     condition_role,
@@ -189,11 +267,13 @@
     base_fit = NULL,
     cutoffs = NULL,
     seed = 1L,
+    modules = c("sentinel", "stability"),
     call = NULL
 ) {
     analysis_call <- if (is.null(call)) match.call() else call
     .validate_input_first_call(analysis_call)
     .validate_base_fit_cutoff_conflict(base_fit, cutoffs)
+    modules <- .normalise_sidecar_modules(modules)
     seed <- .normalise_rescue_seed(seed)
     resolved <- .prepare_input_first_analysis(x, design, assay)
     prepared <- resolved$prepared
@@ -204,7 +284,8 @@
         assay = .prepared_sidecar_assay(prepared),
         acquisition = acquisition
     )
-    sentinel <- .new_sidecar_sentinel(
+    sentinel <- .run_pre_rescue_sentinel(
+        modules,
         prepared$data,
         prepared$groups_by_sample
     )
@@ -216,6 +297,7 @@
         cutoffs,
         seed
     )
+    stability <- .run_pending_stability(modules)
 
     .new_imputefinder_analysis(
         classic = classic,
@@ -223,6 +305,7 @@
         input = input,
         call = analysis_call,
         sentinel = sentinel,
+        stability = stability,
         seeds = list(classic_rescue = seed)
     )
 }

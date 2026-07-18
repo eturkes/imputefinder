@@ -344,6 +344,13 @@ Portable abstention records use class `imputefinder_unavailable` and fields
 dropped-row cells, the original mask, or pre-rescue evidence return code
 `original_input_required` and require original `x` + typed design.
 
+The M11 module router accepts a unique subset of `sentinel` and `stability`;
+unselected slots are `NULL`. Selected `sentinel` stores the input-first
+`pre_rescue` record. Until M12/M14 validation and implementation close, selected
+`stability` returns `module_pending_validation` requiring
+`robustness_certificate_v1`. The default requests both, making incomplete
+research capability explicit without fabricating output.
+
 For matrix input, the typed design supplies the aligned condition. For
 `SummarizedExperiment`, `assay` follows the stable routing rule and the design's
 named condition column must exist in, align with, and equal `colData(x)`; users
@@ -708,7 +715,7 @@ M13 + M14 + M15 → M15P release confirmation + promotion review
 - [x] Implement input-first construction + optional compatible `base_fit`;
       pre-rescue evidence survives classic cutoff failure and fit-only
       limitations return structured `unavailable`.
-- [ ] Add differential fixtures for exact/canonical/tolerance/performance
+- [x] Add differential fixtures for exact/canonical/tolerance/performance
       categories.
 - [x] Run the API naming experiment and freeze the experimental public/internal
       boundary before export.

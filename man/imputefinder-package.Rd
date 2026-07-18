@@ -33,11 +33,15 @@ ImputeFinder filters and seed-modifies the input; it does not normalise or
 impute it. Use the returned data for normalisation, split it by condition,
 and apply the chosen MNAR and MAR methods using the corresponding retained
 feature groups.
+
+The experimental \code{\link[=analyze_missingness]{analyze_missingness()}} sidecar starts from the original
+input and a typed \code{\link[=missingness_design]{missingness_design()}}. It records identity and pre-rescue
+evidence without changing the stable classifier result.
 }
 
 \seealso{
-\code{\link[=classify_missingness]{classify_missingness()}}, \code{\link[=plot_missingness]{plot_missingness()}}, and
-\code{vignette("imputefinder")}.
+\code{\link[=classify_missingness]{classify_missingness()}}, \code{\link[=analyze_missingness]{analyze_missingness()}},
+\code{\link[=plot_missingness]{plot_missingness()}}, and \code{vignette("imputefinder")}.
 }
 \author{
 \strong{Maintainer}: Emir Turkes \email{emir.turkes@eturkes.com} [copyright holder]

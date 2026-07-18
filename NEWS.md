@@ -1,3 +1,9 @@
+# imputefinder 0.99.4 (2026-07-18)
+
+- Adds experimental `analyze_missingness()` input-first sidecars with exact
+  classic-fit compatibility checks, packed original masks, pre-rescue evidence,
+  typed module routing, portable unavailable results, and compact printing.
+
 # imputefinder 0.99.3 (2026-07-18)
 
 - Adds the experimental `missingness_design()` constructor for explicit
