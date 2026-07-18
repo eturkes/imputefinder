@@ -371,9 +371,12 @@ provenance
 
 The caller owns numeric `x`; serialized sidecars retain computed evidence and
 the original mask, not a second full intensity matrix. Re-running a new module
-requires `x` again and verifies its fingerprint. M11 chooses and records the
-fingerprint algorithm and mask representation after a current tooling review.
-Missing/mismatched input artifacts fail explicitly.
+requires `x` again and verifies its fingerprint. The M11 fingerprint is SHA-256
+over the versioned `matrix_core_be_v1` protocol: storage tag, big-endian
+dimensions/observed values, length-prefixed UTF-8-or-byte identifiers, and the
+column-major missing mask. The inline mask uses zero-padded LSB-first base-R
+bit packing (`base_packbits_lsb0_v1`). Protocol identifiers travel with the
+record; unknown identifiers and missing/mismatched artifacts fail explicitly.
 
 Pre-rescue evidence is constructed before the classic attempt. Supported A/C
 work may therefore continue after an automatic cutoff failure; B records the
@@ -678,7 +681,7 @@ M13 + M14 + M15 → M15P release confirmation + promotion review
 - [x] Add internal stable method/profile/cutoff/rescue/policy identifiers and
       sidecar `spec`; preserve every v1 field, attribute, class, and output.
 - [x] Define minimum `missingness_design` roles, validation, and lifecycle.
-- [ ] Define `imputefinder_analysis` schema with inline original mask,
+- [x] Define `imputefinder_analysis` schema with inline original mask,
       fingerprint, provenance, empty module slots, `classic` result/failure sum
       type, and explicit upgrade/error behavior.
 - [ ] Implement input-first construction + optional compatible `base_fit`;
@@ -688,7 +691,7 @@ M13 + M14 + M15 → M15P release confirmation + promotion review
       categories.
 - [x] Run the API naming experiment and freeze the experimental public/internal
       boundary before export.
-- [ ] Research and record fingerprint/mask implementation choice before use.
+- [x] Research and record fingerprint/mask implementation choice before use.
 
 Gate: all v1 unit/scientific/package gates pass; existing performance thresholds
 remain satisfied; no component/attribute/class drift; sidecar round-trip and

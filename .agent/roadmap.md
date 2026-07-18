@@ -17,10 +17,12 @@ delayed backend; J1 standards QC; J2 atlas. Parked work has no active checkbox
 or release obligation.
 
 Exact method, dependency graph, falsification gates, and Definition of Done →
-`PLAN.md` Sections 2-14. Exact next implementation task → M11c: research and
-freeze the deterministic input-fingerprint algorithm + inline original-mask
-representation before either enters the companion schema; then add red
-round-trip, mismatch, and upgrade/error tests.
+`PLAN.md` Sections 2-14. Exact next implementation task → M11d: define the
+pre-rescue evidence schema + red matrix/`SummarizedExperiment`, classic-failure,
+alignment, and unchanged-input tests; then implement original-`x` input-first
+construction. Keep the future public analyzer unexported until its complete
+signature and behavior exist; compatible `base_fit` reuse remains the next
+bounded slice.
 
 ## Completed v1 release path
 
@@ -1590,5 +1592,82 @@ Exact next task → M11c: compare current primary fingerprint primitives and
 mask encodings under determinism, collision/security, cross-session/platform,
 size, and dependency constraints; record the choice before implementation, then
 add red sidecar round-trip/mismatched-input/unknown-schema tests.
+
+Blockers → none.
+
+### 2026-07-18 - M11c analysis schema + input identity
+
+Scope → choose the deterministic matrix fingerprint and inline original-mask
+representation before use; freeze the minimum companion schema around those
+identities without constructing or exporting the input-first analyzer.
+
+Research decision:
+
+- current R/NIST primary documentation + an executable candidate harness favor
+  dependency-free `tools::sha256sum(bytes = ...)`; SHA-256 supplies 128-bit
+  collision and 256-bit preimage strength, while the faster OpenSSL path does
+  not justify another runtime/system dependency for one construction/recheck;
+- arbitrary R serialization was rejected as the canonical payload because R
+  warns that its format may change; `matrix_core_be_v1` instead domain-tags and
+  encodes storage, 32-bit big-endian dimensions, length-prefixed UTF-8-or-byte
+  names, packed missingness, and finite observed values in column-major order;
+- `base_packbits_lsb0_v1` stores the original mask at one bit/cell with zero
+  padding: 62,531 serialized bytes at 500,000 cells versus 2,000,031 for a
+  logical mask; unlike sparse indices, its size is density-invariant;
+- frozen harness SHA-256 =
+  `0857e92b191457779a71f67545964533d106d93b27e9b455a85f64f0e885dd60`;
+  full protocol, alternatives, measured results, limits, and primary links →
+  `dev/fingerprint-mask-experiment.md`.
+
+Implementation:
+
+- internal input records now retain dimensions, canonical ordered names,
+  storage/representation/assay declarations, SHA-256 fingerprint, packed mask,
+  trusted log2-scale declaration, and optional aligned acquisition values - no
+  original numeric matrix;
+- exact decoder validates mask encoding, cell/byte counts, and zero padding;
+  canonical hashing additionally proves that supplied mask bytes describe the
+  matrix before hashing;
+- input verification recomputes identity and emits a typed mismatch with only
+  dimension/name/mask/storage/fingerprint families - never intensity values;
+- experimental `imputefinder_analysis` freezes seven fields: exact classic
+  success or portable stage/class/message/call failure; sidecar spec; aligned
+  typed design + empty estimability; input identity; empty sentinel/stability;
+  and call/seed/hash/warning/failure/assumption/training provenance;
+- schema, lifecycle, fingerprint-canonicalization, and mask-encoding changes
+  require explicit reconstruction; malformed nested records fail typed checks;
+- all constructors/validators remain internal, and `classify_missingness()` is
+  absent from their execution path.
+
+Verification + completion evidence:
+
+- focused red baseline → 12 expected errors from absent identity/schema
+  helpers; focused green → 12 tests / 80 expectations;
+- exact canonical fixture SHA-256 agrees in source and a separately installed
+  package process; text identifiers agree across declared UTF-8/Latin-1 while
+  byte-marked identifiers remain exact;
+- 160 randomized integer/double matrices spanning non-byte-aligned dimensions,
+  missingness, signed zero, and negative values round-trip masks exactly,
+  agree with independent `digest` SHA-256, detect observed-cell changes, and
+  leave caller RNG state exact;
+- package-wide source suite → 112 tests / 701 expectations, 0 failures,
+  warnings, errors, or skips;
+- frozen M5 protocol → 12 scenarios / 13 profiles pass; frozen M7 protocol →
+  13 long scenarios + routine subset pass, MD5 unchanged;
+- 10,000 x 50 v1 performance gate → manual/automatic medians `.195/.238` s,
+  allocation `45.37x/66.53x`, result `4.70x/4.72x`, peak RSS `177.77` MiB,
+  maximum automatic cutoff error `.282`; every frozen gate passes;
+- vignette-bearing source build + source-tarball `R CMD check --as-cran` →
+  status OK; committed-state clean-clone `BiocCheckGitClone` → 0 errors,
+  0 warnings, 0 notes; new-package `BiocCheck` → 0 errors, 0 warnings,
+  2 previously reviewed optional/admin notes;
+- exact v1 serialization, fields/class/attributes, and public signature remain
+  unchanged; `git diff --check` passes.
+
+Exact next task → M11d: freeze pre-rescue evidence fields and red input-first
+matrix/SE/failure/alignment/unchanged-input behavior, then implement original-x
+construction behind the internal API. Defer compatible `base_fit` reuse to the
+following bounded slice and export only when the selected public signature is
+complete.
 
 Blockers → none.
