@@ -327,6 +327,23 @@ intensities. A fit-only call cannot reconstruct dropped-row cells, the original
 mask, or pre-rescue sample evidence; any limited fit-only accessor must return
 structured `unavailable` for analyses needing them.
 
+The frozen M11 comparator report is `base_fit_compatibility_v1`. Exact
+components = result schema/class, returned data/representation, discrete block
+and reconciliation evidence, groups, feature audit, rescue log, aligned sample
+groups, and call. Canonical components = cutoff-source/diagnostic and stored
+profile schemas, roles, labels, warnings, and other non-continuous values.
+Tolerance components = finite doubles in classifications, cutoffs, diagnostics,
+and profiles under absolute + relative `sqrt(.Machine$double.eps)` bounds;
+special-value positions remain exact. Any non-empty difference category rejects
+reuse. Manual sources are rerun as explicit cutoffs; automatic sources are
+re-estimated. The supplied call is mirrored only to compare structure, and the
+compatible supplied fit is retained unchanged; neither fact proves its history.
+
+Portable abstention records use class `imputefinder_unavailable` and fields
+`status`, `quantity`, `code`, `message`, `requires`. Fit-only requests for
+dropped-row cells, the original mask, or pre-rescue evidence return code
+`original_input_required` and require original `x` + typed design.
+
 For matrix input, the typed design supplies the aligned condition. For
 `SummarizedExperiment`, `assay` follows the stable routing rule and the design's
 named condition column must exist in, align with, and equal `colData(x)`; users
@@ -688,7 +705,7 @@ M13 + M14 + M15 → M15P release confirmation + promotion review
 - [x] Define `imputefinder_analysis` schema with inline original mask,
       fingerprint, provenance, empty module slots, `classic` result/failure sum
       type, and explicit upgrade/error behavior.
-- [ ] Implement input-first construction + optional compatible `base_fit`;
+- [x] Implement input-first construction + optional compatible `base_fit`;
       pre-rescue evidence survives classic cutoff failure and fit-only
       limitations return structured `unavailable`.
 - [ ] Add differential fixtures for exact/canonical/tolerance/performance

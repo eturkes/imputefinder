@@ -17,12 +17,11 @@ delayed backend; J1 standards QC; J2 atlas. Parked work has no active checkbox
 or release obligation.
 
 Exact method, dependency graph, falsification gates, and Definition of Done →
-`PLAN.md` Sections 2-14. Exact next implementation task → M11e: freeze the
-`base_fit` compatibility comparator + red success/mismatch/conflicting-cutoff/
-unchanged-object tests, then implement recomputation-backed optional reuse and
-structured fit-only `unavailable`. Keep the future public analyzer unexported
-until its complete signature, module routing, and behavior exist; differential
-comparison fixtures remain the following bounded slice.
+`PLAN.md` Sections 2-14. Exact next implementation task → M11f: freeze compact
+differential fixtures for exact/canonical/tolerance/performance categories,
+including comparator and sidecar overhead gates; then add red full-signature +
+module-selection/routing tests and export `analyze_missingness()` only when its
+documented default and structured `unavailable` behavior are complete.
 
 ## Completed v1 release path
 
@@ -1727,5 +1726,65 @@ compatible reuse, every identity/scientific mismatch family, conflicting
 `base_fit`/`cutoffs`, source-object immutability, and fit-only limitations; then
 implement recomputation-backed optional `base_fit` acceptance + portable
 `unavailable` without exporting `analyze_missingness()` yet.
+
+Blockers → none.
+
+### 2026-07-18 - M11e compatible base fit + portable unavailable
+
+Scope → accept an optional stable fit only when the original input-first path
+can reproduce it under its recorded cutoff-source policy + requested seed;
+freeze fit-only abstention without exporting the incomplete analyzer.
+
+Contract + implementation:
+
+- `base_fit_compatibility_v1` partitions comparisons into exact returned data,
+  representation, discrete decisions, rescue/group/audit/call components;
+  canonical cutoff/profile structure + roles/labels/warnings; and continuous
+  classification/cutoff/diagnostic/profile doubles under absolute + relative
+  `sqrt(.Machine$double.eps)` bounds;
+- ordinary numeric result matrices and ordinary numeric SE assays add canonical
+  SHA-256 identities to exact comparison, preserving signed-zero distinctions
+  that R's `identical()` omits; special numeric values remain position-exact;
+- manual cutoff sources become explicit recomputation inputs; automatic sources
+  are re-estimated; complete-only sources remain `not_needed`; any mismatch or
+  recomputation failure returns a redacted typed error + complete category
+  report, while a compatible supplied result is retained byte-for-byte;
+- simultaneous `base_fit` + `cutoffs` fails as a typed specification conflict;
+  malformed fit/policy inputs have dedicated portable error classes;
+- `imputefinder_unavailable` freezes `status`/`quantity`/`code`/`message`/
+  `requires`; fit-only dropped-row, original-mask, and pre-rescue requests use
+  `original_input_required` and point to original `x` + typed design;
+- helper extraction keeps the internal analyzer below BiocCheck's 50-line
+  recommendation; the future public symbol/export remains absent.
+
+Verification + completion evidence:
+
+- focused red baseline → 8 expected missing-API/unused-argument errors; focused
+  green suite → 10 tests / 93 expectations covering manual/automatic/
+  complete-only success, identity/design/representation/seed/signed-zero drift,
+  schema/policy/conflict failures, exact/canonical/tolerance partitions, RNG +
+  source-object immutability, round-trip, and fit-only abstention;
+- package-wide source suite → 129 tests / 865 expectations, 0 failures, errors,
+  warnings, or skips;
+- frozen M5 protocol → 12 scenarios / 13 target profiles pass; frozen M7
+  protocol → 13 long scenarios + routine subset pass, MD5 unchanged at
+  `4011e381bba2d0d747e91d277a45de5e`;
+- frozen 10,000 x 50 v1 performance gate → manual/automatic medians
+  `.500/.615` s, allocation `45.37x/66.53x`, result `4.70x/4.72x`, peak RSS
+  `170.00` MiB, maximum automatic cutoff error `.282`; every gate passes;
+- vignette-bearing source build + final source-tarball `R CMD check --as-cran`
+  → status OK; an earlier check process was externally interrupted without a
+  terminal status and was discarded before clean terminal reruns;
+- committed-state clean-clone `BiocCheckGitClone` → 0 errors, 0 warnings, 0
+  notes; a working-tree probe correctly rejected ignored local check artifacts;
+  final new-package `BiocCheck` → 0 errors, 0 warnings, 2 previously reviewed
+  optional/admin notes; its intermediate function-length note was removed;
+- exact stable-v1 isolation/public signature regressions + `git diff --check`
+  pass; no stable result/schema or public namespace change.
+
+Exact next task → M11f: freeze compact differential fixtures + overhead gates
+for the four comparison categories; add the complete `modules` argument routing
+and public-wrapper red contract, then export/document `analyze_missingness()`
+only when selected and unavailable module behavior is explicit.
 
 Blockers → none.

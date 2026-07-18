@@ -135,22 +135,65 @@
     )
 }
 
-.analyze_missingness_input_first <- function(
-    x,
-    design,
-    assay = NULL,
-    cutoffs = NULL,
-    seed = 1L,
-    call = NULL
-) {
-    analysis_call <- if (is.null(call)) match.call() else call
-    if (!is.language(analysis_call)) {
+.validate_input_first_call <- function(call) {
+    if (!is.language(call)) {
         .abort_sidecar(
             "Analysis provenance call must be language.",
             "imputefinder_analysis_schema_error",
             field = "call"
         )
     }
+    invisible(call)
+}
+
+.validate_base_fit_cutoff_conflict <- function(base_fit, cutoffs) {
+    if (!is.null(base_fit) && !is.null(cutoffs)) {
+        .abort_sidecar(
+            "`base_fit` and `cutoffs` are conflicting specifications.",
+            "imputefinder_base_fit_conflict_error",
+            arguments = c("base_fit", "cutoffs")
+        )
+    }
+    invisible(base_fit)
+}
+
+.resolve_input_first_classic <- function(
+    prepared,
+    original,
+    call,
+    base_fit,
+    cutoffs,
+    seed
+) {
+    if (is.null(base_fit)) {
+        return(.attempt_input_first_classic(
+            prepared,
+            original,
+            call,
+            cutoffs,
+            seed
+        ))
+    }
+    .accept_compatible_base_fit(
+        base_fit,
+        prepared,
+        original,
+        seed
+    )
+}
+
+.analyze_missingness_input_first <- function(
+    x,
+    design,
+    assay = NULL,
+    base_fit = NULL,
+    cutoffs = NULL,
+    seed = 1L,
+    call = NULL
+) {
+    analysis_call <- if (is.null(call)) match.call() else call
+    .validate_input_first_call(analysis_call)
+    .validate_base_fit_cutoff_conflict(base_fit, cutoffs)
     seed <- .normalise_rescue_seed(seed)
     resolved <- .prepare_input_first_analysis(x, design, assay)
     prepared <- resolved$prepared
@@ -165,10 +208,11 @@
         prepared$data,
         prepared$groups_by_sample
     )
-    classic <- .attempt_input_first_classic(
+    classic <- .resolve_input_first_classic(
         prepared,
         x,
         analysis_call,
+        base_fit,
         cutoffs,
         seed
     )

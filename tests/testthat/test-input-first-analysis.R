@@ -41,7 +41,7 @@ test_that("input-first matrix construction freezes pre-rescue evidence", {
 
     expect_identical(
         names(formals(imputefinder:::.analyze_missingness_input_first)),
-        c("x", "design", "assay", "cutoffs", "seed", "call")
+        c("x", "design", "assay", "base_fit", "cutoffs", "seed", "call")
     )
     expect_false("analyze_missingness" %in% getNamespaceExports("imputefinder"))
     expect_s3_class(analysis, "imputefinder_analysis")
