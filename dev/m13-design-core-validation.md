@@ -75,7 +75,7 @@ gate row, requires all 11 thresholds to pass, and rejects evidence-hash drift.
 ## Boundary and next work
 
 This evidence validates the mandatory algebraic seam used by B/C; it does not
-validate the independently disposable A association panel. M13b next adds
-pre-rescue sample/condition/nuisance/block coverage and overlap summaries from
-stored evidence. Only after those static summaries are green may the frozen A
-association candidates run. Confirmation remains sealed through M15P.
+validate the independently disposable A association panel. M13b static coverage
+is now green under `dev/m13-static-coverage-validation.md`. M13c next implements
+the frozen A candidates and opens only synthetic candidate replicates 1-32 for
+selection; untouched development and confirmation evidence remain sealed.

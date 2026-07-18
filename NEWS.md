@@ -1,3 +1,9 @@
+# imputefinder 0.99.6 (2026-07-18)
+
+- Adds deterministic static sentinel coverage: sample detection and intensity
+  support, condition summaries, declared role levels and singleton flags,
+  explicit condition-by-role zero cells, and pairwise feature overlap.
+
 # imputefinder 0.99.5 (2026-07-18)
 
 - Adds the validated mandatory sidecar design core: canonical declared model

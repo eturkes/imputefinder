@@ -36,11 +36,16 @@
     module %in% modules
 }
 
-.run_pre_rescue_sentinel <- function(modules, data, groups_by_sample) {
+.run_pre_rescue_sentinel <- function(
+    modules,
+    data,
+    groups_by_sample,
+    design
+) {
     if (!.sidecar_module_selected(modules, "sentinel")) {
         return(NULL)
     }
-    .new_sidecar_sentinel(data, groups_by_sample)
+    .new_sidecar_sentinel(data, groups_by_sample, design)
 }
 
 .pending_sidecar_module <- function(module) {

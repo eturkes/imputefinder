@@ -3,8 +3,8 @@
 #' Construct an input-first companion analysis without changing the stable
 #' [classify_missingness()] result contract. The sidecar records the original
 #' missingness mask, a deterministic input fingerprint, aligned typed design,
-#' algebraic design/estimability evidence, pre-rescue evidence, classic result
-#' or structured failure, and provenance.
+#' algebraic design/estimability evidence, pre-rescue evidence, static design
+#' coverage, classic result or structured failure, and provenance.
 #'
 #' @param x An ordinary numeric matrix or a `SummarizedExperiment` containing
 #'   unnormalised log2 protein intensities with features in rows and samples in
@@ -22,9 +22,10 @@
 #'   `cutoffs` are conflicting specifications.
 #' @param seed Integer seed for the classic condition-rescue path.
 #' @param modules Unique subset of `"sentinel"` and `"stability"`. The default
-#'   constructs pre-rescue sentinel evidence and requests stability. Stability
-#'   currently returns a structured `imputefinder_unavailable` record pending
-#'   its frozen validation milestone. Use `character()` to skip both modules.
+#'   constructs pre-rescue evidence plus static coverage and requests
+#'   stability. Stability currently returns a structured
+#'   `imputefinder_unavailable` record pending its frozen validation milestone.
+#'   Use `character()` to skip both modules.
 #'
 #' @return An experimental `imputefinder_analysis` with seven fields:
 #'   `classic`, `spec`, `design`, `input`, `sentinel`, `stability`, and
@@ -42,6 +43,15 @@
 #' The mandatory design core runs independently of `modules`. It reports
 #' algebraic separability and declared units; it performs no association test,
 #' automatic correction, sample exclusion, or causal attribution.
+#'
+#' Selected sentinel output contains `pre_rescue` and `coverage` records.
+#' Coverage uses globally observable features - features finite in at least one
+#' original cell - as its detection denominator while retaining the full input
+#' feature count. It stores canonical sample and condition support, all
+#' declared role levels with singleton flags, complete condition-by-nuisance,
+#' block, and acquisition grids including zero-sample cells, and pairwise
+#' condition feature overlap. These are descriptive pre-rescue summaries, not
+#' association tests or causal evidence.
 #'
 #' @examples
 #' x <- matrix(
@@ -294,7 +304,8 @@ analyze_missingness <- function(
     sentinel <- .run_pre_rescue_sentinel(
         modules,
         prepared$data,
-        prepared$groups_by_sample
+        prepared$groups_by_sample,
+        resolved$design
     )
     classic <- .resolve_input_first_classic(
         prepared,

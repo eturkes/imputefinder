@@ -754,7 +754,7 @@ failure rule; v1 behavior/limitations reproduce on the expanded harness.
 ### M13 - A: design core + confounding sentinel study
 
 - [x] Implement typed design alignment and algebraic estimability/aliasing.
-- [ ] Implement pre-rescue sample/condition/nuisance coverage summaries.
+- [x] Implement pre-rescue sample/condition/nuisance coverage summaries.
 - [ ] Implement only predeclared association terms and uncertainty.
 - [ ] Add stored diagnostic data, concise print/summary, and human wording.
 - [ ] Run all A gates; retain failures and assign the association panel

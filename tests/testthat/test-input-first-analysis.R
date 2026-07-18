@@ -63,7 +63,10 @@ test_that("input-first matrix construction freezes pre-rescue evidence", {
         analysis$input$acquisition,
         stats::setNames(rep("DIA", ncol(fixture$x)), colnames(fixture$x))
     )
-    expect_identical(names(analysis$sentinel), "pre_rescue")
+    expect_identical(
+        names(analysis$sentinel),
+        c("pre_rescue", "coverage")
+    )
     expect_identical(
         names(analysis$sentinel$pre_rescue),
         c("schema", "feature_condition", "sample")

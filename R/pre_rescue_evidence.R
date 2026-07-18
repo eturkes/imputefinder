@@ -75,7 +75,12 @@
 }
 
 .pre_rescue_sample <- function(data, groups_by_sample) {
-    summary <- .pre_rescue_observed_summary(data, 2L)
+    feature_names <- .canonical_sidecar_names(rownames(data))
+    feature_order <- order(feature_names, method = "radix")
+    summary <- .pre_rescue_observed_summary(
+        data[feature_order, , drop = FALSE],
+        2L
+    )
     feature_count <- as.integer(nrow(data))
     missing_count <- as.integer(feature_count - summary$count)
 
@@ -296,9 +301,11 @@
     invisible(evidence)
 }
 
-.new_sidecar_sentinel <- function(data, groups_by_sample) {
+.new_sidecar_sentinel <- function(data, groups_by_sample, design) {
+    pre_rescue <- .new_pre_rescue_evidence(data, groups_by_sample)
     list(
-        pre_rescue = .new_pre_rescue_evidence(data, groups_by_sample)
+        pre_rescue = pre_rescue,
+        coverage = .new_sentinel_coverage(data, design)
     )
 }
 
@@ -306,7 +313,9 @@
     if (is.null(sentinel)) {
         return(invisible(sentinel))
     }
-    if (!is.list(sentinel) || !identical(names(sentinel), "pre_rescue")) {
+    valid_names <- identical(names(sentinel), "pre_rescue") ||
+        identical(names(sentinel), c("pre_rescue", "coverage"))
+    if (!is.list(sentinel) || !valid_names) {
         .abort_sidecar(
             "Stored sentinel output does not satisfy its current schema.",
             "imputefinder_analysis_schema_error",
@@ -314,6 +323,14 @@
         )
     }
     .validate_pre_rescue_evidence(sentinel$pre_rescue, input, design)
+    if ("coverage" %in% names(sentinel)) {
+        .validate_sentinel_coverage(
+            sentinel$coverage,
+            input,
+            design,
+            sentinel$pre_rescue
+        )
+    }
 
     invisible(sentinel)
 }

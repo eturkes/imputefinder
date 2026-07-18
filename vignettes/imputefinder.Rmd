@@ -222,20 +222,26 @@ analysis$design$estimability$rank[
 ]
 analysis$design$estimability$aliasing$affected_terms
 head(analysis$sentinel$pre_rescue$feature_condition)
+analysis$sentinel$coverage$condition
+head(analysis$sentinel$coverage$condition_role)
+analysis$sentinel$coverage$feature_overlap
 analysis$stability
 ```
 
 The compatible `base_fit` is retained exactly only after recomputation and
 exact/canonical/tolerance comparison. The sidecar stores a packed original
 mask and deterministic fingerprint, not a second original intensity matrix.
-Its current sentinel output is pre-rescue coverage evidence. Stability remains
-pending its frozen validation milestone and therefore returns a structured
-`imputefinder_unavailable` record. Independently of module selection, the
-sidecar's mandatory design core stores a canonical model matrix, SVD rank and
-null-space aliases, and declared block-aware units. It reports algebraic
-separability without testing association or correcting data. These records
-report availability and observed evidence; they do not identify a causal
-missingness mechanism.
+Its sentinel output holds pre-rescue feature-condition evidence and static
+sample, condition, declared-role, and feature-overlap coverage. Detection
+fractions exclude globally absent features from their denominator while
+retaining the full input count; condition-by-role tables retain explicit empty
+cells. Stability remains pending its frozen validation milestone and therefore
+returns a structured `imputefinder_unavailable` record. Independently of module
+selection, the sidecar's mandatory design core stores a canonical model matrix,
+SVD rank and null-space aliases, and declared block-aware units. It reports
+algebraic separability without testing association or correcting data. These
+records report availability and observed evidence; they do not identify a
+causal missingness mechanism.
 
 # The stored missingness profile
 

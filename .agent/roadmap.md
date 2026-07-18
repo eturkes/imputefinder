@@ -17,12 +17,12 @@ delayed backend; J1 standards QC; J2 atlas. Parked work has no active checkbox
 or release obligation.
 
 Exact method, dependency graph, falsification gates, and Definition of Done →
-`PLAN.md` Sections 2-14. Exact next implementation task → M13b: encode red
-coverage-schema tests, then implement pre-rescue sample/condition/nuisance/block
-coverage summaries, including singleton levels, explicit empty overlap cells,
-sample detection/intensity support, feature overlap, and condition × declared
-role tables. Fit no association candidate yet; confirmation remains sealed
-through M15P.
+`PLAN.md` Sections 2-14. Exact next implementation task → M13c: encode red A
+association result/support/abstention tests, implement only the three frozen
+candidate engines, then open synthetic candidate replicates `1-32` for
+gate-first selection or a no-winner result. Keep untouched development
+replicates `33-64`, HarmonizR development bytes, and all confirmation evidence
+sealed until the candidate choice locks.
 
 ## Completed v1 release path
 
@@ -2186,5 +2186,79 @@ Exact next task → M13b: write red coverage-schema/order/zero-cell tests, then
 implement static pre-rescue sample/condition/nuisance/block summaries from the
 typed design + stored original evidence. Keep association fitting and all
 external result bytes closed until the static sentinel schema is green.
+
+Blockers → none.
+
+### 2026-07-18 - M13b static sentinel coverage
+
+Scope → implement deterministic descriptive pre-rescue coverage from the typed
+design + original evidence. Fit no association candidate; open no candidate,
+development, external, or confirmation result evidence.
+
+Implementation:
+
+- selected sentinel output retains unchanged `pre_rescue_evidence_v1` and adds
+  `sentinel_static_coverage_v1` with exact sample, condition, role-level,
+  condition-role, and pairwise feature-overlap tables;
+- sample detection fractions use globally observable proteins - finite in at
+  least one original cell - matching the frozen A response denominator; full
+  input counts and observed intensity mean/minimum/median/maximum remain beside
+  them;
+- condition summaries retain sample/full/eligible/detected/complete support,
+  observed + eligible cells, and detection fraction;
+- role-level evidence includes every declared condition/nuisance/block/
+  acquisition value, numeric/categorical encoding, numeric value where
+  applicable, sample/condition counts, and singleton flag;
+- condition-role evidence materializes the full product of canonical conditions
+  with every nuisance/block/acquisition value; zero-sample cells remain explicit
+  with zero support, `NA` detection fraction, and `empty = TRUE`;
+- feature overlap reports shared/union/side-only/neither counts + Jaccard for
+  every unordered condition pair; global absences never inflate denominators;
+- sample/features/conditions/roles/labels canonicalize independently of input,
+  factor-level, nuisance-selector, and integer/double representation order;
+- deserialization validation reconstructs structural tables exactly from the
+  packed original mask + typed design, cross-checks pre-rescue means and
+  intensity-range consistency, and rejects lifecycle/schema/count corruption;
+  prior pre-rescue-only experimental objects remain structurally readable;
+- one redundant constructor validation pass was removed; terminal representative
+  sidecar gates remain inside every frozen runtime/allocation/object-size bound;
+- package version advances to `0.99.6`; README, vignette, NEWS, package help,
+  generated Rd, and `dev/m13-static-coverage-validation.md` document exact
+  denominators, zero cells, descriptive scope, and integrity limits.
+
+Adversarial review + verification:
+
+- focused red baseline → 57 failures + one lifecycle error at the absent seam;
+  final focused suite → 8 tests / 81 expectations; package-wide source suite →
+  152 tests / 1,077 expectations, no failures/errors/warnings/skips;
+- singleton levels, categorical + numeric nuisance grids, empty condition-role
+  cells, zero-support samples, wholly absent input, feature-overlap arithmetic,
+  named order/re-encoding invariance, corruption, legacy readability, and
+  unchanged caller inputs/global state pass;
+- installed frozen M13 verifier → 416 instances, all 11 gates exact; audit/
+  result hashes unchanged at
+  `37528216590dcfff3338501ef61b766697ea63c14b7324912fcb00f84d58790e` /
+  `cb72a69301100287cee569ae7a0d709f42edc10e3b10a62dbff3a86ab88aec6f`;
+  association remains `frozen_unrun`, all external artifacts `metadata_only`;
+- frozen M5 → 12 scenarios / 13 target profiles; frozen M7 → 13 long + routine,
+  MD5 `4011e381bba2d0d747e91d277a45de5e`; all pass;
+- uncontended 10,000 × 50 differential gate → sidecar median `2.257` s =
+  `4.57x` stable; allocation `622.85` MiB = `3.05x` stable; largest allocation
+  `.90x` input; object `1.17x` embedded classic; every frozen gate passes;
+- vignette-bearing build succeeds; source-tarball
+  `R CMD check --as-cran --no-manual` → only expected new-submission note;
+  staged-tree `BiocCheckGitClone` → 0 errors/warnings/notes; new-package
+  `BiocCheck` → 0 errors/warnings + three reviewed notes; automatic `Coverage`
+  view suggestion rejected as genomic/read-coverage metadata, not design/data
+  support; one intermediate clone check was discarded when temporary-worktree
+  cleanup raced its yielded process, then the explicit terminal rerun passed;
+- `git diff --check` passes. No A candidate fit or external-result access
+  occurred.
+
+Exact next task → M13c: write red association output/support/abstention tests,
+implement the frozen OLS-HC3/CR2, restricted Freedman-Lane, and independent-unit
+quasibinomial candidates, then run only simulation candidate replicates `1-32`
+for selection/no-winner. Keep development replicates `33-64`, HarmonizR bytes,
+and confirmation sealed until selection locks.
 
 Blockers → none.

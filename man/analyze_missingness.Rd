@@ -37,9 +37,10 @@ with automatic selection filling omitted conditions. \code{base_fit} and
 \item{seed}{Integer seed for the classic condition-rescue path.}
 
 \item{modules}{Unique subset of \code{"sentinel"} and \code{"stability"}. The default
-constructs pre-rescue sentinel evidence and requests stability. Stability
-currently returns a structured \code{imputefinder_unavailable} record pending
-its frozen validation milestone. Use \code{character()} to skip both modules.}
+constructs pre-rescue evidence plus static coverage and requests
+stability. Stability currently returns a structured
+\code{imputefinder_unavailable} record pending its frozen validation milestone.
+Use \code{character()} to skip both modules.}
 }
 \value{
 An experimental \code{imputefinder_analysis} with seven fields:
@@ -53,8 +54,8 @@ does not retain a second copy of the original numeric matrix.
 Construct an input-first companion analysis without changing the stable
 \code{\link[=classify_missingness]{classify_missingness()}} result contract. The sidecar records the original
 missingness mask, a deterministic input fingerprint, aligned typed design,
-algebraic design/estimability evidence, pre-rescue evidence, classic result
-or structured failure, and provenance.
+algebraic design/estimability evidence, pre-rescue evidence, static design
+coverage, classic result or structured failure, and provenance.
 }
 \details{
 The sidecar reports observed evidence, compatibility, and unavailable
@@ -65,6 +66,15 @@ explicitly instead of being silently upgraded.
 The mandatory design core runs independently of \code{modules}. It reports
 algebraic separability and declared units; it performs no association test,
 automatic correction, sample exclusion, or causal attribution.
+
+Selected sentinel output contains \code{pre_rescue} and \code{coverage} records.
+Coverage uses globally observable features - features finite in at least one
+original cell - as its detection denominator while retaining the full input
+feature count. It stores canonical sample and condition support, all
+declared role levels with singleton flags, complete condition-by-nuisance,
+block, and acquisition grids including zero-sample cells, and pairwise
+condition feature overlap. These are descriptive pre-rescue summaries, not
+association tests or causal evidence.
 }
 \examples{
 x <- matrix(

@@ -415,12 +415,6 @@
             field = "call"
         )
     }
-    .validate_sidecar_input(input)
-    design_record <- .new_sidecar_design_record(design, input)
-    .validate_classic_branch(classic)
-    .validate_classic_design_alignment(classic, design_record, input)
-    .validate_sidecar_sentinel(sentinel, input, design_record)
-    .validate_sidecar_stability(stability)
     if (!is.list(seeds)) {
         .abort_sidecar(
             "Analysis module output or seed provenance is malformed.",
@@ -428,6 +422,7 @@
             field = "analysis"
         )
     }
+    design_record <- .new_sidecar_design_record(design, input)
 
     analysis <- structure(
         list(

@@ -42,7 +42,10 @@ test_that("the public analyzer exposes the frozen complete signature", {
     )
     expect_s3_class(analysis, "imputefinder_analysis")
     expect_s3_class(analysis$classic, "imputefinder_result")
-    expect_identical(names(analysis$sentinel), "pre_rescue")
+    expect_identical(
+        names(analysis$sentinel),
+        c("pre_rescue", "coverage")
+    )
     expect_s3_class(analysis$stability, "imputefinder_unavailable")
     expect_identical(analysis$stability$status, "unavailable")
     expect_identical(analysis$stability$quantity, "stability")
@@ -155,7 +158,10 @@ test_that("selected pre-rescue evidence survives public classic failure", {
 
     expect_s3_class(analysis$classic, "imputefinder_classic_failure")
     expect_identical(analysis$classic$stage, "cutoff")
-    expect_identical(names(analysis$sentinel), "pre_rescue")
+    expect_identical(
+        names(analysis$sentinel),
+        c("pre_rescue", "coverage")
+    )
     expect_s3_class(analysis$stability, "imputefinder_unavailable")
     expect_identical(
         analysis$provenance$failures,
