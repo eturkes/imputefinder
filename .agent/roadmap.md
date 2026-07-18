@@ -17,12 +17,13 @@ delayed backend; J1 standards QC; J2 atlas. Parked work has no active checkbox
 or release obligation.
 
 Exact method, dependency graph, falsification gates, and Definition of Done →
-`PLAN.md` Sections 2-14. Exact next implementation task → M12a: freeze the
-Section 9.1 generator-extension manifest plus executable gate-registry/data-card
-schemas; inventory the minimum controlled + public LFQ DDA/DIA candidates with
-licence, checksum, acquisition, metadata, truth, exclusion, and split
-feasibility before assigning development or sealed-confirmation roles. Open no
-candidate result or confirmation artifact before its role + gate are frozen.
+`PLAN.md` Sections 2-14. Exact next implementation task → M12b: freeze numeric
+generator parameters/seeds and implement only the manifest's Section 9.1
+simulation/semi-synthetic + negative-control scope; assign each minimum data
+family one whole/grouped development or sealed-confirmation role with exact
+split/protocol hashes after a licence/metadata recheck. Evaluate only generator
+truth + v1 reproduction in this slice. Keep every external result artifact
+unopened until the linked A-C numeric gates and candidate protocols are frozen.
 
 ## Completed v1 release path
 
@@ -1858,5 +1859,90 @@ M11 is complete. Exact next task → M12a: freeze generator-extension and
 gate/data-card schemas, then inventory the minimum controlled + public LFQ
 DDA/DIA candidates and their legal/scientific split feasibility before any data
 role or numeric candidate result is opened.
+
+Blockers → none.
+
+### 2026-07-18 - M12a validation schemas + metadata-only data inventory
+
+Scope → freeze the Section 9.1 generator-extension envelope, every A-C claim
+family, executable gate/data/artifact schemas, and the smallest plausible
+controlled/public DDA/DIA inventory without assigning roles or opening result
+artifacts.
+
+Frozen contract:
+
+- dependency-free `dev/m12-validation-contract.R` owns exact ordered schemas,
+  13 specified-unimplemented Tier 1-2 scenario identities, 25 A-C claims, an
+  intentionally empty numeric gate registry, four data cards, six checksummed
+  artifacts, four documented exclusions, and primary-source provenance;
+- generator scope covers 2-4 conditions; balanced/unequal + independent/paired
+  designs; run/batch effects with crossed/partial/perfect confounding; every
+  Section 9.1 missingness pattern; outlier/heteroscedastic/support/low-evidence
+  stress; DDA/DIA strata; null, flat-profile, causal-wording, and grouped-sibling
+  leakage controls;
+- gate rows are accepted only as complete Section 9.4 tuples with a finite
+  numeric threshold, positive sample size, explicit uncertainty/failure rules,
+  known data IDs, and SHA-256 data/protocol hashes - provisional rows cannot
+  masquerade as frozen gates;
+- role/opening state machine requires card/artifact role agreement + split
+  SHA-256 before assignment and a local SHA-256 before artifact opening;
+  M12a additionally fixes all roles to `unassigned`, all artifacts to
+  `metadata_only`, local hashes absent, and gate-row count zero;
+- canonical aggregate contract SHA-256 =
+  `3f9a53d73495b0b7e3ce9ccf6a36ddcbabe4928f39cd5297e9a7cf79848b9e77`;
+  component hashes + rationale live in `dev/m12-validation-contract.md`.
+
+Candidate feasibility:
+
+- MultiPro HCC1806/HS578T PXD041391 → CC0, balanced deliberate-batch DDA/DIA,
+  3 biological replicates/class with technical/instrument siblings; 36 runs per
+  acquisition; biological replicate = minimum split unit; natural missing cells
+  retain no causal labels;
+- MS-DAP PXD036134 → CC0 matched DDA/DIA, 3 known yeast levels x technical
+  triplicates; whole matched family = one role; no biological-unit claim;
+- PXD002099 → CC0 DDA UPS1/yeast series + compact non-normalized protein CSV;
+  whole artifact = one role and an exact <=4-level subset/contrast is required;
+- LFQbench PXD002952 → checksummed 2-condition DIA analysis under reviewed
+  EMBL-EBI terms; all master-mixture/software/instrument derivatives stay one
+  family; owner-rights caveat retained;
+- exact PRIDE SHA-1 + byte identities recorded for every candidate artifact;
+  SHA-1 is upstream transfer identity only and a post-role local SHA-256 is
+  mandatory before opening;
+- PXD041421, PXD028735, the rheumatoid-arthritis SWATH study, and PXD003881 are
+  excluded with explicit artifact/independence/licence/scope reconsideration
+  conditions rather than silently dropped.
+
+Research boundary:
+
+- only PRIDE/API/project metadata, repository terms, and primary papers were
+  inspected; no result archive/CSV bytes or confirmation artifact were
+  downloaded or parsed, no archive contents were listed, and no role was
+  assigned;
+- technical replicates never become independent split units; linked DDA/DIA,
+  instruments, software outputs, and master mixtures cannot manufacture an
+  independent confirmation;
+- the manifest freezes scenario coverage, not acquisition physics, numeric
+  generator parameters, estimator behavior, or evidence that A-C passes.
+
+Verification + completion evidence:
+
+- frozen contract verifier → schemas/catalog/hash exact; 4 adversarial rejection
+  rails pass (`generator_scope`, `role_requires_split`,
+  `opening_requires_role_hash`, `checksum_shape`);
+- package-wide source suite → 137 tests / 918 expectations, 0 failures,
+  errors, warnings, or skips;
+- frozen M5 protocol → 12 scenarios / 13 target profiles pass; frozen M7
+  protocol → 13 long scenarios + routine subset pass, MD5 unchanged at
+  `4011e381bba2d0d747e91d277a45de5e`;
+- vignette-bearing source build succeeds; source-tarball
+  `R CMD check --as-cran --no-manual` completes with only the expected
+  new-submission note;
+- `git diff --check` passes.
+
+Exact next task → M12b: freeze numeric generator parameters/seeds, implement
+only the manifest scenarios/negative controls, and assign whole/grouped data
+families to development vs sealed confirmation with exact split/protocol hashes
+after rechecking terms. Validate generator truth + unchanged v1 behavior only;
+external results remain unopened until the A-C numeric registry/protocol freeze.
 
 Blockers → none.
