@@ -17,10 +17,10 @@ delayed backend; J1 standards QC; J2 atlas. Parked work has no active checkbox
 or release obligation.
 
 Exact method, dependency graph, falsification gates, and Definition of Done →
-`PLAN.md` Sections 2-14. Exact next implementation task → M11b: run the API
-naming experiment, then define the minimum typed `missingness_design` roles,
-alignment, validation, and experimental lifecycle without changing the stable
-classifier signature.
+`PLAN.md` Sections 2-14. Exact next implementation task → M11c: research and
+freeze the deterministic input-fingerprint algorithm + inline original-mask
+representation before either enters the companion schema; then add red
+round-trip, mismatch, and upgrade/error tests.
 
 ## Completed v1 release path
 
@@ -1527,5 +1527,68 @@ Verification + completion evidence:
 Exact next task → M11b: run the public/internal API naming experiment, add red
 alignment/role/lifecycle tests, then implement the minimum typed
 `missingness_design` without changing `classify_missingness()`.
+
+Blockers → none.
+
+### 2026-07-18 - M11b typed design + API boundary
+
+Scope → run the sidecar naming experiment; freeze and export only the minimum
+typed sample-design constructor; prove alignment/lifecycle failures are portable
+and `rules_v1` remains byte-exact.
+
+API decision:
+
+- current Bioconductor naming/namespace guidance + base design-matrix vocabulary
+  informed the rubric; exact official CRAN/Bioconductor documentation searches
+  and 145 installed namespaces found no candidate collision;
+- selected golden-path names = `missingness_design()`, future
+  `analyze_missingness()`, and future `test_detectability()`; only implemented
+  functions are exported; schema constructors, validators, alignment,
+  fingerprints, compatibility comparators, and module runners stay internal;
+- protocol, alternatives, caveat, and public/internal boundary are retained in
+  `dev/api-naming-experiment.md`.
+
+Implementation:
+
+- experimental `missingness_design_v1` object stores schema/lifecycle, declared
+  role-only sample metadata, canonical role map, and canonical explicit
+  interaction sets; unselected metadata is omitted;
+- required condition + optional nuisance/block/acquisition roles require exact
+  columns and complete atomic values; condition/block/acquisition identifiers
+  canonicalize to character while nuisance types remain declared;
+- explicit unique sample row names + exact name-set alignment preserve caller
+  data/order and deterministically align a copied design to analysis order;
+- typed schema/role/alignment/lifecycle errors carry machine-readable context;
+  unknown schemas/lifecycles fail with reconstruction guidance rather than
+  silently upgrading;
+- compact print method, generated help, NEWS, export, and development-version
+  increment complete the first experimental public seam;
+- constructor/metadata/printing leave the stable classifier signature,
+  serialized normative result, fields, class, and attributes exact.
+
+Verification + completion evidence:
+
+- focused red baseline → 9 expected errors from the absent constructor;
+- focused green design suite → 9 tests / 66 expectations;
+- package-wide source suite → 100 tests / 621 expectations, 0 failures,
+  warnings, errors, or skips;
+- frozen M5 protocol verification → 12 scenarios / 13 target profiles pass;
+- frozen M7 protocol verification → 13 long scenarios + routine subset pass;
+  protocol MD5 remains `4011e381bba2d0d747e91d277a45de5e`;
+- 10,000 x 50 manual/automatic performance gate → median `.415/.638` s,
+  allocation `45.37x/66.53x`, result `4.70x/4.72x`, peak RSS `172.72` MiB,
+  maximum automatic cutoff error `.282`; every frozen gate passes;
+- vignette-bearing source build + source-tarball `R CMD check --as-cran` →
+  status OK;
+- committed-state clean-clone `BiocCheckGitClone` → 0 errors, 0 warnings, 0
+  notes; new-package tarball `BiocCheck` → 0 errors, 0 warnings, 2 previously
+  reviewed optional/admin notes; initial function-length/line-width notes
+  exposed by the check were removed before the final run;
+- `git diff --check` → pass.
+
+Exact next task → M11c: compare current primary fingerprint primitives and
+mask encodings under determinism, collision/security, cross-session/platform,
+size, and dependency constraints; record the choice before implementation, then
+add red sidecar round-trip/mismatched-input/unknown-schema tests.
 
 Blockers → none.

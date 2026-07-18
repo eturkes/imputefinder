@@ -287,7 +287,8 @@ release Definition of Done.
 
 ### 5.1 Golden path
 
-Provisional API; M11 runs the naming experiment before export:
+M11 naming experiment selected this experimental API; only implemented
+functions are exported:
 
 ```r
 design <- missingness_design(
@@ -676,7 +677,7 @@ M13 + M14 + M15 → M15P release confirmation + promotion review
 
 - [x] Add internal stable method/profile/cutoff/rescue/policy identifiers and
       sidecar `spec`; preserve every v1 field, attribute, class, and output.
-- [ ] Define minimum `missingness_design` roles, validation, and lifecycle.
+- [x] Define minimum `missingness_design` roles, validation, and lifecycle.
 - [ ] Define `imputefinder_analysis` schema with inline original mask,
       fingerprint, provenance, empty module slots, `classic` result/failure sum
       type, and explicit upgrade/error behavior.
@@ -684,7 +685,9 @@ M13 + M14 + M15 → M15P release confirmation + promotion review
       pre-rescue evidence survives classic cutoff failure and fit-only
       limitations return structured `unavailable`.
 - [ ] Add differential fixtures for exact/canonical/tolerance/performance
-      categories and run the API naming experiment.
+      categories.
+- [x] Run the API naming experiment and freeze the experimental public/internal
+      boundary before export.
 - [ ] Research and record fingerprint/mask implementation choice before use.
 
 Gate: all v1 unit/scientific/package gates pass; existing performance thresholds

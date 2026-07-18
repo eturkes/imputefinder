@@ -1,3 +1,9 @@
+# imputefinder 0.99.3 (2026-07-18)
+
+- Adds the experimental `missingness_design()` constructor for explicit
+  condition, nuisance, block, acquisition, and interaction roles, with strict
+  sample alignment and versioned schema validation.
+
 # imputefinder 0.99.2 (2026-07-15)
 
 - Completes release-candidate audits of public claims, edge cases, process
