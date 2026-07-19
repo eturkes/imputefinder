@@ -764,9 +764,12 @@ hash is `04e824321ac68c73633277064397f1a3fa96ba73ff342fbfe575df7fc6b1f4a6`.
 The production `association_preparation_v1` rail now binds the packed global
 mask/design identity to the exact response, acquisition-specific rebuilt
 cores, coefficient hypotheses, estimability, and biological-unit support.
-Candidate engines, final panel materialization, and every candidate result
-remain `frozen_unrun` until their focused tests and implementation manifest
-lock.
+The first internal candidate engine now implements the frozen OLS-HC3 and
+full-design identity-working-model CR2/Satterthwaite path, exact unavailable
+handoff, per-stratum Holm families, and preparation-bound artifact validation.
+Restricted Freedman-Lane, independent quasibinomial, final panel
+materialization, and the implementation manifest remain open; every candidate
+result remains `frozen_unrun` until all focused rails and the manifest lock.
 
 Gate: protocol hashes exist; every A-C claim has an executable numeric gate and
 failure rule; v1 behavior/limitations reproduce on the expanded harness.

@@ -19,13 +19,13 @@ or release obligation.
 Exact method, dependency graph, falsification gates, and Definition of Done →
 `PLAN.md` Sections 2-14. M13c v3 contract hash =
 `04e824321ac68c73633277064397f1a3fa96ba73ff342fbfe575df7fc6b1f4a6`.
-Exact next implementation task → encode red rank-coordinate HC3/CR2,
-restricted-transformation, quasibinomial, final-panel handoff, and
-implementation-manifest tests, then implement only the three frozen candidate
-engines. Open synthetic candidate replicates `1-32` only after every
-implementation rail passes. Keep association-candidate
-computations on development replicates `33-64`, HarmonizR development bytes,
-and all confirmation evidence sealed until the candidate choice locks.
+Exact next implementation task → red/green constrained-null transformations,
+exact/Monte Carlo maps, seed manifests, and the restricted Freedman-Lane
+candidate; then independent quasibinomial, final-panel handoff, and the
+implementation manifest. Open synthetic candidate replicates `1-32` only after
+every implementation rail passes. Keep development replicates `33-64`,
+HarmonizR development bytes, and all confirmation evidence sealed until the
+candidate choice locks.
 
 ## Completed v1 release path
 
@@ -2461,5 +2461,77 @@ Exact next task → red/green the shared rank-coordinate + HC3/CR2 engine and
 final unavailable handoff, then restricted Freedman-Lane and independent
 quasibinomial. Freeze exact source/environment/test implementation manifest
 only after all engine/handoff rails pass; then open candidate replicates `1-32`.
+
+Blockers → none.
+
+### 2026-07-19 - M13e robust association candidate
+
+Scope → implement and adversarially validate only the frozen
+`a_fraction_ols_hc3_cr2` candidate; keep every candidate replicate,
+development/confirmation allocation, external byte, final panel, and
+implementation/evidence manifest sealed.
+
+Implementation:
+
+- `association_candidate_artifact_v1` retains the exact response,
+  hypothesis/support joins, robust available/unavailable outcomes,
+  stratum-local Holm families, typed-empty seed record, and diagnostics;
+- trusted validation requires the genuine `association_preparation_v1`, checks
+  provenance before dereference, restricts this slice to robust-only failure
+  stages, enforces estimability/support/residual-df/degenerate precedence, and
+  rejects detached hashes, impossible codes, Holm/family drift, typed-seed
+  drift, and diagnostic joins;
+- retained-SVD coordinates use `Z=U D`, `a=D^-1 U'y`, and cancellation-stable
+  HC3/CR2 sandwiches without a second `solve()` rank cutoff;
+- independent fits apply HC3 + the registered leverage denominator floor;
+  blocked fits keep the complete fixed-effect design, identity-working-model
+  symmetric MP CR2 block correction, and scalar Satterthwaite reference df;
+- covariance cleanup symmetrizes, rejects materially negative eigenvalues, and
+  removes only tolerance-scale eigencomponents, preserving every retained
+  direction unchanged when no clamp is required; CR2 df projections normalize
+  their homogeneous scale before Gram arithmetic;
+- the exact registered `nu>=5` floor remains a literal computed-double rule:
+  a mathematical boundary that rounds below `5` abstains. Any tolerance policy
+  change requires a pre-result protocol reseal.
+
+Adversarial corrections:
+
+- the initial global `1-h` gate wrongly rejected valid blocked leverage-one
+  rows; it now applies only to HC3 while CR2 carries null directions through
+  its MP correction;
+- default `solve(crossprod(Z))` introduced an undeclared squared-condition
+  cutoff and discarded SVD-retained scaled axes; direct retained-singular-value
+  algebra removes it;
+- unconditional eigen reconstruction damaged legitimate small covariance
+  directions beside a large one; low-rank-only correction restores the frozen
+  clamp semantics;
+- artifact validation originally allowed provenance-free calls, cross-candidate
+  failure codes, one-way precedence, and logical typed-empty seed columns; all
+  four trust gaps now reject under mutation tests;
+- validation proves preparation provenance, schema, joins, and internal
+  arithmetic; it intentionally does not independently recompute a coherently
+  forged numerical fit. The later genuine-run implementation/evidence hash
+  locks output drift before any candidate result is accepted.
+
+Verification:
+
+- focused robust suite → 7 tests / 90 expectations; independent hard HC3,
+  blocked hard CR2, blocked leverage-one, rank/scaling, covariance cleanup,
+  low-reference, acquisition-Holm, abstention precedence, and validator
+  mutations all pass;
+- full source suite → 168 tests / 1,252 expectations, zero failures/errors/
+  warnings/skips; three-agent final rereview → no remaining math, contract, or
+  architecture blocker;
+- frozen executable contract → 27/27 named self-tests with exact protocol/
+  contract identities; vignette-bearing source build/check → `Status: OK`;
+  `git diff --check` passes;
+- no candidate simulation ran; replicates `1-32`, development `33-64`,
+  HarmonizR bytes, and confirmation remain sealed.
+
+Exact next task → red/green the constrained-null transformation identity,
+exact/Monte Carlo map/seed manifest, and restricted Freedman-Lane candidate on
+local unit fixtures. Then implement the independent quasibinomial candidate +
+final handoff before locking the implementation manifest and opening candidate
+replicates `1-32`.
 
 Blockers → none.

@@ -1,0 +1,799 @@
+.ASSOCIATION_CANDIDATE_ARTIFACT_SCHEMA <- "association_candidate_artifact_v1"
+.ASSOCIATION_CANDIDATES <- "a_fraction_ols_hc3_cr2"
+.ASSOCIATION_CANDIDATE_ARTIFACT_FIELDS <- c(
+    "schema", "protocol", "candidate", "input_sha256", "response",
+    "hypotheses", "support", "outcomes", "multiplicity", "diagnostics"
+)
+.ASSOCIATION_CANDIDATE_HYPOTHESIS_FIELDS <- c(
+    "hypothesis", "stratum", "coefficient", "label", "term_id", "term",
+    "kind", "components", "component_encodings", "role", "eligible",
+    "estimable", "family_member"
+)
+.ASSOCIATION_AVAILABLE_OUTCOME_FIELDS <- c(
+    "status", "quantity", "candidate", "stratum", "hypothesis", "effect",
+    "standard_error", "conf_low", "conf_high", "statistic", "reference_df",
+    "raw_p", "adjusted_p", "flag", "log_odds",
+    "log_odds_standard_error", "log_odds_conf_low", "log_odds_conf_high",
+    "permutation_count", "diagnostics"
+)
+.ASSOCIATION_OUTCOME_DIAGNOSTIC_FIELDS <- c(
+    "variance_method", "rank", "residual_df", "leverage_max",
+    "satterthwaite_df", "dispersion", "converged", "boundary",
+    "allowable_transformations", "evaluated_transformations",
+    "exceedance_count", "permutation_mode"
+)
+.ASSOCIATION_MULTIPLICITY_FIELDS <- c(
+    "stratum", "method", "level", "family_size", "available_count",
+    "unavailable_count"
+)
+.ASSOCIATION_CANDIDATE_DIAGNOSTIC_FIELDS <- c(
+    "input_sha256", "strata", "seed_manifest", "warnings"
+)
+.ASSOCIATION_STRATUM_DIAGNOSTIC_FIELDS <- c(
+    "stratum", "acquisition", "sample_count", "rank", "coefficient_count",
+    "residual_df", "testable_count", "unavailable_count"
+)
+.ASSOCIATION_SEED_MANIFEST_FIELDS <- c(
+    "protocol_id", "candidate_id", "acquisition", "hypothesis_id",
+    "draw_id", "seed", "seed_nonce", "map_retry", "map_sha256"
+)
+.ASSOCIATION_UNAVAILABLE_CODES <- c(
+    "association_no_observable_features",
+    "association_nonestimable",
+    "association_low_independent_support",
+    "association_low_block_support",
+    "association_low_interaction_support",
+    "association_incompatible_unit_positions",
+    "association_low_residual_df",
+    "association_low_reference_df",
+    "association_low_permutation_resolution",
+    "association_incompatible_permutation",
+    "association_degenerate_response",
+    "association_singular_covariance",
+    "association_quasibinomial_boundary",
+    "association_quasibinomial_nonconvergence",
+    "association_quasibinomial_paired_scope",
+    "association_numerical_failure",
+    "association_no_testable_hypotheses"
+)
+.ASSOCIATION_SUPPORT_CODES <- c(
+    "association_low_independent_support",
+    "association_low_block_support",
+    "association_low_interaction_support",
+    "association_incompatible_unit_positions"
+)
+.ASSOCIATION_ROBUST_UNAVAILABLE_CODES <- c(
+    "association_nonestimable",
+    .ASSOCIATION_SUPPORT_CODES,
+    "association_low_residual_df",
+    "association_low_reference_df",
+    "association_degenerate_response",
+    "association_singular_covariance",
+    "association_numerical_failure"
+)
+.ASSOCIATION_ROBUST_FIT_UNAVAILABLE_CODES <- c(
+    "association_low_reference_df",
+    "association_singular_covariance",
+    "association_numerical_failure"
+)
+
+.abort_association_candidate_artifact <- function(message) {
+    .abort_association(
+        message,
+        "imputefinder_association_artifact_error"
+    )
+}
+
+.association_scalar_character <- function(x) {
+    is.character(x) && length(x) == 1L && !is.na(x) && nzchar(x)
+}
+
+.association_sha256 <- function(x) {
+    .association_scalar_character(x) && grepl("^[0-9a-f]{64}$", x)
+}
+
+.association_double_scalar <- function(x, finite = TRUE) {
+    is.double(x) && length(x) == 1L &&
+        if (finite) is.finite(x) else is.na(x)
+}
+
+.association_integer_scalar <- function(x, minimum = NULL, na = FALSE) {
+    valid <- is.integer(x) && length(x) == 1L
+    if (!valid) {
+        return(FALSE)
+    }
+    if (na) {
+        return(is.na(x))
+    }
+    !is.na(x) && (is.null(minimum) || x >= minimum)
+}
+
+.association_numeric_close <- function(x, y) {
+    is.finite(x) && is.finite(y) &&
+        abs(x - y) <= sqrt(.Machine$double.eps) *
+            max(1, abs(x), abs(y))
+}
+
+.empty_association_seed_manifest <- function() {
+    data.frame(
+        protocol_id = character(),
+        candidate_id = character(),
+        acquisition = character(),
+        hypothesis_id = character(),
+        draw_id = integer(),
+        seed = integer(),
+        seed_nonce = integer(),
+        map_retry = integer(),
+        map_sha256 = character(),
+        stringsAsFactors = FALSE
+    )[.ASSOCIATION_SEED_MANIFEST_FIELDS]
+}
+
+.association_unavailable_specification <- function(code) {
+    specifications <- list(
+        association_nonestimable = c(
+            "The encoded coefficient is not estimable in the rebuilt design.",
+            "an estimable encoded coefficient"
+        ),
+        association_low_independent_support = c(
+            "The encoded coefficient has too little independent-unit support.",
+            "at least four independent units on each required side"
+        ),
+        association_low_block_support = c(
+            "The encoded coefficient has too little complete-block support.",
+            "at least six complete blocks on the required sides"
+        ),
+        association_low_interaction_support = c(
+            "The encoded interaction has too little joint-cell support.",
+            "the frozen interaction cell and complete-block support"
+        ),
+        association_incompatible_unit_positions = c(
+            "The declared units do not admit the required restricted positions.",
+            "compatible declared-unit positions"
+        ),
+        association_low_residual_df = c(
+            "The full design leaves fewer than three residual degrees of freedom.",
+            "at least three residual degrees of freedom"
+        ),
+        association_low_reference_df = c(
+            "The CR2 scalar reference distribution has fewer than five degrees of freedom.",
+            "CR2 Satterthwaite degrees of freedom of at least five"
+        ),
+        association_degenerate_response = c(
+            "The detection-fraction response is constant.",
+            "a nonconstant detection-fraction response"
+        ),
+        association_singular_covariance = c(
+            "The scalar robust covariance is nonpositive or singular.",
+            "a positive scalar robust covariance"
+        ),
+        association_numerical_failure = c(
+            "The frozen robust calculation failed its numerical checks.",
+            "a finite, numerically stable robust fit"
+        )
+    )
+    specification <- specifications[[code]]
+    if (is.null(specification)) {
+        .abort_association_candidate_artifact(
+            "No unavailable-result specification exists for this code."
+        )
+    }
+    list(message = specification[[1L]], requires = specification[[2L]])
+}
+
+.new_association_candidate_unavailable <- function(hypothesis, code) {
+    specification <- .association_unavailable_specification(code)
+    .new_unavailable(
+        quantity = hypothesis,
+        code = code,
+        message = specification$message,
+        requires = specification$requires
+    )
+}
+
+.valid_association_candidate_hypotheses <- function(hypotheses, response) {
+    valid <- is.data.frame(hypotheses) && nrow(hypotheses) > 0L &&
+        identical(names(hypotheses), .ASSOCIATION_CANDIDATE_HYPOTHESIS_FIELDS) &&
+        is.character(hypotheses$hypothesis) &&
+        all(grepl("^a_[0-9a-f]{64}$", hypotheses$hypothesis)) &&
+        !anyDuplicated(hypotheses$hypothesis) &&
+        all(vapply(hypotheses[c(
+            "stratum", "coefficient", "label", "term_id", "term", "kind",
+            "role"
+        )], is.character, logical(1L))) &&
+        !anyNA(hypotheses[c(
+            "stratum", "coefficient", "label", "term_id", "term", "kind",
+            "role"
+        )]) &&
+        all(vapply(hypotheses[c(
+            "stratum", "coefficient", "label", "term_id", "term", "kind",
+            "role"
+        )], function(x) all(nzchar(x)), logical(1L))) &&
+        is.list(hypotheses$components) &&
+        inherits(hypotheses$components, "AsIs") &&
+        is.list(hypotheses$component_encodings) &&
+        inherits(hypotheses$component_encodings, "AsIs") &&
+        all(hypotheses$kind %in% c("main", "interaction")) &&
+        all(hypotheses$role %in% c("condition", "nuisance", "interaction")) &&
+        all((hypotheses$kind == "main") ==
+            (hypotheses$role %in% c("condition", "nuisance"))) &&
+        all(lengths(hypotheses$components)[hypotheses$kind == "main"] == 1L) &&
+        all(lengths(hypotheses$components)[hypotheses$kind == "interaction"] >= 2L) &&
+        all(grepl("^coef_[0-9]{4,}$", hypotheses$coefficient)) &&
+        all(grepl("^term_[0-9]{4,}$", hypotheses$term_id)) &&
+        is.logical(hypotheses$eligible) && all(hypotheses$eligible) &&
+        is.logical(hypotheses$estimable) && !anyNA(hypotheses$estimable) &&
+        is.logical(hypotheses$family_member) &&
+        !anyNA(hypotheses$family_member) &&
+        all(hypotheses$stratum %in% response$stratum) &&
+        !anyDuplicated(hypotheses[c("stratum", "coefficient")])
+    if (!valid) {
+        return(FALSE)
+    }
+    component_valid <- all(vapply(seq_len(nrow(hypotheses)), function(index) {
+        components <- hypotheses$components[[index]]
+        encodings <- hypotheses$component_encodings[[index]]
+        is.character(components) && length(components) > 0L &&
+            !anyNA(components) && all(nzchar(components)) &&
+            !anyDuplicated(components) &&
+            identical(components, sort(components, method = "radix")) &&
+            is.character(encodings) && identical(names(encodings), components) &&
+            all(encodings %in% c("numeric", "treatment"))
+    }, logical(1L)))
+    expected_ids <- vapply(seq_len(nrow(hypotheses)), function(index) {
+        .association_hypothesis_id(
+            hypotheses$stratum[[index]],
+            hypotheses$coefficient[[index]],
+            hypotheses$label[[index]],
+            hypotheses$term_id[[index]]
+        )
+    }, character(1L))
+    strata <- unique(response$stratum)
+    canonical <- do.call(order, list(
+        match(hypotheses$stratum, strata),
+        hypotheses$coefficient,
+        method = "radix"
+    ))
+    component_valid && identical(hypotheses$hypothesis, expected_ids) &&
+        identical(canonical, seq_len(nrow(hypotheses)))
+}
+
+.valid_association_candidate_support <- function(support, hypotheses) {
+    valid <- is.data.frame(support) &&
+        identical(names(support), .ASSOCIATION_SUPPORT_FIELDS) &&
+        identical(support$hypothesis, hypotheses$hypothesis) &&
+        all(vapply(support[c(
+            "hypothesis", "design", "side_definition"
+        )], is.character, logical(1L))) &&
+        !anyNA(support[c("hypothesis", "design", "side_definition")]) &&
+        all(nzchar(support$side_definition)) &&
+        all(support$design %in% c("independent", "blocked")) &&
+        all(vapply(support[c(
+            "side_count_low", "side_count_high", "complete_block_count",
+            "cell_count_min"
+        )], is.integer, logical(1L))) &&
+        all(support$side_count_low >= 0L) &&
+        all(support$side_count_high >= 0L) &&
+        all(is.na(support$complete_block_count) |
+            support$complete_block_count >= 0L) &&
+        all(is.na(support$cell_count_min) | support$cell_count_min >= 0L) &&
+        all(is.na(support$complete_block_count[
+            support$design == "independent"
+        ])) &&
+        all(!is.na(support$complete_block_count[
+            support$design == "blocked"
+        ])) &&
+        all(is.na(support$cell_count_min[hypotheses$kind == "main"])) &&
+        all(!is.na(support$cell_count_min[
+            hypotheses$kind == "interaction"
+        ])) &&
+        is.list(support$numeric_components) &&
+        inherits(support$numeric_components, "AsIs") &&
+        is.logical(support$eligible) && !anyNA(support$eligible) &&
+        is.character(support$code) &&
+        identical(is.na(support$code), support$eligible) &&
+        all(is.na(support$code) | support$code %in% .ASSOCIATION_SUPPORT_CODES)
+    if (!valid) {
+        return(FALSE)
+    }
+    numeric_valid <- all(vapply(seq_len(nrow(support)), function(index) {
+        numeric <- support$numeric_components[[index]]
+        expected <- names(hypotheses$component_encodings[[index]])[
+            hypotheses$component_encodings[[index]] == "numeric"
+        ]
+        is.data.frame(numeric) && identical(
+            names(numeric),
+            c(
+                "component", "median", "minimum", "maximum",
+                "extrapolates_0_1"
+            )
+        ) && is.character(numeric$component) &&
+            is.double(numeric$median) && is.double(numeric$minimum) &&
+            is.double(numeric$maximum) &&
+            is.logical(numeric$extrapolates_0_1) && !anyNA(numeric) &&
+            all(nzchar(numeric$component)) &&
+            !anyDuplicated(numeric$component) &&
+            identical(numeric$component, expected) &&
+            all(is.finite(numeric$median)) &&
+            all(is.finite(numeric$minimum)) &&
+            all(is.finite(numeric$maximum)) &&
+            all(numeric$minimum <= numeric$median) &&
+            all(numeric$median <= numeric$maximum) &&
+            identical(
+                numeric$extrapolates_0_1,
+                numeric$minimum > 0 | numeric$maximum < 1
+            )
+    }, logical(1L)))
+    expected_eligible <- vapply(seq_len(nrow(support)), function(index) {
+        if (identical(
+            support$code[[index]],
+            "association_incompatible_unit_positions"
+        )) {
+            return(FALSE)
+        }
+        blocked <- identical(support$design[[index]], "blocked")
+        interaction <- identical(hypotheses$kind[[index]], "interaction")
+        if (interaction) {
+            if (blocked) {
+                support$cell_count_min[[index]] >= 6L &&
+                    support$complete_block_count[[index]] >= 6L
+            } else {
+                support$cell_count_min[[index]] >= 4L
+            }
+        } else if (blocked) {
+            support$side_count_low[[index]] >= 6L &&
+                support$side_count_high[[index]] >= 6L &&
+                support$complete_block_count[[index]] >= 6L
+        } else {
+            support$side_count_low[[index]] >= 4L &&
+                support$side_count_high[[index]] >= 4L
+        }
+    }, logical(1L))
+    expected_code <- vapply(seq_len(nrow(support)), function(index) {
+        if (expected_eligible[[index]]) {
+            return(NA_character_)
+        }
+        if (identical(
+            support$code[[index]],
+            "association_incompatible_unit_positions"
+        )) {
+            return("association_incompatible_unit_positions")
+        }
+        if (identical(hypotheses$kind[[index]], "interaction")) {
+            "association_low_interaction_support"
+        } else if (identical(support$design[[index]], "blocked")) {
+            "association_low_block_support"
+        } else {
+            "association_low_independent_support"
+        }
+    }, character(1L))
+    numeric_valid && identical(support$eligible, expected_eligible) &&
+        identical(support$code, expected_code)
+}
+
+.valid_association_robust_diagnostics <- function(
+    diagnostics,
+    outcome,
+    design
+) {
+    valid <- is.list(diagnostics) &&
+        identical(names(diagnostics), .ASSOCIATION_OUTCOME_DIAGNOSTIC_FIELDS) &&
+        .association_scalar_character(diagnostics$variance_method) &&
+        diagnostics$variance_method %in% c("HC3", "CR2") &&
+        .association_integer_scalar(diagnostics$rank, 1L) &&
+        .association_integer_scalar(diagnostics$residual_df, 3L) &&
+        .association_double_scalar(diagnostics$leverage_max) &&
+        diagnostics$leverage_max >= 0 && diagnostics$leverage_max <= 1 &&
+        .association_double_scalar(diagnostics$dispersion, FALSE) &&
+        is.logical(diagnostics$converged) &&
+        length(diagnostics$converged) == 1L && is.na(diagnostics$converged) &&
+        is.logical(diagnostics$boundary) &&
+        length(diagnostics$boundary) == 1L && is.na(diagnostics$boundary) &&
+        .association_double_scalar(
+            diagnostics$allowable_transformations,
+            FALSE
+        ) &&
+        .association_integer_scalar(
+            diagnostics$evaluated_transformations,
+            na = TRUE
+        ) &&
+        .association_integer_scalar(diagnostics$exceedance_count, na = TRUE) &&
+        identical(diagnostics$permutation_mode, "none") &&
+        .association_integer_scalar(outcome$permutation_count, na = TRUE)
+    if (!valid) {
+        return(FALSE)
+    }
+    if (identical(design, "independent")) {
+        identical(diagnostics$variance_method, "HC3") &&
+            .association_double_scalar(diagnostics$satterthwaite_df, FALSE) &&
+            identical(outcome$reference_df, as.double(diagnostics$residual_df))
+    } else {
+        identical(diagnostics$variance_method, "CR2") &&
+            .association_double_scalar(diagnostics$satterthwaite_df) &&
+            diagnostics$satterthwaite_df >= 5 &&
+            .association_numeric_close(
+                outcome$reference_df,
+                diagnostics$satterthwaite_df
+            )
+    }
+}
+
+.valid_association_available_outcome <- function(
+    outcome,
+    key,
+    candidate,
+    hypothesis,
+    support
+) {
+    valid <- is.list(outcome) &&
+        identical(class(outcome), "imputefinder_association") &&
+        identical(names(outcome), .ASSOCIATION_AVAILABLE_OUTCOME_FIELDS) &&
+        identical(outcome$status, "available") &&
+        identical(outcome$quantity, key) &&
+        identical(outcome$candidate, candidate) &&
+        identical(outcome$stratum, hypothesis$stratum) &&
+        identical(outcome$hypothesis, key) &&
+        all(vapply(outcome[c(
+            "effect", "standard_error", "conf_low", "conf_high", "statistic",
+            "reference_df", "raw_p", "adjusted_p"
+        )], .association_double_scalar, logical(1L))) &&
+        outcome$standard_error > 0 && outcome$conf_low <= outcome$effect &&
+        outcome$conf_high >= outcome$effect && outcome$reference_df >= 3 &&
+        outcome$raw_p >= 0 && outcome$raw_p <= 1 &&
+        outcome$adjusted_p >= 0 && outcome$adjusted_p <= 1 &&
+        is.logical(outcome$flag) && length(outcome$flag) == 1L &&
+        !is.na(outcome$flag) &&
+        identical(outcome$flag, outcome$adjusted_p <= 0.05)
+    if (!valid || !identical(candidate, "a_fraction_ols_hc3_cr2")) {
+        return(FALSE)
+    }
+    secondary <- unlist(outcome[c(
+        "log_odds", "log_odds_standard_error", "log_odds_conf_low",
+        "log_odds_conf_high"
+    )], use.names = FALSE)
+    critical <- stats::qt(0.975, outcome$reference_df)
+    all(is.na(secondary)) && is.double(secondary) &&
+        .association_numeric_close(
+            outcome$statistic,
+            outcome$effect / outcome$standard_error
+        ) &&
+        .association_numeric_close(
+            outcome$raw_p,
+            2 * stats::pt(-abs(outcome$statistic), outcome$reference_df)
+        ) &&
+        .association_numeric_close(
+            outcome$conf_low,
+            outcome$effect - critical * outcome$standard_error
+        ) &&
+        .association_numeric_close(
+            outcome$conf_high,
+            outcome$effect + critical * outcome$standard_error
+        ) &&
+        .valid_association_robust_diagnostics(
+            outcome$diagnostics,
+            outcome,
+            support$design
+        )
+}
+
+.valid_association_candidate_unavailable <- function(outcome, key, candidate) {
+    allowed <- if (identical(candidate, "a_fraction_ols_hc3_cr2")) {
+        .ASSOCIATION_ROBUST_UNAVAILABLE_CODES
+    } else {
+        character()
+    }
+    is.list(outcome) &&
+        identical(class(outcome), "imputefinder_unavailable") &&
+        identical(names(outcome), .UNAVAILABLE_FIELDS) &&
+        identical(outcome$status, "unavailable") &&
+        identical(outcome$quantity, key) &&
+        .association_scalar_character(outcome$code) &&
+        outcome$code %in% allowed &&
+        .association_scalar_character(outcome$message) &&
+        is.character(outcome$requires) && length(outcome$requires) > 0L &&
+        !anyNA(outcome$requires) && all(nzchar(outcome$requires)) &&
+        !anyDuplicated(outcome$requires)
+}
+
+.valid_association_candidate_multiplicity <- function(
+    multiplicity,
+    response,
+    hypotheses,
+    available
+) {
+    strata <- unique(response$stratum)
+    valid <- is.data.frame(multiplicity) &&
+        identical(names(multiplicity), .ASSOCIATION_MULTIPLICITY_FIELDS) &&
+        identical(multiplicity$stratum, strata) && !anyNA(multiplicity) &&
+        all(multiplicity$method == "Holm") &&
+        all(multiplicity$level == 0.05) &&
+        all(vapply(multiplicity[c(
+            "family_size", "available_count", "unavailable_count"
+        )], is.integer, logical(1L))) &&
+        all(multiplicity$family_size >= 0L) &&
+        all(multiplicity$available_count >= 0L) &&
+        all(multiplicity$unavailable_count >= 0L)
+    if (!valid) {
+        return(FALSE)
+    }
+    all(vapply(seq_along(strata), function(index) {
+        selected <- hypotheses$stratum == strata[[index]]
+        count <- as.integer(sum(available[selected]))
+        multiplicity$family_size[[index]] == count &&
+            multiplicity$available_count[[index]] == count &&
+            multiplicity$unavailable_count[[index]] ==
+                as.integer(sum(!available[selected]))
+    }, logical(1L)))
+}
+
+.valid_association_candidate_diagnostics <- function(
+    diagnostics,
+    artifact,
+    available
+) {
+    if (!is.list(diagnostics)) {
+        return(FALSE)
+    }
+    strata <- unique(artifact$response$stratum)
+    records <- diagnostics$strata
+    seed <- diagnostics$seed_manifest
+    valid <- is.list(diagnostics) &&
+        identical(names(diagnostics), .ASSOCIATION_CANDIDATE_DIAGNOSTIC_FIELDS) &&
+        identical(diagnostics$input_sha256, artifact$input_sha256) &&
+        is.data.frame(records) &&
+        identical(names(records), .ASSOCIATION_STRATUM_DIAGNOSTIC_FIELDS) &&
+        identical(records$stratum, strata) &&
+        all(vapply(records[c("stratum", "acquisition")],
+            is.character, logical(1L))) &&
+        all(vapply(records[c(
+            "sample_count", "rank", "coefficient_count", "residual_df",
+            "testable_count", "unavailable_count"
+        )], is.integer, logical(1L))) &&
+        !anyNA(records) && all(records$sample_count > 0L) &&
+        all(records$rank > 0L) && all(records$coefficient_count > 0L) &&
+        all(records$residual_df == records$sample_count - records$rank) &&
+        all(records$testable_count >= 0L) &&
+        all(records$unavailable_count >= 0L) &&
+        identical(seed, .empty_association_seed_manifest()) &&
+        is.character(diagnostics$warnings) &&
+        !anyNA(diagnostics$warnings) && all(nzchar(diagnostics$warnings)) &&
+        !anyDuplicated(diagnostics$warnings) &&
+        identical(
+            diagnostics$warnings,
+            sort(diagnostics$warnings, method = "radix")
+        )
+    if (!valid) {
+        return(FALSE)
+    }
+    expected_warnings <- sort(unique(unname(vapply(
+        artifact$outcomes[!available],
+        `[[`,
+        character(1L),
+        "code"
+    ))), method = "radix")
+    if (!identical(diagnostics$warnings, expected_warnings)) {
+        return(FALSE)
+    }
+    all(vapply(seq_along(strata), function(index) {
+        stratum <- strata[[index]]
+        response_selected <- artifact$response$stratum == stratum
+        hypothesis_selected <- artifact$hypotheses$stratum == stratum
+        available_selected <- which(hypothesis_selected & available)
+        outcome_diagnostics <- lapply(
+            artifact$outcomes[available_selected],
+            `[[`,
+            "diagnostics"
+        )
+        outcome_join <- !length(outcome_diagnostics) ||
+            all(vapply(outcome_diagnostics, function(outcome) {
+                identical(outcome$rank, records$rank[[index]]) &&
+                    identical(
+                        outcome$residual_df,
+                        records$residual_df[[index]]
+                    )
+            }, logical(1L)))
+        identical(
+            records$acquisition[[index]],
+            unique(artifact$response$acquisition[response_selected])
+        ) && records$sample_count[[index]] == sum(response_selected) &&
+            records$coefficient_count[[index]] >= sum(hypothesis_selected) &&
+            records$testable_count[[index]] ==
+                sum(available[hypothesis_selected]) &&
+            records$unavailable_count[[index]] ==
+                sum(!available[hypothesis_selected]) && outcome_join
+    }, logical(1L)))
+}
+
+.validate_association_candidate_artifact <- function(
+    artifact,
+    preparation
+) {
+    if (missing(preparation)) {
+        .abort_association_candidate_artifact(
+            "Association candidate validation requires its preparation."
+        )
+    }
+    .validate_association_preparation(preparation)
+    valid <- is.list(artifact) &&
+        identical(
+            class(artifact),
+            "imputefinder_association_candidate_artifact"
+        ) &&
+        identical(names(artifact), .ASSOCIATION_CANDIDATE_ARTIFACT_FIELDS) &&
+        identical(artifact$schema, .ASSOCIATION_CANDIDATE_ARTIFACT_SCHEMA) &&
+        identical(artifact$protocol, .association_protocol()) &&
+        .association_scalar_character(artifact$candidate) &&
+        artifact$candidate %in% .ASSOCIATION_CANDIDATES &&
+        .association_sha256(artifact$input_sha256) &&
+        .valid_association_response(artifact$response)
+    if (!valid || !.valid_association_candidate_hypotheses(
+        artifact$hypotheses,
+        artifact$response
+    ) || !.valid_association_candidate_support(
+        artifact$support,
+        artifact$hypotheses
+    )) {
+        .abort_association_candidate_artifact(
+            "Stored association candidate header or joins are malformed."
+        )
+    }
+    expected_hypotheses <- artifact$hypotheses[
+        .ASSOCIATION_HYPOTHESIS_FIELDS
+    ]
+    provenance_valid <- identical(
+        artifact$protocol,
+        preparation$protocol
+    ) && identical(
+        artifact$input_sha256,
+        preparation$input_sha256
+    ) && identical(
+        artifact$response,
+        preparation$response
+    ) && identical(
+        expected_hypotheses,
+        preparation$hypotheses
+    ) && identical(artifact$support, preparation$support)
+    if (!provenance_valid) {
+        .abort_association_candidate_artifact(
+            "Stored association candidate provenance is detached."
+        )
+    }
+    outcomes <- artifact$outcomes
+    if (!is.list(outcomes) ||
+        !identical(names(outcomes), artifact$hypotheses$hypothesis)) {
+        .abort_association_candidate_artifact(
+            "Stored association candidate outcome keys are malformed."
+        )
+    }
+    available <- unname(vapply(outcomes, function(outcome) {
+        identical(class(outcome), "imputefinder_association")
+    }, logical(1L)))
+    outcome_valid <- vapply(seq_along(outcomes), function(index) {
+        outcome <- outcomes[[index]]
+        key <- names(outcomes)[[index]]
+        if (available[[index]]) {
+            .valid_association_available_outcome(
+                outcome,
+                key,
+                artifact$candidate,
+                artifact$hypotheses[index, , drop = FALSE],
+                artifact$support[index, , drop = FALSE]
+            )
+        } else {
+            .valid_association_candidate_unavailable(
+                outcome,
+                key,
+                artifact$candidate
+            )
+        }
+    }, logical(1L))
+    if (!all(outcome_valid) ||
+        !identical(artifact$hypotheses$family_member, available) ||
+        any(available & (!artifact$hypotheses$estimable |
+            !artifact$support$eligible))) {
+        .abort_association_candidate_artifact(
+            "Stored association candidate outcomes are malformed."
+        )
+    }
+    for (index in which(!available)) {
+        stratum <- preparation$strata[[
+            artifact$hypotheses$stratum[[index]]
+        ]]
+        residual_df <- length(stratum$samples) - stratum$core$rank$rank
+        degenerate <- length(unique(unname(stratum$response))) == 1L
+        expected <- if (!artifact$hypotheses$estimable[[index]]) {
+            "association_nonestimable"
+        } else if (!artifact$support$eligible[[index]]) {
+            artifact$support$code[[index]]
+        } else if (residual_df < 3L) {
+            "association_low_residual_df"
+        } else if (degenerate) {
+            "association_degenerate_response"
+        } else {
+            NULL
+        }
+        if (!is.null(expected) &&
+            !identical(outcomes[[index]]$code, expected)) {
+            .abort_association_candidate_artifact(
+                "Stored association unavailable precedence is malformed."
+            )
+        }
+        if (is.null(expected) &&
+            !outcomes[[index]]$code %in%
+                .ASSOCIATION_ROBUST_FIT_UNAVAILABLE_CODES) {
+            .abort_association_candidate_artifact(
+                "Stored association fit-stage disposition is malformed."
+            )
+        }
+        if (is.null(expected) &&
+            identical(outcomes[[index]]$code, "association_low_reference_df") &&
+            !identical(artifact$support$design[[index]], "blocked")) {
+            .abort_association_candidate_artifact(
+                "Stored association reference-df scope is malformed."
+            )
+        }
+    }
+    for (stratum in unique(artifact$hypotheses$stratum)) {
+        selected <- artifact$hypotheses$stratum == stratum & available
+        if (any(selected)) {
+            raw <- vapply(outcomes[selected], `[[`, numeric(1L), "raw_p")
+            adjusted <- vapply(
+                outcomes[selected],
+                `[[`,
+                numeric(1L),
+                "adjusted_p"
+            )
+            if (!identical(adjusted, stats::p.adjust(raw, method = "holm"))) {
+                .abort_association_candidate_artifact(
+                    "Stored association Holm arithmetic is malformed."
+                )
+            }
+        }
+    }
+    diagnostic_valid <- .valid_association_candidate_multiplicity(
+        artifact$multiplicity,
+        artifact$response,
+        artifact$hypotheses,
+        available
+    ) && .valid_association_candidate_diagnostics(
+        artifact$diagnostics,
+        artifact,
+        available
+    )
+    if (!diagnostic_valid) {
+        .abort_association_candidate_artifact(
+            "Stored association multiplicity or diagnostics are malformed."
+        )
+    }
+    expected_strata <- do.call(rbind, lapply(
+        preparation$strata,
+        function(stratum) {
+            rank <- stratum$core$rank$rank
+            data.frame(
+                stratum = stratum$stratum,
+                acquisition = stratum$acquisition,
+                sample_count = as.integer(length(stratum$samples)),
+                rank = rank,
+                coefficient_count = as.integer(ncol(
+                    stratum$core$model$matrix
+                )),
+                residual_df = as.integer(length(stratum$samples) - rank),
+                stringsAsFactors = FALSE
+            )
+        }
+    ))
+    row.names(expected_strata) <- NULL
+    provenance_valid <- provenance_valid && identical(
+        artifact$diagnostics$strata[c(
+            "stratum", "acquisition", "sample_count", "rank",
+            "coefficient_count", "residual_df"
+        )],
+        expected_strata
+    )
+    if (!provenance_valid) {
+        .abort_association_candidate_artifact(
+            "Stored association candidate provenance is detached."
+        )
+    }
+    invisible(artifact)
+}
