@@ -2775,7 +2775,7 @@ Verification:
   contract `422954c88ed7683f58ac296cb4d9e785d61c3f80a276914235d4b285bbc16547`,
   and gate registry
   `65f01b20e74b216399e17433df393f32e9bda189f73992ab419069cf7d5c343b`;
-- registered association verifier → 584 expectations with stable pre/post source
+- registered association verifier → 587 expectations with stable pre/post source
   and namespace hashes; complete package source suite → zero failures, warnings,
   errors, or skips;
 - vignette-bearing source build succeeds; source-tarball `R CMD check --as-cran
@@ -2783,12 +2783,19 @@ Verification:
   submission note; `git diff --check` passes;
 - independent statistical + contract reviews → no remaining result-sensitive,
   schema, resolver, inventory, or authorization finding;
-- study status remains manifest absent, inputs `0/416`, results `0/1248`,
-  evidence absent. No candidate/development/confirmation computation or
+- first locked manifest `f22549e6…` reached the candidate command but failed in
+  generator loading before writing any artifact: the isolated environment
+  inherited base only while the frozen generator uses `stats::ave`. Inputs
+  remained `0/416`, results `0/1248`, and evidence absent;
+- corrected runtime inherits the sealed `stats` namespace. A focused loader rail
+  plus ephemeral end-to-end replay validates the first 3000x16 input at
+  `fbafc276…`; the failed zero-artifact manifest is retired intact before a new
+  implementation seal. No candidate estimator, development/confirmation, or
   external artifact opened.
 
-Exact next task → scoped pre-allocation commit, immutable implementation-manifest
-lock, then candidate replicates `1-32` only. Resolve and verify candidate
-evidence before any development or public materialization.
+Exact next task → scoped loader-fix commit, recoverable retirement of the
+zero-artifact manifest, replacement implementation lock, then candidate
+replicates `1-32` only. Resolve and verify candidate evidence before any
+development or public materialization.
 
 Blockers → none.

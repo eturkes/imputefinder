@@ -956,20 +956,12 @@
     )
 }
 
-.association_protocol_runtime <- function(resolver) {
-    .validate_association_study_resolver(
-        resolver,
-        resolver$implementation_hash
-    )
-    if (!identical(resolver$mode, "frozen_protocol")) {
-        .abort_association_evidence(
-            "Association generator runtime requires a protocol resolver."
-        )
-    }
+.association_load_protocol_generator <- function(root) {
+    root <- .association_manifest_root(root)
     previous <- getwd()
     on.exit(setwd(previous), add = TRUE)
-    setwd(resolver$root)
-    generator <- new.env(parent = baseenv())
+    setwd(root)
+    generator <- new.env(parent = asNamespace("stats"))
     loaded <- tryCatch({
         sys.source(
             "dev/m12-generator-validation.R",
@@ -1004,6 +996,19 @@
         )
     }
     list(simulate = generator$simulate_m12b_scenario)
+}
+
+.association_protocol_runtime <- function(resolver) {
+    .validate_association_study_resolver(
+        resolver,
+        resolver$implementation_hash
+    )
+    if (!identical(resolver$mode, "frozen_protocol")) {
+        .abort_association_evidence(
+            "Association generator runtime requires a protocol resolver."
+        )
+    }
+    .association_load_protocol_generator(resolver$root)
 }
 
 .association_protocol_input <- function(

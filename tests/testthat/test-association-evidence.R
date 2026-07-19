@@ -253,6 +253,17 @@ test_that("production study constants are exact frozen-contract projections", {
         gates$gate_binding_hash,
         expected_gates$gate_binding_hash
     )
+    runtime <- imputefinder:::.association_load_protocol_generator(root)
+    expect_true(is.function(runtime$simulate))
+    expect_identical(
+        parent.env(environment(runtime$simulate)),
+        asNamespace("stats")
+    )
+    expect_true(exists(
+        "ave",
+        envir = environment(runtime$simulate),
+        inherits = TRUE
+    ))
 })
 
 test_that("study identities and selected-winner gates exactly mirror v4", {
