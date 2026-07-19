@@ -752,6 +752,14 @@ quasibinomial model as empirical rather than MSqRob-equivalent.
 `dev/m12-validation-contract.md` owns thresholds, hashes, audit evidence, and
 the exact candidate/perturbation summary.
 
+M13's pre-result Track A v3 addendum binds the immutable M12 hashes while
+freezing one coefficient per hypothesis, acquisition-specific rebuilt models,
+support cells, constrained-null permutation, canonical mask/design seeds,
+result schema, candidate-agnostic opportunity denominators, four fixed
+alternative targets, and exact candidate/development/confirmation stage seals.
+`dev/m13-association-contract.md` owns these superseding details; its aggregate
+hash is `a1d89ca88aec1248ef717b13aaa67eb0b0603e6dfb3057e49d3229ba2344b72d`.
+
 Gate: protocol hashes exist; every A-C claim has an executable numeric gate and
 failure rule; v1 behavior/limitations reproduce on the expanded harness.
 
@@ -759,10 +767,12 @@ failure rule; v1 behavior/limitations reproduce on the expanded harness.
 
 - [x] Implement typed design alignment and algebraic estimability/aliasing.
 - [x] Implement pre-rescue sample/condition/nuisance coverage summaries.
+- [x] Freeze the executable M13c association addendum before candidate results.
 - [ ] Implement only predeclared association terms and uncertainty.
 - [ ] Add stored diagnostic data, concise print/summary, and human wording.
-- [ ] Run all A gates; retain failures and assign the association panel
-      `confirmation_candidate`, `killed`, or `parked`.
+- [ ] Run candidate + development A gates; retain failures and assign the
+      association panel `confirmation_candidate`, `killed`, or `parked`.
+      Confirmation gates remain sealed for synchronized M15P.
 
 Gate: the algebraic design/estimability core must pass because B/C depend on it.
 The association panel closes through a recorded disposition; only a passing

@@ -17,10 +17,12 @@ delayed backend; J1 standards QC; J2 atlas. Parked work has no active checkbox
 or release obligation.
 
 Exact method, dependency graph, falsification gates, and Definition of Done →
-`PLAN.md` Sections 2-14. Exact next implementation task → M13c: encode red A
-association result/support/abstention tests, implement only the three frozen
-candidate engines, then open synthetic candidate replicates `1-32` for
-gate-first selection or a no-winner result. Keep association-candidate
+`PLAN.md` Sections 2-14. M13c v3 contract hash =
+`a1d89ca88aec1248ef717b13aaa67eb0b0603e6dfb3057e49d3229ba2344b72d`.
+Exact next implementation task → encode red A association
+response/hypothesis/support/result/abstention/hash tests, then implement only
+the three frozen candidate engines. Open synthetic candidate replicates `1-32`
+only after the implementation rails pass. Keep association-candidate
 computations on development replicates `33-64`, HarmonizR development bytes,
 and all confirmation evidence sealed until the candidate choice locks.
 
@@ -2332,5 +2334,63 @@ independent-unit quasibinomial candidates, then run only simulation candidate
 replicates `1-32` for selection/no-winner. Keep A candidate computations on
 development replicates `33-64`, HarmonizR bytes, and confirmation sealed until
 selection locks.
+
+Blockers → none.
+
+### 2026-07-19 - M13c pre-result association addendum v3
+
+Scope → close Track A ambiguities before any candidate computation while
+preserving every M12 threshold, candidate, generator, evidence role, and seal.
+
+Freeze:
+
+- standalone executable `m13_a_association_protocol_v3` binds the immutable
+  M12 contract/gate/A-protocol/bundle and generator protocol/audit hashes;
+- globally observable denominator remains fixed over the complete input;
+  acquisition levels define separate rebuilt model/Holm strata;
+- hypotheses are canonical 1-df condition/nuisance coefficients and explicit
+  condition/nuisance-only product columns; intercept, block, and acquisition
+  remain adjustment/descriptive-only;
+- support now has exact categorical sides, numeric unit-position median sides,
+  Cartesian interaction cells, independent `4`/side and blocked `6`-complete-
+  block floors;
+- HC3, full-design identity-working-model CR2/Satterthwaite, constrained-null
+  Freedman-Lane, empirical independent quasibinomial, abstention, covariance,
+  transformation-count, and canonical seed/hash rules are executable;
+- Monte Carlo transforms now have an exact seeded stream-to-map algorithm,
+  identity/duplicate rejection, retry audit, map hash, and RNG restoration;
+- exact nested association/result/unavailable schemas + candidate-agnostic
+  opportunity denominator prevent silent successful-fit denominator changes;
+- top-level abstention represents zero observable features/no hypotheses;
+  winner panels bind v3 gate, implementation, and candidate-evidence hashes;
+- fixed alternative targets = DDA crossed `batch[batch_2]`, DDA unequal
+  `condition[D]`, DIA partial `batch[batch_3]`, DIA paired `condition[B]`;
+- corrected effective Track A scope for `dda_monotone_unequal`; candidate gates
+  bind replicates `1-32`; every screening-qualified candidate faces the full
+  gate before deterministic ranking; development opens only after winner lock;
+  confirmation remains M15P-only;
+- adversarial architecture/contract/mathematical rereview closed all pre-seal
+  findings; historical M12 objects remain byte-identical.
+
+Verification:
+
+- executable contract self-tests reject upstream/component/hash/allocation/
+  stage drift, incomplete gates, malformed result bindings, and prove canonical
+  collision-safe seed/map ordering plus RNG restoration;
+- protocol hash =
+  `cf064d6d41bdf0cf774a0a223d7301e16953ff1c16614ff04a752457df6b44d1`;
+- aggregate v3 hash =
+  `a1d89ca88aec1248ef717b13aaa67eb0b0603e6dfb3057e49d3229ba2344b72d`;
+- `Rscript --vanilla dev/m13-association-contract.R --verify` passes all 24
+  named self-tests with exact component hashes;
+- `git diff --check` passes; no candidate simulation ran and no external result
+  artifact was read.
+
+Exact next task → red tests for response, strata, coefficient eligibility,
+support boundaries, available/unavailable records, Holm, canonical mask/design
+hash, implementation/evidence manifests, candidate opportunity denominators,
+HC3/CR2, restricted transformations, and quasibinomial effects. Keep all result
+allocations sealed until those rails are green and the implementation manifest
+locks.
 
 Blockers → none.
