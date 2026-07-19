@@ -18,14 +18,12 @@ or release obligation.
 
 Exact method, dependency graph, falsification gates, and Definition of Done →
 `PLAN.md` Sections 2-14. M13c v3 contract hash =
-`04e824321ac68c73633277064397f1a3fa96ba73ff342fbfe575df7fc6b1f4a6`.
-Exact next implementation task → red/green constrained-null transformations,
-exact/Monte Carlo maps, seed manifests, and the restricted Freedman-Lane
-candidate; then independent quasibinomial, final-panel handoff, and the
-implementation manifest. Open synthetic candidate replicates `1-32` only after
-every implementation rail passes. Keep development replicates `33-64`,
-HarmonizR development bytes, and all confirmation evidence sealed until the
-candidate choice locks.
+`85d121ebd5ddd589be0f389553a3b7ffa6076a12a8fcbcb476a8969f7d987ae4`.
+Exact next implementation task → red/green the independent quasibinomial
+candidate, then final-panel handoff + implementation manifest. Open synthetic
+candidate replicates `1-32` only after every implementation rail passes. Keep
+development replicates `33-64`, HarmonizR development bytes, and all
+confirmation evidence sealed until the candidate choice locks.
 
 ## Completed v1 release path
 
@@ -2533,5 +2531,89 @@ exact/Monte Carlo map/seed manifest, and restricted Freedman-Lane candidate on
 local unit fixtures. Then implement the independent quasibinomial candidate +
 final handoff before locking the implementation manifest and opening candidate
 replicates `1-32`.
+
+Blockers → none.
+
+### 2026-07-19 - M13f restricted Freedman-Lane candidate
+
+Scope → implement and independently validate only the frozen
+`a_fraction_freedman_lane` candidate on local fixtures. Preserve all synthetic
+candidate/development allocations, external result bytes, final panel, and the
+implementation/evidence manifest as sealed.
+
+Pre-result amendment:
+
+- implementation exposed three impossible/ambiguous frozen requirements before
+  any result allocation: delimiter-joined seeds excluded valid acquisition
+  labels, the blocked helper contradicted radix block ordering, and finite
+  doubles could not hold every exact transformation count;
+- the authorized v3 reseal uses a domain-separated typed length-prefixed seed
+  key, caller-preserved radix block order, `log(T)` branch decisions, and
+  finite-double saturation only for Monte Carlo diagnostics;
+- global seed collision resolution still covers every planned Monte Carlo
+  instance, while result manifests retain only available outcomes; every
+  byte-identical residual stabilizer refits the literal original response;
+- the final seal also binds the complete-QR CR2 residual projector and rejects
+  malformed seed types/keys, duplicate per-hypothesis map hashes, and retry
+  counts beyond the declared limit in both executable-contract and production
+  validation;
+- protocol/contract/gate identities now equal
+  `5f484f614d72d9560d96e2b8f75b71cc1027950958ea1459be93eece595069f5` /
+  `85d121ebd5ddd589be0f389553a3b7ffa6076a12a8fcbcb476a8969f7d987ae4` /
+  `f2fd8d0171003e0ae9b31757acf2d43acf7477965d517f1757f4d895c6abe731`.
+
+Implementation:
+
+- each coefficient restriction is constructed in the retained full-model rank
+  coordinates; the constrained-null projection produces `y0_hat`, residuals,
+  and the exact frozen `P Z0` tolerance;
+- independent transforms use pairwise-complete, transitive equivalence groups;
+  exact maps are globally lexicographic. Blocked transforms use radix block
+  swaps of complete condition/nuisance-matched sibling bundles;
+- `20 <= T <= 100000` enumerates every distinct map; larger spaces generate
+  9,999 distinct seeded nonidentity maps with exact RNG restoration, retry +
+  big-endian map-hash audit, and frozen `+1` Monte Carlo arithmetic;
+- every transform recomputes the full scalar HC3/CR2 Wald statistic through a
+  cached-response refit. A complete-QR orthogonal-complement projector prevents
+  roundoff-only CR2 PSD failures at the first blocked Monte Carlo size;
+- hypotheses plan/evaluate/discard maps sequentially. Artifact validation
+  regenerates maps, refits all transformed responses, recomputes exceedance,
+  p-value, disposition, Holm families, and the available-only seed manifest;
+- low resolution, incompatible layouts, retry exhaustion, and transformed-fit
+  failure enter the exact frozen per-hypothesis unavailable path.
+
+Adversarial corrections:
+
+- independent connected-component traversal initially reduced the wrong matrix
+  margin; a multi-group exact-map fixture now locks the correct partition;
+- identity-only response preservation undercounted nonidentity residual
+  stabilizer ties; literal residual equality now selects original response
+  bytes for every stabilizer map;
+- a shape-valid artifact could originally forge coherent exceedance/p-value
+  arithmetic; provenance validation now reruns every transformation;
+- all-hypothesis map retention and exact planning duplicated avoidable memory;
+  enumeration/generation is now delayed to one evaluated hypothesis at a time;
+- retry exhaustion originally aborted the full candidate and unavailable Monte
+  Carlo rows leaked seed records; both now obey per-hypothesis disposition and
+  result-manifest rules.
+
+Verification:
+
+- focused restricted-permutation suite → 13 tests / 149 expectations;
+  focused robust suite → 7 tests / 90 expectations; both pass without
+  failure, warning, error, or skip;
+- package-wide source suite → 181 tests / 1,401 expectations, zero failures,
+  warnings, errors, or skips;
+- executable frozen contract → 30/30 named self-tests; exact new protocol,
+  component, contract, gate, allocation, and stage identities reproduce;
+- vignette-bearing source build succeeds; source-tarball
+  `R CMD check --as-cran --no-manual` passes every substantive rail with only
+  the expected new-submission note; `git diff --check` passes;
+- no candidate simulation ran; replicates `1-32`, development `33-64`,
+  HarmonizR bytes, and confirmation remain sealed.
+
+Exact next task → red/green the empirical independent-unit quasibinomial
+candidate, then final panel/handoff + implementation manifest. Open candidate
+replicates `1-32` only after all three candidates and manifest rails lock.
 
 Blockers → none.

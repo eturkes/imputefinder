@@ -95,10 +95,16 @@ K = (Z'Z)^-1
 a_hat = K Z' y
 beta_hat = V_r a_hat
 H = U_r U_r'
-M = I - H
+M = I - H                         [independent]
+M = Q_perp Q_perp'                [blocked]
 e = M y
 d0 = n - r
 ```
+
+For blocked CR2, obtain `[Q_r,Q_perp]` from the complete LAPACK Householder QR
+of `U_r`, form `M = Q_perp Q_perp'`, and symmetrize it. This is mathematically
+`I-H`; the orthogonal-complement construction is frozen because direct
+subtraction can create tolerance-scale negative cluster-block eigenvalues.
 
 For raw coefficient axis `l_j`, set `c_j = V_r' l_j` and
 `theta_j = c_j'a_hat`. This retains every estimable direction without inverting
@@ -136,7 +142,7 @@ With a declared block, retain the complete design including block fixed
 effects; clusters are blocks. For cluster selector `C_g`:
 
 ```
-B_g = C_g M C_g' = I - H_gg
+B_g = C_g M C_g'
 A_g = B_g^(+1/2)
 s_g = Z_g' A_g e_g
 V_CR2 = K [sum_g s_g s_g'] K
@@ -212,8 +218,11 @@ y_b* = y0_hat + P_b e0
 ```
 
 Every transform refits the full model and recomputes the complete HC3/CR2 Wald
-statistic `W_b* = theta_b*^2/v_b*`. A failed transform makes the hypothesis
-unavailable; no draw is discarded. Require
+statistic `W_b* = theta_b*^2/v_b*`. When `P_b e0` is byte-identical to `e0`,
+refit the original response bytes rather than numerically recomposing the same
+`y`; this preserves the literal tie for every distinct residual-stabilizer map.
+A failed transform makes the hypothesis unavailable; no draw is discarded.
+Require
 
 ```
 max(abs(P_b Z0-Z0)) <= sqrt(.Machine$double.eps) * max(1,max(abs(Z0)))
@@ -227,8 +236,9 @@ requiring its label vector to be invariant would forbid the intended test.
 
 Independent maps permute canonical unit IDs inside constrained-null row groups.
 Two rows share a group only when every pair meets the tolerance above; a
-nontransitive tolerance relation is incompatible. Enumerate radix-sorted groups
-and units, identity first, then lexicographic within-group permutations.
+nontransitive tolerance relation is incompatible. Radix-sort groups and units,
+then enumerate distinct canonical row-index vectors in global lexicographic
+order with identity first.
 `T = product_g factorial(n_g)`.
 
 Blocked maps require a categorical condition pivot: the radix-first condition
@@ -249,10 +259,19 @@ maps produce equal responses/statistics. Deduplicate maps before counting.
 - `T > 100000` - draw 9,999 distinct nonidentity maps and use
   `(1 + sum(W_b* >= W_obs))/10000`.
 
+The branch uses `log(T)`, so every finite map space above 100,000 reaches Monte
+Carlo even when `T` exceeds double range. The diagnostic
+`allowable_transformations` is exact for enumerated spaces; for Monte Carlo it
+stores the nearest finite-double `T`, saturated at `.Machine$double.xmax`.
+
 Finite doubles use literal `>=`; there is no tie jitter. The Monte Carlo seed
 function accepts the complete candidate/acquisition/hypothesis manifest in one
 call, sorts it canonically, and resolves collisions globally before returning
-any seed. For each sorted draw ID, its seed starts a fresh
+any seed. Its SHA-256 input is a `seed-v2` domain tag followed by the typed,
+length-prefixed text vector of protocol, input hash, candidate, acquisition,
+hypothesis, decimal draw ID, and decimal collision nonce; every valid
+acquisition label is therefore unambiguous. For each sorted draw ID, its seed
+starts a fresh
 Mersenne-Twister/Inversion/Rejection stream. An independent proposal calls
 `sample.int(n_g)` once per radix group and maps the group to that sampled order;
 a blocked proposal calls `sample.int(2, B, replace=TRUE)-1` and composes the
@@ -261,8 +280,9 @@ accepted row-index vector, then continue the same draw stream. Record the retry
 count and SHA-256 of the big-endian integer map. More than 1,000,000 retries for
 one draw is `association_numerical_failure`. This is sequential rejection over
 the finite product map space; unique seeds alone are never treated as proof of
-unique transforms. RNG kind, seed existence, and seed bytes are restored
-exactly.
+unique transforms. The result seed manifest retains rows only for available
+Monte Carlo outcomes, although collision resolution always used the complete
+pre-map manifest. RNG kind, seed existence, and seed bytes are restored exactly.
 
 ## Empirical quasibinomial candidate
 

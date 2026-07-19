@@ -1,5 +1,8 @@
 .ASSOCIATION_CANDIDATE_ARTIFACT_SCHEMA <- "association_candidate_artifact_v1"
-.ASSOCIATION_CANDIDATES <- "a_fraction_ols_hc3_cr2"
+.ASSOCIATION_CANDIDATES <- c(
+    "a_fraction_ols_hc3_cr2",
+    "a_fraction_freedman_lane"
+)
 .ASSOCIATION_CANDIDATE_ARTIFACT_FIELDS <- c(
     "schema", "protocol", "candidate", "input_sha256", "response",
     "hypotheses", "support", "outcomes", "multiplicity", "diagnostics"
@@ -75,6 +78,16 @@
     "association_low_reference_df",
     "association_singular_covariance",
     "association_numerical_failure"
+)
+.ASSOCIATION_FREEDMAN_LANE_UNAVAILABLE_CODES <- c(
+    .ASSOCIATION_ROBUST_UNAVAILABLE_CODES,
+    "association_low_permutation_resolution",
+    "association_incompatible_permutation"
+)
+.ASSOCIATION_FREEDMAN_LANE_FIT_UNAVAILABLE_CODES <- c(
+    .ASSOCIATION_ROBUST_FIT_UNAVAILABLE_CODES,
+    "association_low_permutation_resolution",
+    "association_incompatible_permutation"
 )
 
 .abort_association_candidate_artifact <- function(message) {
@@ -158,6 +171,14 @@
         association_low_reference_df = c(
             "The CR2 scalar reference distribution has fewer than five degrees of freedom.",
             "CR2 Satterthwaite degrees of freedom of at least five"
+        ),
+        association_low_permutation_resolution = c(
+            "The constrained-null design admits fewer than 20 transformations.",
+            "at least 20 distinct constrained-null transformations"
+        ),
+        association_incompatible_permutation = c(
+            "The declared design does not admit the frozen constrained-null maps.",
+            "a design with compatible constrained-null permutation maps"
         ),
         association_degenerate_response = c(
             "The detection-fraction response is constant.",
@@ -374,7 +395,8 @@
 .valid_association_robust_diagnostics <- function(
     diagnostics,
     outcome,
-    design
+    design,
+    candidate
 ) {
     valid <- is.list(diagnostics) &&
         identical(names(diagnostics), .ASSOCIATION_OUTCOME_DIAGNOSTIC_FIELDS) &&
@@ -389,21 +411,11 @@
         length(diagnostics$converged) == 1L && is.na(diagnostics$converged) &&
         is.logical(diagnostics$boundary) &&
         length(diagnostics$boundary) == 1L && is.na(diagnostics$boundary) &&
-        .association_double_scalar(
-            diagnostics$allowable_transformations,
-            FALSE
-        ) &&
-        .association_integer_scalar(
-            diagnostics$evaluated_transformations,
-            na = TRUE
-        ) &&
-        .association_integer_scalar(diagnostics$exceedance_count, na = TRUE) &&
-        identical(diagnostics$permutation_mode, "none") &&
-        .association_integer_scalar(outcome$permutation_count, na = TRUE)
+        .association_scalar_character(diagnostics$permutation_mode)
     if (!valid) {
         return(FALSE)
     }
-    if (identical(design, "independent")) {
+    reference_valid <- if (identical(design, "independent")) {
         identical(diagnostics$variance_method, "HC3") &&
             .association_double_scalar(diagnostics$satterthwaite_df, FALSE) &&
             identical(outcome$reference_df, as.double(diagnostics$residual_df))
@@ -416,6 +428,66 @@
                 diagnostics$satterthwaite_df
             )
     }
+    if (!reference_valid) {
+        return(FALSE)
+    }
+    freedman_lane <- identical(
+        candidate,
+        .ASSOCIATION_FREEDMAN_LANE_CANDIDATE
+    )
+    if (!freedman_lane) {
+        return(
+            .association_double_scalar(
+                diagnostics$allowable_transformations,
+                FALSE
+            ) && .association_integer_scalar(
+                diagnostics$evaluated_transformations,
+                na = TRUE
+            ) && .association_integer_scalar(
+                diagnostics$exceedance_count,
+                na = TRUE
+            ) && identical(diagnostics$permutation_mode, "none") &&
+                .association_integer_scalar(
+                    outcome$permutation_count,
+                    na = TRUE
+                )
+        )
+    }
+    allowable <- diagnostics$allowable_transformations
+    valid <- .association_double_scalar(allowable) && allowable >= 20 &&
+        allowable == floor(allowable) &&
+        .association_integer_scalar(
+            diagnostics$evaluated_transformations,
+            1L
+        ) && .association_integer_scalar(
+            diagnostics$exceedance_count,
+            0L
+        ) && .association_integer_scalar(outcome$permutation_count, 20L)
+    if (!valid) {
+        return(FALSE)
+    }
+    if (allowable <= .ASSOCIATION_EXACT_PERMUTATION_MAX) {
+        valid <- identical(diagnostics$permutation_mode, "exact") &&
+            diagnostics$evaluated_transformations == allowable &&
+            outcome$permutation_count ==
+                diagnostics$evaluated_transformations &&
+            diagnostics$exceedance_count >= 1L &&
+            diagnostics$exceedance_count <=
+                diagnostics$evaluated_transformations
+        expected_p <- diagnostics$exceedance_count /
+            diagnostics$evaluated_transformations
+    } else {
+        valid <- identical(
+            diagnostics$permutation_mode,
+            "monte_carlo"
+        ) && diagnostics$evaluated_transformations ==
+            .ASSOCIATION_MONTE_CARLO_DRAWS &&
+            outcome$permutation_count == 10000L &&
+            diagnostics$exceedance_count <=
+                .ASSOCIATION_MONTE_CARLO_DRAWS
+        expected_p <- (1 + diagnostics$exceedance_count) / 10000
+    }
+    valid && identical(outcome$raw_p, as.double(expected_p))
 }
 
 .valid_association_available_outcome <- function(
@@ -444,7 +516,12 @@
         is.logical(outcome$flag) && length(outcome$flag) == 1L &&
         !is.na(outcome$flag) &&
         identical(outcome$flag, outcome$adjusted_p <= 0.05)
-    if (!valid || !identical(candidate, "a_fraction_ols_hc3_cr2")) {
+    robust <- identical(candidate, "a_fraction_ols_hc3_cr2")
+    freedman_lane <- identical(
+        candidate,
+        .ASSOCIATION_FREEDMAN_LANE_CANDIDATE
+    )
+    if (!valid || (!robust && !freedman_lane)) {
         return(FALSE)
     }
     secondary <- unlist(outcome[c(
@@ -452,15 +529,21 @@
         "log_odds_conf_high"
     )], use.names = FALSE)
     critical <- stats::qt(0.975, outcome$reference_df)
-    all(is.na(secondary)) && is.double(secondary) &&
+    statistic_valid <- if (freedman_lane) {
+        outcome$statistic >= 0 && .association_numeric_close(
+            outcome$statistic,
+            (outcome$effect / outcome$standard_error)^2
+        )
+    } else {
         .association_numeric_close(
             outcome$statistic,
             outcome$effect / outcome$standard_error
-        ) &&
-        .association_numeric_close(
+        ) && .association_numeric_close(
             outcome$raw_p,
             2 * stats::pt(-abs(outcome$statistic), outcome$reference_df)
-        ) &&
+        )
+    }
+    all(is.na(secondary)) && is.double(secondary) && statistic_valid &&
         .association_numeric_close(
             outcome$conf_low,
             outcome$effect - critical * outcome$standard_error
@@ -472,13 +555,19 @@
         .valid_association_robust_diagnostics(
             outcome$diagnostics,
             outcome,
-            support$design
+            support$design,
+            candidate
         )
 }
 
 .valid_association_candidate_unavailable <- function(outcome, key, candidate) {
     allowed <- if (identical(candidate, "a_fraction_ols_hc3_cr2")) {
         .ASSOCIATION_ROBUST_UNAVAILABLE_CODES
+    } else if (identical(
+        candidate,
+        .ASSOCIATION_FREEDMAN_LANE_CANDIDATE
+    )) {
+        .ASSOCIATION_FREEDMAN_LANE_UNAVAILABLE_CODES
     } else {
         character()
     }
@@ -526,6 +615,76 @@
     }, logical(1L)))
 }
 
+.valid_association_freedman_lane_seed_manifest <- function(seed, artifact) {
+    monte_carlo <- vapply(artifact$outcomes, function(outcome) {
+        identical(class(outcome), "imputefinder_association") &&
+            identical(outcome$diagnostics$permutation_mode, "monte_carlo")
+    }, logical(1L))
+    monte_carlo_ids <- artifact$hypotheses$hypothesis[monte_carlo]
+    if (identical(seed, .empty_association_seed_manifest())) {
+        return(!length(monte_carlo_ids))
+    }
+    valid <- is.data.frame(seed) && nrow(seed) > 0L &&
+        identical(names(seed), .ASSOCIATION_SEED_MANIFEST_FIELDS) &&
+        all(vapply(seed[c(
+            "protocol_id", "candidate_id", "acquisition", "hypothesis_id",
+            "map_sha256"
+        )], is.character, logical(1L))) &&
+        all(vapply(seed[c(
+            "draw_id", "seed", "seed_nonce", "map_retry"
+        )], is.integer, logical(1L))) && !anyNA(seed) &&
+        all(seed$protocol_id == .ASSOCIATION_PROTOCOL_ID) &&
+        all(seed$candidate_id == .ASSOCIATION_FREEDMAN_LANE_CANDIDATE) &&
+        all(seed$hypothesis_id %in% monte_carlo_ids) &&
+        all(seed$draw_id > 0L) && all(seed$seed > 0L) &&
+        all(seed$seed_nonce >= 0L) && all(seed$map_retry >= 0L) &&
+        all(seed$map_retry <= .ASSOCIATION_MAP_RETRY_LIMIT) &&
+        all(grepl("^[0-9a-f]{64}$", seed$map_sha256)) &&
+        !anyDuplicated(seed$seed)
+    if (!valid) {
+        return(FALSE)
+    }
+    ordered <- do.call(order, c(
+        unname(seed[c(
+            "candidate_id", "acquisition", "hypothesis_id", "draw_id"
+        )]),
+        list(method = "radix")
+    ))
+    if (!identical(ordered, seq_len(nrow(seed)))) {
+        return(FALSE)
+    }
+    instances <- unique(seed[c(
+        "candidate_id", "acquisition", "hypothesis_id"
+    )])
+    row.names(instances) <- NULL
+    if (!identical(
+        sort(instances$hypothesis_id, method = "radix"),
+        sort(monte_carlo_ids, method = "radix")
+    )) {
+        return(FALSE)
+    }
+    all(vapply(seq_len(nrow(instances)), function(index) {
+        instance <- instances[index, , drop = FALSE]
+        selected <- seed$candidate_id == instance$candidate_id &
+            seed$acquisition == instance$acquisition &
+            seed$hypothesis_id == instance$hypothesis_id
+        rows <- seed[selected, , drop = FALSE]
+        hypothesis_index <- match(
+            instance$hypothesis_id,
+            artifact$hypotheses$hypothesis
+        )
+        stratum <- artifact$hypotheses$stratum[[hypothesis_index]]
+        acquisition <- unique(
+            artifact$response$acquisition[
+                artifact$response$stratum == stratum
+            ]
+        )
+        identical(rows$draw_id, seq_len(.ASSOCIATION_MONTE_CARLO_DRAWS)) &&
+            !anyDuplicated(rows$map_sha256) &&
+            identical(instance$acquisition, acquisition)
+    }, logical(1L)))
+}
+
 .valid_association_candidate_diagnostics <- function(
     diagnostics,
     artifact,
@@ -537,6 +696,19 @@
     strata <- unique(artifact$response$stratum)
     records <- diagnostics$strata
     seed <- diagnostics$seed_manifest
+    seed_valid <- if (identical(
+        artifact$candidate,
+        "a_fraction_ols_hc3_cr2"
+    )) {
+        identical(seed, .empty_association_seed_manifest())
+    } else if (identical(
+        artifact$candidate,
+        .ASSOCIATION_FREEDMAN_LANE_CANDIDATE
+    )) {
+        .valid_association_freedman_lane_seed_manifest(seed, artifact)
+    } else {
+        FALSE
+    }
     valid <- is.list(diagnostics) &&
         identical(names(diagnostics), .ASSOCIATION_CANDIDATE_DIAGNOSTIC_FIELDS) &&
         identical(diagnostics$input_sha256, artifact$input_sha256) &&
@@ -554,7 +726,7 @@
         all(records$residual_df == records$sample_count - records$rank) &&
         all(records$testable_count >= 0L) &&
         all(records$unavailable_count >= 0L) &&
-        identical(seed, .empty_association_seed_manifest()) &&
+        seed_valid &&
         is.character(diagnostics$warnings) &&
         !anyNA(diagnostics$warnings) && all(nzchar(diagnostics$warnings)) &&
         !anyDuplicated(diagnostics$warnings) &&
@@ -602,6 +774,130 @@
             records$unavailable_count[[index]] ==
                 sum(!available[hypothesis_selected]) && outcome_join
     }, logical(1L)))
+}
+
+.valid_association_freedman_lane_provenance <- function(
+    artifact,
+    preparation,
+    available
+) {
+    records <- tryCatch(
+        .association_freedman_lane_records(preparation),
+        error = function(error) NULL
+    )
+    if (is.null(records) || length(records) != nrow(artifact$hypotheses)) {
+        return(FALSE)
+    }
+    seeds <- tryCatch(
+        .association_freedman_lane_seeds(
+            records,
+            preparation$input_sha256
+        ),
+        error = function(error) NULL
+    )
+    if (is.null(seeds)) {
+        return(FALSE)
+    }
+    seed_manifests <- vector("list", length(records))
+    for (index in seq_along(records)) {
+        record <- records[[index]]
+        outcome <- artifact$outcomes[[index]]
+        if (!is.null(record$code)) {
+            if (available[[index]] || !identical(
+                outcome$code,
+                record$code
+            )) {
+                return(FALSE)
+            }
+            next
+        }
+        generated <- NULL
+        if (identical(record$permutations$mode, "monte_carlo")) {
+            generated <- tryCatch(
+                .association_freedman_lane_generate_maps(record, seeds),
+                error = function(error) NULL
+            )
+            if (is.null(generated)) {
+                return(FALSE)
+            }
+            if (!generated$ok) {
+                if (available[[index]] || !identical(
+                    outcome$code,
+                    "association_numerical_failure"
+                )) {
+                    return(FALSE)
+                }
+                next
+            }
+            record$maps <- generated$maps
+        }
+        evaluated <- .association_freedman_lane_evaluate(record)
+        if (!evaluated$ok) {
+            if (available[[index]] || !identical(
+                outcome$code,
+                "association_numerical_failure"
+            )) {
+                return(FALSE)
+            }
+            next
+        }
+        if (!available[[index]]) {
+            return(FALSE)
+        }
+        diagnostics <- outcome$diagnostics
+        observed <- evaluated$result
+        valid <- all(vapply(c(
+            "effect", "standard_error", "conf_low", "conf_high",
+            "reference_df"
+        ), function(field) {
+            .association_numeric_close(outcome[[field]], observed[[field]])
+        }, logical(1L))) &&
+            identical(outcome$statistic, evaluated$statistic) &&
+            identical(outcome$raw_p, evaluated$raw_p) &&
+            identical(
+                outcome$permutation_count,
+                evaluated$permutation_count
+            ) && identical(
+                diagnostics$variance_method,
+                observed$diagnostics$variance_method
+            ) && identical(diagnostics$rank, observed$diagnostics$rank) &&
+            identical(
+                diagnostics$residual_df,
+                observed$diagnostics$residual_df
+            ) && .association_numeric_close(
+                diagnostics$leverage_max,
+                observed$diagnostics$leverage_max
+            ) && identical(
+                is.na(diagnostics$satterthwaite_df),
+                is.na(observed$diagnostics$satterthwaite_df)
+            ) && (is.na(diagnostics$satterthwaite_df) ||
+                .association_numeric_close(
+                    diagnostics$satterthwaite_df,
+                    observed$diagnostics$satterthwaite_df
+                )) && identical(
+                diagnostics$allowable_transformations,
+                evaluated$allowable_transformations
+            ) && identical(
+                diagnostics$evaluated_transformations,
+                evaluated$evaluated_transformations
+            ) && identical(
+                diagnostics$exceedance_count,
+                evaluated$exceedance_count
+            ) && identical(
+                diagnostics$permutation_mode,
+                evaluated$permutation_mode
+            )
+        if (!valid) {
+            return(FALSE)
+        }
+        if (!is.null(generated)) {
+            seed_manifests[[index]] <- generated$manifest
+        }
+    }
+    expected_seed <- .association_bind_freedman_lane_seed_manifests(
+        seed_manifests
+    )
+    identical(artifact$diagnostics$seed_manifest, expected_seed)
 }
 
 .validate_association_candidate_artifact <- function(
@@ -695,6 +991,18 @@
             "Stored association candidate outcomes are malformed."
         )
     }
+    if (identical(
+        artifact$candidate,
+        .ASSOCIATION_FREEDMAN_LANE_CANDIDATE
+    ) && !.valid_association_freedman_lane_provenance(
+        artifact,
+        preparation,
+        available
+    )) {
+        .abort_association_candidate_artifact(
+            "Stored Freedman-Lane provenance or disposition is malformed."
+        )
+    }
     for (index in which(!available)) {
         stratum <- preparation$strata[[
             artifact$hypotheses$stratum[[index]]
@@ -718,9 +1026,16 @@
                 "Stored association unavailable precedence is malformed."
             )
         }
+        fit_codes <- if (identical(
+            artifact$candidate,
+            .ASSOCIATION_FREEDMAN_LANE_CANDIDATE
+        )) {
+            .ASSOCIATION_FREEDMAN_LANE_FIT_UNAVAILABLE_CODES
+        } else {
+            .ASSOCIATION_ROBUST_FIT_UNAVAILABLE_CODES
+        }
         if (is.null(expected) &&
-            !outcomes[[index]]$code %in%
-                .ASSOCIATION_ROBUST_FIT_UNAVAILABLE_CODES) {
+            !outcomes[[index]]$code %in% fit_codes) {
             .abort_association_candidate_artifact(
                 "Stored association fit-stage disposition is malformed."
             )

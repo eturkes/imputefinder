@@ -183,7 +183,7 @@ test_that("blocked OLS uses full-design CR2 and Satterthwaite df", {
     expect_equal(outcome$standard_error, 0.018298126367785, tolerance = 1e-9)
     expect_equal(outcome$statistic, 11.613210868087545, tolerance = 1e-8)
     expect_equal(outcome$reference_df, 7, tolerance = 1e-10)
-    expect_equal(outcome$raw_p, 7.919630641550018e-06, tolerance = 1e-9)
+    expect_equal(outcome$raw_p, 7.9196306295336e-06, tolerance = 1e-9)
     expect_equal(outcome$conf_low, 0.1692318066320262, tolerance = 1e-9)
     expect_equal(outcome$conf_high, 0.2557681933679738, tolerance = 1e-9)
     expect_equal(outcome$diagnostics$satterthwaite_df, 7, tolerance = 1e-10)

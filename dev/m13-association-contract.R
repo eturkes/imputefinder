@@ -34,9 +34,9 @@
 .M13A_EXPECTED_HASHES <- c(
     descriptor = "7d282ab27457f5e8fc8a29e636ee5c4b8cce4949d7277e741ba31669edd14456",
     upstream_bindings = "5dc11e3dd5e43e1b638d8faf377836ad3b39b59319e0bfe3098d273891277bdd",
-    normative_digest = "e2540c28ce25df6779066fd71621878b1cd15e394f9177f4d4b878cabcfbaaf2",
-    normative_source_digest = "facaaca9c226702066bc2fbcba03e956d6658ac554eb079d3eb90129d28dbd81",
-    implementation_bindings = "e298256d380f71fcf4227eb76efe1e15db1da5b99b636f18852195c929d672a1",
+    normative_digest = "461c7947757de46792784293d1666c459e1454521145f52dde1cdb3a06b32935",
+    normative_source_digest = "b1a7a4840da88f7639a213d2fb88b297a935eaef6fc625371987b877d21d4226",
+    implementation_bindings = "8ad1d822c6f626c45b9d55631a824eb5c1b165a54dc0ef32e3ebe51c4cb497f9",
     effective_manifest = "5dcf4f6408aed4ac7f9ccf07f4502805d34d2ea513ac68ac1c8e1259f23372f6",
     response = "baeb69d8ce3164629e8a50c5290549291d29b2a1c2dac155391be9da67ef57eb",
     strata = "4b7df275274bd127eed9a402695b2cfc9196f54a4c59271cde866aed17ceec92",
@@ -44,14 +44,14 @@
     support = "df04c882ea0928dac9e7f13ca813f2789091953cbf3fc237d857f6160df7d0a8",
     unit_positions = "6a69ec1ad4a3e4d85cbcdae4a1809e0d39728b12a3dc003e9d7335131f15d701",
     candidate_engines = "790608cd7875c28f2b5c2eae1445b9da1cdfe6aecfc4d39d68496f511a6835bf",
-    numerics = "ad4a68cea70d7fcb66b636f20c03bf8c02e2dbf13cadc8d5bc98f287868a87cb",
-    permutation = "73a4336214978ac61843918d68d6f6d7515b968b76733f250057075389c1d498",
-    permutation_counts = "c9b26f4fa66c18e0395129a8d0ff986e87026c568338796762b49cdeb2685632",
-    permutation_maps = "58f97c63c6dabeb91c89f479550fbc9b42509daa47bb0e8eb1c0e6c9df117610",
-    seed_protocol = "6589b53b9454329e4ee3e6a7e1391e567a70fe913c884223fea57b7e8b8cdcfb",
+    numerics = "997a7c8d6c0eb3a20b3b841bb9d9688f586ca26ec6e96d1a3f3ba4ee61a56b85",
+    permutation = "62ed7f671c9ee871eb6c9311cf6fba7eef0afe4d7ad384021c6b824c83d3430b",
+    permutation_counts = "8a605d537ec00e71c2cdb0a6e8b27126775bb3d70824cd43e1e555e54b772816",
+    permutation_maps = "fd4a0288087ca7ff0f402b9b0bc8d1a657810ddf32e4bce37d8160ae4f174203",
+    seed_protocol = "d4dab4cb4971b931e5262e5609afe0f5ce110e35a68edc6c49c9d735e21a37ad",
     input_hash = "35871cc878f941af0b299b7cc680842df35b760b85c10b849f5168692c6fa64c",
     multiplicity = "1e6d84fe9da0b0623aa97f0bd0f7cba88051e8e703798d901badc06379e7d0ae",
-    result_schema = "361d8124805fd4daf1fa370c5830d3005e5057d12c5dec403b69f3d3a7ff6599",
+    result_schema = "a342159404e24c40b754a44025d41cde8b448c610d0f3b505fa87d30c3535d7e",
     result_records = "1cfbdf3fae1be20dead577bf961d3e2091b8edbca36f66479c7a5b57a024c21e",
     lifecycle = "d7b358c0835b2fef76892e654d7477a66a8d745445c53b82339c88862d303040",
     unavailable_codes = "75ff8476e75dde29007d7b879409df4f157a844ddf8ee09e2abad30627bdc021",
@@ -62,7 +62,7 @@
     selection = "98ce4cb116d8b9397b48bec86519b6e78534cd5ba6d04d9c3d807101e3da7073",
     screening_allocation = "d861cba428cc76eac35cb3bd6648f672985e10afc6c74779428f1f5895e8da09",
     screening_thresholds = "d1e176c765e3e5f28fb31beb625d6678f7999ce2d6a51fa609cc02c58323d2ee",
-    gate_registry = "e74b0a596001c9e846e555b8d3ef8f45966b2edac72bc528847d7a661149b3c3",
+    gate_registry = "f2fd8d0171003e0ae9b31757acf2d43acf7477965d517f1757f4d895c6abe731",
     completed_gate_lineage = "9d7f5c30e28cd437a1dde001a1715e6e143dfbe8b1f399fb7d7f3029b1198a6e",
     structural_gates = "5a36db4ba1836b65dcd84753045abde5c4175aef30efd73c36046d8b673d6a74",
     execution_seal = "4bab3eb16c15b39b95a52a2bff24940bcabd0f68dbbb71f36edfa884e250a81c",
@@ -70,7 +70,7 @@
     implementation_manifest_schema = "296045d46d341478dedeef0b4ec416ed77127221659f9a184d1881ce12cd6f7d",
     candidate_evidence_schema = "e8781ed57e149ab0d47422ea4d832b670da4a46b2b761934224287928a0dfd32",
     release_boundary = "5e25356ea2e3cb33b31439bf78ac01e254e99435fe0e12fc8be716c6bf1348e0",
-    contract = "04e824321ac68c73633277064397f1a3fa96ba73ff342fbfe575df7fc6b1f4a6"
+    contract = "85d121ebd5ddd589be0f389553a3b7ffa6076a12a8fcbcb476a8969f7d987ae4"
 )
 
 # BEGIN M13A NORMATIVE SOURCE
@@ -131,13 +131,14 @@ m13a_implementation_bindings <- function() {
         component = c(
             "design_schema", "design_encoding", "design_rank",
             "design_aliasing", "design_contrast", "design_units",
-            "input_hash"
+            "input_hash", "cr2_residual_projector"
         ),
         identifier = c(
             "design_estimability_v1", "canonical_treatment_contrasts_v1",
             "svd_relative_v1", "ordered_null_projector_mgs_v1",
             "row_space_residual_v1", "declared_block_or_sample_v1",
-            "association_mask_design_be_v1"
+            "association_mask_design_be_v1",
+            "complete_qr_residual_projector_v1"
         ),
         drift_rule = "new version plus explicit migration; never silent reinterpretation",
         stringsAsFactors = FALSE
@@ -343,7 +344,7 @@ m13a_numerics <- function() {
             "X=U_r D_r V_r'; Z=X V_r; K=(Z'Z)^-1; coefficient direction c=V_r' e_j",
             "tau(A)=max(dim(A))*double_epsilon*max(1,max_abs(A)); clamp leverage into [0,1] only within tau(H); require 1-h>tau(H); HC3 uses K Z' diag((e/(1-h))^2) Z K",
             "one tau(A) rule for every matrix; symmetrize covariance; eigenvalue below -tau(V) fails; values in [-tau(V),tau(V)] become zero; scalar contrast variance must exceed tau(V)",
-            "full design including block fixed effects; identity working model; symmetric MP inverse-square-root correction using tau(B_g); scalar Satterthwaite",
+            "full design including block fixed effects; identity working model; M=Q_perp Q_perp' from symmetrized complete LAPACK QR orthogonal complement of U_r; symmetric MP inverse-square-root correction using tau(B_g); scalar Satterthwaite",
             "require max_abs(P Z0-Z0)<=sqrt(double_epsilon)*max(1,max_abs(Z0)) plus exact label preservation",
             "after finite W computation compare literal IEEE-754 Wstar>=Wobs; no tie jitter or discarded transform",
             "stats::glm.fit in rank coordinates with quasibinomial; start/etastart NULL; family mustart; glm.control(epsilon=1e-10,maxit=100,trace=FALSE); final weighted SVD rank r",
@@ -391,7 +392,7 @@ m13a_permutation <- function() {
             "2^(complete swappable block count); incomplete blocks fixed"
         ),
         canonical_order = c(
-            "radix groups/units; identity first; lexicographic within-group permutations",
+            "radix groups/units; identity first; globally lexicographic canonical row-index maps",
             "radix blocks; identity first; ascending binary swap masks"
         ),
         incompatible = rep("association_incompatible_permutation", 2L),
@@ -412,6 +413,11 @@ m13a_permutation_counts <- function() {
             "unavailable",
             "count(Wstar>=Wobs)/T",
             "(1+count(Wstar>=Wobs))/10000"
+        ),
+        diagnostic_count = c(
+            "exact T",
+            "exact T",
+            "min(nearest finite-double T, double.xmax); branch uses log(T)"
         ),
         failure_code = c(
             "association_low_permutation_resolution",
@@ -442,7 +448,7 @@ m13a_permutation_maps <- function() {
             "within each matched signature, radix-ordered technical siblings map positionally and move jointly"
         ),
         validation = rep(
-            "deduplicate row-index maps; identity first; require exact bijection and frozen P Z0 invariant; tested-pivot equality is intentionally not required",
+            "deduplicate row-index maps; identity first; require exact bijection and frozen P Z0 invariant; a byte-identical transformed residual refits original response bytes; tested-pivot equality is intentionally not required",
             2L
         ),
         stringsAsFactors = FALSE
@@ -451,13 +457,13 @@ m13a_permutation_maps <- function() {
 
 m13a_seed_protocol <- function() {
     data.frame(
-        stream_id = "m13a_permutation_seed_stream_v3",
+        stream_id = "m13a_permutation_seed_stream_v4",
         protocol_id = .M13A_PROTOCOL_ID,
         input_hash = "association_mask_design_be_v1 SHA-256; never intensity values or R serialize bytes",
-        key = "protocol_id|input_sha256|candidate_id|acquisition|hypothesis_id|draw_id|seed_nonce",
+        key = "seed-v2 tag plus typed length-prefixed UTF-8/bytes vector(protocol_id,input_sha256,candidate_id,acquisition,hypothesis_id,decimal draw_id,decimal seed_nonce)",
         integer_map = "first seven SHA-256 hex digits plus one",
         collision = "canonical open addressing across the complete requested seed manifest; Monte Carlo map collisions use within-draw stream retries",
-        order = "one complete manifest call; radix candidate/acquisition/hypothesis then integer draw ID",
+        order = "one complete seed call before maps; radix candidate/acquisition/hypothesis then integer draw ID; emitted result rows only for available Monte Carlo outcomes",
         rng = "Mersenne-Twister/Inversion/Rejection inside exact restored local scope; each draw seed starts one stream; identity/duplicate maps retry in that stream",
         stringsAsFactors = FALSE
     )
@@ -732,9 +738,6 @@ m13a_permutation_map_sha256 <- function(map) {
         .m13a_fail("M13c blocked Monte Carlo swaps are malformed.")
     }
     moved <- lapply(swaps, function(map) which(map != identity))
-    first <- vapply(moved, `[[`, integer(1L), 1L)
-    swaps <- swaps[order(first, method = "radix")]
-    moved <- moved[order(first, method = "radix")]
     if (anyDuplicated(unlist(moved))) {
         .m13a_fail("M13c blocked Monte Carlo swaps must move disjoint rows.")
     }
@@ -763,14 +766,23 @@ m13a_monte_carlo_maps <- function(
     )
     valid <- is.data.frame(seed_manifest) &&
         identical(names(seed_manifest), seed_fields) && nrow(seed_manifest) > 0L &&
+        all(vapply(seed_manifest[c(
+            "protocol_id", "candidate_id", "acquisition", "hypothesis_id"
+        )], is.character, logical(1L))) &&
+        !anyNA(seed_manifest) &&
+        all(seed_manifest$protocol_id == .M13A_PROTOCOL_ID) &&
+        is.integer(seed_manifest$draw_id) &&
         identical(seed_manifest$draw_id, sort(seed_manifest$draw_id, method = "radix")) &&
-        !anyDuplicated(seed_manifest$draw_id) &&
+        all(seed_manifest$draw_id > 0L) && !anyDuplicated(seed_manifest$draw_id) &&
         length(unique(seed_manifest$candidate_id)) == 1L &&
         identical(unique(seed_manifest$candidate_id), "a_fraction_freedman_lane") &&
         length(unique(seed_manifest$acquisition)) == 1L &&
+        nzchar(unique(seed_manifest$acquisition)) &&
         length(unique(seed_manifest$hypothesis_id)) == 1L &&
+        grepl("^a_[0-9a-f]{64}$", unique(seed_manifest$hypothesis_id)) &&
         is.integer(seed_manifest$seed) && all(seed_manifest$seed > 0L) &&
-        !anyDuplicated(seed_manifest$seed) && is.integer(n) && length(n) == 1L &&
+        !anyDuplicated(seed_manifest$seed) && is.integer(seed_manifest$seed_nonce) &&
+        all(seed_manifest$seed_nonce >= 0L) && is.integer(n) && length(n) == 1L &&
         !is.na(n) && n > 0L && .m13a_scalar_character(design) &&
         design %in% c("independent", "blocked")
     if (!valid) {
@@ -998,7 +1010,7 @@ m13a_result_schema <- function() {
             draw_id = "integer,positive",
             seed = "integer,positive-unique-over-complete-manifest",
             seed_nonce = "integer,nonnegative-global-seed-collision-count",
-            map_retry = "integer,nonnegative-within-draw-stream-retry-count",
+            map_retry = "integer,0-to-1000000-within-draw-stream-retry-count",
             map_sha256 = "character,sha256:canonical-row-index-map"
         )
     )
@@ -1624,6 +1636,7 @@ m13a_validate_result_shape <- function(result) {
             hypotheses$stratum[match(seed$hypothesis_id, hypotheses$hypothesis)]
         ])
         diagnostic_valid <- identical(result$candidate, "a_fraction_freedman_lane") &&
+            !anyNA(seed) &&
             all(vapply(seed[c(
                 "protocol_id", "candidate_id", "acquisition", "hypothesis_id",
                 "map_sha256"
@@ -1636,8 +1649,14 @@ m13a_validate_result_shape <- function(result) {
             is.integer(seed$seed) && all(seed$seed > 0L) &&
             !anyDuplicated(seed$seed) && is.integer(seed$seed_nonce) &&
             all(seed$seed_nonce >= 0L) && is.integer(seed$map_retry) &&
-            all(seed$map_retry >= 0L) &&
+            all(seed$map_retry >= 0L) && all(seed$map_retry <= 1000000L) &&
             all(vapply(seed$map_sha256, .m13a_sha256, logical(1L))) &&
+            all(vapply(split(
+                seed$map_sha256,
+                seed$hypothesis_id
+            ), function(hashes) {
+                !anyDuplicated(hashes)
+            }, logical(1L))) &&
             !anyDuplicated(seed_key) &&
             identical(canonical, seq_len(nrow(seed))) &&
             length(mc_ids) > 0L && all(counts == 9999L) &&
@@ -1806,6 +1825,41 @@ m13a_validate_result_shape <- function(result) {
         ),
         class = "imputefinder_association_panel"
     )
+}
+
+.m13a_monte_carlo_result_fixture <- function() {
+    result <- .m13a_result_fixture(TRUE)
+    result$candidate <- "a_fraction_freedman_lane"
+    result$methods[["candidate"]] <- "a_fraction_freedman_lane"
+    outcome <- result$outcomes[[1L]]
+    outcome$candidate <- "a_fraction_freedman_lane"
+    outcome$statistic <- (outcome$effect / outcome$standard_error)^2
+    outcome$raw_p <- 0.0001
+    outcome$adjusted_p <- 0.0001
+    outcome$permutation_count <- 10000L
+    outcome$diagnostics$allowable_transformations <- 362880.0
+    outcome$diagnostics$evaluated_transformations <- 9999L
+    outcome$diagnostics$exceedance_count <- 0L
+    outcome$diagnostics$permutation_mode <- "monte_carlo"
+    result$outcomes[[1L]] <- outcome
+
+    draw_id <- seq_len(9999L)
+    result$diagnostics$seed_manifest <- data.frame(
+        protocol_id = rep(.M13A_PROTOCOL_ID, 9999L),
+        candidate_id = rep("a_fraction_freedman_lane", 9999L),
+        acquisition = rep("undeclared", 9999L),
+        hypothesis_id = rep(result$hypotheses$hypothesis, 9999L),
+        draw_id = draw_id,
+        seed = draw_id,
+        seed_nonce = integer(9999L),
+        map_retry = integer(9999L),
+        map_sha256 = paste0(
+            strrep("0", 56L),
+            sprintf("%08x", draw_id)
+        ),
+        stringsAsFactors = FALSE
+    )
+    result
 }
 
 .m13a_panel_unavailable_fixture <- function() {
@@ -2662,7 +2716,6 @@ m13a_seed_manifest <- function(
         !anyNA(instances) &&
         all(instances$candidate_id == "a_fraction_freedman_lane") &&
         all(nzchar(instances$acquisition)) &&
-        !any(grepl("|", instances$acquisition, fixed = TRUE)) &&
         all(grepl("^a_[0-9a-f]{64}$", instances$hypothesis_id)) &&
         !anyDuplicated(instances) &&
         is.integer(draw_ids) && length(draw_ids) > 0L && !anyNA(draw_ids) &&
@@ -2684,15 +2737,20 @@ m13a_seed_manifest <- function(
     for (index in seq_len(nrow(grid))) {
         candidate_nonce <- 0L
         repeat {
-            key <- paste(
+            key <- c(
                 .M13A_PROTOCOL_ID, input_sha256,
                 grid$candidate_id[[index]], grid$acquisition[[index]],
                 grid$hypothesis_id[[index]], grid$draw_id[[index]],
-                candidate_nonce,
-                sep = "|"
+                candidate_nonce
             )
             digest <- unname(tools::sha256sum(
-                bytes = charToRaw(enc2utf8(key))
+                bytes = c(
+                    charToRaw(
+                        "imputefinder:association-permutation-seed:v2"
+                    ),
+                    as.raw(0L),
+                    .m13a_encode_text_vector(as.character(key))
+                )
             ))
             candidate_seed <- as.integer(
                 strtoi(substr(digest, 1L, 7L), 16L) + 1L
@@ -2973,6 +3031,10 @@ m13a_self_tests <- function(contract = m13a_contract()) {
         as.integer(c(3, 1, 2))
     )
     result_fixture <- .m13a_result_fixture(TRUE)
+    monte_carlo_fixture <- .m13a_monte_carlo_result_fixture()
+    duplicate_map_fixture <- monte_carlo_fixture
+    duplicate_map_fixture$diagnostics$seed_manifest$map_sha256[[2L]] <-
+        duplicate_map_fixture$diagnostics$seed_manifest$map_sha256[[1L]]
     unavailable_fixture <- .m13a_result_fixture(FALSE)
     panel_unavailable_fixture <- .m13a_panel_unavailable_fixture()
     declared_fixture <- result_fixture
@@ -3013,6 +3075,12 @@ m13a_self_tests <- function(contract = m13a_contract()) {
         ,
         drop = FALSE
     ]
+    wrong_protocol_seeds <- map_seeds
+    wrong_protocol_seeds$protocol_id <- "wrong_protocol"
+    negative_nonce_seeds <- map_seeds
+    negative_nonce_seeds$seed_nonce[[1L]] <- -1L
+    double_draw_seeds <- map_seeds
+    double_draw_seeds$draw_id <- as.double(double_draw_seeds$draw_id)
     rng_kind_before <- RNGkind()
     rng_exists_before <- exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
     rng_seed_before <- if (rng_exists_before) {
@@ -3083,6 +3151,12 @@ m13a_self_tests <- function(contract = m13a_contract()) {
         result_schema_available = !.m13a_expect_error(
             m13a_validate_result_shape(result_fixture)
         ),
+        result_schema_monte_carlo = !.m13a_expect_error(
+            m13a_validate_result_shape(monte_carlo_fixture)
+        ),
+        result_seed_map_duplicate_rejected = .m13a_expect_error(
+            m13a_validate_result_shape(duplicate_map_fixture)
+        ),
         result_schema_unavailable = !.m13a_expect_error(
             m13a_validate_result_shape(unavailable_fixture)
         ),
@@ -3102,6 +3176,28 @@ m13a_self_tests <- function(contract = m13a_contract()) {
             m13a_validate_result_shape(wrong_extrapolation)
         ),
         monte_carlo_maps_reproducible = identical(maps_a, maps_b),
+        monte_carlo_seed_rows_rejected = .m13a_expect_error(
+            m13a_monte_carlo_maps(
+                wrong_protocol_seeds,
+                "independent",
+                9L,
+                groups = list(1:9)
+            )
+        ) && .m13a_expect_error(
+            m13a_monte_carlo_maps(
+                negative_nonce_seeds,
+                "independent",
+                9L,
+                groups = list(1:9)
+            )
+        ) && .m13a_expect_error(
+            m13a_monte_carlo_maps(
+                double_draw_seeds,
+                "independent",
+                9L,
+                groups = list(1:9)
+            )
+        ),
         monte_carlo_maps_distinct = !anyDuplicated(
             maps_a$manifest$map_sha256
         ) && all(vapply(maps_a$maps, function(map) {

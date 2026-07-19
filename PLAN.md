@@ -759,17 +759,21 @@ typed per-component numeric support, result schema, candidate-agnostic
 opportunity denominators, four fixed alternative targets, and exact
 candidate/development/confirmation stage seals.
 `dev/m13-association-contract.md` owns these superseding details; its aggregate
-hash is `04e824321ac68c73633277064397f1a3fa96ba73ff342fbfe575df7fc6b1f4a6`.
+hash is `85d121ebd5ddd589be0f389553a3b7ffa6076a12a8fcbcb476a8969f7d987ae4`
+(protocol `5f484f614d72d9560d96e2b8f75b71cc1027950958ea1459be93eece595069f5`;
+gate registry `f2fd8d0171003e0ae9b31757acf2d43acf7477965d517f1757f4d895c6abe731`).
 
 The production `association_preparation_v1` rail now binds the packed global
 mask/design identity to the exact response, acquisition-specific rebuilt
 cores, coefficient hypotheses, estimability, and biological-unit support.
-The first internal candidate engine now implements the frozen OLS-HC3 and
-full-design identity-working-model CR2/Satterthwaite path, exact unavailable
-handoff, per-stratum Holm families, and preparation-bound artifact validation.
-Restricted Freedman-Lane, independent quasibinomial, final panel
-materialization, and the implementation manifest remain open; every candidate
-result remains `frozen_unrun` until all focused rails and the manifest lock.
+The first two internal candidate engines now implement the frozen OLS-HC3/
+full-design identity-working-model CR2/Satterthwaite path and studentized
+restricted Freedman-Lane with exact/Monte Carlo constrained-null maps. Both
+bind exact unavailable handoff, per-stratum Holm families, preparation-bound
+artifact validation, and recomputed permutation provenance. Independent
+quasibinomial, final panel materialization, and the implementation manifest
+remain open; every candidate result remains `frozen_unrun` until all focused
+rails and the manifest lock.
 
 Gate: protocol hashes exist; every A-C claim has an executable numeric gate and
 failure rule; v1 behavior/limitations reproduce on the expanded harness.

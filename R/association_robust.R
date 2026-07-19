@@ -94,6 +94,38 @@
     as.double(sum(norms)^2 / denominator)
 }
 
+.association_residual_projector <- function(left_basis) {
+    if (!is.matrix(left_basis) || !is.numeric(left_basis) ||
+        nrow(left_basis) < ncol(left_basis) ||
+        any(!is.finite(left_basis))) {
+        return(NULL)
+    }
+    n <- nrow(left_basis)
+    rank <- ncol(left_basis)
+    if (rank == n) {
+        return(matrix(0, nrow = n, ncol = n))
+    }
+    decomposition <- tryCatch(
+        qr(left_basis, LAPACK = TRUE),
+        error = function(error) NULL
+    )
+    if (is.null(decomposition)) {
+        return(NULL)
+    }
+    complete <- tryCatch(
+        qr.Q(decomposition, complete = TRUE),
+        error = function(error) NULL
+    )
+    if (is.null(complete) || !identical(dim(complete), c(n, n)) ||
+        any(!is.finite(complete))) {
+        return(NULL)
+    }
+    complement <- complete[, seq.int(rank + 1L, n), drop = FALSE]
+    output <- tcrossprod(complement)
+    output <- (output + t(output)) / 2
+    if (any(!is.finite(output))) NULL else output
+}
+
 .association_robust_algebra <- function(stratum) {
     x <- stratum$core$model$matrix
     y <- unname(stratum$response)
@@ -134,7 +166,14 @@
     if (!blocked && any(1 - leverage <= h_tolerance)) {
         return(.association_robust_failure("association_numerical_failure"))
     }
-    residual_maker <- diag(n) - h_matrix
+    residual_maker <- if (blocked) {
+        .association_residual_projector(u)
+    } else {
+        diag(n) - h_matrix
+    }
+    if (is.null(residual_maker)) {
+        return(.association_robust_failure("association_numerical_failure"))
+    }
     residual <- as.vector(residual_maker %*% y)
     coefficients <- inverse_singular_values * as.vector(crossprod(u, y))
     if (any(!is.finite(residual)) || any(!is.finite(coefficients))) {
@@ -190,6 +229,8 @@
         rank = rank,
         residual_df = residual_df,
         leverage_max = as.double(max(leverage)),
+        leverage = leverage,
+        leverage_tolerance = h_tolerance,
         basis = v,
         left_basis = u,
         inverse_singular_values = inverse_singular_values,
@@ -200,6 +241,70 @@
         residual_maker = residual_maker,
         adjustments = adjustments
     )
+}
+
+.association_robust_refit <- function(fit, response) {
+    valid <- is.list(fit) && isTRUE(fit$ok) &&
+        is.double(response) &&
+        length(response) == nrow(fit$left_basis) &&
+        all(is.finite(response))
+    if (!valid) {
+        return(.association_robust_failure("association_numerical_failure"))
+    }
+    residual <- as.vector(fit$residual_maker %*% response)
+    coefficients <- fit$inverse_singular_values *
+        as.vector(crossprod(fit$left_basis, response))
+    if (any(!is.finite(residual)) || any(!is.finite(coefficients))) {
+        return(.association_robust_failure("association_numerical_failure"))
+    }
+    if (identical(fit$method, "HC3")) {
+        if (!is.double(fit$leverage) ||
+            length(fit$leverage) != length(response) ||
+            !is.finite(fit$leverage_tolerance) ||
+            any(1 - fit$leverage <= fit$leverage_tolerance)) {
+            return(.association_robust_failure(
+                "association_numerical_failure"
+            ))
+        }
+        scaled_residual <- residual / (1 - fit$leverage)
+        meat <- crossprod(
+            fit$left_basis * scaled_residual,
+            fit$left_basis * scaled_residual
+        )
+    } else if (identical(fit$method, "CR2")) {
+        meat <- matrix(0, nrow = fit$rank, ncol = fit$rank)
+        for (adjustment in fit$adjustments) {
+            rows <- adjustment$rows
+            score <- crossprod(
+                fit$left_basis[rows, , drop = FALSE],
+                adjustment$matrix %*% residual[rows]
+            )
+            meat <- meat + tcrossprod(as.vector(score))
+        }
+    } else {
+        return(.association_robust_failure("association_numerical_failure"))
+    }
+    covariance <- sweep(
+        meat,
+        1L,
+        fit$inverse_singular_values,
+        `*`
+    )
+    covariance <- sweep(
+        covariance,
+        2L,
+        fit$inverse_singular_values,
+        `*`
+    )
+    covariance <- .association_clean_psd(covariance)
+    if (is.null(covariance)) {
+        return(.association_robust_failure("association_numerical_failure"))
+    }
+    output <- fit
+    output$coefficients <- coefficients
+    output$covariance <- covariance$matrix
+    output$covariance_tolerance <- covariance$tolerance
+    output
 }
 
 .association_robust_contrast <- function(fit, coefficient, columns) {
