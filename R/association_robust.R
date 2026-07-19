@@ -1,43 +1,6 @@
 .ASSOCIATION_ROBUST_CANDIDATE <- "a_fraction_ols_hc3_cr2"
 
-.association_matrix_tolerance <- function(x) {
-    if (!is.matrix(x) || !is.numeric(x) || !length(x) ||
-        any(!is.finite(x))) {
-        return(NA_real_)
-    }
-    max(dim(x)) * .Machine$double.eps * max(1, max(abs(x)))
-}
-
-.association_clean_psd <- function(x) {
-    if (!is.matrix(x) || !is.numeric(x) || nrow(x) != ncol(x)) {
-        return(NULL)
-    }
-    x <- (x + t(x)) / 2
-    tolerance <- .association_matrix_tolerance(x)
-    if (!is.finite(tolerance)) {
-        return(NULL)
-    }
-    decomposition <- tryCatch(
-        eigen(x, symmetric = TRUE),
-        error = function(error) NULL
-    )
-    if (is.null(decomposition) ||
-        any(!is.finite(decomposition$values)) ||
-        any(decomposition$values < -tolerance)) {
-        return(NULL)
-    }
-    values <- decomposition$values
-    selected <- abs(values) <= tolerance
-    if (!any(selected)) {
-        return(list(matrix = x, tolerance = tolerance))
-    }
-    vectors <- decomposition$vectors[, selected, drop = FALSE]
-    correction <- sweep(vectors, 2L, values[selected], `*`) %*% t(vectors)
-    cleaned <- x - correction
-    cleaned <- (cleaned + t(cleaned)) / 2
-    dimnames(cleaned) <- dimnames(x)
-    list(matrix = cleaned, tolerance = tolerance)
-}
+.association_robust_failure <- .association_candidate_failure
 
 .association_cr2_adjustment <- function(block) {
     if (!is.matrix(block) || !is.numeric(block) ||
@@ -70,10 +33,6 @@
         `/`
     )
     inverse_root %*% t(vectors)
-}
-
-.association_robust_failure <- function(code) {
-    list(ok = FALSE, code = code)
 }
 
 .association_cr2_reference_df <- function(projection) {
@@ -422,57 +381,6 @@
         ),
         class = "imputefinder_association"
     )
-}
-
-.association_candidate_multiplicity <- function(
-    response,
-    hypotheses,
-    available
-) {
-    strata <- unique(response$stratum)
-    rows <- lapply(strata, function(stratum) {
-        selected <- hypotheses$stratum == stratum
-        count <- as.integer(sum(available[selected]))
-        data.frame(
-            stratum = stratum,
-            method = "Holm",
-            level = 0.05,
-            family_size = count,
-            available_count = count,
-            unavailable_count = as.integer(sum(!available[selected])),
-            stringsAsFactors = FALSE,
-            row.names = NULL
-        )
-    })
-    output <- do.call(rbind, unname(rows))
-    row.names(output) <- NULL
-    output[.ASSOCIATION_MULTIPLICITY_FIELDS]
-}
-
-.association_candidate_stratum_diagnostics <- function(
-    preparation,
-    hypotheses,
-    available
-) {
-    rows <- lapply(preparation$strata, function(stratum) {
-        selected <- hypotheses$stratum == stratum$stratum
-        rank <- stratum$core$rank$rank
-        data.frame(
-            stratum = stratum$stratum,
-            acquisition = stratum$acquisition,
-            sample_count = as.integer(length(stratum$samples)),
-            rank = rank,
-            coefficient_count = as.integer(ncol(stratum$core$model$matrix)),
-            residual_df = as.integer(length(stratum$samples) - rank),
-            testable_count = as.integer(sum(available[selected])),
-            unavailable_count = as.integer(sum(!available[selected])),
-            stringsAsFactors = FALSE,
-            row.names = NULL
-        )
-    })
-    output <- do.call(rbind, unname(rows))
-    row.names(output) <- NULL
-    output[.ASSOCIATION_STRATUM_DIAGNOSTIC_FIELDS]
 }
 
 .run_association_ols_hc3_cr2 <- function(preparation) {

@@ -1,7 +1,9 @@
 .ASSOCIATION_CANDIDATE_ARTIFACT_SCHEMA <- "association_candidate_artifact_v1"
+.ASSOCIATION_QUASIBINOMIAL_CANDIDATE <- "a_fraction_quasibinomial"
 .ASSOCIATION_CANDIDATES <- c(
     "a_fraction_ols_hc3_cr2",
-    "a_fraction_freedman_lane"
+    "a_fraction_freedman_lane",
+    .ASSOCIATION_QUASIBINOMIAL_CANDIDATE
 )
 .ASSOCIATION_CANDIDATE_ARTIFACT_FIELDS <- c(
     "schema", "protocol", "candidate", "input_sha256", "response",
@@ -89,6 +91,67 @@
     "association_low_permutation_resolution",
     "association_incompatible_permutation"
 )
+.ASSOCIATION_QUASIBINOMIAL_UNAVAILABLE_CODES <- c(
+    "association_nonestimable",
+    .ASSOCIATION_SUPPORT_CODES,
+    "association_low_residual_df",
+    "association_degenerate_response",
+    "association_singular_covariance",
+    "association_quasibinomial_boundary",
+    "association_quasibinomial_nonconvergence",
+    "association_quasibinomial_paired_scope",
+    "association_numerical_failure"
+)
+.ASSOCIATION_QUASIBINOMIAL_FIT_UNAVAILABLE_CODES <- c(
+    "association_singular_covariance",
+    "association_quasibinomial_boundary",
+    "association_quasibinomial_nonconvergence",
+    "association_quasibinomial_paired_scope",
+    "association_numerical_failure"
+)
+
+.association_matrix_tolerance <- function(x) {
+    if (!is.matrix(x) || !is.numeric(x) || !length(x) ||
+        any(!is.finite(x))) {
+        return(NA_real_)
+    }
+    max(dim(x)) * .Machine$double.eps * max(1, max(abs(x)))
+}
+
+.association_clean_psd <- function(x) {
+    if (!is.matrix(x) || !is.numeric(x) || nrow(x) != ncol(x)) {
+        return(NULL)
+    }
+    x <- (x + t(x)) / 2
+    tolerance <- .association_matrix_tolerance(x)
+    if (!is.finite(tolerance)) {
+        return(NULL)
+    }
+    decomposition <- tryCatch(
+        eigen(x, symmetric = TRUE),
+        error = function(error) NULL
+    )
+    if (is.null(decomposition) ||
+        any(!is.finite(decomposition$values)) ||
+        any(decomposition$values < -tolerance)) {
+        return(NULL)
+    }
+    values <- decomposition$values
+    selected <- abs(values) <= tolerance
+    if (!any(selected)) {
+        return(list(matrix = x, tolerance = tolerance))
+    }
+    vectors <- decomposition$vectors[, selected, drop = FALSE]
+    correction <- sweep(vectors, 2L, values[selected], `*`) %*% t(vectors)
+    cleaned <- x - correction
+    cleaned <- (cleaned + t(cleaned)) / 2
+    dimnames(cleaned) <- dimnames(x)
+    list(matrix = cleaned, tolerance = tolerance)
+}
+
+.association_candidate_failure <- function(code) {
+    list(ok = FALSE, code = code)
+}
 
 .abort_association_candidate_artifact <- function(message) {
     .abort_association(
@@ -185,12 +248,24 @@
             "a nonconstant detection-fraction response"
         ),
         association_singular_covariance = c(
-            "The scalar robust covariance is nonpositive or singular.",
-            "a positive scalar robust covariance"
+            "The scalar association covariance is nonpositive or singular.",
+            "a positive scalar association covariance"
+        ),
+        association_quasibinomial_boundary = c(
+            "The grouped counts or fitted probabilities reach the frozen quasibinomial boundary.",
+            "strictly interior counts and fitted probabilities"
+        ),
+        association_quasibinomial_nonconvergence = c(
+            "The frozen quasibinomial fit did not converge.",
+            "convergence within 100 IRLS iterations"
+        ),
+        association_quasibinomial_paired_scope = c(
+            "The empirical quasibinomial candidate is not licensed for blocked units.",
+            "independent biological units"
         ),
         association_numerical_failure = c(
-            "The frozen robust calculation failed its numerical checks.",
-            "a finite, numerically stable robust fit"
+            "The frozen association calculation failed its numerical checks.",
+            "a finite, numerically stable association fit"
         )
     )
     specification <- specifications[[code]]
@@ -210,6 +285,57 @@
         message = specification$message,
         requires = specification$requires
     )
+}
+
+.association_candidate_multiplicity <- function(
+    response,
+    hypotheses,
+    available
+) {
+    strata <- unique(response$stratum)
+    rows <- lapply(strata, function(stratum) {
+        selected <- hypotheses$stratum == stratum
+        count <- as.integer(sum(available[selected]))
+        data.frame(
+            stratum = stratum,
+            method = "Holm",
+            level = 0.05,
+            family_size = count,
+            available_count = count,
+            unavailable_count = as.integer(sum(!available[selected])),
+            stringsAsFactors = FALSE,
+            row.names = NULL
+        )
+    })
+    output <- do.call(rbind, unname(rows))
+    row.names(output) <- NULL
+    output[.ASSOCIATION_MULTIPLICITY_FIELDS]
+}
+
+.association_candidate_stratum_diagnostics <- function(
+    preparation,
+    hypotheses,
+    available
+) {
+    rows <- lapply(preparation$strata, function(stratum) {
+        selected <- hypotheses$stratum == stratum$stratum
+        rank <- stratum$core$rank$rank
+        data.frame(
+            stratum = stratum$stratum,
+            acquisition = stratum$acquisition,
+            sample_count = as.integer(length(stratum$samples)),
+            rank = rank,
+            coefficient_count = as.integer(ncol(stratum$core$model$matrix)),
+            residual_df = as.integer(length(stratum$samples) - rank),
+            testable_count = as.integer(sum(available[selected])),
+            unavailable_count = as.integer(sum(!available[selected])),
+            stringsAsFactors = FALSE,
+            row.names = NULL
+        )
+    })
+    output <- do.call(rbind, unname(rows))
+    row.names(output) <- NULL
+    output[.ASSOCIATION_STRATUM_DIAGNOSTIC_FIELDS]
 }
 
 .valid_association_candidate_hypotheses <- function(hypotheses, response) {
@@ -490,6 +616,43 @@
     valid && identical(outcome$raw_p, as.double(expected_p))
 }
 
+.valid_association_quasibinomial_diagnostics <- function(
+    diagnostics,
+    outcome,
+    design
+) {
+    is.list(diagnostics) &&
+        identical(names(diagnostics), .ASSOCIATION_OUTCOME_DIAGNOSTIC_FIELDS) &&
+        identical(design, "independent") &&
+        identical(diagnostics$variance_method, "quasibinomial") &&
+        .association_integer_scalar(diagnostics$rank, 1L) &&
+        .association_integer_scalar(diagnostics$residual_df, 3L) &&
+        .association_double_scalar(diagnostics$leverage_max, FALSE) &&
+        .association_double_scalar(diagnostics$satterthwaite_df, FALSE) &&
+        .association_double_scalar(diagnostics$dispersion) &&
+        diagnostics$dispersion > 0 &&
+        identical(diagnostics$converged, TRUE) &&
+        identical(diagnostics$boundary, FALSE) &&
+        .association_double_scalar(
+            diagnostics$allowable_transformations,
+            FALSE
+        ) &&
+        .association_integer_scalar(
+            diagnostics$evaluated_transformations,
+            na = TRUE
+        ) &&
+        .association_integer_scalar(
+            diagnostics$exceedance_count,
+            na = TRUE
+        ) &&
+        identical(diagnostics$permutation_mode, "none") &&
+        .association_integer_scalar(outcome$permutation_count, na = TRUE) &&
+        identical(
+            outcome$reference_df,
+            as.double(diagnostics$residual_df)
+        )
+}
+
 .valid_association_available_outcome <- function(
     outcome,
     key,
@@ -521,18 +684,33 @@
         candidate,
         .ASSOCIATION_FREEDMAN_LANE_CANDIDATE
     )
-    if (!valid || (!robust && !freedman_lane)) {
+    quasibinomial <- identical(
+        candidate,
+        .ASSOCIATION_QUASIBINOMIAL_CANDIDATE
+    )
+    if (!valid || (!robust && !freedman_lane && !quasibinomial)) {
         return(FALSE)
     }
     secondary <- unlist(outcome[c(
         "log_odds", "log_odds_standard_error", "log_odds_conf_low",
         "log_odds_conf_high"
     )], use.names = FALSE)
+    if (!is.double(secondary)) {
+        return(FALSE)
+    }
     critical <- stats::qt(0.975, outcome$reference_df)
     statistic_valid <- if (freedman_lane) {
         outcome$statistic >= 0 && .association_numeric_close(
             outcome$statistic,
             (outcome$effect / outcome$standard_error)^2
+        )
+    } else if (quasibinomial) {
+        .association_numeric_close(
+            outcome$statistic,
+            outcome$log_odds / outcome$log_odds_standard_error
+        ) && .association_numeric_close(
+            outcome$raw_p,
+            2 * stats::pt(-abs(outcome$statistic), outcome$reference_df)
         )
     } else {
         .association_numeric_close(
@@ -543,7 +721,35 @@
             2 * stats::pt(-abs(outcome$statistic), outcome$reference_df)
         )
     }
-    all(is.na(secondary)) && is.double(secondary) && statistic_valid &&
+    secondary_valid <- if (quasibinomial) {
+        all(is.finite(secondary)) && outcome$log_odds_standard_error > 0 &&
+            .association_numeric_close(
+                outcome$log_odds_conf_low,
+                outcome$log_odds - critical *
+                    outcome$log_odds_standard_error
+            ) && .association_numeric_close(
+                outcome$log_odds_conf_high,
+                outcome$log_odds + critical *
+                    outcome$log_odds_standard_error
+            )
+    } else {
+        all(is.na(secondary))
+    }
+    diagnostics_valid <- if (quasibinomial) {
+        .valid_association_quasibinomial_diagnostics(
+            outcome$diagnostics,
+            outcome,
+            support$design
+        )
+    } else {
+        .valid_association_robust_diagnostics(
+            outcome$diagnostics,
+            outcome,
+            support$design,
+            candidate
+        )
+    }
+    secondary_valid && statistic_valid &&
         .association_numeric_close(
             outcome$conf_low,
             outcome$effect - critical * outcome$standard_error
@@ -551,13 +757,7 @@
         .association_numeric_close(
             outcome$conf_high,
             outcome$effect + critical * outcome$standard_error
-        ) &&
-        .valid_association_robust_diagnostics(
-            outcome$diagnostics,
-            outcome,
-            support$design,
-            candidate
-        )
+        ) && diagnostics_valid
 }
 
 .valid_association_candidate_unavailable <- function(outcome, key, candidate) {
@@ -568,10 +768,15 @@
         .ASSOCIATION_FREEDMAN_LANE_CANDIDATE
     )) {
         .ASSOCIATION_FREEDMAN_LANE_UNAVAILABLE_CODES
+    } else if (identical(
+        candidate,
+        .ASSOCIATION_QUASIBINOMIAL_CANDIDATE
+    )) {
+        .ASSOCIATION_QUASIBINOMIAL_UNAVAILABLE_CODES
     } else {
         character()
     }
-    is.list(outcome) &&
+    valid <- is.list(outcome) &&
         identical(class(outcome), "imputefinder_unavailable") &&
         identical(names(outcome), .UNAVAILABLE_FIELDS) &&
         identical(outcome$status, "unavailable") &&
@@ -582,6 +787,10 @@
         is.character(outcome$requires) && length(outcome$requires) > 0L &&
         !anyNA(outcome$requires) && all(nzchar(outcome$requires)) &&
         !anyDuplicated(outcome$requires)
+    valid && identical(
+        outcome,
+        .new_association_candidate_unavailable(key, outcome$code)
+    )
 }
 
 .valid_association_candidate_multiplicity <- function(
@@ -699,6 +908,9 @@
     seed_valid <- if (identical(
         artifact$candidate,
         "a_fraction_ols_hc3_cr2"
+    ) || identical(
+        artifact$candidate,
+        .ASSOCIATION_QUASIBINOMIAL_CANDIDATE
     )) {
         identical(seed, .empty_association_seed_manifest())
     } else if (identical(
@@ -900,6 +1112,46 @@
     identical(artifact$diagnostics$seed_manifest, expected_seed)
 }
 
+.valid_association_quasibinomial_provenance <- function(
+    artifact,
+    preparation,
+    available
+) {
+    records <- tryCatch(
+        .association_quasibinomial_records(preparation),
+        error = function(error) NULL
+    )
+    if (is.null(records) || length(records) != nrow(artifact$hypotheses)) {
+        return(FALSE)
+    }
+    comparison_fields <- setdiff(
+        .ASSOCIATION_AVAILABLE_OUTCOME_FIELDS,
+        c("adjusted_p", "flag")
+    )
+    all(vapply(seq_along(records), function(index) {
+        record <- records[[index]]
+        outcome <- artifact$outcomes[[index]]
+        if (!is.null(record$code)) {
+            return(!available[[index]] && identical(
+                outcome$code,
+                record$code
+            ))
+        }
+        if (!available[[index]] || is.null(record$result) ||
+            !isTRUE(record$result$ok)) {
+            return(FALSE)
+        }
+        expected <- .new_association_quasibinomial_outcome(
+            record$result,
+            record$hypothesis
+        )
+        identical(
+            outcome[comparison_fields],
+            expected[comparison_fields]
+        )
+    }, logical(1L)))
+}
+
 .validate_association_candidate_artifact <- function(
     artifact,
     preparation
@@ -1003,18 +1255,48 @@
             "Stored Freedman-Lane provenance or disposition is malformed."
         )
     }
+    if (identical(
+        artifact$candidate,
+        .ASSOCIATION_QUASIBINOMIAL_CANDIDATE
+    ) && !.valid_association_quasibinomial_provenance(
+        artifact,
+        preparation,
+        available
+    )) {
+        .abort_association_candidate_artifact(
+            "Stored quasibinomial provenance or disposition is malformed."
+        )
+    }
+    quasibinomial <- identical(
+        artifact$candidate,
+        .ASSOCIATION_QUASIBINOMIAL_CANDIDATE
+    )
     for (index in which(!available)) {
         stratum <- preparation$strata[[
             artifact$hypotheses$stratum[[index]]
         ]]
         residual_df <- length(stratum$samples) - stratum$core$rank$rank
         degenerate <- length(unique(unname(stratum$response))) == 1L
+        response_rows <- artifact$response$stratum ==
+            artifact$hypotheses$stratum[[index]]
+        boundary <- any(
+            artifact$response$detected_count[response_rows] <= 0L |
+                artifact$response$detected_count[response_rows] >=
+                    artifact$response$globally_observable_count[response_rows]
+        )
         expected <- if (!artifact$hypotheses$estimable[[index]]) {
             "association_nonestimable"
         } else if (!artifact$support$eligible[[index]]) {
             artifact$support$code[[index]]
         } else if (residual_df < 3L) {
             "association_low_residual_df"
+        } else if (quasibinomial && identical(
+            artifact$support$design[[index]],
+            "blocked"
+        )) {
+            "association_quasibinomial_paired_scope"
+        } else if (quasibinomial && boundary) {
+            "association_quasibinomial_boundary"
         } else if (degenerate) {
             "association_degenerate_response"
         } else {
@@ -1026,7 +1308,9 @@
                 "Stored association unavailable precedence is malformed."
             )
         }
-        fit_codes <- if (identical(
+        fit_codes <- if (quasibinomial) {
+            .ASSOCIATION_QUASIBINOMIAL_FIT_UNAVAILABLE_CODES
+        } else if (identical(
             artifact$candidate,
             .ASSOCIATION_FREEDMAN_LANE_CANDIDATE
         )) {

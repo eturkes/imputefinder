@@ -19,11 +19,11 @@ or release obligation.
 Exact method, dependency graph, falsification gates, and Definition of Done →
 `PLAN.md` Sections 2-14. M13c v3 contract hash =
 `85d121ebd5ddd589be0f389553a3b7ffa6076a12a8fcbcb476a8969f7d987ae4`.
-Exact next implementation task → red/green the independent quasibinomial
-candidate, then final-panel handoff + implementation manifest. Open synthetic
-candidate replicates `1-32` only after every implementation rail passes. Keep
-development replicates `33-64`, HarmonizR development bytes, and all
-confirmation evidence sealed until the candidate choice locks.
+Exact next implementation task → red/green the final-panel handoff and locked
+implementation manifest, including the executable-contract quasibinomial panel
+fixture. Open synthetic candidate replicates `1-32` only after every manifest
+rail passes. Keep development replicates `33-64`, HarmonizR development bytes,
+and all confirmation evidence sealed until the candidate choice locks.
 
 ## Completed v1 release path
 
@@ -2615,5 +2615,73 @@ Verification:
 Exact next task → red/green the empirical independent-unit quasibinomial
 candidate, then final panel/handoff + implementation manifest. Open candidate
 replicates `1-32` only after all three candidates and manifest rails lock.
+
+Blockers → none.
+
+### 2026-07-19 - M13g empirical quasibinomial candidate
+
+Scope → implement and adversarially validate only the frozen empirical
+independent-unit `a_fraction_quasibinomial` candidate. Preserve synthetic
+candidate/development allocations, external bytes, public panel, and the
+implementation/evidence manifests as sealed.
+
+Implementation:
+
+- grouped `(k,G-k)` counts fit through the exact frozen `stats::glm.fit`
+  controls in retained SVD coordinates; every count/probability boundary,
+  convergence result, final weighted-rank check, and literal finite `phi>0`
+  rule has an exact structured disposition;
+- Pearson dispersion and the weighted information inverse pass the common
+  covariance PSD/scalar tolerance rails; the primary 0→1 encoded-column delta
+  effect uses its analytic gradient and unclamped residual-df t interval;
+  log-odds effect, SE, interval, statistic, and raw p remain secondary;
+- only independent units are licensed. Candidate records retain common
+  estimability/support/residual-df precedence, paired-scope abstention,
+  per-contrast continuation, stratum-local Holm families, typed-empty seed
+  provenance, and exact preparation-bound fit/effect replay;
+- common covariance/failure/multiplicity infrastructure now lives in the
+  candidate boundary rather than the robust engine. Unavailable validation
+  replays the complete canonical object, including human message/requirements;
+- the declared `testthat` floor is `3.1.7`, the first release containing the
+  mocked-binding API used by the deterministic failure rails.
+
+Adversarial corrections:
+
+- the first detection-mask fixture accidentally made `G=max(k)` and therefore
+  forced a legitimate count boundary; rotating observed feature positions
+  preserves the fixed global denominator while keeping intended rows interior;
+- malformed GLM output was initially conflated with a fitted-probability
+  boundary; nonfinite/shape failures now use numerical failure while only
+  finite probabilities outside the inclusive frozen interval use the boundary
+  code;
+- an apparent zero-dispersion fixture has positive roundoff-scale `phi` and
+  correctly reaches scalar singular covariance. A separate exact-zero fixture
+  now locks the literal `phi<=0` numerical path;
+- initial tests reconstructed delta effects through the implementation's own
+  coordinates. Raw-design grouped GLM/covariance plus finite-difference
+  gradient oracles now independently cover numeric and interaction inference,
+  alongside mixed contrast failure, both count limits, inclusive probability
+  floors, unclamped CI, acquisition strata, and rank deficiency.
+
+Verification:
+
+- focused quasibinomial suite → 9 tests / 77 expectations; focused robust and
+  restricted-permutation suites remain 7 / 90 and 13 / 149; all pass;
+- package-wide source suite → 190 tests / 1,478 expectations, zero failures,
+  warnings, errors, or skips; a separate 100-fit synthetic raw-coordinate
+  equivalence sweep had maximum relative error `3e-15`;
+- three-agent final rereview → no remaining mathematical, contract, schema,
+  provenance, dependency, or architecture finding; executable frozen contract
+  remains 30/30 with unchanged v3 identities and `frozen_unrun` lifecycle;
+- vignette-bearing source build succeeds; source-tarball
+  `R CMD check --as-cran --no-manual` passes every substantive rail with only
+  the expected new-submission note; usage scan and `git diff --check` pass;
+- no candidate simulation ran; replicates `1-32`, development `33-64`,
+  HarmonizR bytes, final panel, manifests, and confirmation remain sealed.
+
+Exact next task → M13h: implement the exact public-panel handoff and
+implementation-manifest constructor/validator, including executable-contract
+quasibinomial panel coverage. Lock the manifest before opening candidate
+replicates `1-32`.
 
 Blockers → none.
