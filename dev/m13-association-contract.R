@@ -2779,6 +2779,28 @@ m13a_seed_manifest <- function(
 
 # END M13A NORMATIVE SOURCE
 
+.m13a_quasibinomial_result_fixture <- function() {
+    result <- .m13a_result_fixture(TRUE)
+    result$candidate <- "a_fraction_quasibinomial"
+    result$methods[["candidate"]] <- "a_fraction_quasibinomial"
+    outcome <- result$outcomes[[1L]]
+    outcome$candidate <- "a_fraction_quasibinomial"
+    outcome$log_odds <- 1.0
+    outcome$log_odds_standard_error <- 0.2
+    outcome$log_odds_conf_low <- 0.51
+    outcome$log_odds_conf_high <- 1.49
+    outcome$statistic <- 5.0
+    outcome$raw_p <- 2 * stats::pt(-5, 6)
+    outcome$adjusted_p <- outcome$raw_p
+    outcome$diagnostics$variance_method <- "quasibinomial"
+    outcome$diagnostics$leverage_max <- NA_real_
+    outcome$diagnostics$dispersion <- 1.25
+    outcome$diagnostics$converged <- TRUE
+    outcome$diagnostics$boundary <- FALSE
+    result$outcomes[[1L]] <- outcome
+    result
+}
+
 m13a_normative_source_digest <- function() {
     path <- "dev/m13-association-contract.R"
     lines <- readLines(path, warn = FALSE, encoding = "UTF-8")
@@ -3032,6 +3054,7 @@ m13a_self_tests <- function(contract = m13a_contract()) {
     )
     result_fixture <- .m13a_result_fixture(TRUE)
     monte_carlo_fixture <- .m13a_monte_carlo_result_fixture()
+    quasibinomial_fixture <- .m13a_quasibinomial_result_fixture()
     duplicate_map_fixture <- monte_carlo_fixture
     duplicate_map_fixture$diagnostics$seed_manifest$map_sha256[[2L]] <-
         duplicate_map_fixture$diagnostics$seed_manifest$map_sha256[[1L]]
@@ -3153,6 +3176,9 @@ m13a_self_tests <- function(contract = m13a_contract()) {
         ),
         result_schema_monte_carlo = !.m13a_expect_error(
             m13a_validate_result_shape(monte_carlo_fixture)
+        ),
+        result_schema_quasibinomial = !.m13a_expect_error(
+            m13a_validate_result_shape(quasibinomial_fixture)
         ),
         result_seed_map_duplicate_rejected = .m13a_expect_error(
             m13a_validate_result_shape(duplicate_map_fixture)

@@ -771,9 +771,13 @@ full-design identity-working-model CR2/Satterthwaite path, studentized
 restricted Freedman-Lane with exact/Monte Carlo constrained-null maps, and the
 empirical independent-unit grouped quasibinomial path. They bind exact
 unavailable handoff, per-stratum Holm families, preparation-bound artifact
-validation, and candidate-specific numerical provenance replay. Final panel
-materialization and the implementation manifest remain open; every candidate
-result remains `frozen_unrun` until those rails and the manifest lock.
+validation, and candidate-specific numerical provenance replay. The exact
+final-panel shape reader and fail-closed implementation-manifest core now bind
+fixed passing-test receipts, stable source snapshots, the full live dependency
+set, and child/parent namespace fingerprints. Semantic candidate-evidence
+resolution, public materialization/handoff, authorization, and the actual
+manifest lock remain open; every candidate result remains `frozen_unrun` until
+those rails are green.
 
 Gate: protocol hashes exist; every A-C claim has an executable numeric gate and
 failure rule; v1 behavior/limitations reproduce on the expanded harness.

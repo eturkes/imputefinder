@@ -1152,6 +1152,14 @@
     }, logical(1L)))
 }
 
+.valid_association_robust_provenance <- function(artifact, preparation) {
+    expected <- tryCatch(
+        .association_robust_artifact(preparation),
+        error = function(error) NULL
+    )
+    !is.null(expected) && identical(artifact, expected)
+}
+
 .validate_association_candidate_artifact <- function(
     artifact,
     preparation
@@ -1241,6 +1249,17 @@
             !artifact$support$eligible))) {
         .abort_association_candidate_artifact(
             "Stored association candidate outcomes are malformed."
+        )
+    }
+    if (identical(
+        artifact$candidate,
+        .ASSOCIATION_ROBUST_CANDIDATE
+    ) && !.valid_association_robust_provenance(
+        artifact,
+        preparation
+    )) {
+        .abort_association_candidate_artifact(
+            "Stored robust-model provenance or disposition is malformed."
         )
     }
     if (identical(

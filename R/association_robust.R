@@ -383,7 +383,7 @@
     )
 }
 
-.run_association_ols_hc3_cr2 <- function(preparation) {
+.association_robust_artifact <- function(preparation) {
     .validate_association_preparation(preparation)
     hypotheses <- preparation$hypotheses
     outcomes <- vector("list", nrow(hypotheses))
@@ -495,6 +495,11 @@
         ),
         class = "imputefinder_association_candidate_artifact"
     )
+    artifact
+}
+
+.run_association_ols_hc3_cr2 <- function(preparation) {
+    artifact <- .association_robust_artifact(preparation)
     .validate_association_candidate_artifact(artifact, preparation)
     artifact
 }

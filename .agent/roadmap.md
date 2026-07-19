@@ -19,11 +19,12 @@ or release obligation.
 Exact method, dependency graph, falsification gates, and Definition of Done →
 `PLAN.md` Sections 2-14. M13c v3 contract hash =
 `85d121ebd5ddd589be0f389553a3b7ffa6076a12a8fcbcb476a8969f7d987ae4`.
-Exact next implementation task → red/green the final-panel handoff and locked
-implementation manifest, including the executable-contract quasibinomial panel
-fixture. Open synthetic candidate replicates `1-32` only after every manifest
-rail passes. Keep development replicates `33-64`, HarmonizR development bytes,
-and all confirmation evidence sealed until the candidate choice locks.
+Exact next implementation task → build the semantic candidate-evidence resolver
+and study harness, then green the guarded manifest authorizer and exact public
+panel materializer/handoff. Open synthetic candidate replicates `1-32` only
+after every resolver + manifest rail passes. Keep development replicates
+`33-64`, HarmonizR development bytes, and all confirmation evidence sealed until
+the candidate choice locks.
 
 ## Completed v1 release path
 
@@ -2685,3 +2686,56 @@ quasibinomial panel coverage. Lock the manifest before opening candidate
 replicates `1-32`.
 
 Blockers → none.
+
+### 2026-07-19 - M13h fail-closed panel + implementation-seal rails
+
+Scope → implement the pre-allocation panel/manifest rails; adversarially prove
+they cannot mint a winner or seal detached code/evidence.
+
+Implemented:
+
+- exact frozen public-panel shape reader reconstructs the internal candidate
+  artifact and replays candidate-specific numerics; robust replay now rebuilds
+  the deterministic HC3/CR2 artifact exactly;
+- executable contract gains a quasibinomial panel fixture outside the normative
+  source boundary; all frozen v3 identities remain unchanged;
+- manifest core ports the frozen escaped-frame/self-hash protocol and requires a
+  canonical complete inventory of package, M12/M13 contract, test, and harness
+  sources with live-byte hashes;
+- fixed subprocess registry derives pass status + positive counts from command
+  exit/output rather than caller claims; focused receipt binds 443 expectations,
+  stable pre/post source-inventory SHA-256, and the child package-namespace
+  fingerprint;
+- environment seal binds every live non-base namespace plus a child/parent
+  fingerprint over all package-owned bindings; stored, tested, live source, and
+  executable namespace drift all reject;
+- candidate-evidence tables/materializers from the initial draft were deleted
+  after review proved opaque aggregates could fabricate a winner from entirely
+  unavailable outcomes. The sentinel association slot remains absent and
+  `SEAL_READY` remains `FALSE` until semantic resolution exists.
+
+Verification:
+
+- focused panel/manifest/robust rail → 15 tests / 132 expectations; package-wide
+  source suite → 198 tests / 1,520 expectations; zero failures, warnings, errors,
+  or skips;
+- registered child harness → 443 focused expectations with child/parent
+  namespace and source-snapshot matches; frozen contract → 31/31 with unchanged
+  protocol/contract/gate/effective-manifest hashes;
+- vignette-bearing source build succeeds; source-tarball `R CMD check --as-cran
+  --no-manual` passes every substantive rail with only the expected new-
+  submission note; `git diff --check` passes;
+- independent math + contract rereviews → no current finding after robust replay,
+  source snapshot, namespace, receipt-schema, and fail-closed lifecycle fixes;
+- no candidate simulation, candidate/development allocation, external data,
+  HarmonizR bytes, public panel, implementation manifest, or confirmation result
+  opened or created.
+
+Exact next task → M13i: implement a companion resolver that hashes and validates
+every exact input/result artifact, derives outcome bindings + six screening
+metrics from frozen truth/opportunity allocations, resolves raw full-gate rows,
+runs the frozen evaluator, and alone may authorize ranking/materialization. Then
+flip the implementation-seal guard, lock the exact manifest, and only afterward
+open candidate replicates `1-32`.
+
+Blockers → none; authorization is intentionally red pending M13i.
