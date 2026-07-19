@@ -759,7 +759,7 @@ typed per-component numeric support, result schema, candidate-agnostic
 opportunity denominators, four fixed alternative targets, and exact
 candidate/development/confirmation stage seals.
 `dev/m13-association-contract.md` owns these superseding details; its aggregate
-hash is `2dfd532bf5e17f9221b78aecb0b1b4a3d281da55354ff253adb73e7a634e7883`.
+hash is `04e824321ac68c73633277064397f1a3fa96ba73ff342fbfe575df7fc6b1f4a6`.
 
 Gate: protocol hashes exist; every A-C claim has an executable numeric gate and
 failure rule; v1 behavior/limitations reproduce on the expanded harness.

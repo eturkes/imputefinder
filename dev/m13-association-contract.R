@@ -35,7 +35,7 @@
     descriptor = "7d282ab27457f5e8fc8a29e636ee5c4b8cce4949d7277e741ba31669edd14456",
     upstream_bindings = "5dc11e3dd5e43e1b638d8faf377836ad3b39b59319e0bfe3098d273891277bdd",
     normative_digest = "e2540c28ce25df6779066fd71621878b1cd15e394f9177f4d4b878cabcfbaaf2",
-    normative_source_digest = "4c5a4a8621c82036929ed81aad3026f95d83570e18ea79332dc209e590b9a453",
+    normative_source_digest = "facaaca9c226702066bc2fbcba03e956d6658ac554eb079d3eb90129d28dbd81",
     implementation_bindings = "e298256d380f71fcf4227eb76efe1e15db1da5b99b636f18852195c929d672a1",
     effective_manifest = "5dcf4f6408aed4ac7f9ccf07f4502805d34d2ea513ac68ac1c8e1259f23372f6",
     response = "baeb69d8ce3164629e8a50c5290549291d29b2a1c2dac155391be9da67ef57eb",
@@ -62,7 +62,7 @@
     selection = "98ce4cb116d8b9397b48bec86519b6e78534cd5ba6d04d9c3d807101e3da7073",
     screening_allocation = "d861cba428cc76eac35cb3bd6648f672985e10afc6c74779428f1f5895e8da09",
     screening_thresholds = "d1e176c765e3e5f28fb31beb625d6678f7999ce2d6a51fa609cc02c58323d2ee",
-    gate_registry = "480d52cdc41703d3a3dd6b35a70c53c88af4e165d6d28e5a9cac20e984ce5eee",
+    gate_registry = "e74b0a596001c9e846e555b8d3ef8f45966b2edac72bc528847d7a661149b3c3",
     completed_gate_lineage = "9d7f5c30e28cd437a1dde001a1715e6e143dfbe8b1f399fb7d7f3029b1198a6e",
     structural_gates = "5a36db4ba1836b65dcd84753045abde5c4175aef30efd73c36046d8b673d6a74",
     execution_seal = "4bab3eb16c15b39b95a52a2bff24940bcabd0f68dbbb71f36edfa884e250a81c",
@@ -70,7 +70,7 @@
     implementation_manifest_schema = "296045d46d341478dedeef0b4ec416ed77127221659f9a184d1881ce12cd6f7d",
     candidate_evidence_schema = "e8781ed57e149ab0d47422ea4d832b670da4a46b2b761934224287928a0dfd32",
     release_boundary = "5e25356ea2e3cb33b31439bf78ac01e254e99435fe0e12fc8be716c6bf1348e0",
-    contract = "2dfd532bf5e17f9221b78aecb0b1b4a3d281da55354ff253adb73e7a634e7883"
+    contract = "04e824321ac68c73633277064397f1a3fa96ba73ff342fbfe575df7fc6b1f4a6"
 )
 
 # BEGIN M13A NORMATIVE SOURCE
@@ -1350,7 +1350,11 @@ m13a_validate_result_shape <- function(result) {
         declared <- !any(stratum_map$stratum == "all") &&
             identical(
                 stratum_map$stratum,
-                vapply(stratum_map$acquisition, m13a_stratum_id, character(1L))
+                unname(vapply(
+                    stratum_map$acquisition,
+                    m13a_stratum_id,
+                    character(1L)
+                ))
             )
         canonical <- do.call(
             order,
@@ -2971,6 +2975,26 @@ m13a_self_tests <- function(contract = m13a_contract()) {
     result_fixture <- .m13a_result_fixture(TRUE)
     unavailable_fixture <- .m13a_result_fixture(FALSE)
     panel_unavailable_fixture <- .m13a_panel_unavailable_fixture()
+    declared_fixture <- result_fixture
+    declared_stratum <- m13a_stratum_id("DDA")
+    declared_fixture$response$stratum <- declared_stratum
+    declared_fixture$response$acquisition <- "DDA"
+    declared_fixture$hypotheses$stratum <- declared_stratum
+    declared_hypothesis <- m13a_hypothesis_id(
+        declared_stratum,
+        declared_fixture$hypotheses$coefficient,
+        declared_fixture$hypotheses$label,
+        declared_fixture$hypotheses$term_id
+    )
+    declared_fixture$hypotheses$hypothesis <- declared_hypothesis
+    declared_fixture$support$hypothesis <- declared_hypothesis
+    declared_fixture$outcomes[[1L]]$quantity <- declared_hypothesis
+    declared_fixture$outcomes[[1L]]$stratum <- declared_stratum
+    declared_fixture$outcomes[[1L]]$hypothesis <- declared_hypothesis
+    names(declared_fixture$outcomes) <- declared_hypothesis
+    declared_fixture$multiplicity$stratum <- declared_stratum
+    declared_fixture$diagnostics$strata$stratum <- declared_stratum
+    declared_fixture$diagnostics$strata$acquisition <- "DDA"
     corrupted_result <- result_fixture
     corrupted_result$outcomes[[1L]]$quantity <- "wrong_key"
     missing_numeric_support <- result_fixture
@@ -3061,6 +3085,9 @@ m13a_self_tests <- function(contract = m13a_contract()) {
         ),
         result_schema_unavailable = !.m13a_expect_error(
             m13a_validate_result_shape(unavailable_fixture)
+        ),
+        result_schema_declared = !.m13a_expect_error(
+            m13a_validate_result_shape(declared_fixture)
         ),
         panel_abstention_available = !.m13a_expect_error(
             m13a_validate_result_shape(panel_unavailable_fixture)

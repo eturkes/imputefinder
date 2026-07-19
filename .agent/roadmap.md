@@ -18,7 +18,7 @@ or release obligation.
 
 Exact method, dependency graph, falsification gates, and Definition of Done →
 `PLAN.md` Sections 2-14. M13c v3 contract hash =
-`2dfd532bf5e17f9221b78aecb0b1b4a3d281da55354ff253adb73e7a634e7883`.
+`04e824321ac68c73633277064397f1a3fa96ba73ff342fbfe575df7fc6b1f4a6`.
 Exact next implementation task → encode red A association
 response/hypothesis/support/result/abstention/hash tests, then implement only
 the three frozen candidate engines. Open synthetic candidate replicates `1-32`
@@ -2356,6 +2356,9 @@ Freeze:
   block floors; red-test derivation exposed multi-numeric interaction loss, so
   typed component encodings + exact per-component numeric support were added
   before candidate computation and adversarially rereviewed;
+- production red tests exposed incidental `vapply()` names that rejected every
+  declared-acquisition result; the comparison now strips only those names and
+  a declared-stratum fixture locks the valid path before candidate computation;
 - HC3, full-design identity-working-model CR2/Satterthwaite, constrained-null
   Freedman-Lane, empirical independent quasibinomial, abstention, covariance,
   transformation-count, and canonical seed/hash rules are executable;
@@ -2380,10 +2383,10 @@ Verification:
   stage drift, incomplete gates, malformed result bindings, and prove canonical
   collision-safe seed/map ordering plus RNG restoration;
 - protocol hash =
-  `445b3300ab5f6808b1ab77cf6142817ca86ee2cf0446014d8b6f3e00c8943c08`;
+  `254e9cb03d3f981bbbcf621b8e13985c8abb43916ab9b79901b32bac13b55c59`;
 - aggregate v3 hash =
-  `2dfd532bf5e17f9221b78aecb0b1b4a3d281da55354ff253adb73e7a634e7883`;
-- `Rscript --vanilla dev/m13-association-contract.R --verify` passes all 26
+  `04e824321ac68c73633277064397f1a3fa96ba73ff342fbfe575df7fc6b1f4a6`;
+- `Rscript --vanilla dev/m13-association-contract.R --verify` passes all 27
   named self-tests with exact component hashes;
 - `git diff --check` passes; no candidate simulation ran and no external result
   artifact was read.
