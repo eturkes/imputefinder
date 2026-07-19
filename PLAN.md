@@ -761,6 +761,13 @@ candidate/development/confirmation stage seals.
 `dev/m13-association-contract.md` owns these superseding details; its aggregate
 hash is `04e824321ac68c73633277064397f1a3fa96ba73ff342fbfe575df7fc6b1f4a6`.
 
+The production `association_preparation_v1` rail now binds the packed global
+mask/design identity to the exact response, acquisition-specific rebuilt
+cores, coefficient hypotheses, estimability, and biological-unit support.
+Candidate engines, final panel materialization, and every candidate result
+remain `frozen_unrun` until their focused tests and implementation manifest
+lock.
+
 Gate: protocol hashes exist; every A-C claim has an executable numeric gate and
 failure rule; v1 behavior/limitations reproduce on the expanded harness.
 

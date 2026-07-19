@@ -19,10 +19,11 @@ or release obligation.
 Exact method, dependency graph, falsification gates, and Definition of Done →
 `PLAN.md` Sections 2-14. M13c v3 contract hash =
 `04e824321ac68c73633277064397f1a3fa96ba73ff342fbfe575df7fc6b1f4a6`.
-Exact next implementation task → encode red A association
-response/hypothesis/support/result/abstention/hash tests, then implement only
-the three frozen candidate engines. Open synthetic candidate replicates `1-32`
-only after the implementation rails pass. Keep association-candidate
+Exact next implementation task → encode red rank-coordinate HC3/CR2,
+restricted-transformation, quasibinomial, final-panel handoff, and
+implementation-manifest tests, then implement only the three frozen candidate
+engines. Open synthetic candidate replicates `1-32` only after every
+implementation rail passes. Keep association-candidate
 computations on development replicates `33-64`, HarmonizR development bytes,
 and all confirmation evidence sealed until the candidate choice locks.
 
@@ -2397,5 +2398,68 @@ hash, implementation/evidence manifests, candidate opportunity denominators,
 HC3/CR2, restricted transformations, and quasibinomial effects. Keep all result
 allocations sealed until those rails are green and the implementation manifest
 locks.
+
+Blockers → none.
+
+### 2026-07-19 - M13d association preparation + identity rails
+
+Scope → implement the candidate-agnostic response/hypothesis/support boundary
+under the resealed v3 contract; retain all candidate/development/confirmation
+result allocations sealed.
+
+Implementation:
+
+- `association_mask_design_be_v1` now has an independent production encoder;
+  its gold digest matches the executable contract and is invariant to row/
+  column order, factor levels, integer/double representation, role order,
+  interaction order, and finite intensity values while remaining sensitive to
+  mask, design, roles, and interactions;
+- `association_preparation_v1` stores only packed original-mask/global typed-
+  design identity, global sample detection fractions, acquisition-specific
+  rebuilt cores, eligible coefficient axes, and common-support records - no
+  intensity or candidate result enters it;
+- acquisition strata remove acquisition-containing terms before rebuilding;
+  condition/nuisance main and eligible explicit interaction axes retain exact
+  raw-coefficient estimability, including nonestimable rows;
+- support counts unique biological-unit positions, numeric medians/ties/ranges,
+  coefficient-specific categorical targets, Cartesian interaction cells, and
+  six-complete-block requirements; technical sibling multiplicity cannot
+  inflate support;
+- top-level zero-observable/no-hypothesis states use the frozen exact
+  `imputefinder_unavailable` shape;
+- validation reconstructs hash, response, stratum IDs, exact sample bijections,
+  designs, cores, hypotheses, and support from the packed global identity;
+  detached hashes/masks/designs, sample omission, forged/reordered strata,
+  empty available state, missing hypotheses, and support drift reject.
+
+Adversarial corrections:
+
+- math/architecture review found all multilevel main coefficients initially
+  targeted the first nonreference level; coefficient-level lookup + A/B/C
+  regression now distinguish A/B from A/C support;
+- contract/architecture review found the initial preparation validator trusted
+  a shape-only SHA and subset-directional strata; packed identity + exact
+  reconstruction closes both trust gaps;
+- implementation tests exposed the frozen result validator's incidental
+  `vapply()` names bug; contract protocol/aggregate identities were resealed to
+  `254e9cb03d3f981bbbcf621b8e13985c8abb43916ab9b79901b32bac13b55c59` /
+  `04e824321ac68c73633277064397f1a3fa96ba73ff342fbfe575df7fc6b1f4a6`
+  in commit `59e0ccd` before any candidate computation.
+
+Verification:
+
+- focused preparation suite → 9 tests / 85 expectations; full source suite →
+  161 tests / 1,162 expectations; zero failures/errors/warnings/skips;
+- three-agent rereview → no remaining identity, lifecycle, hypothesis,
+  support-math, or stratum-rebuild blocker;
+- frozen executable contract → 27/27 named self-tests with exact hashes;
+  vignette-bearing source build/check → `Status: OK`; `git diff --check` passes;
+- no candidate simulation ran; development replicates `33-64`, HarmonizR
+  bytes, and confirmation remain sealed.
+
+Exact next task → red/green the shared rank-coordinate + HC3/CR2 engine and
+final unavailable handoff, then restricted Freedman-Lane and independent
+quasibinomial. Freeze exact source/environment/test implementation manifest
+only after all engine/handoff rails pass; then open candidate replicates `1-32`.
 
 Blockers → none.
