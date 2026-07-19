@@ -17,12 +17,11 @@ delayed backend; J1 standards QC; J2 atlas. Parked work has no active checkbox
 or release obligation.
 
 Exact method, dependency graph, falsification gates, and Definition of Done →
-`PLAN.md` Sections 2-14. M13c v3 contract hash =
-`85d121ebd5ddd589be0f389553a3b7ffa6076a12a8fcbcb476a8969f7d987ae4`.
-Exact next implementation task → build the semantic candidate-evidence resolver
-and study harness, then green the guarded manifest authorizer and exact public
-panel materializer/handoff. Open synthetic candidate replicates `1-32` only
-after every resolver + manifest rail passes. Keep development replicates
+`PLAN.md` Sections 2-14. M13c v4 contract hash =
+`422954c88ed7683f58ac296cb4d9e785d61c3f80a276914235d4b285bbc16547`.
+Exact next task → commit the verified pre-allocation implementation, lock its
+manifest, run synthetic candidate replicates `1-32`, and resolve/lock one winner
+or no-winner before exact public materialization/handoff. Keep development replicates
 `33-64`, HarmonizR development bytes, and all confirmation evidence sealed until
 the candidate choice locks.
 
@@ -2739,3 +2738,57 @@ flip the implementation-seal guard, lock the exact manifest, and only afterward
 open candidate replicates `1-32`.
 
 Blockers → none; authorization is intentionally red pending M13i.
+
+### 2026-07-19 - M13i semantic evidence + immutable candidate-study rails
+
+Scope → close every pre-allocation resolver, statistical, provenance, and
+lifecycle rail; keep all candidate artifacts unopened until independent review
+and broad verification pass.
+
+Implemented:
+
+- pre-result v4 amendment freezes closed-endpoint 128-target coverage,
+  `stats::median` bias, exact four-by-32 whole-replicate bootstrap sampling,
+  nine SHA-derived streams, caller RNG restoration, and an inclusive
+  eight-ULP ranking boundary;
+- semantic resolver regenerates every input from the bound M12 generator,
+  re-executes each engine from candidate-visible preparation only, derives
+  candidate-specific oracle audits, complete structured dispositions, six
+  screens, five raw full-gate rows, deterministic ranking, and winner/no-winner;
+- fixture replay has a distinct non-authoritative schema/class; production
+  authorization requires the exact on-disk pre-allocation manifest and stores a
+  self-hashed aggregate of the canonical manifest + 416 input + 1,248 result
+  byte inventory;
+- fixed harness exposes only implementation lock, candidate run, evidence
+  resolution/verification, and status. Exact layout rejects extras including
+  replicate 33; symlinks, detached bytes, concurrent commands, and replacement
+  writes fail closed;
+- full-gate evidence retains estimate, numerator, denominator, interval, note,
+  status, threshold, failure treatment, and audit hash. Execution failures map
+  every prepared hypothesis to `association_numerical_failure` and reject the
+  candidate globally.
+
+Verification:
+
+- frozen v4 contract/self-tests pass with protocol
+  `e9d3b3799bb160d65feb0ae63b2e49a92bb4e8e005b89232ada96b83cfabed27`,
+  contract `422954c88ed7683f58ac296cb4d9e785d61c3f80a276914235d4b285bbc16547`,
+  and gate registry
+  `65f01b20e74b216399e17433df393f32e9bda189f73992ab419069cf7d5c343b`;
+- registered association verifier → 584 expectations with stable pre/post source
+  and namespace hashes; complete package source suite → zero failures, warnings,
+  errors, or skips;
+- vignette-bearing source build succeeds; source-tarball `R CMD check --as-cran
+  --no-manual` passes every substantive rail with only the expected new-
+  submission note; `git diff --check` passes;
+- independent statistical + contract reviews → no remaining result-sensitive,
+  schema, resolver, inventory, or authorization finding;
+- study status remains manifest absent, inputs `0/416`, results `0/1248`,
+  evidence absent. No candidate/development/confirmation computation or
+  external artifact opened.
+
+Exact next task → scoped pre-allocation commit, immutable implementation-manifest
+lock, then candidate replicates `1-32` only. Resolve and verify candidate
+evidence before any development or public materialization.
+
+Blockers → none.

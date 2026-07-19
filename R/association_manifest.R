@@ -24,9 +24,9 @@
     "dev/m13-association-implementation.R"
 )
 
-# The implementation seal remains deliberately red until the semantic
-# candidate-evidence resolver is part of this exact source inventory.
-.ASSOCIATION_IMPLEMENTATION_SEAL_READY <- FALSE
+# The semantic resolver, immutable artifact inventory, and study harness are
+# complete. Public construction still runs both registered verification rails.
+.ASSOCIATION_IMPLEMENTATION_SEAL_READY <- TRUE
 
 .abort_association_manifest <- function(message) {
     .abort_association(
@@ -340,7 +340,10 @@
     )) {
         return("contract")
     }
-    if (identical(path, "dev/m13-association-implementation.R")) {
+    if (path %in% c(
+        "dev/m13-association-implementation.R",
+        "dev/m13-association-study.R"
+    )) {
         return("harness")
     }
     if (grepl("^tests/", path)) {
@@ -494,7 +497,7 @@
     lines <- strsplit(text, "\n", fixed = TRUE)[[1L]]
     tests <- lines[startsWith(lines, "self_tests: ")]
     valid <- length(tests) == 1L &&
-        "contract_version: m13_association_contract_v3" %in% lines &&
+        "contract_version: m13_association_contract_v4" %in% lines &&
         paste0(
             "state: frozen_unrun; candidate=1-32; ",
             "development=sealed; confirmation=sealed"

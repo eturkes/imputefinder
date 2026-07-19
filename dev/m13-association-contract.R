@@ -18,8 +18,8 @@
 .m13a_candidates <- .m13a_source("dev/m12-candidate-protocol.R")
 .m13a_generator <- .m13a_source("dev/m12-generator-validation.R")
 
-.M13A_VERSION <- "m13_association_contract_v3"
-.M13A_PROTOCOL_ID <- "m13_a_association_protocol_v3"
+.M13A_VERSION <- "m13_association_contract_v4"
+.M13A_PROTOCOL_ID <- "m13_a_association_protocol_v4"
 .M13A_CHECKED_ON <- "2026-07-19"
 .M13A_CANDIDATE_REPLICATES <- 1:32
 .M13A_DEVELOPMENT_REPLICATES <- 33:64
@@ -32,10 +32,10 @@
     generator_audit = "4d216966c8cc54b1b23685d8801c7c65b2afcc5879dd15430d57a88f765e8a00"
 )
 .M13A_EXPECTED_HASHES <- c(
-    descriptor = "7d282ab27457f5e8fc8a29e636ee5c4b8cce4949d7277e741ba31669edd14456",
+    descriptor = "2e4785f5276ae64c23c9fd6fb42be12555d70a861957dbcf979cfe18b5df2de6",
     upstream_bindings = "5dc11e3dd5e43e1b638d8faf377836ad3b39b59319e0bfe3098d273891277bdd",
-    normative_digest = "461c7947757de46792784293d1666c459e1454521145f52dde1cdb3a06b32935",
-    normative_source_digest = "b1a7a4840da88f7639a213d2fb88b297a935eaef6fc625371987b877d21d4226",
+    normative_digest = "23c8288d81e08d7b87fd1d2d0f85cb0c4319edca680c276d3334a2ef94a74782",
+    normative_source_digest = "ee49e77725a7bfc3e85a094496193e73869af4be4d1f9bceee8010bb55765a0b",
     implementation_bindings = "8ad1d822c6f626c45b9d55631a824eb5c1b165a54dc0ef32e3ebe51c4cb497f9",
     effective_manifest = "5dcf4f6408aed4ac7f9ccf07f4502805d34d2ea513ac68ac1c8e1259f23372f6",
     response = "baeb69d8ce3164629e8a50c5290549291d29b2a1c2dac155391be9da67ef57eb",
@@ -48,29 +48,30 @@
     permutation = "62ed7f671c9ee871eb6c9311cf6fba7eef0afe4d7ad384021c6b824c83d3430b",
     permutation_counts = "8a605d537ec00e71c2cdb0a6e8b27126775bb3d70824cd43e1e555e54b772816",
     permutation_maps = "fd4a0288087ca7ff0f402b9b0bc8d1a657810ddf32e4bce37d8160ae4f174203",
-    seed_protocol = "d4dab4cb4971b931e5262e5609afe0f5ce110e35a68edc6c49c9d735e21a37ad",
+    seed_protocol = "d384a4f446acba3f4e36b3f3b662e6910402c43c43fc51909f476d0899140ebe",
     input_hash = "35871cc878f941af0b299b7cc680842df35b760b85c10b849f5168692c6fa64c",
     multiplicity = "1e6d84fe9da0b0623aa97f0bd0f7cba88051e8e703798d901badc06379e7d0ae",
-    result_schema = "a342159404e24c40b754a44025d41cde8b448c610d0f3b505fa87d30c3535d7e",
+    result_schema = "1b924dd61b42f24d1480da585fe4166cb2d2fe7ef90be83f99a9f1b74834a5cf",
     result_records = "1cfbdf3fae1be20dead577bf961d3e2091b8edbca36f66479c7a5b57a024c21e",
     lifecycle = "d7b358c0835b2fef76892e654d7477a66a8d745445c53b82339c88862d303040",
     unavailable_codes = "75ff8476e75dde29007d7b879409df4f157a844ddf8ee09e2abad30627bdc021",
     truth = "821ad25d39770f46d84ea48b2a76ecae2ec1641068bebbb29e4d2709432946cc",
     truth_methods = "13dabc75ae7f8a780831586b35e7f7900bd727b412260f74efcdf5731607b261",
     opportunities = "21eb96391a0efa21f410390f2e77a67fd174fe165ea2631cac969ecf78ca4e6b",
-    evaluation_allocation = "a63a9c6bc87d4ba0b44a287d6b633f5c1b0822320983130ef4a3a680bc764e7c",
-    selection = "98ce4cb116d8b9397b48bec86519b6e78534cd5ba6d04d9c3d807101e3da7073",
+    evaluation_allocation = "f2fdcbc9116fb76c9dbd7a28cba8b8d30e685fc97f785547037ea8b0b941cc38",
+    selection = "f0e99d3f86baf2a8993491932f9a1f5378d629986e592a3c8b39d2fe39cc20e2",
     screening_allocation = "d861cba428cc76eac35cb3bd6648f672985e10afc6c74779428f1f5895e8da09",
-    screening_thresholds = "d1e176c765e3e5f28fb31beb625d6678f7999ce2d6a51fa609cc02c58323d2ee",
-    gate_registry = "f2fd8d0171003e0ae9b31757acf2d43acf7477965d517f1757f4d895c6abe731",
+    screening_thresholds = "c8ca1c22cba1e7da8bdd2898d97370efa508eeccc93f41129182cf4a1d4b20aa",
+    gate_statistics = "7deed5afc046265b327229f6fc8756cc0ee2525d9ef2da4d3fc7d367fba5b10c",
+    gate_registry = "65f01b20e74b216399e17433df393f32e9bda189f73992ab419069cf7d5c343b",
     completed_gate_lineage = "9d7f5c30e28cd437a1dde001a1715e6e143dfbe8b1f399fb7d7f3029b1198a6e",
-    structural_gates = "5a36db4ba1836b65dcd84753045abde5c4175aef30efd73c36046d8b673d6a74",
-    execution_seal = "4bab3eb16c15b39b95a52a2bff24940bcabd0f68dbbb71f36edfa884e250a81c",
+    structural_gates = "c29ac1fe23bb78f10640fb65a1756d38d4b18279dd967eb422f08f8024ec1db8",
+    execution_seal = "db611f42f94c2823fffc9dae039ab26c2d1df97debae6a3fac99529e321879bf",
     evidence_hash_protocol = "0d850d7d013d199bc1f6ba0d707f7b3390d26b82a2cbe10fe85039f8f4ec7df3",
-    implementation_manifest_schema = "296045d46d341478dedeef0b4ec416ed77127221659f9a184d1881ce12cd6f7d",
-    candidate_evidence_schema = "e8781ed57e149ab0d47422ea4d832b670da4a46b2b761934224287928a0dfd32",
+    implementation_manifest_schema = "8af3ebaaff8172968896500731747f0cbebe716bd4258143d271717f3aaf678a",
+    candidate_evidence_schema = "1e2d6e09eac4754cd8b39ac90d858188edb09a93c8422468018050f079708205",
     release_boundary = "5e25356ea2e3cb33b31439bf78ac01e254e99435fe0e12fc8be716c6bf1348e0",
-    contract = "85d121ebd5ddd589be0f389553a3b7ffa6076a12a8fcbcb476a8969f7d987ae4"
+    contract = "422954c88ed7683f58ac296cb4d9e785d61c3f80a276914235d4b285bbc16547"
 )
 
 # BEGIN M13A NORMATIVE SOURCE
@@ -107,7 +108,7 @@ m13a_descriptor <- function() {
         role = "pre_result_superseding_addendum",
         supersedes = "ambiguous Track A details in m12_a_candidate_protocol_v2",
         preserves = "M12 thresholds;candidates;generator identities;external data roles;sealed evidence",
-        gate_version = "nine association/public rows superseded by m13a_gate_registry_v3; eleven completed core rows retain exact M12 bindings",
+        gate_version = "nine association/public rows superseded by m13a_gate_registry_v4; eleven completed core rows retain exact M12 bindings",
         result_state = "frozen_unrun",
         external_state = "metadata_only",
         checked_on = .M13A_CHECKED_ON,
@@ -883,7 +884,7 @@ m13a_result_schema <- function() {
             diagnostics = "list[4],exact:diagnostics"
         ),
         protocol = c(
-            id = "character[1],exact:m13_a_association_protocol_v3",
+            id = "character[1],exact:m13_a_association_protocol_v4",
             hash = "character[1],sha256:m13a-protocol-hash",
             contract_hash = "character[1],sha256:m13a-contract-hash",
             gate_registry_hash = "character[1],sha256:m13a-gate-registry-hash",
@@ -1003,7 +1004,7 @@ m13a_result_schema <- function() {
             unavailable_count = "integer,nonnegative"
         ),
         seed_manifest = c(
-            protocol_id = "character,exact:m13_a_association_protocol_v3",
+            protocol_id = "character,exact:m13_a_association_protocol_v4",
             candidate_id = "character,exact:a_fraction_freedman_lane",
             acquisition = "character,nonempty",
             hypothesis_id = "character,hypotheses-foreign-key",
@@ -2015,7 +2016,7 @@ m13a_evaluation_allocation <- function() {
         candidate_count = 32L,
         development_replicates = "33-64",
         development_count = 32L,
-        candidate_state = "authorized_after_v3_and_implementation_hash_freeze",
+        candidate_state = "authorized_after_v4_and_implementation_hash_freeze",
         development_state = "sealed_until_winner_lock",
         m12_required_tracks = manifest$required_tracks,
         effective_required_tracks = effective_tracks,
@@ -2025,24 +2026,35 @@ m13a_evaluation_allocation <- function() {
 
 m13a_selection <- function() {
     data.frame(
-        selection_id = "a_association_selection_v3",
+        selection_id = "a_association_selection_v4",
         candidates = .m13a_tokens(
             "a_fraction_ols_hc3_cr2", "a_fraction_freedman_lane",
             "a_fraction_quasibinomial"
         ),
         computation_scope = "all 13 scenarios x replicates 1-32 only",
-        hard_rejection = "candidate screening: within-licensed-scope null/calibration miss malformed disposition or causal wording; out-of-scope is not a screening rejection; every screening-qualified candidate then faces the full v3 synthetic gate",
+        hard_rejection = "candidate screening: within-licensed-scope null/calibration miss malformed disposition causal wording or any sealed-engine execution failure; out-of-scope is not a screening rejection; every screening-qualified candidate then faces the full v4 synthetic gate",
         scope_denominator = "candidate-agnostic opportunity manifest after common estimability/support",
         scope_numerator = "denominator hypotheses returning complete finite available outcomes",
         out_of_scope = "named unavailable retained in denominator and therefore lowers scope coverage",
         screening_metrics = "same thresholds within licensed target/null subsets; in-scope unavailable stays a miss; exact denominators reported",
-        ranking = "rank only full-v3-gate passers by the deterministic anchored-cluster algorithm in m13a_rank_candidates",
-        selected_winner_gate = "apply the unchanged full 64-null/128-target v3 registry to every screening-qualified candidate before ranking; unavailable target or zero-p family eliminates that candidate",
+        ranking = "rank only full-v4-gate passers by the deterministic anchored-cluster algorithm in m13a_rank_candidates",
+        ranking_near_tie = "absolute metric difference <= 0.02 + 8*.Machine$double.eps*pmax(1,abs(value),abs(anchor),0.02); mathematically exact decimal boundary included and materially outside excluded",
+        selected_winner_gate = "apply the unchanged-threshold full 64-null/128-target v4 registry to every screening-qualified candidate before ranking; unavailable target or zero-p family eliminates that candidate",
         no_winner = "no screening-qualified full-gate passer kills/parks the panel; one candidate failure never suppresses another passer; design core remains mandatory",
         development_unlock = "lock one winner and candidate evidence hash before opening replicates 33-64 or HarmonizR bytes",
         confirmation_unlock = "M15P synchronized opening only; MultiPro remains sealed through M13",
         stringsAsFactors = FALSE
     )
+}
+
+.m13a_ranking_near <- function(value, anchor) {
+    slack <- 8 * .Machine$double.eps * pmax(
+        1,
+        abs(value),
+        abs(anchor),
+        0.02
+    )
+    abs(value - anchor) <= 0.02 + slack
 }
 
 m13a_rank_candidates <- function(metrics) {
@@ -2074,9 +2086,16 @@ m13a_rank_candidates <- function(metrics) {
             method = "radix"
         )
         anchor <- remaining[anchor_order[[1L]], , drop = FALSE]
-        near <- abs(remaining$scope_coverage - anchor$scope_coverage) <= 0.02 &
-            abs(remaining$power - anchor$power) <= 0.02 &
-            abs(remaining$absolute_bias - anchor$absolute_bias) <= 0.02
+        near <- .m13a_ranking_near(
+            remaining$scope_coverage,
+            anchor$scope_coverage
+        ) & .m13a_ranking_near(
+            remaining$power,
+            anchor$power
+        ) & .m13a_ranking_near(
+            remaining$absolute_bias,
+            anchor$absolute_bias
+        )
         cluster <- remaining[near, , drop = FALSE]
         chosen_order <- order(
             cluster$simplicity_rank,
@@ -2149,7 +2168,64 @@ m13a_screening_thresholds <- function() {
             "licensed fixed alternative targets; in-scope unavailable is miss",
             "licensed fixed alternative targets; in-scope unavailable makes metric failed"
         ),
-        role = "candidate screening only; every screening-qualified candidate then faces the full v3 gate registry before ranking",
+        role = "candidate screening only; every screening-qualified candidate then faces the full v4 gate registry before ranking",
+        stringsAsFactors = FALSE
+    )
+}
+
+m13a_gate_statistics <- function() {
+    data.frame(
+        m12_gate_id = c(
+            "a_assoc_null_upper", "a_assoc_null_stratum",
+            "a_assoc_interval_coverage", "a_assoc_alternative_power",
+            "a_assoc_effect_bias"
+        ),
+        estimate = c(
+            "one-sided 95% Clopper-Pearson upper bound for the pooled false-family fraction",
+            "maximum DDA/DIA false-family fraction; lexical acquisition breaks an exact tie",
+            "mean of 128 fixed-target binary indicators that conf_low<=candidate-specific nonzero oracle truth<=conf_high, with both endpoints closed",
+            "mean of 128 fixed-target binary indicators adjusted_p<=0.05",
+            "stats::median of 128 fixed-target absolute candidate-specific projection errors; arithmetic mean of ordered positions 64 and 65"
+        ),
+        numerator = c(
+            "false-family count", "false-family count in selected acquisition",
+            "covered-target count", "detected-target count",
+            "sum absolute projection error; audit field only"
+        ),
+        denominator = c(
+            "64 fixed null scenario-replicates",
+            "32 fixed null scenario-replicates in selected acquisition; gate-registry sample_size=64 denotes total pooled null allocation",
+            rep("128 fixed targets: four scenarios x replicates 1-32", 3L)
+        ),
+        uncertainty = c(
+            "one-sided exact binomial lower=0 upper=qbeta(.95,x+1,n-x); x=n gives 1; observed fraction retained as numerator/denominator",
+            "two-sided exact binomial qbeta(.025/.975) for the selected acquisition; boundary endpoints 0/1",
+            rep("9999-draw scenario-stratified whole-generator-replicate bootstrap; canonical target-table scenario order and replicate order 1:32; sample.int(32L,32L,replace=TRUE) once per scenario per draw; type-8 .025/.975 quantiles expanded only to contain the point estimate", 3L)
+        ),
+        seed = c(
+            rep("not_applicable", 2L),
+            rep("SHA-256 UTF-8 paste(protocol_id,candidate_id,versioned_gate_id,scenario_stratified_whole_replicate_bootstrap_v1,sep=TAB); integer first seven hex digits plus one", 3L)
+        ),
+        rng = c(
+            rep("not_applicable", 2L),
+            rep("R RNGkind Mersenne-Twister/Inversion/Rejection; caller kind seed and seed absence restored exactly", 3L)
+        ),
+        dependence = c(
+            rep("not_applicable", 2L),
+            rep("the resampling unit is one complete generated matrix/result; all within-replicate feature-module dependence stays intact and features/modules are never resampled separately", 3L)
+        ),
+        passage = c(
+            "threshold compares the one-sided Clopper-Pearson upper endpoint stored as estimate",
+            rep(
+                "threshold compares the point statistic; interval is audit evidence",
+                4L
+            )
+        ),
+        bootstrap_statistic = c(
+            rep("not_applicable", 2L),
+            "mean", "mean",
+            "stats::median; even-length arithmetic mean of the two central ordered values in every draw"
+        ),
         stringsAsFactors = FALSE
     )
 }
@@ -2202,6 +2278,7 @@ m13a_normative_digest <- function() {
         selection = m13a_selection(),
         screening_allocation = m13a_screening_allocation(),
         screening_thresholds = m13a_screening_thresholds(),
+        gate_statistics = m13a_gate_statistics(),
         structural_gates = m13a_structural_gates(),
         execution_seal = m13a_execution_seal(),
         evidence_hash_protocol = m13a_evidence_hash_protocol(),
@@ -2247,7 +2324,7 @@ m13a_protocol_hash <- function() {
     )
 }
 
-.m13a_v3_comparator <- function(gate_id, comparator) {
+.m13a_v4_comparator <- function(gate_id, comparator) {
     replacements <- c(
         a_public_confirmation_coverage = paste0(
             "all estimable per-acquisition condition/instrument/nuisance ",
@@ -2270,6 +2347,29 @@ m13a_protocol_hash <- function() {
     } else comparator
 }
 
+.m13a_v4_metric <- function(gate_id, metric) {
+    if (identical(gate_id, "a_assoc_interval_coverage")) {
+        "fixed_target_95_interval_coverage_fraction"
+    } else {
+        metric
+    }
+}
+
+.m13a_v4_uncertainty <- function(gate_id, uncertainty_method) {
+    if (gate_id %in% c(
+        "a_assoc_interval_coverage",
+        "a_assoc_alternative_power",
+        "a_assoc_effect_bias"
+    )) {
+        paste0(
+            "9999-draw scenario-stratified whole-generator-replicate ",
+            "bootstrap; type-8 .025/.975; point-contained"
+        )
+    } else {
+        uncertainty_method
+    }
+}
+
 m13a_gate_registry <- function() {
     base <- .m13a_m12$m12_validation_contract()$gate_registry
     selected <- base$track == "A" &
@@ -2278,22 +2378,32 @@ m13a_gate_registry <- function() {
     base_bindings <- .m13a_m12$m12_gate_binding_hashes()
     stage <- vapply(base$gate_id, .m13a_association_stage, character(1L))
     output <- data.frame(
-        gate_id = paste0(base$gate_id, "_v3"),
-        registry_version = "m13a_gate_registry_v3",
+        gate_id = paste0(base$gate_id, "_v4"),
+        registry_version = "m13a_gate_registry_v4",
         claim_id = base$claim_id,
         track = base$track,
-        metric = base$metric,
+        metric = unname(mapply(
+            .m13a_v4_metric,
+            base$gate_id,
+            base$metric,
+            USE.NAMES = FALSE
+        )),
         unit = base$unit,
         comparator = vapply(
             seq_len(nrow(base)),
-            function(index) .m13a_v3_comparator(
+            function(index) .m13a_v4_comparator(
                 base$gate_id[[index]], base$comparator[[index]]
             ),
             character(1L)
         ),
         strata = base$strata,
         sample_size = base$sample_size,
-        uncertainty_method = base$uncertainty_method,
+        uncertainty_method = unname(mapply(
+            .m13a_v4_uncertainty,
+            base$gate_id,
+            base$uncertainty_method,
+            USE.NAMES = FALSE
+        )),
         threshold_operator = base$threshold_operator,
         threshold_value = base$threshold_value,
         threshold_scale = base$threshold_scale,
@@ -2340,7 +2450,7 @@ m13a_completed_gate_lineage <- function() {
 m13a_gate_binding_hashes <- function(registry = m13a_gate_registry()) {
     canonical <- m13a_gate_registry()
     if (!identical(registry, canonical)) {
-        .m13a_fail("M13c gate bindings require the canonical v3 registry.")
+        .m13a_fail("M13c gate bindings require the canonical v4 registry.")
     }
     stats::setNames(registry$gate_binding_hash, registry$gate_id)
 }
@@ -2348,7 +2458,7 @@ m13a_gate_binding_hashes <- function(registry = m13a_gate_registry()) {
 m13a_gate_registry_hash <- function(registry = m13a_gate_registry()) {
     canonical <- m13a_gate_registry()
     if (!identical(registry, canonical)) {
-        .m13a_fail("M13c gate-registry hash requires the canonical v3 registry.")
+        .m13a_fail("M13c gate-registry hash requires the canonical v4 registry.")
     }
     .m13a_m12$.m12_hash_frame(registry)
 }
@@ -2440,6 +2550,7 @@ m13a_structural_gates <- function() {
     data.frame(
         rail_id = c(
             "a_candidate_disposition_exact", "a_candidate_holm_exact",
+            "a_candidate_engine_execution_complete",
             "a_screening_null_available",
             "a_full_gate_candidate_null_available",
             "a_full_gate_candidate_target_finite"
@@ -2447,6 +2558,7 @@ m13a_structural_gates <- function() {
         rule = c(
             "finite_available_or_exact_structured_unavailable_fraction",
             "canonical_family_holm_recalculation_match_fraction",
+            "every sealed candidate-engine run completes without a top-level execution failure; a caught error emits association_numerical_failure for every prepared hypothesis but remains a global structural rejection",
             "each licensed-scope null family has at least one available raw p-value",
             "each screening-qualified candidate full-denominator null family has at least one available raw p-value",
             "each screening-qualified candidate has complete finite outcomes for every full-denominator alternative target"
@@ -2454,13 +2566,15 @@ m13a_structural_gates <- function() {
         denominator = c(
             "all eligible coefficient outputs including nonestimable unsupported and out-of-scope",
             "all nonempty available families",
+            "all 416 scenario-replicate executions per candidate",
             "64 null scenario-replicates per candidate",
             "64 null scenario-replicates per screening-qualified candidate",
             "128 fixed alternative targets per screening-qualified candidate"
         ),
-        required = rep(TRUE, 5L),
+        required = rep(TRUE, 6L),
         failure = c(
             "candidate screening rejection", "candidate screening rejection",
+            "candidate screening rejection",
             "candidate screening rejection",
             "candidate eliminated before ranking", "candidate eliminated before ranking"
         ),
@@ -2475,8 +2589,10 @@ m13a_execution_seal <- function() {
         source_manifest = "exact source_file schema; safe canonical repository paths plus current-byte SHA-256; roles contract,engine,evaluator,schema,test,harness all required",
         environment_manifest = "exact sorted name/value/required schema including R.version.string R.platform imputefinder.version and every loaded non-base dependency",
         test_manifest = "exact sorted command/positive-expectation-count/passed-status/evidence-SHA-256 schema",
-        binding = "candidate evidence stores v3 contract hash protocol hash implementation-manifest hash effective-manifest hash and exact scenario/replicate IDs",
-        mutation_rule = "any source environment allocation or input-binding drift rejects execution and requires a new pre-result implementation seal",
+        binding = "candidate evidence stores v4 contract hash protocol hash implementation-manifest hash effective-manifest hash and exact scenario/replicate IDs",
+        replay = "production resolver stores no caller callbacks; package-owned readers regenerate inputs from the manifest-bound M12 generator and re-execute each engine from candidate-visible preparation only",
+        authorization = "fixture replay has a distinct schema/class; production resolver requires the exact on-disk pre-allocation manifest; authorization requires the exact canonical manifest+416-input+1248-result inventory with no extras and matching byte hashes before/after complete replay; candidate evidence persists that allocation-inventory aggregate and verification additionally binds the stored evidence object",
+        mutation_rule = "any source environment allocation input result or replay-binding drift rejects execution and requires a new pre-result implementation seal",
         current_state = "required_uncreated",
         stringsAsFactors = FALSE
     )
@@ -2522,9 +2638,9 @@ m13a_implementation_manifest_schema <- function() {
     rows <- list(
         implementation_manifest = c(
             "schema=character[1]:m13a_implementation_manifest_v1",
-            "contract_hash=sha256:current-v3", "protocol_hash=sha256:current-v3",
-            "gate_registry_hash=sha256:current-v3",
-            "effective_manifest_hash=sha256:current-v3",
+            "contract_hash=sha256:current-v4", "protocol_hash=sha256:current-v4",
+            "gate_registry_hash=sha256:current-v4",
+            "effective_manifest_hash=sha256:current-v4",
             "source_files=data.frame:source_file",
             "environment=data.frame:environment_value",
             "tests=data.frame:test_evidence", "state=character[1]:locked",
@@ -2568,7 +2684,9 @@ m13a_candidate_evidence_schema <- function() {
             "contract_hash=sha256", "protocol_hash=sha256",
             "gate_registry_hash=sha256", "implementation_hash=sha256",
             "effective_manifest_hash=sha256",
-            "generator_protocol_hash=sha256", "candidate_ids=character[3]",
+            "generator_protocol_hash=sha256",
+            "artifact_inventory_hash=sha256:canonical-manifest-plus-416-input-plus-1248-result-byte-inventory; production-only; fixture-NA",
+            "candidate_ids=character[3]",
             "scenario_ids=character[13]", "replicate_ids=integer[32]:1..32",
             "run_bindings=data.frame:run_binding",
             "outcome_bindings=data.frame:outcome_binding",
@@ -2608,8 +2726,27 @@ m13a_candidate_evidence_schema <- function() {
             "licensed_scope=character:exact-screening-allocation",
             "status=character:measured|failed", "passed=logical:exact-comparator"
         ),
+        full_gate_result = c(
+            "candidate_id=character:screening-qualified-candidate-order",
+            "gate_id=character:exact-five-v4-selected-winner-gates",
+            "m12_gate_id=character:bound-upstream-gate",
+            "stage=character:selected_winner_synthetic",
+            "metric=character:exact-gate-registry-metric",
+            "estimate=double-finite-measured-else-NA",
+            "numerator=double-nonnegative-measured-else-NA",
+            "denominator=double-positive-measured-else-NA",
+            "lower=double<=estimate-measured-else-NA",
+            "upper=double>=estimate-measured-else-NA",
+            "operator=character:exact-gate-registry-operator",
+            "threshold=double:exact-gate-registry-threshold",
+            "status=character:measured|failed|unavailable",
+            "passed=logical:measured-and-exact-comparator",
+            "failure_treatment=character:exact-gate-registry-treatment",
+            "evidence_hash=sha256:exact-gate-audit-frame",
+            "note=character:nonempty-statistic-or-failure-description"
+        ),
         ranking_metric = c(
-            "candidate_id=character:full-v3-gate-passer",
+            "candidate_id=character:full-v4-gate-passer",
             "scope_coverage=double:[0,1]", "power=double:[0,1]",
             "absolute_bias=double:nonnegative",
             "median_runtime=double:finite-nonnegative"
@@ -2688,6 +2825,7 @@ m13a_contract <- function() {
         selection = m13a_selection(),
         screening_allocation = m13a_screening_allocation(),
         screening_thresholds = m13a_screening_thresholds(),
+        gate_statistics = m13a_gate_statistics(),
         gate_registry = m13a_gate_registry(),
         completed_gate_lineage = m13a_completed_gate_lineage(),
         structural_gates = m13a_structural_gates(),
@@ -2829,7 +2967,7 @@ m13a_validate_contract <- function(contract = m13a_contract()) {
     }
     expected <- m13a_contract()
     if (!is.list(contract) || !identical(names(contract), names(expected))) {
-        .m13a_fail("M13c contract components/order differ from v3.")
+        .m13a_fail("M13c contract components/order differ from v4.")
     }
     valid <- vapply(names(expected), function(component) {
         identical(contract[[component]], expected[[component]])

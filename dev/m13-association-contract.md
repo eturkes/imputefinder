@@ -1,4 +1,4 @@
-# M13c association addendum v3
+# M13c association addendum v4
 
 Status: pre-result contract frozen; all three candidates remain unrun. Synthetic
 replicates 1-32 are the only association evidence authorized next. Association
@@ -10,7 +10,7 @@ artifacts remain sealed.
 M12 fixed the candidates and thresholds before results, but Track A v2 left the
 scalar hypothesis, acquisition handling, support cells, permutation groups,
 runtime schema, and stage denominators under-specified. This standalone
-`m13_a_association_protocol_v3` supersedes those details without rewriting the
+`m13_a_association_protocol_v4` supersedes those details without rewriting the
 historical M12 objects. It binds:
 
 - M12 contract/gate registry:
@@ -29,7 +29,7 @@ The executable tables, encoder, seed manifest, schema validator, and gate
 evaluator live in `dev/m13-association-contract.R`. Its marked normative source
 region and this full Markdown file are themselves SHA-256 inputs to the protocol
 hash. The verifier prints component/protocol/aggregate identities; this file
-does not embed a self-referential v3 hash.
+does not embed a self-referential v4 hash.
 
 ## Response and acquisition strata
 
@@ -348,7 +348,7 @@ denominator but remains a miss in common scope coverage. Every screened null
 family must contain at least one available p-value - zero-p abstention rejects
 screening instead of improving false-flag error.
 
-Every screening-qualified candidate then faces the full fixed v3 synthetic
+Every screening-qualified candidate then faces the full fixed v4 synthetic
 registry: 64 null families and all 128 targets. A zero-p null family,
 unavailable target, or numeric miss eliminates that candidate. Only full-gate
 passers enter winner ranking, so failure of a narrow candidate cannot suppress
@@ -364,13 +364,59 @@ anchor in each named metric: common opportunity coverage, Holm target power,
 and median absolute candidate-specific projection bias. Choose the cluster's
 lowest frozen simplicity rank, then median runtime, then candidate ID; remove
 it and repeat. Anchoring each iteration prevents nontransitive pairwise
-near-tie decisions.
+near-tie decisions. “Within 0.02” is inclusive under binary arithmetic:
+`abs(value-anchor) <= 0.02 + 8*.Machine$double.eps*`
+`pmax(1,abs(value),abs(anchor),0.02)`. This includes a mathematically exact
+decimal boundary while excluding a materially larger difference.
+
+### Exact selected-winner gate statistics
+
+Four synthetic selected-winner gates use point statistics for passage and
+retain interval endpoints as audit evidence. The pooled null gate instead uses
+the one-sided 95% Clopper-Pearson upper endpoint itself as its passage estimate
+over all 64 fixed null scenario-replicates. Its retained one-sided interval is
+`[0, upper]`; numerator and denominator retain the observed fraction. The
+acquisition error gate is the larger DDA/DIA false-family fraction over 32 rows,
+with acquisition ID breaking an exact tie, and reports the corresponding
+two-sided exact binomial interval. Its inherited registry `sample_size=64`
+denotes the total pooled null allocation; its retained raw denominator is the 32
+rows in the selected acquisition.
+
+Coverage is operationally the fraction of the 128 fixed targets satisfying the
+closed-endpoint relation `conf_low <= candidate oracle <= conf_high`. The historical
+M12 `median_replicate_95_interval_coverage` label is replaced by
+`fixed_target_95_interval_coverage_fraction`; the threshold remains 0.90. Power
+is the fraction of those 128 targets with Holm-adjusted `p <= 0.05`. Bias is
+`stats::median` of their 128 absolute candidate-specific projection errors:
+the arithmetic mean of ordered positions 64 and 65.
+
+Coverage, power, and bias each report a 9,999-draw scenario-stratified
+whole-generator-replicate bootstrap interval. In canonical target-table
+scenario order and replicate order 1-32, each draw invokes
+`sample.int(32L, 32L, replace=TRUE)` once per scenario, concatenates those four
+complete 32-row samples, and recomputes the mean or the same `stats::median`.
+Because the unit is the complete generated matrix and candidate result, every
+feature module and all within-replicate module dependence stay intact; features
+or modules are never separately resampled. Quantiles are type 8 at 0.025 and
+0.975, expanded only when needed to contain the point estimate.
+
+The bootstrap seed is one plus the integer represented by the first seven hex
+digits of SHA-256 over the UTF-8 tab-separated vector `protocol_id`,
+`candidate_id`, versioned `gate_id`, and
+`scenario_stratified_whole_replicate_bootstrap_v1`. Execution uses R RNG kind
+`Mersenne-Twister` / `Inversion` / `Rejection` and restores the caller's RNG
+kind, seed bytes, and seed absence exactly.
+
+The candidate permutation seed key already includes `protocol_id`; the v4
+identity therefore deliberately reseals fresh candidate permutation streams.
+No v3 candidate stream was allocated, so this is a pre-result version boundary,
+not a post-result rerun. V3 identities and fixture bytes remain historical.
 
 ## Versioned gates and bookkeeping correction
 
 The 11 completed design-core gates retain their exact M12 IDs and binding
-hashes. The nine association/public rows receive new `_v3` IDs in
-`m13a_gate_registry_v3`, full numeric rows, v3 protocol/data hashes, lineage to
+hashes. The nine association/public rows receive new `_v4` IDs in
+`m13a_gate_registry_v4`, full numeric rows, v4 protocol/data hashes, lineage to
 the original M12 gate binding, stage, replicate range, and a new binding hash.
 `m13a_evaluate_gate_results()` accepts exactly one complete evidence stage and
 rejects omissions, detached bindings, malformed or inverted interval endpoints,
@@ -379,14 +425,14 @@ comparators name the candidate-specific plug-in projection rather than the
 historical M12 expectation wording.
 
 The M12 confirmation comparator included acquisition as a tested term, which
-contradicts acquisition-specific models. Its v3 successor keeps the same
+contradicts acquisition-specific models. Its v4 successor keeps the same
 threshold, sample size, data, claim, and failure treatment but tests
 per-acquisition condition/instrument/nuisance coefficients and labels
 acquisition descriptive. The historical M12 row remains unchanged.
 
 M12 also omitted Track A from `dda_monotone_unequal.required_tracks` despite
-using that scenario in all three A alternative gates. The v3 effective manifest
-sets `A;B;C`; v3 evidence hashes derive from that manifest. Historical M12
+using that scenario in all three A alternative gates. The v4 effective manifest
+sets `A;B;C`; v4 evidence hashes derive from that manifest. Historical M12
 manifest/data hashes remain unchanged and are retained as upstream lineage.
 
 Candidate association gates bind exact replicates 1-32. After a winner and its
@@ -410,7 +456,7 @@ order, type, cardinality, key, class, nesting, NA rules, canonical order, and
 schema values. `m13a_validate_result_shape()` checks joins, available and legacy
 unavailable identities, finite evidence, support keys, exact Holm arithmetic,
 and diagnostic/seed schemas on synthetic fixtures. Its protocol record binds
-the v3 contract and gate-registry hashes, locked implementation-manifest hash,
+the v4 contract and gate-registry hashes, locked implementation-manifest hash,
 candidate-evidence hash, winner state, and historical M12 hashes. A merely
 candidate-shaped object without those winner bindings is invalid.
 
@@ -422,18 +468,43 @@ enter the public object.
 Before any candidate computation, freeze a separate implementation manifest:
 exact engine/evaluator/schema/test/harness source hashes,
 R/platform/package/loaded-nonbase-dependency environment, focused-test
-evidence, and v3 protocol/contract/gate/effective-manifest hashes. The exact
+evidence, and v4 protocol/contract/gate/effective-manifest hashes. The exact
 nested schemas and `m13a_evidence_bundle_hash_v1` component/self-hash algorithm
 are implementation rails whose validators must turn green before any result
 allocation. Candidate evidence contains the complete canonical 3-candidate x
 13-scenario x 32-replicate run grid, outcome dispositions, six screening
 metrics per candidate, the complete selected-winner-stage gate set for every
 screening-qualified candidate, full-passer ranking metrics/order, and the
-selected winner or no-winner state. Run hashes cover internal candidate
+selected winner or no-winner state. Production evidence also persists the
+aggregate hash of the canonical implementation-manifest, 416-input, and
+1,248-result byte inventory; fixture evidence stores `NA`. Run hashes cover internal candidate
 artifacts without the later public winner wrapper; only after evidence locks is
 the public panel materialized with that evidence hash. This one-way binding
 avoids a self-referential result/evidence hash. Any drift rejects execution and
 requires a new pre-result implementation seal.
+
+Production replay accepts no caller-provided reader, generator, provenance, or
+engine callback. A package-owned resolver reads only the fixed study-artifact
+layout, regenerates every stored input with the manifest-bound M12 generator,
+and re-executes each candidate from its candidate-visible preparation. Oracle
+probabilities remain evaluator-only. The resolver requires the exact regular,
+non-symlinked on-disk implementation manifest created before allocation. The
+authorizer accepts exactly that manifest, 416 canonical inputs, and 1,248
+canonical candidate results - no extra file, directory, symlink, development,
+or confirmation artifact. It binds byte-hash inventories and revalidates the
+complete live source, namespace, environment, and registered test receipt both
+before and after semantic replay. The allocation aggregate is stored inside the
+self-hashed production evidence, so later object-preserving reserialization or
+elapsed-time rewriting fails verification. Evidence verification additionally requires
+the sole stored evidence artifact to equal the supplied evidence object.
+Fixture replay uses a distinct schema and class and has no authorization path.
+
+A caught top-level candidate-engine error is exactly
+`association_numerical_failure`: every prepared hypothesis receives that
+structured unavailable disposition, but the run also fails the global
+`a_candidate_engine_execution_complete` structural rail and rejects that
+candidate at screening. This is distinct from a candidate's declared,
+structured in-scope or out-of-scope abstention.
 
 ## Verification
 

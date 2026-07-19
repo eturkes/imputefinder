@@ -239,9 +239,9 @@ test_that("preparation rebuilds acquisition strata from the global response", {
     expect_identical(
         preparation$protocol,
         c(
-            id = "m13_a_association_protocol_v3",
-            hash = "5f484f614d72d9560d96e2b8f75b71cc1027950958ea1459be93eece595069f5",
-            contract_hash = "85d121ebd5ddd589be0f389553a3b7ffa6076a12a8fcbcb476a8969f7d987ae4",
+            id = "m13_a_association_protocol_v4",
+            hash = "e9d3b3799bb160d65feb0ae63b2e49a92bb4e8e005b89232ada96b83cfabed27",
+            contract_hash = "422954c88ed7683f58ac296cb4d9e785d61c3f80a276914235d4b285bbc16547",
             response = "a_sample_detection_fraction_v3",
             encoding = "canonical_treatment_contrasts_v1",
             rank = "svd_relative_v1",

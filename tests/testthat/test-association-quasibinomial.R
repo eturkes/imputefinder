@@ -648,7 +648,7 @@ test_that("quasibinomial artifact validation replays fit and delta arithmetic", 
 
     seeded <- artifact
     seeded$diagnostics$seed_manifest <- data.frame(
-        protocol_id = "m13_a_association_protocol_v3",
+        protocol_id = "m13_a_association_protocol_v4",
         candidate_id = "a_fraction_quasibinomial",
         acquisition = "undeclared",
         hypothesis_id = artifact$hypotheses$hypothesis[[1L]],

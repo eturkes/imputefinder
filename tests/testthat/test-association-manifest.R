@@ -21,7 +21,7 @@ association_manifest_runs <- function(source_sha256 = strrep("a", 64L)) {
             command = commands[[1L]],
             status = 0L,
             output = charToRaw(paste0(
-                "contract_version: m13_association_contract_v3\n",
+                "contract_version: m13_association_contract_v4\n",
                 "state: frozen_unrun; candidate=1-32; ",
                 "development=sealed; confirmation=sealed\n",
                 "self_tests: alpha=TRUE; beta=TRUE\n"
@@ -53,9 +53,9 @@ association_manifest_fixture <- function() {
     )
     manifest <- list(
         schema = "m13a_implementation_manifest_v1",
-        contract_hash = "85d121ebd5ddd589be0f389553a3b7ffa6076a12a8fcbcb476a8969f7d987ae4",
-        protocol_hash = "5f484f614d72d9560d96e2b8f75b71cc1027950958ea1459be93eece595069f5",
-        gate_registry_hash = "f2fd8d0171003e0ae9b31757acf2d43acf7477965d517f1757f4d895c6abe731",
+        contract_hash = "422954c88ed7683f58ac296cb4d9e785d61c3f80a276914235d4b285bbc16547",
+        protocol_hash = "e9d3b3799bb160d65feb0ae63b2e49a92bb4e8e005b89232ada96b83cfabed27",
+        gate_registry_hash = "65f01b20e74b216399e17433df393f32e9bda189f73992ab419069cf7d5c343b",
         effective_manifest_hash = "5dcf4f6408aed4ac7f9ccf07f4502805d34d2ea513ac68ac1c8e1259f23372f6",
         source_files = source_files,
         environment = imputefinder:::.association_implementation_environment(
@@ -128,7 +128,7 @@ test_that("test evidence derives status and counts from registered executions", 
         {
             x <- runs
             x[[1L]]$output <- charToRaw(paste0(
-                "contract_version: m13_association_contract_v3\n",
+                "contract_version: m13_association_contract_v4\n",
                 "state: frozen_unrun; candidate=1-32; ",
                 "development=sealed; confirmation=sealed\n",
                 "self_tests: alpha=FALSE\n"
@@ -179,6 +179,7 @@ test_that("source inventory is canonical and complete across implementation role
         "R/association_manifest.R",
         "dev/m13-association-contract.R",
         "dev/m13-association-implementation.R",
+        "dev/m13-association-study.R",
         "tests/testthat/test-association-manifest.R"
     ) %in% specification$path))
     expect_identical(manifest[c("path", "role")], specification)
@@ -274,20 +275,15 @@ test_that("manifest core rejects every detached live seal component", {
     )
 })
 
-test_that("authorization remains frozen until semantic evidence is complete", {
+test_that("authorization guard is green after semantic evidence completion", {
     fixture <- association_manifest_fixture()
 
-    expect_error(
-        imputefinder:::.new_association_implementation_manifest(
-            association_manifest_root()
-        ),
-        class = "imputefinder_association_manifest_error"
-    )
-    expect_error(
-        imputefinder:::.validate_association_implementation_manifest(
+    expect_true(imputefinder:::.ASSOCIATION_IMPLEMENTATION_SEAL_READY)
+    expect_invisible(
+        imputefinder:::.validate_association_implementation_manifest_core(
             fixture$manifest,
-            association_manifest_root()
-        ),
-        class = "imputefinder_association_manifest_error"
+            association_manifest_root(),
+            fixture$receipt
+        )
     )
 })

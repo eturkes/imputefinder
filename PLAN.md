@@ -752,16 +752,18 @@ quasibinomial model as empirical rather than MSqRob-equivalent.
 `dev/m12-validation-contract.md` owns thresholds, hashes, audit evidence, and
 the exact candidate/perturbation summary.
 
-M13's pre-result Track A v3 addendum binds the immutable M12 hashes while
+M13's pre-result Track A v4 addendum binds the immutable M12 hashes while
 freezing one coefficient per hypothesis, acquisition-specific rebuilt models,
 support cells, constrained-null permutation, canonical mask/design seeds,
 typed per-component numeric support, result schema, candidate-agnostic
 opportunity denominators, four fixed alternative targets, and exact
-candidate/development/confirmation stage seals.
+candidate/development/confirmation stage seals. V4 additionally freezes the
+128-target coverage fraction and 9,999-draw scenario-stratified whole-replicate
+bootstrap mechanics, preserving within-replicate feature-module dependence.
 `dev/m13-association-contract.md` owns these superseding details; its aggregate
-hash is `85d121ebd5ddd589be0f389553a3b7ffa6076a12a8fcbcb476a8969f7d987ae4`
-(protocol `5f484f614d72d9560d96e2b8f75b71cc1027950958ea1459be93eece595069f5`;
-gate registry `f2fd8d0171003e0ae9b31757acf2d43acf7477965d517f1757f4d895c6abe731`).
+hash is `422954c88ed7683f58ac296cb4d9e785d61c3f80a276914235d4b285bbc16547`
+(protocol `e9d3b3799bb160d65feb0ae63b2e49a92bb4e8e005b89232ada96b83cfabed27`;
+gate registry `65f01b20e74b216399e17433df393f32e9bda189f73992ab419069cf7d5c343b`).
 
 The production `association_preparation_v1` rail now binds the packed global
 mask/design identity to the exact response, acquisition-specific rebuilt
@@ -774,10 +776,14 @@ unavailable handoff, per-stratum Holm families, preparation-bound artifact
 validation, and candidate-specific numerical provenance replay. The exact
 final-panel shape reader and fail-closed implementation-manifest core now bind
 fixed passing-test receipts, stable source snapshots, the full live dependency
-set, and child/parent namespace fingerprints. Semantic candidate-evidence
-resolution, public materialization/handoff, authorization, and the actual
-manifest lock remain open; every candidate result remains `frozen_unrun` until
-those rails are green.
+set, and child/parent namespace fingerprints. The semantic evidence resolver
+now owns exact input/result reads, generator and engine replay, outcome audits,
+screening/full gates, ranking, and self-hash; production accepts no caller
+provenance callback and fixture evidence is non-authoritative. The fixed study
+harness has no development/confirmation command. Public materialization/handoff,
+the immutable implementation-manifest artifact, and candidate allocation remain
+open; the authorizer guard and all implementation rails are green, while every
+candidate result remains `frozen_unrun` until that artifact locks.
 
 Gate: protocol hashes exist; every A-C claim has an executable numeric gate and
 failure rule; v1 behavior/limitations reproduce on the expanded harness.

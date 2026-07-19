@@ -36,10 +36,10 @@ association_panel_fixture <- function(candidate = "quasibinomial") {
         list(
             schema = "sentinel_association_v1",
             protocol = list(
-                id = "m13_a_association_protocol_v3",
-                hash = "5f484f614d72d9560d96e2b8f75b71cc1027950958ea1459be93eece595069f5",
-                contract_hash = "85d121ebd5ddd589be0f389553a3b7ffa6076a12a8fcbcb476a8969f7d987ae4",
-                gate_registry_hash = "f2fd8d0171003e0ae9b31757acf2d43acf7477965d517f1757f4d895c6abe731",
+                id = "m13_a_association_protocol_v4",
+                hash = "e9d3b3799bb160d65feb0ae63b2e49a92bb4e8e005b89232ada96b83cfabed27",
+                contract_hash = "422954c88ed7683f58ac296cb4d9e785d61c3f80a276914235d4b285bbc16547",
+                gate_registry_hash = "65f01b20e74b216399e17433df393f32e9bda189f73992ab419069cf7d5c343b",
                 implementation_hash = strrep("1", 64L),
                 candidate_evidence_hash = strrep("2", 64L),
                 winner_state = "winner_locked",

@@ -62,13 +62,13 @@ test_that("permutation map hashes and global seeds match frozen bytes", {
 
     seeds <- association_fl_seed_fixture()
     expect_identical(seeds$protocol_id, rep(
-        "m13_a_association_protocol_v3",
+        "m13_a_association_protocol_v4",
         4L
     ))
     expect_identical(seeds$draw_id, 1:4)
     expect_identical(
         seeds$seed,
-        c(89457621L, 112932404L, 177825668L, 33585167L)
+        c(103057578L, 163934502L, 141830235L, 63070989L)
     )
     expect_identical(seeds$seed_nonce, rep(0L, 4L))
 
@@ -122,19 +122,19 @@ test_that("Monte Carlo maps match frozen streams and restore RNG exactly", {
     expect_identical(RNGkind(), before_kind)
     expect_identical(.Random.seed, before_seed)
     expect_identical(generated$maps, list(
-        `1` = c(9L, 3L, 4L, 2L, 8L, 1L, 6L, 5L, 7L),
-        `2` = c(8L, 2L, 5L, 1L, 6L, 3L, 7L, 4L, 9L),
-        `3` = c(2L, 1L, 8L, 5L, 6L, 9L, 3L, 4L, 7L),
-        `4` = c(6L, 4L, 1L, 9L, 5L, 2L, 7L, 3L, 8L)
+        `1` = c(1L, 9L, 5L, 3L, 8L, 6L, 7L, 2L, 4L),
+        `2` = c(6L, 1L, 8L, 7L, 4L, 5L, 9L, 2L, 3L),
+        `3` = c(5L, 7L, 6L, 8L, 2L, 9L, 3L, 1L, 4L),
+        `4` = c(2L, 7L, 6L, 4L, 3L, 5L, 8L, 1L, 9L)
     ))
     expect_identical(generated$manifest$map_retry, rep(0L, 4L))
     expect_identical(
         generated$manifest$map_sha256,
         c(
-            "18ee5a32a3c8345274c5c4200ac257e85192dd2849c4325dba38d47e0562e3cc",
-            "04facf4394b59c3bbfa194a42c6d99c96c24dbbfad87d0fc66d043e4a3f0feac",
-            "1e4e1989a5079de24b81812468270e57e2dd338549771d258119bd93c2ff5f06",
-            "8da4c17b54cddac01b43160ec374ca2abe0571fd6e197a286e1acecf8268b19e"
+            "e63c139967d673412c7b9f50816aed9164c898e13414b7b680c9f02876e1351f",
+            "22f454da7881fccd30a8b244aca975a6b352ab891b3100ffae71a5cac1322e4c",
+            "6caa7eaa8121e1310d44de4290b7b1a94cdd9d45cae62b9c9f2ad6b64da8012d",
+            "d56ed8f3076ecb0caf25f46b19370f9b048bb4e677f19de8addff6ec45fdaa89"
         )
     )
     wrong_protocol <- seeds
@@ -169,10 +169,10 @@ test_that("Monte Carlo maps match frozen streams and restore RNG exactly", {
     expect_identical(
         blocked$manifest$map_sha256,
         c(
-            "0fa6c9f528db3305ddc8cbaf7dba85f1f19fa5934cb1c08309c6348a7259dfc8",
-            "c918ba056b916fe8bdba6d2b1e654319eb3372bbc64cc5f6c3e04eb56073c5cb",
-            "0129bc561c8a0577199f05f4cc5454727dc54bc3f4f0aacb90b13544c9ec6e8c",
-            "5dc9da3391f7dfffd75daf1c6ade1aede89bf635dd135ceaa0da3a760f55f1bb"
+            "d9b7bb82d4a4c65421ac7191898ba33318eabe29985c51a779ce136fe24c1dac",
+            "8775bf3ac01210ccd8e213150a2d3004a9ecf1abf80eea545935ea6e82ba245a",
+            "4d1dba9e2dbc72c5565c9f36202c9dd23e8c32cddc877d6f4ec4cbd3f6143a7e",
+            "06ff75aafbd0e25960a5c46dc21e1ebeef3a683977ab7b217a772e85e8e125da"
         )
     )
 })
@@ -803,19 +803,19 @@ test_that("independent Monte Carlo Freedman-Lane binds all 9999 maps", {
     expect_identical(outcome$permutation_count, 10000L)
     expect_equal(outcome$effect, 0.269444444444445, tolerance = 1e-14)
     expect_equal(outcome$statistic, 8.40923535253228, tolerance = 1e-12)
-    expect_identical(outcome$diagnostics$exceedance_count, 317L)
-    expect_identical(outcome$raw_p, 0.0318)
+    expect_identical(outcome$diagnostics$exceedance_count, 295L)
+    expect_identical(outcome$raw_p, 0.0296)
     expect_identical(nrow(seed), 9999L)
     expect_identical(seed$draw_id, seq_len(9999L))
     expect_identical(anyDuplicated(seed$seed), 0L)
     expect_identical(anyDuplicated(seed$map_sha256), 0L)
     expect_true(all(grepl("^[0-9a-f]{64}$", seed$map_sha256)))
-    expect_identical(seed$seed[c(1L, 9999L)], c(4099601L, 252728501L))
+    expect_identical(seed$seed[c(1L, 9999L)], c(89491256L, 157368857L))
     expect_identical(
         seed$map_sha256[c(1L, 9999L)],
         c(
-            "b242994955770d61f6f9f95c2634d848e3870c314941a39f29b88066e1139a2b",
-            "043056a2628561e6268cef08c622f19eca5b3b9c7ce77bf23067f4c7a5cb968d"
+            "aef2aa5a83f05f233d75d5a758a8306b70ff71314e42bd86bb4b8f297fd64cb6",
+            "47d7421513addb20ecdc90e5bae698f67a3049ed85e45a4ad39fb891900d6579"
         )
     )
     expect_invisible(
