@@ -755,10 +755,11 @@ the exact candidate/perturbation summary.
 M13's pre-result Track A v3 addendum binds the immutable M12 hashes while
 freezing one coefficient per hypothesis, acquisition-specific rebuilt models,
 support cells, constrained-null permutation, canonical mask/design seeds,
-result schema, candidate-agnostic opportunity denominators, four fixed
-alternative targets, and exact candidate/development/confirmation stage seals.
+typed per-component numeric support, result schema, candidate-agnostic
+opportunity denominators, four fixed alternative targets, and exact
+candidate/development/confirmation stage seals.
 `dev/m13-association-contract.md` owns these superseding details; its aggregate
-hash is `a1d89ca88aec1248ef717b13aaa67eb0b0603e6dfb3057e49d3229ba2344b72d`.
+hash is `2dfd532bf5e17f9221b78aecb0b1b4a3d281da55354ff253adb73e7a634e7883`.
 
 Gate: protocol hashes exist; every A-C claim has an executable numeric gate and
 failure rule; v1 behavior/limitations reproduce on the expanded harness.

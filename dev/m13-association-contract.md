@@ -74,6 +74,8 @@ the full SHA-256 of the version tag and length-prefixed stratum, coefficient,
 label, and term ID. The outcomes list uses exactly those IDs, in hypothesis
 order. Available and existing `imputefinder_unavailable` records set `quantity`
 to the same list key, so every abstention joins deterministically.
+Each hypothesis also records a named `numeric`/`treatment` encoding vector whose
+names and order exactly equal its canonical components.
 
 Raw coefficient axes must pass the existing row-space estimability rule. Only
 finite available raw p-values enter Holm. Nonestimable/unsupported outcomes
@@ -182,7 +184,13 @@ gets equal median weight, regardless of sibling count.
   numeric below/above-median side, then materialize all `2^k` Cartesian cells.
   Every cell requires 4 independent units or 6 blocks. A block counts once per
   occupied cell, regardless of repeated positions, and must occupy every cell
-  to be complete.
+  to be complete. Stored low/high counts are the minima across component
+  marginal sides. The support row carries a canonical nested table with one
+  median, range, and 0-to-1 extrapolation flag per numeric component; a scalar
+  summary is insufficient when an interaction contains multiple numeric
+  variables.
+  Numeric support rows must equal that recorded numeric-component subset
+  exactly; their extrapolation flags are derived from the stored ranges.
 
 The role-eligible manifest retains all eligible columns. The candidate-agnostic
 opportunity manifest is its subset with observable response, estimability,

@@ -18,7 +18,7 @@ or release obligation.
 
 Exact method, dependency graph, falsification gates, and Definition of Done →
 `PLAN.md` Sections 2-14. M13c v3 contract hash =
-`a1d89ca88aec1248ef717b13aaa67eb0b0603e6dfb3057e49d3229ba2344b72d`.
+`2dfd532bf5e17f9221b78aecb0b1b4a3d281da55354ff253adb73e7a634e7883`.
 Exact next implementation task → encode red A association
 response/hypothesis/support/result/abstention/hash tests, then implement only
 the three frozen candidate engines. Open synthetic candidate replicates `1-32`
@@ -2353,7 +2353,9 @@ Freeze:
   remain adjustment/descriptive-only;
 - support now has exact categorical sides, numeric unit-position median sides,
   Cartesian interaction cells, independent `4`/side and blocked `6`-complete-
-  block floors;
+  block floors; red-test derivation exposed multi-numeric interaction loss, so
+  typed component encodings + exact per-component numeric support were added
+  before candidate computation and adversarially rereviewed;
 - HC3, full-design identity-working-model CR2/Satterthwaite, constrained-null
   Freedman-Lane, empirical independent quasibinomial, abstention, covariance,
   transformation-count, and canonical seed/hash rules are executable;
@@ -2378,10 +2380,10 @@ Verification:
   stage drift, incomplete gates, malformed result bindings, and prove canonical
   collision-safe seed/map ordering plus RNG restoration;
 - protocol hash =
-  `cf064d6d41bdf0cf774a0a223d7301e16953ff1c16614ff04a752457df6b44d1`;
+  `445b3300ab5f6808b1ab77cf6142817ca86ee2cf0446014d8b6f3e00c8943c08`;
 - aggregate v3 hash =
-  `a1d89ca88aec1248ef717b13aaa67eb0b0603e6dfb3057e49d3229ba2344b72d`;
-- `Rscript --vanilla dev/m13-association-contract.R --verify` passes all 24
+  `2dfd532bf5e17f9221b78aecb0b1b4a3d281da55354ff253adb73e7a634e7883`;
+- `Rscript --vanilla dev/m13-association-contract.R --verify` passes all 26
   named self-tests with exact component hashes;
 - `git diff --check` passes; no candidate simulation ran and no external result
   artifact was read.

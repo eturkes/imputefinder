@@ -34,14 +34,14 @@
 .M13A_EXPECTED_HASHES <- c(
     descriptor = "7d282ab27457f5e8fc8a29e636ee5c4b8cce4949d7277e741ba31669edd14456",
     upstream_bindings = "5dc11e3dd5e43e1b638d8faf377836ad3b39b59319e0bfe3098d273891277bdd",
-    normative_digest = "4df01ec1bb76bd7f9ba83a45966d7456ccf82caaf5e2162bb713e721fa920f15",
-    normative_source_digest = "19bc1cab67cea24494ffce901423569a0c13c2ece798fcc5739ff5b90cea75c7",
+    normative_digest = "e2540c28ce25df6779066fd71621878b1cd15e394f9177f4d4b878cabcfbaaf2",
+    normative_source_digest = "4c5a4a8621c82036929ed81aad3026f95d83570e18ea79332dc209e590b9a453",
     implementation_bindings = "e298256d380f71fcf4227eb76efe1e15db1da5b99b636f18852195c929d672a1",
     effective_manifest = "5dcf4f6408aed4ac7f9ccf07f4502805d34d2ea513ac68ac1c8e1259f23372f6",
     response = "baeb69d8ce3164629e8a50c5290549291d29b2a1c2dac155391be9da67ef57eb",
     strata = "4b7df275274bd127eed9a402695b2cfc9196f54a4c59271cde866aed17ceec92",
     hypotheses = "6a395c7dea901373cda91e22b719fa4dfad19ca2dcfaa9405d694dd9e8905e5c",
-    support = "3bdc412be2caaa8f10593f2f425f6b6691ed6a92794bf19d860c9144bf01296f",
+    support = "df04c882ea0928dac9e7f13ca813f2789091953cbf3fc237d857f6160df7d0a8",
     unit_positions = "6a69ec1ad4a3e4d85cbcdae4a1809e0d39728b12a3dc003e9d7335131f15d701",
     candidate_engines = "790608cd7875c28f2b5c2eae1445b9da1cdfe6aecfc4d39d68496f511a6835bf",
     numerics = "ad4a68cea70d7fcb66b636f20c03bf8c02e2dbf13cadc8d5bc98f287868a87cb",
@@ -51,7 +51,7 @@
     seed_protocol = "6589b53b9454329e4ee3e6a7e1391e567a70fe913c884223fea57b7e8b8cdcfb",
     input_hash = "35871cc878f941af0b299b7cc680842df35b760b85c10b849f5168692c6fa64c",
     multiplicity = "1e6d84fe9da0b0623aa97f0bd0f7cba88051e8e703798d901badc06379e7d0ae",
-    result_schema = "ebc2cf8a49af2244fb029e7ad12a0a0926121e12c57670e7181d18d3d7c45fd2",
+    result_schema = "361d8124805fd4daf1fa370c5830d3005e5057d12c5dec403b69f3d3a7ff6599",
     result_records = "1cfbdf3fae1be20dead577bf961d3e2091b8edbca36f66479c7a5b57a024c21e",
     lifecycle = "d7b358c0835b2fef76892e654d7477a66a8d745445c53b82339c88862d303040",
     unavailable_codes = "75ff8476e75dde29007d7b879409df4f157a844ddf8ee09e2abad30627bdc021",
@@ -62,7 +62,7 @@
     selection = "98ce4cb116d8b9397b48bec86519b6e78534cd5ba6d04d9c3d807101e3da7073",
     screening_allocation = "d861cba428cc76eac35cb3bd6648f672985e10afc6c74779428f1f5895e8da09",
     screening_thresholds = "d1e176c765e3e5f28fb31beb625d6678f7999ce2d6a51fa609cc02c58323d2ee",
-    gate_registry = "7b0ce5acd094ac2e8f171971de2b932409ca6ddee2d00a308e1ff9a020c20619",
+    gate_registry = "480d52cdc41703d3a3dd6b35a70c53c88af4e165d6d28e5a9cac20e984ce5eee",
     completed_gate_lineage = "9d7f5c30e28cd437a1dde001a1715e6e143dfbe8b1f399fb7d7f3029b1198a6e",
     structural_gates = "5a36db4ba1836b65dcd84753045abde5c4175aef30efd73c36046d8b673d6a74",
     execution_seal = "4bab3eb16c15b39b95a52a2bff24940bcabd0f68dbbb71f36edfa884e250a81c",
@@ -70,7 +70,7 @@
     implementation_manifest_schema = "296045d46d341478dedeef0b4ec416ed77127221659f9a184d1881ce12cd6f7d",
     candidate_evidence_schema = "e8781ed57e149ab0d47422ea4d832b670da4a46b2b761934224287928a0dfd32",
     release_boundary = "5e25356ea2e3cb33b31439bf78ac01e254e99435fe0e12fc8be716c6bf1348e0",
-    contract = "a1d89ca88aec1248ef717b13aaa67eb0b0603e6dfb3057e49d3229ba2344b72d"
+    contract = "2dfd532bf5e17f9221b78aecb0b1b4a3d281da55354ff253adb73e7a634e7883"
 )
 
 # BEGIN M13A NORMATIVE SOURCE
@@ -254,7 +254,7 @@ m13a_support <- function() {
             "median computed over independent units; record range and whether encoded 0-to-1 leaves range",
             "at least six complete blocks and six blocks per side",
             "at least six complete blocks and six blocks per side; record range and 0-to-1 extrapolation",
-            "every 2^k relevant cell meets 4 independent units or 6 complete blocks"
+            "every 2^k relevant cell meets 4 independent units or 6 complete blocks; stored low/high counts are the minima over component marginal sides; numeric support is stored once per numeric component"
         ),
         failure_code = c(
             "association_low_independent_support",
@@ -912,6 +912,7 @@ m13a_result_schema <- function() {
             term = "character,canonical-model-term",
             kind = "character:main|interaction",
             components = "AsIs-list-of-character,canonical-component-order",
+            component_encodings = "AsIs-list-of-named-character:numeric|treatment,exact-components-and-order",
             role = "character:condition|nuisance|interaction",
             eligible = "logical,role-rule;always-TRUE-in-this-table",
             estimable = "logical,row-space-rule",
@@ -925,10 +926,7 @@ m13a_result_schema <- function() {
             side_count_high = "integer,nonnegative",
             complete_block_count = "integer,nonnegative-or-NA-independent",
             cell_count_min = "integer,nonnegative-or-NA-main",
-            numeric_median = "double,finite-or-NA-no-numeric-component",
-            numeric_min = "double,finite-or-NA-no-numeric-component",
-            numeric_max = "double,finite-or-NA-no-numeric-component",
-            extrapolates_0_1 = "logical-or-NA-no-numeric-component",
+            numeric_components = "AsIs-list-of-data.frame(component,median,minimum,maximum,extrapolates_0_1),one-row-per-numeric-component-canonical",
             eligible = "logical,common-support-rule",
             code = "character,NA-iff-eligible-else-support-code"
         ),
@@ -1386,6 +1384,14 @@ m13a_validate_result_shape <- function(result) {
                 all(nzchar(x)) && !anyDuplicated(x) &&
                 identical(x, sort(x, method = "radix"))
         }, logical(1L))) &&
+        is.list(hypotheses$component_encodings) &&
+        inherits(hypotheses$component_encodings, "AsIs") &&
+        all(vapply(seq_len(nrow(hypotheses)), function(index) {
+            encoding <- hypotheses$component_encodings[[index]]
+            is.character(encoding) &&
+                identical(names(encoding), hypotheses$components[[index]]) &&
+                all(encoding %in% c("numeric", "treatment"))
+        }, logical(1L))) &&
         all(hypotheses$kind %in% c("main", "interaction")) &&
         all(hypotheses$role %in% c("condition", "nuisance", "interaction")) &&
         all((hypotheses$kind == "main") ==
@@ -1438,25 +1444,42 @@ m13a_validate_result_shape <- function(result) {
         all(!is.na(support$complete_block_count[support$design == "blocked"])) &&
         all(is.na(support$cell_count_min[hypotheses$kind == "main"])) &&
         all(!is.na(support$cell_count_min[hypotheses$kind == "interaction"])) &&
-        all(vapply(support[c(
-            "numeric_median", "numeric_min", "numeric_max"
-        )], is.double, logical(1L))) &&
-        is.logical(support$extrapolates_0_1) &&
+        is.list(support$numeric_components) &&
+        inherits(support$numeric_components, "AsIs") &&
+        all(vapply(seq_len(nrow(support)), function(index) {
+            numeric <- support$numeric_components[[index]]
+            is.data.frame(numeric) && identical(
+                names(numeric),
+                c(
+                    "component", "median", "minimum", "maximum",
+                    "extrapolates_0_1"
+                )
+            ) && is.character(numeric$component) &&
+                is.double(numeric$median) && is.double(numeric$minimum) &&
+                is.double(numeric$maximum) &&
+                is.logical(numeric$extrapolates_0_1) && !anyNA(numeric) &&
+                all(nzchar(numeric$component)) &&
+                !anyDuplicated(numeric$component) &&
+                identical(
+                    numeric$component,
+                    names(hypotheses$component_encodings[[index]])[
+                        hypotheses$component_encodings[[index]] == "numeric"
+                    ]
+                ) &&
+                all(is.finite(numeric$median)) &&
+                all(is.finite(numeric$minimum)) &&
+                all(is.finite(numeric$maximum)) &&
+                all(numeric$minimum <= numeric$median) &&
+                all(numeric$median <= numeric$maximum) &&
+                identical(
+                    numeric$extrapolates_0_1,
+                    numeric$minimum > 0 | numeric$maximum < 1
+                )
+        }, logical(1L))) &&
         is.logical(support$eligible) && !anyNA(support$eligible) &&
         is.character(support$code) &&
         identical(is.na(support$code), support$eligible) &&
         all(is.na(support$code) | support$code %in% support_codes)
-    if (support_valid && nrow(support)) {
-        numeric <- !is.na(support$numeric_median) |
-            !is.na(support$numeric_min) | !is.na(support$numeric_max) |
-            !is.na(support$extrapolates_0_1)
-        complete_numeric <- is.finite(support$numeric_median) &
-            is.finite(support$numeric_min) & is.finite(support$numeric_max) &
-            !is.na(support$extrapolates_0_1)
-        support_valid <- identical(numeric, complete_numeric) &&
-            all(support$numeric_min[numeric] <= support$numeric_median[numeric]) &&
-            all(support$numeric_median[numeric] <= support$numeric_max[numeric])
-    }
     outcomes <- result$outcomes
     outcome_valid <- is.list(outcomes) &&
         identical(names(outcomes), hypotheses$hypothesis)
@@ -1658,6 +1681,7 @@ m13a_validate_result_shape <- function(result) {
         stringsAsFactors = FALSE
     )
     hypotheses$components <- I(list("condition"))
+    hypotheses$component_encodings <- I(list(c(condition = "treatment")))
     hypotheses <- hypotheses[.m13a_schema_fields("hypotheses")]
     support <- data.frame(
         hypothesis = hypothesis,
@@ -1667,14 +1691,16 @@ m13a_validate_result_shape <- function(result) {
         side_count_high = 4L,
         complete_block_count = NA_integer_,
         cell_count_min = NA_integer_,
-        numeric_median = NA_real_,
-        numeric_min = NA_real_,
-        numeric_max = NA_real_,
-        extrapolates_0_1 = NA,
         eligible = TRUE,
         code = NA_character_,
         stringsAsFactors = FALSE
     )
+    support$numeric_components <- I(list(data.frame(
+        component = character(), median = double(), minimum = double(),
+        maximum = double(), extrapolates_0_1 = logical(),
+        stringsAsFactors = FALSE
+    )))
+    support <- support[.m13a_schema_fields("support")]
     outcome <- if (available) {
         structure(
             list(
@@ -2828,8 +2854,10 @@ m13a_verify_hashes <- function(contract = m13a_contract()) {
     })
     report <- do.call(rbind, reports)
     detached <- results
+    first <- substr(detached$gate_binding_hash[[1L]], 1L, 1L)
     detached$gate_binding_hash[[1L]] <- paste0(
-        "1", substr(detached$gate_binding_hash[[1L]], 2L, 64L)
+        if (identical(first, "0")) "1" else "0",
+        substr(detached$gate_binding_hash[[1L]], 2L, 64L)
     )
     selected_stage <- registry$stage[[1L]]
     selected <- registry$stage == selected_stage
@@ -2945,6 +2973,16 @@ m13a_self_tests <- function(contract = m13a_contract()) {
     panel_unavailable_fixture <- .m13a_panel_unavailable_fixture()
     corrupted_result <- result_fixture
     corrupted_result$outcomes[[1L]]$quantity <- "wrong_key"
+    missing_numeric_support <- result_fixture
+    missing_numeric_support$hypotheses$component_encodings[[1L]] <- c(
+        condition = "numeric"
+    )
+    wrong_extrapolation <- missing_numeric_support
+    wrong_extrapolation$support$numeric_components[[1L]] <- data.frame(
+        component = "condition", median = 0.5, minimum = 0.2,
+        maximum = 0.8, extrapolates_0_1 = FALSE,
+        stringsAsFactors = FALSE
+    )
     map_seeds <- seeds_a[
         seeds_a$acquisition == seeds_a$acquisition[[1L]] &
             seeds_a$hypothesis_id == seeds_a$hypothesis_id[[1L]],
@@ -3029,6 +3067,12 @@ m13a_self_tests <- function(contract = m13a_contract()) {
         ),
         result_join_rejected = .m13a_expect_error(
             m13a_validate_result_shape(corrupted_result)
+        ),
+        numeric_support_subset_rejected = .m13a_expect_error(
+            m13a_validate_result_shape(missing_numeric_support)
+        ),
+        numeric_extrapolation_rejected = .m13a_expect_error(
+            m13a_validate_result_shape(wrong_extrapolation)
         ),
         monte_carlo_maps_reproducible = identical(maps_a, maps_b),
         monte_carlo_maps_distinct = !anyDuplicated(
