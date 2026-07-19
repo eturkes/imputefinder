@@ -6,7 +6,7 @@
 # Run from the repository root:
 # Rscript --vanilla dev/m12-validation-contract.R --verify
 
-.M12_CONTRACT_VERSION <- "m12_validation_contract_v3"
+.M12_CONTRACT_VERSION <- "m12_validation_contract_v4"
 .M12_CHECKED_ON <- "2026-07-18"
 
 .m12_schema_catalog <- function() {
@@ -382,9 +382,9 @@
 .m12_protocol_registry <- function() {
     data.frame(
         protocol_id = c(
-            "m12_a_candidate_protocol_v1",
-            "m12_b_perturbation_protocol_v1",
-            "m12_c_candidate_protocol_v1"
+            "m12_a_candidate_protocol_v2",
+            "m12_b_perturbation_protocol_v2",
+            "m12_c_candidate_protocol_v2"
         ),
         track = c("A", "B", "C"),
         purpose = c(
@@ -394,9 +394,9 @@
         ),
         implementation_file = rep("dev/m12-candidate-protocol.R", 3L),
         protocol_hash = c(
-            "e20bdcc8e040eed65457480be7ae2ce2542761165c3d27161b953f86f39e5edc",
-            "57ffa1220c740dcb69508d3ad1b9beb05e7013c3a92af528293211e41a13f256",
-            "58b6e3c6d7f35f5561549a3a52420e49b0f3eb296752353d1bb3c9d433cf9d96"
+            "ca0cf8dbbf082446d9116ce280f0acf2c6517d35ec6137edb7b415585ce92683",
+            "20912c4dfadeebb0c1da7100cb54dfa27f202ea39c3e0d991fb0ee38bab383c2",
+            "f28b01a4cf5373807b4c71241a3563bc64cf55aa8d446cb62e242c9ecae76b04"
         ),
         result_state = rep("frozen_unrun", 3L),
         stringsAsFactors = FALSE
@@ -631,7 +631,7 @@
     protocol_index <- match(track, protocols$track)
     out <- data.frame(
         gate_id = specs$gate_id,
-        registry_version = rep("m12_gate_registry_v1", nrow(specs)),
+        registry_version = rep("m12_gate_registry_v2", nrow(specs)),
         claim_id = specs$claim_id,
         track = track,
         metric = specs$metric,
@@ -991,13 +991,13 @@
         reason = c(
             "same MultiPro laboratory/protocol family as PXD041391 and inventoried processed archives lacked upstream checksums",
             "more than 700 cross-platform runs; no minimum processed protein artifact and checksummed subset was identifiable without opening data",
-            "valuable blocked longitudinal DIA case, but no stable deidentified protein artifact/accession and data licence were identified",
+            "blocked longitudinal DIA case has disease-category/batch overlap plus ad hoc count adjustments, and no stable deidentified protein artifact/accession or verified reuse licence was identified",
             "strong controlled DDA truth, but PRIDE exposes raw/mzXML/mzIdentML rather than a compact deposited protein matrix"
         ),
         reconsider_when = c(
             "a non-independent exploratory role is needed and exact artifacts receive checksums",
             "platform-shift evidence is promoted and an exact <=4-condition artifact/protocol is frozen",
-            "a stable deidentified protein matrix, subject/batch metadata, and reuse terms are verified",
+            "a stable deidentified protein matrix, subject/batch metadata, reuse terms, and a design permitting disease effects to be separated from batch are verified",
             "a versioned protein-level derivation with immutable preprocessing and checksum is frozen"
         ),
         metadata_url = c(
@@ -1063,8 +1063,9 @@
             "r_p_adjust", "r_quantile", "brglm2_current",
             "bias_reduction_2020", "survival_clogit", "geepack_current",
             "gee_small_sample_md", "limma_current", "limma_manual",
-            "permutation_glm_2014", "cluster_bootstrap_2013",
-            "cluster_cr2_2018",
+            "permutation_glm_2014", "permutation_robust_wald_2019",
+            "cluster_bootstrap_2013", "cluster_cr2_2018",
+            "cluster_cr2_corrigendum_2023", "msqrob_hurdle_2020",
             "selective_risk_coverage_2010"
         ),
         scope = c(
@@ -1073,8 +1074,11 @@
             "adjusted-score bias reduction", "conditional logistic likelihood",
             "clustered binary GEE implementation", "small-cluster GEE covariance",
             "omics linear-model implementation", "missing/blocked linear models",
-            "nuisance-aware permutation", "cluster bootstrap",
+            "nuisance-aware permutation", "heteroscedastic robust permutation",
+            "cluster bootstrap",
             "small-sample cluster-robust fixed-effect inference",
+            "corrected absorbed-fixed-effect CR2 shortcut",
+            "protein-within-peptide quasibinomial precedent",
             "risk-coverage display calibration"
         ),
         url = c(
@@ -1088,11 +1092,14 @@
             "https://bioconductor.org/packages/release/bioc/html/limma.html",
             "https://bioconductor.org/packages/release/bioc/manuals/limma/man/limma.pdf",
             "https://doi.org/10.1016/j.neuroimage.2014.01.060",
-            "https://doi.org/10.1016/j.jmva.2012.10.006",
+            "https://doi.org/10.1016/j.neuroimage.2019.116030",
+            "https://doi.org/10.1016/j.jmva.2012.09.003",
             "https://doi.org/10.1080/07350015.2016.1247004",
+            "https://doi.org/10.1080/07350015.2023.2174123",
+            "https://doi.org/10.1021/acs.analchem.9b04375",
             "https://www.jmlr.org/papers/v11/el-yaniv10a.html"
         ),
-        checked_on = rep(.M12_CHECKED_ON, 13L),
+        checked_on = rep("2026-07-19", 16L),
         note = c(
             "Holm strong FWER and BY arbitrary-dependence FDR definitions",
             "type 8 approximately median-unbiased and Hyndman-Fan recommended",
@@ -1103,9 +1110,12 @@
             "small-sample robust covariance can inflate type-I error; MD correction",
             "current maintained Bioconductor linear-model engine",
             "lmFit accepts missing values and declared block/correlation structures",
-            "permutation validity depends on exchangeability/restricted design",
-            "resampling subjects preserves within-subject dependence",
-            "CR2 with Satterthwaite tests corrects small-cluster fixed-effect inference",
+            "permutation validity requires null-invariant exchangeability blocks distinct from compatible variance groups",
+            "robust W is asymptotically valid under general heteroscedasticity; small-sample residual permutation can remain liberal",
+            "resampling subjects preserves within-subject dependence; sparse binary clusters can make ordinary cluster bootstrap fail",
+            "CR2 Satterthwaite df reflect leverage/imbalance and can be far below the cluster count",
+            "absorbed-fixed-effect shortcut is valid only for ordinary unweighted LS with identity working model and rank conditions",
+            "MSqRob groups peptide detections within protein and moderates protein dispersions; it does not validate one global all-protein count",
             "abstention labels require explicit risk-coverage tradeoff"
         ),
         stringsAsFactors = FALSE
@@ -1521,7 +1531,7 @@ m12_validate_contract <- function(contract = m12_validation_contract()) {
         "candidate_exclusions", "source_manifest"
     )
     if (!identical(names(contract), expected_names)) {
-        .m12_fail("contract components/order differ from v3")
+        .m12_fail("contract components/order differ from v4")
     }
     catalog <- contract$schema_catalog
     if (!identical(
@@ -1747,15 +1757,15 @@ m12_contract_hashes <- function(contract = m12_validation_contract()) {
     generator_manifest = "9d1381833cd59e8775bd99e730d5c783b98c5a82afff6d52276e83a46a8be76a",
     generator_protocol = "9f2166bc7a31112d5529d81adcd68cae70b99d12374f3d77bc45844d3d16bd7a",
     claim_inventory = "c31032238677acc5e57478057852481f29dd24bc3f6fb88d629653be5ba8d296",
-    protocol_registry = "61f7c1d9c42e80e1dafb13693e7a1818c7835ee9fd219e8a953167fe0c84ab6d",
+    protocol_registry = "98d33b1a5ea9363047fd7d68a1b3fb6c179bb8ec10f17b16b0cac1c921a5e166",
     internal_evidence = "7c2deb16729dc06720bea8ce14b1ed4024dcc51f836c03e00b3ccc7696464a1a",
-    gate_registry = "12e1fb5f9886b4ca6a4accb18909b3aa40cf33ac220800d970d79d456d9fcd87",
+    gate_registry = "70d101b890de687be8973c9ff263caa454b61505f99470e5ec6061cb344db92f",
     data_cards = "0ba7fa86286afd4cc72dfea6eda4b0bc1324553229c2a3b7c412d41c777d684c",
     data_roles = "500d08b89b44c3adde9782176ae1065bf20c2eb135b89e666c8623ec2c83665c",
     artifact_manifest = "7c3267020d484ad9bc1bf4b8ac442cf0916d554e9e467e5c696ab2a20fb1c652",
-    candidate_exclusions = "7ef14dd357171ffaad2e3793dfd1e038d1cc4108d56d052a2f751e4061e71af8",
-    source_manifest = "e413eb42bb5f173dde1f994664b2dd9b081eee304323cea3cf8ac390ac2651b4",
-    contract = "2cd5ecd8bf5763da1c5d9e1d8994207e701bcea9a7efcf4ae539dfd9b52d7431"
+    candidate_exclusions = "0a0feba302870f297de8886ae2d745f91593664c645a72af85df84062c518722",
+    source_manifest = "d81aae9a43a48b692bec5d248d4d78c711a2918be9632c2c06f3a4ff27fea691",
+    contract = "45d1cda936b21a42d6735d900917734398eecb3ff1c136cab486cf90ee2b21e5"
 )
 
 .m12_expect_error <- function(code) {

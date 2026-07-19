@@ -2,7 +2,8 @@
 
 Status: M12 complete. All generators, evidence roles, numeric gates, candidate
 comparisons, perturbations, support rules, and calibration procedures are
-hash-frozen before results. Every external artifact remains unopened.
+hash-frozen before results. A 2026-07-19 full-text audit revised the still-unrun
+candidate bundle to v2; every external artifact remains unopened.
 
 Run from the repository root:
 
@@ -32,10 +33,10 @@ split, role,
 opening, checksum, subset, claim-coverage, numeric-threshold, data/protocol
 binding, result-seal,
 omission, detached-result, unavailable, fabricated unavailable endpoints, and
-wrong-side or altered-registry failures. Eight candidate rails reject allocation,
-replacement, cutoff-floor, multiplicity, result-opening, seed-key, and
-C-resampling drift plus empty seed manifests. This proves protocol integrity -
-not that a candidate passes.
+wrong-side or altered-registry failures. Nine candidate rails reject allocation,
+replacement, cutoff-floor, multiplicity, result-opening, seed-key,
+C-resampling, and Satterthwaite-floor drift plus empty seed manifests. This
+proves protocol integrity - not that a candidate passes.
 
 ## Frozen hashes
 
@@ -49,15 +50,15 @@ ordered component names + hashes.
 | Generator manifest | `9d1381833cd59e8775bd99e730d5c783b98c5a82afff6d52276e83a46a8be76a` |
 | Generator protocol linkage | `9f2166bc7a31112d5529d81adcd68cae70b99d12374f3d77bc45844d3d16bd7a` |
 | Claim inventory | `c31032238677acc5e57478057852481f29dd24bc3f6fb88d629653be5ba8d296` |
-| Candidate protocol registry | `61f7c1d9c42e80e1dafb13693e7a1818c7835ee9fd219e8a953167fe0c84ab6d` |
+| Candidate protocol registry | `98d33b1a5ea9363047fd7d68a1b3fb6c179bb8ec10f17b16b0cac1c921a5e166` |
 | Internal evidence | `7c2deb16729dc06720bea8ce14b1ed4024dcc51f836c03e00b3ccc7696464a1a` |
-| Numeric gate registry | `12e1fb5f9886b4ca6a4accb18909b3aa40cf33ac220800d970d79d456d9fcd87` |
+| Numeric gate registry | `70d101b890de687be8973c9ff263caa454b61505f99470e5ec6061cb344db92f` |
 | Data cards | `0ba7fa86286afd4cc72dfea6eda4b0bc1324553229c2a3b7c412d41c777d684c` |
 | Data roles | `500d08b89b44c3adde9782176ae1065bf20c2eb135b89e666c8623ec2c83665c` |
 | Artifact manifest | `7c3267020d484ad9bc1bf4b8ac442cf0916d554e9e467e5c696ab2a20fb1c652` |
-| Candidate exclusions | `7ef14dd357171ffaad2e3793dfd1e038d1cc4108d56d052a2f751e4061e71af8` |
-| Source manifest | `e413eb42bb5f173dde1f994664b2dd9b081eee304323cea3cf8ac390ac2651b4` |
-| **Aggregate contract** | **`2cd5ecd8bf5763da1c5d9e1d8994207e701bcea9a7efcf4ae539dfd9b52d7431`** |
+| Candidate exclusions | `0a0feba302870f297de8886ae2d745f91593664c645a72af85df84062c518722` |
+| Source manifest | `d81aae9a43a48b692bec5d248d4d78c711a2918be9632c2c06f3a4ff27fea691` |
+| **Aggregate contract** | **`45d1cda936b21a42d6735d900917734398eecb3ff1c136cab486cf90ee2b21e5`** |
 
 Generator subprotocol:
 
@@ -75,10 +76,10 @@ Candidate/perturbation protocols:
 
 | Track | Protocol | SHA-256 |
 |---|---|---|
-| A | Design core + association comparison | `e20bdcc8e040eed65457480be7ae2ce2542761165c3d27161b953f86f39e5edc` |
-| B | Perturbations + cutoff/display calibration | `57ffa1220c740dcb69508d3ad1b9beb05e7013c3a92af528293211e41a13f256` |
-| C | Detection + observed-abundance comparison | `58b6e3c6d7f35f5561549a3a52420e49b0f3eb296752353d1bb3c9d433cf9d96` |
-| **Bundle** | ordered A/B/C hashes | **`8eb5592131407ae48d4b4caa06ef13eea84371471215eae41997faf0e5ec0821`** |
+| A | Design core + association comparison | `ca0cf8dbbf082446d9116ce280f0acf2c6517d35ec6137edb7b415585ce92683` |
+| B | Perturbations + cutoff/display calibration | `20912c4dfadeebb0c1da7100cb54dfa27f202ea39c3e0d991fb0ee38bab383c2` |
+| C | Detection + observed-abundance comparison | `f28b01a4cf5373807b4c71241a3563bc64cf55aa8d446cb62e242c9ecae76b04` |
+| **Bundle** | ordered A/B/C hashes | **`3bc4ef531d6c84475114befc5c153e50680459f1d8125fdbabac5fd840a1de65`** |
 
 Intentional changes require version/hash updates before linked results are
 inspected.
@@ -117,12 +118,20 @@ from the null projector + ordered projected axes, then compares three
 sample-detection-fraction
 association candidates: OLS with independent HC3 or paired/repeated CR2,
 studentized restricted Freedman-Lane, and independent-unit quasibinomial.
+Paired/repeated CR2 always uses the full OLS design + identity working model;
+computed Satterthwaite df below `5` returns a named unavailable result.
 Per-side/block/residual-df and permutation-resolution floors precede fitting.
-Freedman-Lane freezes exchangeability, two-sided tails, exact enumeration, and
-the `9999`-draw Monte Carlo correction. Holm `0.05` controls the
-acquisition-specific declared-term family. Candidate selection is gate-first,
-then supported scope, then explicit simplicity/noninferiority; there is no
-silent fallback.
+Freedman-Lane recomputes a scalar HC3/CR2 robust Wald statistic and permits only
+null-invariant transformations within compatible nuisance, exchangeability,
+and variance groups; an impossible transformation scheme is unavailable.
+Two-sided tails, exact enumeration, and the `9999`-draw Monte Carlo correction
+remain frozen. Its heteroscedastic justification is asymptotic, so the small-n
+candidate may legitimately yield no winner. The quasibinomial row is one
+all-protein aggregate count per sample with one dispersion - an empirical
+candidate, not an implementation of MSqRob's peptide-within-protein model.
+Holm `0.05` controls the acquisition-specific declared-term family. Candidate
+selection is gate-first, then supported scope, then explicit
+simplicity/noninferiority; there is no silent fallback.
 
 B keeps three uncertainty families separate:
 
@@ -156,6 +165,8 @@ whole-block bootstrap draws from the frozen C stream. Observed-abundance
 candidates = OLS+HC3 and ordinary/robust `limma` empirical-Bayes fits on finite
 original cells; paired/repeated OLS uses CR2/Satterthwaite. Support floors,
 separation, nonestimability, and component-specific abstention precede fitting.
+The same full-design identity-working-model CR2 rule and Satterthwaite-df floor
+apply to paired/repeated abundance fits.
 BY `0.05` families are separate by contrast/component and count
 unsupported original features conservatively as `p=1`.
 
@@ -289,16 +300,66 @@ small-sample covariance, permutation, cluster-bootstrap, and risk-coverage
 papers listed in the source manifest. Package availability did not select a
 winner.
 
+### 2026-07-19 pre-result literature audit
+
+The DOI-title audit covered the 24 pre-existing DOI anchors in this contract and
+`PLAN.md`: 23 resolved to the intended work. The former
+`cluster_bootstrap_2013` DOI (`10.1016/j.jmva.2012.10.006`) resolved to an
+unrelated almost-periodically-correlated time-series paper. It is replaced by
+Cheng, Yu, and Huang's *The cluster bootstrap consistency in generalized
+estimating equations*,
+[DOI 10.1016/j.jmva.2012.09.003](https://doi.org/10.1016/j.jmva.2012.09.003).
+This is a source-truth correction: the old hash proved only that the wrong
+string had not drifted.
+
+Full-text findings frozen before any candidate result opened:
+
+- The cluster-bootstrap paper supports whole-cluster resampling to retain
+  within-cluster dependence, but documents sparse-binary failures of the usual
+  cluster bootstrap at small cluster counts. It does not justify treating
+  technical siblings as independent.
+- The CR2 [author manuscript](https://jepusto.com/files/Pustejovsky-Tipton-201601.pdf)
+  warns that leverage/imbalance can drive Satterthwaite df far below the cluster
+  count and that very low df can remain liberal. Its official
+  [corrigendum](https://doi.org/10.1080/07350015.2023.2174123) retracts the
+  general GLS absorbed-fixed-effect shortcut; the corrected shortcut is only
+  ordinary unweighted least squares with identity working model + stated rank
+  conditions. Hence v2 uses the full design and abstains below df `5`.
+- Winkler et al.'s [open full text](https://pmc.ncbi.nlm.nih.gov/articles/PMC4010955/)
+  separates exchangeability blocks from variance groups. Helwig's later
+  [open comparison](https://pmc.ncbi.nlm.nih.gov/articles/PMC6765412/) supports
+  a robust Wald statistic asymptotically under heteroscedasticity but finds
+  residual-permutation small-sample inflation can persist. Freedman-Lane
+  therefore remains a falsifiable candidate, not a validity guarantee. That
+  comparison studies independent settings; the paired CR2 branch is an
+  explicitly gate-tested extension without direct literature validation.
+- The MSqRob [author preprint](https://backoffice.biblio.ugent.be/download/8671265/8671315)
+  models peptides detected out of each protein's peptide set and moderates
+  protein-specific dispersions. It does not validate one global detected-protein
+  count per sample; v2 records the quasibinomial candidate as an analogy only.
+- The rheumatoid-arthritis SWATH
+  [open article](https://academic.oup.com/bioinformatics/article/36/7/2217/5650405)
+  is a small single cohort with disease-category/batch overlap and ad hoc
+  normalized-count adjustments. It supports cautious disease-discriminative
+  wording, not confounder-adjusted validation or causation.
+
+The Taylor & Francis original CR2 article and ACS final MSqRob article remained
+publisher-gated in the available browser session. Their final DOI metadata were
+checked, while substantive claims above came from the author versions and the
+open official corrigendum. Contract v4, candidate bundle v2, and gate registry
+v2 encode the correction; every A/B/C candidate-result computation over the
+`1-64` allocation and every external result remain unopened.
+
 PXD041421 remains related to MultiPro; PXD028735 exposes only >700 raw files in
-the checked metadata; the rheumatoid-arthritis SWATH case still lacks a stable
-deidentified/licensed protein artifact; PXD003881 still lacks a compact frozen
-protein derivation. Their explicit reconsideration conditions remain in the
-contract.
+the checked metadata; the rheumatoid-arthritis SWATH case additionally lacks a
+stable deidentified/licensed protein artifact and a design separating disease
+from batch; PXD003881 still lacks a compact frozen protein derivation. Their
+explicit reconsideration conditions remain in the contract.
 
 ## Exact next slice
 
-M13a implements only the mandatory algebraic design core: canonical declared
-model matrix, SVD rank/null-space alias report, contrast row-space
-estimability, block/technical-unit accounting, and exact named-order/side-effect
-rails. A association candidates and development artifact bytes remain closed
-until that core is green. Confirmation stays sealed through M15P.
+M13c writes red association output/support/abstention tests, implements only the
+v2-frozen A candidates, then opens simulation candidate replicates `1-32` for
+selection/no-winner. A candidate computations on development replicates
+`33-64`, HarmonizR bytes, and all confirmation evidence stay sealed until
+selection locks.

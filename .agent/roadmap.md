@@ -20,9 +20,9 @@ Exact method, dependency graph, falsification gates, and Definition of Done →
 `PLAN.md` Sections 2-14. Exact next implementation task → M13c: encode red A
 association result/support/abstention tests, implement only the three frozen
 candidate engines, then open synthetic candidate replicates `1-32` for
-gate-first selection or a no-winner result. Keep untouched development
-replicates `33-64`, HarmonizR development bytes, and all confirmation evidence
-sealed until the candidate choice locks.
+gate-first selection or a no-winner result. Keep association-candidate
+computations on development replicates `33-64`, HarmonizR development bytes,
+and all confirmation evidence sealed until the candidate choice locks.
 
 ## Completed v1 release path
 
@@ -2260,5 +2260,77 @@ implement the frozen OLS-HC3/CR2, restricted Freedman-Lane, and independent-unit
 quasibinomial candidates, then run only simulation candidate replicates `1-32`
 for selection/no-winner. Keep development replicates `33-64`, HarmonizR bytes,
 and confirmation sealed until selection locks.
+
+Blockers → none.
+
+### 2026-07-19 - M12 pre-result literature audit + v2 correction
+
+Scope → use newly available authenticated/OA full text to adversarially audit
+the frozen M12 sources and method claims before M13c opens any A candidate
+result. Preserve the M13a/b implementation/evidence and every external seal.
+
+Source audit:
+
+- 24 pre-existing contract/PLAN DOI anchors were title-resolved: 23 matched;
+  `cluster_bootstrap_2013` incorrectly used
+  `10.1016/j.jmva.2012.10.006`, an unrelated almost-periodic time-series paper;
+  corrected source = Cheng/Yu/Huang cluster-bootstrap consistency,
+  `10.1016/j.jmva.2012.09.003`;
+- full CR2 author manuscript + official 2023 corrigendum constrain any
+  absorbed-fixed-effect shortcut to ordinary unweighted LS, identity working
+  model, and rank conditions; leverage-dependent Satterthwaite df can be much
+  lower than cluster count;
+- Winkler exchangeability/variance-group conditions + Helwig robust-W results
+  leave small-n Freedman-Lane calibration empirical; independent robust-W
+  evidence does not directly validate the paired CR2 extension;
+- MSqRob's author version models peptide detections within each protein and
+  moderates protein-specific dispersions - not one all-protein count/sample;
+  the global quasibinomial candidate is now explicitly analogy-only;
+- full RA SWATH methods show disease-category/batch overlap + ad hoc count
+  adjustments, strengthening its exclusion from confounder-adjusted validation;
+- Taylor & Francis original CR2 and ACS final MSqRob copies remained gated;
+  final DOI metadata + titles were checked, while claims use author versions,
+  open full text, and the open official correction. No human access action is
+  outstanding.
+
+Pre-result freeze:
+
+- contract/candidate/gate versions advance to v4/v2/v2; A/C CR2 uses the full
+  design + identity working model and returns named unavailable below computed
+  Satterthwaite df `5`;
+- restricted Freedman-Lane recomputes scalar HC3/CR2 robust Wald statistics and
+  permits only null-invariant transforms within compatible nuisance,
+  exchangeability, and variance groups; incompatible layouts abstain;
+- candidate protocol hashes A/B/C/bundle =
+  `ca0cf8dbbf082446d9116ce280f0acf2c6517d35ec6137edb7b415585ce92683` /
+  `20912c4dfadeebb0c1da7100cb54dfa27f202ea39c3e0d991fb0ee38bab383c2` /
+  `f28b01a4cf5373807b4c71241a3563bc64cf55aa8d446cb62e242c9ecae76b04` /
+  `3bc4ef531d6c84475114befc5c153e50680459f1d8125fdbabac5fd840a1de65`;
+  source/aggregate contract hashes =
+  `d81aae9a43a48b692bec5d248d4d78c711a2918be9632c2c06f3a4ff27fea691` /
+  `45d1cda936b21a42d6735d900917734398eecb3ff1c136cab486cf90ee2b21e5`;
+- M13a's 416-row audit remains byte-identical at
+  `37528216590dcfff3338501ef61b766697ea63c14b7324912fcb00f84d58790e`;
+  registry-only rebinding changes its 11-row result hash to
+  `816303e18fb165d90891833e46e3d056e3d97289e4e2d267460d9e61b9f85144`
+  with all estimates/thresholds unchanged.
+
+Verification:
+
+- M12 contract → 20/20 schema/gate rails; candidate protocol → 9/9 mutation
+  rails; generator hashes/audit unchanged; all pass;
+- installed M13 verifier → all 11 gates pass across 416 instances; association
+  stays `frozen_unrun`, external artifacts stay `metadata_only`;
+- package-wide source suite → 152 tests / 1,077 expectations, no failures,
+  errors, warnings, or skips; vignette-bearing source build succeeds;
+- `git diff --check` passes. No A/B/C candidate result, external result, or
+  sealed artifact byte was opened.
+
+Exact next task → M13c: write red association output/support/abstention tests,
+implement the v2-frozen OLS-HC3/CR2, restricted Freedman-Lane, and
+independent-unit quasibinomial candidates, then run only simulation candidate
+replicates `1-32` for selection/no-winner. Keep A candidate computations on
+development replicates `33-64`, HarmonizR bytes, and confirmation sealed until
+selection locks.
 
 Blockers → none.

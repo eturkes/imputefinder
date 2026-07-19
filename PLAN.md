@@ -743,9 +743,13 @@ mismatched-input failures pass.
 Frozen M12 allocation = simulation replicates `1-32` candidate
 selection/calibration, `33-64` untouched development. Registry = 27 retained
 claims + 66 numeric gates bound to exact data/protocol hashes. Track protocols
-`m12_a_candidate_protocol_v1`, `m12_b_perturbation_protocol_v1`, and
-`m12_c_candidate_protocol_v1` remain `frozen_unrun`; external artifacts remain
-`metadata_only`. `dev/m12-validation-contract.md` owns thresholds, hashes, and
+`m12_a_candidate_protocol_v2`, `m12_b_perturbation_protocol_v2`, and
+`m12_c_candidate_protocol_v2` remain `frozen_unrun`; external artifacts remain
+`metadata_only`. The pre-result v2 literature correction requires full-design
+identity-working-model CR2 with computed Satterthwaite df `>=5`, compatible
+exchangeability/variance groups for residual permutation, and treats the global
+quasibinomial model as empirical rather than MSqRob-equivalent.
+`dev/m12-validation-contract.md` owns thresholds, hashes, audit evidence, and
 the exact candidate/perturbation summary.
 
 Gate: protocol hashes exist; every A-C claim has an executable numeric gate and
@@ -979,11 +983,27 @@ Active A-C rationale:
   motivate design/coverage diagnostics before interpretation or imputation.
 - [Missingness as disease-discriminative signal](https://doi.org/10.1093/bioinformatics/btz898)
   shows condition-associated missingness was disease-discriminative in one
-  longitudinal rheumatoid-arthritis SWATH cohort; it is not proof of causation.
+  small longitudinal rheumatoid-arthritis SWATH cohort with disease/batch
+  overlap and ad hoc count adjustments; it is neither proof of causation nor
+  validation of a confounder-adjusted association estimator.
 - [MSqRob's missing hurdle](https://doi.org/10.1021/acs.analchem.9b04375)
   directly motivates paired detection/intensity components for label-free DDA,
   with associational interpretation and empirical FDP/power evaluation on a
-  controlled spike-in benchmark.
+  controlled spike-in benchmark. Its grouped response is peptides within each
+  protein, not one all-protein detected fraction per sample.
+- [Restricted permutation](https://doi.org/10.1016/j.neuroimage.2014.01.060)
+  requires null-invariant exchangeability blocks compatible with distinct
+  variance groups; the later [robust-W comparison](https://doi.org/10.1016/j.neuroimage.2019.116030)
+  supplies asymptotic heteroscedastic support but warns that small-sample
+  residual-permutation inflation can persist.
+- [CR2/Satterthwaite inference](https://doi.org/10.1080/07350015.2016.1247004)
+  makes reference df leverage-dependent; its
+  [corrigendum](https://doi.org/10.1080/07350015.2023.2174123) limits the
+  absorbed-fixed-effect shortcut to ordinary unweighted LS with identity
+  working model + rank conditions.
+- [Cluster-bootstrap consistency](https://doi.org/10.1016/j.jmva.2012.09.003)
+  supports whole-cluster resampling while documenting sparse-binary failure
+  modes at small cluster counts.
 - [Downstream-centric imputation criteria](https://doi.org/10.1021/acs.jproteome.3c00205)
   show that reconstruction error could mislead downstream method choice in the
   evaluated benchmarks.

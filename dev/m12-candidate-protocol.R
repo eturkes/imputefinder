@@ -15,16 +15,16 @@
     environment
 })
 
-.M12C_VERSION <- "m12_candidate_protocol_v1"
-.M12C_CHECKED_ON <- "2026-07-18"
+.M12C_VERSION <- "m12_candidate_protocol_v2"
+.M12C_CHECKED_ON <- "2026-07-19"
 .M12C_CANDIDATE_REPLICATES <- 1:32
 .M12C_DEVELOPMENT_REPLICATES <- 33:64
 .M12C_BOOTSTRAP_DRAWS <- 999L
 .M12C_PERMUTATION_DRAWS <- 9999L
 .M12C_PROTOCOL_IDS <- c(
-    A = "m12_a_candidate_protocol_v1",
-    B = "m12_b_perturbation_protocol_v1",
-    C = "m12_c_candidate_protocol_v1"
+    A = "m12_a_candidate_protocol_v2",
+    B = "m12_b_perturbation_protocol_v2",
+    C = "m12_c_candidate_protocol_v2"
 )
 
 .m12c_fail <- function(...) {
@@ -109,14 +109,14 @@ m12c_a_candidates <- function() {
         target = rep("declared_term_association_with_sample_detection_fraction", 3L),
         design_scope = c(
             "independent HC3 or paired/repeated CR2; estimable declared terms",
-            "independent or paired/repeated with a frozen exchangeability scheme; estimable declared terms",
-            "independent units only; estimable declared terms"
+            "independent or paired/repeated only when frozen transformations preserve declared exchangeability and variance groups; estimable declared terms",
+            "independent units only; empirical aggregate candidate with no feature-level peptide-effect analogue; estimable declared terms"
         ),
         response = rep("detected globally-observable proteins / globally-observable proteins per sample before rescue", 3L),
         fit = c(
             "ordinary least squares on detection fraction",
-            "same OLS effect; reduced fitted value plus transformed reduced-model residual, then full-model studentized statistic",
-            "quasibinomial logit on detected/undetected counts with estimated dispersion"
+            "same OLS effect; reduced fitted values plus transformed reduced-model residuals; full-model scalar robust Wald statistic recomputed per transform",
+            "one aggregate detected/undetected count per sample; quasibinomial logit with one estimated dispersion"
         ),
         effect = c(
             "design-adjusted percentage-point contrast",
@@ -124,20 +124,20 @@ m12c_a_candidates <- function() {
             "standardized marginal probability contrast plus log-odds coefficient"
         ),
         uncertainty = c(
-            "independent HC3 t interval with residual df; paired/repeated CR2 t interval with Satterthwaite df",
-            "OLS robust interval; two-sided abs(t*)>=abs(t_obs); exact exceed/total including identity when allowable transformations<=100000, else 9999 unique keyed draws and p=(1+exceed)/(1+9999)",
+            "independent HC3 t interval with residual df; paired/repeated full-design identity-working-model CR2 t interval, unavailable when computed Satterthwaite df<5",
+            "same robust OLS interval and reference-df floors as OLS candidate; two-sided W*>=Wobs; exact exceed/total including identity when allowable transformations<=100000, else 9999 unique keyed draws and p=(1+exceed)/(1+9999)",
             "dispersion-scaled covariance; t critical value with residual degrees of freedom"
         ),
         randomization = c(
             "none",
-            "independent: permute whole-unit reduced residuals within identical nuisance strata; paired/repeated: permute condition positions within complete blocks, moving technical siblings together",
+            "independent: permute whole-unit reduced residuals within the intersection of identical nuisance, exchangeability, and variance strata; paired/repeated: use only null-invariant condition-position swaps within complete blocks, moving technical siblings together; required crossing of a declared group => unavailable",
             "none"
         ),
         multiplicity = rep("Holm 0.05 within acquisition x declared association panel", 3L),
         separation = c("not applicable", "not applicable", "boundary/nonconvergence => structured unavailable"),
         reference_implementation = c(
-            "base R matrix algebra; explicit HC3 and CR2/Satterthwaite covariance",
-            "base R matrix algebra and frozen exchangeability blocks",
+            "base R matrix algebra; explicit HC3 and full-design identity-working-model CR2/Satterthwaite covariance",
+            "base R matrix algebra; HC3/CR2 robust Wald statistic and frozen exchangeability/variance groups",
             "stats::glm family=quasibinomial"
         ),
         simplicity_rank = 1:3,
@@ -156,14 +156,19 @@ m12c_a_support <- function() {
         min_units_per_contrast_side = c(4L, 6L),
         min_complete_blocks = c(0L, 6L),
         residual_df_floor = c(3L, 3L),
+        min_satterthwaite_df = c(NA_integer_, 5L),
         min_allowable_permutations = c(20L, 20L),
         extra_rule = c(
             "whole biological units only; every permutation stratum must preserve the declared nuisance layout",
-            "complete blocks for the contrasted levels; technical siblings move together; CR2 requires at least six independent blocks"
+            "complete blocks for the contrasted levels; technical siblings move together; CR2 uses the full design with identity working model and requires computed Satterthwaite df>=5"
         ),
         failure_code = c(
             "association_low_independent_support",
             "association_low_block_support"
+        ),
+        satterthwaite_failure_code = c(
+            "not_applicable",
+            "association_low_reference_df"
         ),
         stringsAsFactors = FALSE
     )
@@ -307,9 +312,9 @@ m12c_seed_protocol <- function() {
     data.frame(
         protocol_id = unname(.M12C_PROTOCOL_IDS),
         stream_id = c(
-            "m12c_a_permutation_seed_stream_v1",
-            "m12c_b_perturbation_seed_stream_v1",
-            "m12c_c_resampling_seed_stream_v1"
+            "m12c_a_permutation_seed_stream_v2",
+            "m12c_b_perturbation_seed_stream_v2",
+            "m12c_c_resampling_seed_stream_v2"
         ),
         purpose = c(
             "A Monte Carlo restricted permutations",
@@ -391,7 +396,7 @@ m12c_c_candidates <- function() {
             "delta-method standardized-risk interval from adjusted-score covariance independent; 999 whole-block bootstrap percentile interval paired/repeated",
             "delta-method standardized-risk interval from Mancl-DeRouen corrected sandwich; t df=clusters-rank",
             "conditional profile-likelihood interval; no marginal risk-difference interval",
-            "HC3 t interval with residual df independent; CR2 t interval with Satterthwaite df paired/repeated",
+            "HC3 t interval with residual df independent; full-design identity-working-model CR2 t interval paired/repeated, unavailable when computed Satterthwaite df<5",
             "moderated t interval with missing values retained",
             "robust moderated t interval with missing values retained"
         ),
@@ -407,7 +412,7 @@ m12c_c_candidates <- function() {
             "brglm2 mean bias reduction reference; package choice deferred to passing study",
             "geepack score reference; exchangeable repeated/paired and independence single-observation clusters; explicit Mancl-DeRouen covariance",
             "survival exact conditional-likelihood reference",
-            "base R matrix algebra; explicit HC3 and CR2/Satterthwaite covariance",
+            "base R matrix algebra; explicit HC3 and full-design identity-working-model CR2/Satterthwaite covariance",
             "Bioconductor limma lmFit/eBayes",
             "Bioconductor limma lmFit/eBayes robust"
         ),
@@ -420,7 +425,7 @@ m12c_c_candidates <- function() {
 
 m12c_c_resampling <- function() {
     data.frame(
-        resampling_id = "c_detection_paired_block_bootstrap_v1",
+        resampling_id = "c_detection_paired_block_bootstrap_v2",
         candidate_ids = "c_detection_glm_hc3;c_detection_mean_br",
         draw_count = .M12C_BOOTSTRAP_DRAWS,
         unit = "complete declared subject/pair block",
@@ -429,7 +434,7 @@ m12c_c_resampling <- function() {
         estimand_grid = "refit each weighted draw; standardize fitted risks over the original empirical declared design grid",
         interval = "type-8 0.025/0.975 percentiles over successful draws",
         failure = "retain every failure class; interval unavailable unless at least 900 of 999 draws succeed",
-        seed_stream = "m12c_c_resampling_seed_stream_v1",
+        seed_stream = "m12c_c_resampling_seed_stream_v2",
         state = "frozen_unrun",
         stringsAsFactors = FALSE
     )
@@ -450,18 +455,25 @@ m12c_c_support <- function() {
         min_units_per_contrast_side = c(4L, 6L, 10L, 3L, 6L, 1L),
         min_informative_events = c(2L, 3L, 2L, 3L, 6L, 1L),
         residual_df_floor = c(3L, 3L, 4L, 3L, 3L, 1L),
+        min_satterthwaite_df = c(
+            NA_integer_, NA_integer_, NA_integer_, NA_integer_, 5L, NA_integer_
+        ),
         extra_rule = c(
             "at least two detected and two undetected overall",
             "at least three discordant complete blocks for contrasted levels",
             "at least ten independent clusters and both outcomes overall",
             "at least three observed units on each contrast side",
-            "at least six independent blocks observed on both contrast sides",
+            "at least six independent blocks observed on both contrast sides; full-design identity-working-model CR2 requires computed Satterthwaite df>=5",
             "A contrast estimable; batch-exclusive condition contrast always unavailable"
         ),
         failure_code = c(
             "detection_low_support", "detection_low_discordance",
             "detection_too_few_clusters", "abundance_low_support",
             "abundance_low_paired_support", "contrast_nonestimable"
+        ),
+        satterthwaite_failure_code = c(
+            rep("not_applicable", 4L), "abundance_low_reference_df",
+            "not_applicable"
         ),
         stringsAsFactors = FALSE
     )
@@ -558,11 +570,14 @@ m12c_method_sources <- function() {
             "r_p_adjust", "r_quantile", "brglm2_current", "bias_reduction_2020",
             "survival_clogit", "geepack_current", "gee_small_sample_md",
             "limma_current", "limma_manual", "permutation_glm_2014",
-            "cluster_bootstrap_2013", "cluster_cr2_2018",
+            "permutation_robust_wald_2019", "cluster_bootstrap_2013",
+            "cluster_cr2_2018", "cluster_cr2_corrigendum_2023",
+            "msqrob_hurdle_2020",
             "selective_risk_coverage_2010"
         ),
         tracks = c(
-            "A;C", "B", "C", "C", "C", "C", "C", "C", "C", "A", "B;C", "A;C", "B"
+            "A;C", "B", "C", "C", "C", "C", "C", "C", "C", "A",
+            "A", "B;C", "A;C", "A;C", "A", "B"
         ),
         scope = c(
             "Holm/BY definitions and dependency guarantees",
@@ -575,8 +590,11 @@ m12c_method_sources <- function() {
             "current omics linear-model implementation",
             "missing-value and blocked linear-model behavior",
             "nuisance-aware restricted permutation conditions",
+            "heteroscedastic robust-W asymptotics and small-sample warnings",
             "cluster/subject bootstrap preserves within-cluster structure",
             "small-sample CR2/Satterthwaite inference with arbitrary fixed effects",
+            "corrected absorbed-fixed-effect shortcut limited to OLS with identity working model",
+            "protein-within-peptide quasibinomial precedent; not validation of the global all-protein denominator",
             "risk-coverage framing for abstaining displays"
         ),
         url = c(
@@ -590,11 +608,14 @@ m12c_method_sources <- function() {
             "https://bioconductor.org/packages/release/bioc/html/limma.html",
             "https://bioconductor.org/packages/release/bioc/manuals/limma/man/limma.pdf",
             "https://doi.org/10.1016/j.neuroimage.2014.01.060",
-            "https://doi.org/10.1016/j.jmva.2012.10.006",
+            "https://doi.org/10.1016/j.neuroimage.2019.116030",
+            "https://doi.org/10.1016/j.jmva.2012.09.003",
             "https://doi.org/10.1080/07350015.2016.1247004",
+            "https://doi.org/10.1080/07350015.2023.2174123",
+            "https://doi.org/10.1021/acs.analchem.9b04375",
             "https://www.jmlr.org/papers/v11/el-yaniv10a.html"
         ),
-        checked_on = rep(.M12C_CHECKED_ON, 13L),
+        checked_on = rep(.M12C_CHECKED_ON, 16L),
         stringsAsFactors = FALSE
     )
 }
@@ -703,7 +724,7 @@ m12c_validate_protocol <- function(protocol = m12c_protocol()) {
         "candidate_selection", "excluded_candidates", "method_sources"
     )
     if (!identical(names(protocol), expected_components)) {
-        .m12c_fail("M12c protocol components/order differ from v1.")
+        .m12c_fail("M12c protocol components/order differ from v2.")
     }
     if (any(!vapply(protocol, is.data.frame, logical(1L))) ||
         any(vapply(protocol, function(x) any(vapply(x, is.factor, logical(1L))),
@@ -747,6 +768,14 @@ m12c_validate_protocol <- function(protocol = m12c_protocol()) {
         nrow(protocol$a_support) != 2L ||
         any(protocol$a_support$min_units_per_contrast_side < 4L) ||
         any(protocol$a_support$residual_df_floor < 3L) ||
+        !identical(
+            protocol$a_support$min_satterthwaite_df,
+            c(NA_integer_, 5L)
+        ) ||
+        !identical(
+            protocol$a_support$satterthwaite_failure_code,
+            c("not_applicable", "association_low_reference_df")
+        ) ||
         any(protocol$a_support$min_allowable_permutations < 20L)) {
         .m12c_fail("M12c A core/candidate comparison is malformed.")
     }
@@ -781,7 +810,17 @@ m12c_validate_protocol <- function(protocol = m12c_protocol()) {
         nrow(protocol$c_support) != 6L ||
         any(protocol$c_support$min_units_per_contrast_side <= 0L) ||
         any(protocol$c_support$min_informative_events <= 0L) ||
-        any(protocol$c_support$residual_df_floor <= 0L)) {
+        any(protocol$c_support$residual_df_floor <= 0L) ||
+        !identical(
+            protocol$c_support$min_satterthwaite_df,
+            c(NA_integer_, NA_integer_, NA_integer_, NA_integer_, 5L,
+              NA_integer_)
+        ) ||
+        !identical(
+            protocol$c_support$satterthwaite_failure_code,
+            c(rep("not_applicable", 4L), "abundance_low_reference_df",
+              "not_applicable")
+        )) {
         .m12c_fail("M12c C estimand/candidate/support comparison is malformed.")
     }
 
@@ -909,28 +948,28 @@ m12c_protocol_hashes <- function(protocol = m12c_protocol()) {
 }
 
 .M12C_EXPECTED_HASHES <- c(
-    descriptors = "aedf57f027f458c797e62e0d417d683ab2bc930c4b103e6d39a97a716f3e6103",
+    descriptors = "28b4fb982a7d48747ace1e701a2250b7d1663e9a79948940cfc9d111bf896203",
     evaluation_allocation = "67eab76bd0e2d9507f4f558d9b823e33fc87ced797645a2848697540a1222754",
     a_design_core = "06899b13aff59d6bd727fd747611bc0a5c901ccedc1d6f376aee441e55b6f6c6",
-    a_candidates = "e0ce32a5177128fe7197305fe19fa256309af1205e9ae64990ab860dfca403f0",
-    a_support = "e76f2e8f7749be8194706b1b51293bac53530d84ac4afac319c3c935e1f22e9a",
+    a_candidates = "ea6da31838d22bf079d812864c0ecfd204bc431ff7e3fd4ce97eea7efb124c9f",
+    a_support = "2b1b65f3726798d04ec466fc8ef8f6b3e9ce390cf3ea822276cdff5b1a791a4e",
     b_perturbations = "0ce3cb0b8d781aa829b42e022e201ce83c572532885dbde5cce90ac055d65c19",
     b_cutoff_policy = "9079d59a76896874e469982f9308fd01f933ca967390a4cd2300ac52ebe2a052",
     b_policy_scenarios = "9e94fb14ffd9a4f1a4521468cc8f0821aaf03070b33a40b7d06da9d42763b04b",
     b_display_calibration = "0d7985d628f85cde7ded6a10bf721b70e7f0b64e099d3e79dbe116c775002034",
-    seed_protocol = "71c56ad02907ba3fed028f0f82d76b7422d208d487fd547a3c7e1a20e661810f",
+    seed_protocol = "efd82566f20f2fd3e035943e5c2854b383974351fe64fc3a2b3a9726aa33d574",
     c_estimands = "8049c2bb6bc135b1bd34627b16bbe262f89223443eb56b76a09440539e0c7585",
-    c_candidates = "bfe15d4c541faed7e22cb24322031d07151bf28a470a2f96f0e27adbf13c2c1f",
-    c_resampling = "3aa076a69a7e8a27fd3e0a805932d41e0424da40ee8da2d8500c71c787c320e4",
-    c_support = "c2785f0c1c1086877a479d74ddc8678d90e7d8ca85a2253c78b3fda89a4f0a9c",
+    c_candidates = "0ffb487bce24814fdebf570b83fea7d11c15d21dc226c3d2cdcba90cf033c7c0",
+    c_resampling = "1759fff01d569b22f08657861785da9bcd0ec358dfa1f1e0c307bccae11c8629",
+    c_support = "81c8726aa1cf68dd5af07af551a9d0b8c750cb5ced15074b09359be28067d26c",
     multiplicity = "75482e90cb35d5491bea00573bedcc09fcb0797aba852e4aebeacbb611e1e7c8",
     candidate_selection = "aa11b90dc459cd38baa6539e0f989b482394e71bba4c18e133a60b0c90b2c01a",
     excluded_candidates = "27dabc8a910dee3fc2e513a3a14041a812670abe6db90520d3f4d7207102085b",
-    method_sources = "1a87c3218b3ba9b0b254d3ef4a49abc16146f34b77ee99c12f5d983d12d8a0d2",
-    a_protocol = "e20bdcc8e040eed65457480be7ae2ce2542761165c3d27161b953f86f39e5edc",
-    b_protocol = "57ffa1220c740dcb69508d3ad1b9beb05e7013c3a92af528293211e41a13f256",
-    c_protocol = "58b6e3c6d7f35f5561549a3a52420e49b0f3eb296752353d1bb3c9d433cf9d96",
-    protocol_bundle = "8eb5592131407ae48d4b4caa06ef13eea84371471215eae41997faf0e5ec0821"
+    method_sources = "4f677fd08b19268a547395e1870878a24e00c58fb11b01880f43f8d8f51b56cf",
+    a_protocol = "ca0cf8dbbf082446d9116ce280f0acf2c6517d35ec6137edb7b415585ce92683",
+    b_protocol = "20912c4dfadeebb0c1da7100cb54dfa27f202ea39c3e0d991fb0ee38bab383c2",
+    c_protocol = "f28b01a4cf5373807b4c71241a3563bc64cf55aa8d446cb62e242c9ecae76b04",
+    protocol_bundle = "3bc4ef531d6c84475114befc5c153e50680459f1d8125fdbabac5fd840a1de65"
 )
 
 .m12c_expect_error <- function(code) {
@@ -952,6 +991,8 @@ m12c_protocol_hashes <- function(protocol = m12c_protocol()) {
     wrong_seed_key$seed_protocol$key[[2L]] <- "version|input|draw"
     wrong_c_resampling <- protocol
     wrong_c_resampling$c_resampling$draw_count <- 998L
+    weak_reference_df <- protocol
+    weak_reference_df$a_support$min_satterthwaite_df[[2L]] <- 4L
     empty_seed_manifest <- .m12c_expect_error(m12c_seed_manifest(
         unname(.M12C_PROTOCOL_IDS[["B"]]),
         paste(rep("0", 64L), collapse = ""),
@@ -968,6 +1009,9 @@ m12c_protocol_hashes <- function(protocol = m12c_protocol()) {
         seed_key_seal = .m12c_expect_error(m12c_validate_protocol(wrong_seed_key)),
         c_resampling_seal = .m12c_expect_error(
             m12c_validate_protocol(wrong_c_resampling)
+        ),
+        satterthwaite_floor = .m12c_expect_error(
+            m12c_validate_protocol(weak_reference_df)
         ),
         empty_seed_manifest = empty_seed_manifest
     )

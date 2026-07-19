@@ -56,11 +56,16 @@ value remains in the comparison.
 - complete 416-row audit SHA-256:
   `37528216590dcfff3338501ef61b766697ea63c14b7324912fcb00f84d58790e`;
 - registry-bound 11-row gate-result SHA-256:
-  `cb72a69301100287cee569ae7a0d709f42edc10e3b10a62dbff3a86ab88aec6f`;
+  `816303e18fb165d90891833e46e3d056e3d97289e4e2d267460d9e61b9f85144`;
 - upstream M12 generator protocol:
   `cdea1bf874152e63fba08c49e390da1dd18690105e43a2dc7a03fc6866d0d080`;
 - upstream M12 validation contract:
-  `2cd5ecd8bf5763da1c5d9e1d8994207e701bcea9a7efcf4ae539dfd9b52d7431`.
+  `45d1cda936b21a42d6735d900917734398eecb3ff1c136cab486cf90ee2b21e5`.
+
+The 2026-07-19 pre-result M12 literature correction left the 416-row design
+audit byte-identical. The gate-result hash changed only because each row is now
+bound to candidate protocol v2 + gate registry v2; all 11 estimates and
+thresholds are unchanged.
 
 Reproduce after installing the current source package locally:
 

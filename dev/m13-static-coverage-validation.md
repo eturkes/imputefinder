@@ -46,9 +46,9 @@ constructed objects always contain coverage.
   schema corruption, legacy readability, original-object immutability, and
   matrix/`SummarizedExperiment` integration pass.
 - Frozen M13 mandatory verifier → all 11 gates pass across 416 development
-  instances; audit/result hashes remain
+  instances; current audit/result hashes =
   `37528216590dcfff3338501ef61b766697ea63c14b7324912fcb00f84d58790e` /
-  `cb72a69301100287cee569ae7a0d709f42edc10e3b10a62dbff3a86ab88aec6f`.
+  `816303e18fb165d90891833e46e3d056e3d97289e4e2d267460d9e61b9f85144`.
 - Frozen M5 → 12 scenarios / 13 target profiles pass; frozen M7 → 13 long +
   routine scenarios pass, MD5
   `4011e381bba2d0d747e91d277a45de5e`.
