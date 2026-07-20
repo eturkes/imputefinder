@@ -19,9 +19,10 @@ or release obligation.
 Exact method, dependency graph, falsification gates, and Definition of Done →
 `PLAN.md` Sections 2-14. M13c v4 contract hash =
 `422954c88ed7683f58ac296cb4d9e785d61c3f80a276914235d4b285bbc16547`.
-Exact next task → M14a: implement the frozen weighted/instance perturbation
-manifest and deterministic streams for B, beginning with red manifest/seed/
-grouping tests. Keep B result allocation and every confirmation artifact sealed.
+Exact next task → M14b: implement the sampling-stability panel over M14a's
+integer unit weights, beginning with red fixed-cutoff/support/state-transition/
+retention tests. Keep estimator/assumption results, the B study allocation, and
+every confirmation artifact sealed.
 
 ## Completed v1 release path
 
@@ -2833,5 +2834,61 @@ continues to support B/C. M13 is complete.
 Exact next task → M14a: write red perturbation-manifest, deterministic-stream,
 unit-grouping, and fit-only isolation tests; implement the smallest B manifest +
 stream core. Keep B study results and all confirmation evidence sealed.
+
+Blockers → none.
+
+### 2026-07-20 - M14a weighted perturbation manifest + deterministic streams
+
+Scope → implement only B's pre-execution manifest/stream/grouping core; keep
+all B result allocations, development/confirmation evidence, and the public
+stability slot sealed.
+
+Implemented:
+
+- internal `robustness_perturbation_manifest_v1` binds frozen M12 B protocol
+  `20912c4d...83c2`, a B-owned canonical matrix/design/feature-cluster SHA-256,
+  normalized named sources, all four perturbation families, and the six exact
+  assumption-policy definitions;
+- sampling instances stratify independent units by declared condition/
+  acquisition signatures while repeated-measure blocks move jointly;
+  technical siblings remain inside their block. Feature/module membership and
+  exhaustive leave-one-unit-out omissions retain canonical name alignment;
+- the exact M12 SHA-derived stream key, first-seven-hex integer map, and
+  manifest-wide open addressing produce 999 sampling + 999 estimator draws as
+  internal integer weights. Local Mersenne-Twister/Inversion/Rejection scopes
+  restore caller RNG kind/state, including an initially absent `.Random.seed`;
+- fit-only requests for a stability perturbation manifest now return portable
+  `original_input_required`; full validation regenerates and exactly compares
+  the input/design/grouping-bound manifest, so altered weights or provenance
+  reject;
+- adversarial 10,000 × 50 dry construction exposed repeated per-draw source IDs
+  (1.89 GB object). Normalizing IDs into source tables reduced the final object
+  to 44,074,472 bytes while retaining every weight and name mapping; measured
+  construction elapsed time was 1.62 s in the source-loaded benchmark.
+
+Verification:
+
+- focused red baseline → 5 expected missing-boundary errors; focused final
+  stability suite → 80 expectations; stability + fit-only compatibility → 182
+  expectations; all pass;
+- complete package source suite → 1,753 expectations, zero failures, warnings,
+  errors, or skips;
+- frozen M12 executable protocol/self-tests pass unchanged with B protocol
+  `20912c4dfadeebb0c1da7100cb54dfa27f202ea39c3e0d991fb0ee38bab383c2`,
+  lifecycle `frozen_unrun`, candidate allocation `1-32`, development `33-64`,
+  and external artifacts `metadata_only`;
+- vignette-bearing source build succeeds; source-tarball `R CMD check --as-cran
+  --no-manual` passes every substantive rail with only the expected new-
+  submission note;
+- BiocCheck → 0 errors, 1 warning, 7 notes. The warning is limited to the two
+  pre-existing locally restored association `set.seed()` sites; M14a adds no
+  `set.seed()`, >50-line function, or >80-character source/test line;
+- `git diff --check` passes. No B simulation result, development/confirmation
+  artifact, or external data was opened or created.
+
+Exact next task → M14b: add red tests and implement the sampling-stability panel
+over M14a unit weights: fixed successful baseline cutoff, support/unavailable
+handling, feature-condition state + retained-feature transitions/frequencies,
+and leave-one-unit influence. Keep estimator and assumption panels unexecuted.
 
 Blockers → none.

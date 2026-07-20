@@ -8,7 +8,8 @@
 .FIT_ONLY_ARTIFACTS <- c(
     "dropped_row_cells",
     "original_mask",
-    "pre_rescue_evidence"
+    "pre_rescue_evidence",
+    "stability_perturbation_manifest"
 )
 
 .new_unavailable <- function(quantity, code, message, requires) {

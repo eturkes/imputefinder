@@ -814,7 +814,7 @@ is not a failed mandatory-core claim and does not block B/C.
 
 ### M14 - B: robustness certificate
 
-- [ ] Implement weighted/instance perturbation manifests + deterministic streams.
+- [x] Implement weighted/instance perturbation manifests + deterministic streams.
 - [ ] Implement sampling, cutoff-estimator, and assumption/policy panels
       separately.
 - [ ] Add margins, state transitions, retention/cutoff summaries, failures, and

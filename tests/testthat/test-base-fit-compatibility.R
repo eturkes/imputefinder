@@ -421,7 +421,8 @@ test_that("fit-only input artifacts are portable unavailable records", {
     artifacts <- c(
         "dropped_row_cells",
         "original_mask",
-        "pre_rescue_evidence"
+        "pre_rescue_evidence",
+        "stability_perturbation_manifest"
     )
 
     unavailable <- lapply(
