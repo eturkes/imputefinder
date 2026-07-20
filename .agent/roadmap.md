@@ -6,7 +6,7 @@ Canonical method + gates → `PLAN.md`. This ledger owns session state, evidence
 
 - [x] M11 freeze v1 + extension seams
 - [x] M12 frozen A-C validation + gate registry
-- [ ] M13 design core + confounding-sentinel study
+- [x] M13 design core + confounding-sentinel study
 - [ ] M14 robustness certificates
 - [ ] M15 detectability contrast engine
 - [ ] M15P release confirmation + next-card promotion review
@@ -19,11 +19,9 @@ or release obligation.
 Exact method, dependency graph, falsification gates, and Definition of Done →
 `PLAN.md` Sections 2-14. M13c v4 contract hash =
 `422954c88ed7683f58ac296cb4d9e785d61c3f80a276914235d4b285bbc16547`.
-Exact next task → commit the verified pre-allocation implementation, lock its
-manifest, run synthetic candidate replicates `1-32`, and resolve/lock one winner
-or no-winner before exact public materialization/handoff. Keep development replicates
-`33-64`, HarmonizR development bytes, and all confirmation evidence sealed until
-the candidate choice locks.
+Exact next task → M14a: implement the frozen weighted/instance perturbation
+manifest and deterministic streams for B, beginning with red manifest/seed/
+grouping tests. Keep B result allocation and every confirmation artifact sealed.
 
 ## Completed v1 release path
 
@@ -2797,5 +2795,43 @@ Exact next task → scoped loader-fix commit, recoverable retirement of the
 zero-artifact manifest, replacement implementation lock, then candidate
 replicates `1-32` only. Resolve and verify candidate evidence before any
 development or public materialization.
+
+Blockers → none.
+
+### 2026-07-19 - M13j candidate study + killed-panel disposition
+
+Scope → execute only frozen candidate replicates `1-32`, resolve one winner or
+no-winner through the semantic authorizer, independently replay the stored
+evidence, and preserve all later allocations unless a winner locks.
+
+Evidence:
+
+- replacement implementation manifest
+  `d821cae04b689c6ddb3b5843602e146e3bdecada485faf7afcd83544cac1cba4`
+  passed its pre-allocation receipts; exact inventory = 416 canonical inputs +
+  1,248 canonical results, aggregate
+  `9aefb8ec8d2906bbb6530d48a6e8778cf95fe207760aa31dc0c7ab324c1cd551`;
+- all 1,248 runs completed as measured panels. All candidates passed both null
+  controls but failed interval coverage, alternative power, and bias; none
+  entered the five full gates or ranking;
+- semantic evidence
+  `a5a242c3adeba3843cc9a91546543794f54b924785db831781fe8c4ae360cbc6`
+  resolved `no_winner`; independent full replay returned
+  `verified_no_winner` with the same hash;
+- final lifecycle status → manifest present, inputs `416/416`, results
+  `1248/1248`, evidence present. Development replicates `33-64`, HarmonizR,
+  public materialization, and confirmation stayed sealed;
+- exact candidate metrics, structured failure counts, negative controls,
+  identities, and reproduction commands →
+  `dev/m13-association-validation.md`.
+
+Disposition → statistical association panel `killed`: frozen evidence rejected
+all current candidates, so no gate is weakened and no new holdout is opened.
+Mandatory design/estimability + static coverage core survives independently and
+continues to support B/C. M13 is complete.
+
+Exact next task → M14a: write red perturbation-manifest, deterministic-stream,
+unit-grouping, and fit-only isolation tests; implement the smallest B manifest +
+stream core. Keep B study results and all confirmation evidence sealed.
 
 Blockers → none.

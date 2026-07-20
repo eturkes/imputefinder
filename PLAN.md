@@ -264,7 +264,8 @@ Current portfolio:
 | ID | Direction | State | Dependency |
 |---|---|---|---|
 | v1 | Condition-aware hard-state classifier | `stable` | complete |
-| A | Design/confounding sentinel | `active` | M11-M12 |
+| A | Design/confounding sentinel core | `active` | M11-M12 |
+| A-panel | Statistical missingness association | `killed` | M13: no full-gate passer |
 | B | Robustness certificate | `active` | mandatory A design core + M12 |
 | C | Detectability contrast | `active` | mandatory A design core + M12 |
 | D | Censor-aware continuous evidence | `parked` | A design core + B + identification study |
@@ -780,10 +781,13 @@ set, and child/parent namespace fingerprints. The semantic evidence resolver
 now owns exact input/result reads, generator and engine replay, outcome audits,
 screening/full gates, ranking, and self-hash; production accepts no caller
 provenance callback and fixture evidence is non-authoritative. The fixed study
-harness has no development/confirmation command. Public materialization/handoff,
-the immutable implementation-manifest artifact, and candidate allocation remain
-open; the authorizer guard and all implementation rails are green, while every
-candidate result remains `frozen_unrun` until that artifact locks.
+harness has no development/confirmation command. Implementation manifest
+`d821cae0...c1cba4` locked before allocation; all 416 canonical inputs and 1,248
+candidate results were then generated. Independently replayed evidence
+`a5a242c3...60cbc6` resolved `no_winner`: all candidates failed screening, so
+the full-gate/ranking sets are empty. The association panel is `killed`; public
+materialization, development replicates `33-64`, HarmonizR bytes, and
+confirmation remain unopened. The mandatory design core survives independently.
 
 Gate: protocol hashes exist; every A-C claim has an executable numeric gate and
 failure rule; v1 behavior/limitations reproduce on the expanded harness.
@@ -793,16 +797,20 @@ failure rule; v1 behavior/limitations reproduce on the expanded harness.
 - [x] Implement typed design alignment and algebraic estimability/aliasing.
 - [x] Implement pre-rescue sample/condition/nuisance coverage summaries.
 - [x] Freeze the executable M13c association addendum before candidate results.
-- [ ] Implement only predeclared association terms and uncertainty.
-- [ ] Add stored diagnostic data, concise print/summary, and human wording.
-- [ ] Run candidate + development A gates; retain failures and assign the
-      association panel `confirmation_candidate`, `killed`, or `parked`.
-      Confirmation gates remain sealed for synchronized M15P.
+- [x] Implement only predeclared association terms and uncertainty.
+- [x] Retain exact candidate diagnostics/evidence; omit the public panel,
+      print/summary, and wording surface after the killed disposition.
+- [x] Run candidate A gates and retain every failure. No candidate passed
+      screening, so development was correctly not opened and the association
+      panel is `killed`; confirmation remains sealed for synchronized M15P.
 
 Gate: the algebraic design/estimability core must pass because B/C depend on it.
 The association panel closes through a recorded disposition; only a passing
 panel becomes a confirmation candidate. Neither component mutates data or makes
 causal attribution/automatic correction.
+
+M13 candidate evidence → `dev/m13-association-validation.md`. The killed panel
+is not a failed mandatory-core claim and does not block B/C.
 
 ### M14 - B: robustness certificate
 
