@@ -7,7 +7,11 @@ date: "1 September 2026"
 package: imputefinder
 output:
   BiocStyle::html_document:
+    toc: true
     toc_float: true
+    toc_depth: 3
+    math_method: mathml
+    css: vignette.css
 abstract: |
   ImputeFinder classifies quantitative-proteomics missingness separately within
   experimental conditions. This vignette shows how on/off rescue, manual and
