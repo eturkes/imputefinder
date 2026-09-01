@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.R
 \name{plot_missingness}
 \alias{plot_missingness}
-\title{Plot a Stored Missingness Profile}
+\title{Plot a missingness profile}
 \usage{
 plot_missingness(result, condition)
 }
@@ -13,14 +13,14 @@ plot_missingness(result, condition)
 \item{condition}{One condition label in \code{result}.}
 }
 \value{
-A \code{ggplot} object. A recorded cutoff is shown as a vertical
-line; bottom ticks identify seeded feature-condition blocks. Stored profile
-and cutoff warnings appear in the caption.
+A \code{ggplot} object. The cutoff is shown as a vertical line, and
+bottom ticks mark blocks that received a rescue value. Any stored warnings
+appear in the caption.
 }
 \description{
-Plot the count-weighted proportion of features with missing observations for
-one condition. The curve is read directly from the profile stored in
-\code{result}; the input data and classifications are not recomputed.
+Plot the estimated proportion of features with missing values across the
+intensity range for one condition. The function uses the profile already
+stored in \code{result}; it does not recalculate the classification.
 }
 \examples{
 x <- rbind(

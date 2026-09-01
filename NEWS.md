@@ -1,9 +1,10 @@
 # imputefinder 0.99.4 (2026-09-01)
 
-- Adds an explicit pooled-versus-condition-specific counterexample that shows
-  why on/off features need separate condition states.
-- Surfaces deterministic scientific-regression metrics and their limitations in
-  the user-facing documentation.
+## Documentation and examples
+
+- Adds a worked comparison showing why on/off features need separate condition
+  states.
+- Documents the synthetic regression results and explains their limitations.
 - Adds a package citation and removes a stale reference to deleted development
   validation tooling.
 
@@ -13,8 +14,7 @@
   current roxygen2 release.
 - Removes development-only scientific, cutoff, and performance tooling from
   the default submission branch so it contains package source only.
-- Repairs repository documentation links and records AI-assisted
-  submission-preparation provenance in source control.
+- Repairs repository documentation links.
 
 # imputefinder 0.99.2 (2026-07-15)
 
@@ -31,12 +31,12 @@
   protein-intensity missingness for matrices and `SummarizedExperiment`
   objects.
 - Preserves plausible condition-specific on/off proteins with a reproducible,
-  audited one-cell rescue while filtering globally absent features, features
+  recorded one-cell rescue while filtering globally absent features, features
   with a block lacking enough MAR evidence, and all-MNAR features.
 - Provides manual and automatic condition-specific cutoffs, stored missingness
-  profiles, diagnostic plots, seed provenance, and feature-level decision
-  records for downstream normalisation and imputation.
+  profiles, diagnostic plots, a rescue log, and feature-level decisions for
+  downstream normalisation and imputation.
 - Pins rescue sampling to a restored local R RNG configuration so a fixed seed
-  is independent of caller RNG settings.
+  is independent of global RNG settings.
 - Records numerical warnings from the automatic trend model and rejects the
   affected cutoff instead of silently accepting a suspect fit.

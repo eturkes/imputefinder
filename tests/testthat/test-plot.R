@@ -19,9 +19,12 @@ test_that("missingness plots use the stored profile and recorded cutoff", {
 
     expect_s3_class(plot, "ggplot")
     expect_identical(plot$data, stored_grid)
-    expect_identical(plot$labels$title, "Missingness profile - condition A")
-    expect_identical(plot$labels$x, "Mean log2 intensity")
-    expect_identical(plot$labels$y, "Features with missing values")
+    expect_identical(plot$labels$title, "Missingness profile for condition A")
+    expect_identical(plot$labels$x, "Mean log2 protein intensity")
+    expect_identical(
+        plot$labels$y,
+        "Proportion of features with missing values"
+    )
 
     y_scale <- plot$scales$get_scales("y")
     expect_identical(y_scale$limits, c(0, 1))
@@ -38,7 +41,7 @@ test_that("missingness plots use the stored profile and recorded cutoff", {
     expect_identical(unique(cutoff_layer$xintercept), 12)
 })
 
-test_that("missingness plots mark seeded feature-condition blocks", {
+test_that("missingness plots mark blocks that received rescue values", {
     result <- classify_normative_fixture()
     plot <- plot_missingness(result, "A")
     geom_classes <- plot_geom_classes(plot)
@@ -49,12 +52,12 @@ test_that("missingness plots mark seeded feature-condition blocks", {
     expect_identical(unique(seed_layer$x), 8)
     expect_match(
         plot$labels$caption,
-        "Bottom ticks mark seeded feature-condition blocks.",
+        "Bottom ticks mark blocks that received a rescue value.",
         fixed = TRUE
     )
 })
 
-test_that("missingness plots surface stored warnings without a default warning", {
+test_that("missingness plots show stored warnings without a default warning", {
     result <- classify_normative_fixture()
     expect_null(plot_missingness(result, "B")$labels$caption)
 
@@ -96,7 +99,7 @@ test_that("missingness plots reject invalid results and conditions", {
 
     expect_error(
         plot_missingness(list(), "A"),
-        "`result` must inherit from `imputefinder_result`.",
+        "`result` must be returned by `classify_missingness()`.",
         fixed = TRUE
     )
     for (condition in list(character(), c("A", "B"), NA_character_, "")) {

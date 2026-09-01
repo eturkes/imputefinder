@@ -1,17 +1,17 @@
 utils::globalVariables(c("intensity", "mean_intensity", "missing_proportion"))
 
-#' Plot a Stored Missingness Profile
+#' Plot a missingness profile
 #'
-#' Plot the count-weighted proportion of features with missing observations for
-#' one condition. The curve is read directly from the profile stored in
-#' \code{result}; the input data and classifications are not recomputed.
+#' Plot the estimated proportion of features with missing values across the
+#' intensity range for one condition. The function uses the profile already
+#' stored in \code{result}; it does not recalculate the classification.
 #'
 #' @param result An \code{imputefinder_result} returned by
 #'   \code{\link{classify_missingness}}.
 #' @param condition One condition label in \code{result}.
-#' @return A \code{ggplot} object. A recorded cutoff is shown as a vertical
-#'   line; bottom ticks identify seeded feature-condition blocks. Stored profile
-#'   and cutoff warnings appear in the caption.
+#' @return A \code{ggplot} object. The cutoff is shown as a vertical line, and
+#'   bottom ticks mark blocks that received a rescue value. Any stored warnings
+#'   appear in the caption.
 #' @seealso \code{\link{classify_missingness}} and
 #'   \code{vignette("imputefinder")}.
 #' @examples
@@ -95,10 +95,10 @@ plot_missingness <- function(result, condition) {
             expand = ggplot2::expansion(mult = c(0, 0.02))
         ) +
         ggplot2::labs(
-            title = sprintf("Missingness profile - condition %s", condition),
+            title = sprintf("Missingness profile for condition %s", condition),
             subtitle = .cutoff_subtitle(cutoff, diagnostic),
-            x = "Mean log2 intensity",
-            y = "Features with missing values",
+            x = "Mean log2 protein intensity",
+            y = "Proportion of features with missing values",
             caption = .plot_caption(profile, diagnostic)
         ) +
         ggplot2::theme_minimal(base_size = 11) +
@@ -116,7 +116,7 @@ plot_missingness <- function(result, condition) {
 .stored_plot_profile <- function(result, condition) {
     if (!inherits(result, "imputefinder_result")) {
         stop(
-            "`result` must inherit from `imputefinder_result`.",
+            "`result` must be returned by `classify_missingness()`.",
             call. = FALSE
         )
     }
@@ -273,7 +273,7 @@ plot_missingness <- function(result, condition) {
         "recorded"
     }
     sprintf(
-        "Cutoff: %s (%s)",
+        "Cutoff %s (%s)",
         format(cutoff, trim = TRUE, scientific = FALSE),
         source
     )
@@ -285,7 +285,7 @@ plot_missingness <- function(result, condition) {
 
 .plot_caption <- function(profile, diagnostic) {
     notes <- if (any(profile$raw$seeded)) {
-        "Bottom ticks mark seeded feature-condition blocks."
+        "Bottom ticks mark blocks that received a rescue value."
     } else {
         character()
     }

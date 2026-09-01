@@ -312,7 +312,10 @@
 
     if (!identical(prepared$representation, "SummarizedExperiment") ||
         !methods::is(original, "SummarizedExperiment")) {
-        stop("Unsupported input representation provenance.", call. = FALSE)
+        stop(
+            "ImputeFinder could not restore the original input type.",
+            call. = FALSE
+        )
     }
 
     row_index <- if (nrow(data) == 0L) integer() else rownames(data)

@@ -83,7 +83,7 @@
 
     if (anyNA(classifications$retained)) {
         stop(
-            "Reconciliation produced an incomplete feature audit.",
+            "ImputeFinder could not assign a decision to every feature.",
             call. = FALSE
         )
     }
@@ -168,7 +168,7 @@
     )
     if (!valid_status || !valid_classifications) {
         stop(
-            "Reconciliation inputs do not satisfy the audit schemas.",
+            "The classification tables are incomplete or inconsistent.",
             call. = FALSE
         )
     }

@@ -316,7 +316,7 @@
         is.list(profile$metadata)
     if (!valid_container) {
         return(.automatic_cutoff_input_failure(
-            "The stored profile is malformed.",
+            "The stored missingness profile is not valid.",
             quality
         ))
     }
@@ -332,7 +332,10 @@
     if (!all(required_raw %in% names(profile$raw)) ||
         !all(required_grid %in% names(profile$grid))) {
         return(.automatic_cutoff_input_failure(
-            "The stored profile lacks required evidence fields.",
+            paste(
+                "The stored missingness profile does not contain the fields",
+                "needed for automatic cutoff estimation."
+            ),
             quality
         ))
     }
@@ -348,7 +351,7 @@
         all(is.finite(raw$mean_intensity))
     if (!valid) {
         return(.automatic_cutoff_input_failure(
-            "Raw profile evidence contains invalid values.",
+            "The stored missingness profile contains invalid values.",
             quality
         ))
     }
@@ -367,7 +370,7 @@
     }
     if (nrow(raw) < specification$minimum_features) {
         reason <- sprintf(
-            "Automatic cutoff requires at least %d feature blocks.",
+            "Automatic cutoff estimation needs at least %d features.",
             specification$minimum_features
         )
         return(.automatic_cutoff_input_failure(reason, quality))
@@ -375,8 +378,8 @@
     if (any(class_counts < specification$minimum_class_features)) {
         reason <- sprintf(
             paste0(
-                "Automatic cutoff requires at least %d missing and %d ",
-                "complete feature blocks."
+                "Automatic cutoff estimation needs at least %d features with ",
+                "missing values and %d complete features."
             ),
             specification$minimum_class_features,
             specification$minimum_class_features
@@ -448,7 +451,10 @@
     grid <- profile$grid
     if (!.valid_automatic_cutoff_grid(grid)) {
         return(.automatic_cutoff_input_failure(
-            "The profile grid or smoothing metadata is invalid.",
+            paste(
+                "The stored missingness profile cannot be used for cutoff",
+                "estimation."
+            ),
             quality
         ))
     }
@@ -463,7 +469,10 @@
     quality$support$supported_grid_points <- as.integer(sum(finite))
     if (!any(finite)) {
         return(.automatic_cutoff_input_failure(
-            "The profile has no supported observed-intensity grid.",
+            paste(
+                "The missingness profile has no supported points within the",
+                "observed intensity range."
+            ),
             quality
         ))
     }
@@ -476,7 +485,10 @@
     quality <- .record_density_support(quality, grid, keep)
     if (sum(keep) < specification$minimum_supported_grid_points) {
         return(.automatic_cutoff_input_failure(
-            "The profile has too little density-supported grid coverage.",
+            paste(
+                "Too little of the observed intensity range is supported to",
+                "estimate a cutoff."
+            ),
             quality
         ))
     }
@@ -524,17 +536,17 @@
     quality$trend <- trend
     if (length(trend$warnings) > 0L) {
         return(.automatic_cutoff_input_failure(
-            "The missingness-trend model emitted numerical warnings.",
+            paste(
+                "The missingness trend could not be fitted without numerical",
+                "warnings."
+            ),
             quality,
             trend$warnings
         ))
     }
     if (!trend$credible) {
         return(.automatic_cutoff_input_failure(
-            paste0(
-                "No statistically credible descending missingness trend ",
-                "was detected."
-            ),
+            "Missingness does not decrease clearly enough with intensity.",
             quality
         ))
     }
@@ -558,7 +570,10 @@
         x, y, weight, spacing, bandwidth
     )) {
         return(.automatic_cutoff_input_failure(
-            "The profile grid or smoothing metadata is invalid.",
+            paste(
+                "The stored missingness profile cannot be used for cutoff",
+                "estimation."
+            ),
             support$quality
         ))
     }
@@ -790,7 +805,10 @@
     quality$derivative$half_window_points <- half_window
     if (2L * half_window + 1L > length(candidate$y)) {
         return(.automatic_cutoff_input_failure(
-            "The supported profile is too short for derivative smoothing.",
+            paste(
+                "The supported profile is too short to estimate a smooth",
+                "transition."
+            ),
             quality
         ))
     }
@@ -818,9 +836,9 @@
     quality$derivative$credible_lobe_count <- as.integer(length(lobes))
     if (length(lobes) == 0L) {
         return(.automatic_cutoff_input_failure(
-            paste0(
-                "No credible descending derivative lobe has an interior ",
-                "boundary."
+            paste(
+                "The profile does not contain a clear downward transition",
+                "with an interior boundary."
             ),
             quality
         ))
@@ -917,7 +935,7 @@
         cutoff <= min(candidate$x) ||
         cutoff >= max(candidate$x)) {
         return(.automatic_cutoff_failure(
-            "The derivative boundary is not an interior finite cutoff.",
+            "The estimated boundary falls outside the usable intensity range.",
             quality,
             specification
         ))
@@ -951,9 +969,9 @@
     diagnostic$profile <- if (is.list(profile)) profile$metadata else NULL
     message <- sprintf(
         paste0(
-            "Automatic cutoff is unidentifiable for condition `%s`: %s ",
-            "Inspect `profile` on this error and supply a manual cutoff ",
-            "for `%s`."
+            "Could not estimate an automatic cutoff for condition `%s`: %s ",
+            "Inspect the error's `profile` field, then supply a named manual ",
+            "cutoff for `%s` through `cutoffs`."
         ),
         condition,
         decision$reason,

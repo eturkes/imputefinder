@@ -57,13 +57,13 @@ test_that("automatic cutoff passes frozen stress profiles", {
     }
 })
 
-test_that("automatic cutoff enforces total and per-class evidence floors", {
+test_that("automatic cutoff enforces minimum data requirements", {
     below_total <- imputefinder:::.detect_automatic_cutoff(
         automatic_cutoff_profile(n = 79L)
     )
     expect_identical(below_total$status, "unidentifiable")
     expect_true(is.na(below_total$cutoff))
-    expect_match(below_total$reason, "at least 80 feature blocks", fixed = TRUE)
+    expect_match(below_total$reason, "at least 80 features", fixed = TRUE)
     expect_identical(below_total$quality$evidence$feature_count, 79L)
 
     missing <- seq_len(80L) <= 11L
@@ -73,7 +73,7 @@ test_that("automatic cutoff enforces total and per-class evidence floors", {
     expect_identical(below_class$status, "unidentifiable")
     expect_match(
         below_class$reason,
-        "at least 12 missing and 12 complete feature blocks",
+        "at least 12 features with missing values and 12 complete features",
         fixed = TRUE
     )
     expect_identical(
@@ -102,7 +102,7 @@ test_that("automatic cutoff enforces total and per-class evidence floors", {
     )
 })
 
-test_that("flat and unsupported profiles fail without endpoint fallbacks", {
+test_that("flat and unsupported profiles fail instead of inventing cutoffs", {
     flat_profile <- automatic_cutoff_profile(
         n = 2000L,
         missing = seq_len(2000L) %% 8L == 0L
@@ -113,7 +113,7 @@ test_that("flat and unsupported profiles fail without endpoint fallbacks", {
     expect_true(is.na(flat$cutoff))
     expect_match(
         flat$reason,
-        "No statistically credible descending missingness trend",
+        "Missingness does not decrease clearly enough with intensity",
         fixed = TRUE
     )
     expect_false(flat$quality$trend$credible)
@@ -126,7 +126,7 @@ test_that("flat and unsupported profiles fail without endpoint fallbacks", {
     expect_true(is.na(unsupported$cutoff))
     expect_match(
         unsupported$reason,
-        "no supported observed-intensity grid",
+        "no supported points within the observed intensity range",
         fixed = TRUE
     )
 })
@@ -256,10 +256,10 @@ test_that("automatic failure carries its condition and diagnostic profile", {
     expect_s3_class(error, "imputefinder_cutoff_error")
     expect_s3_class(error, "imputefinder_cutoff_unidentifiable")
     expect_identical(error$condition, "B")
-    expect_match(error$reason, "at least 80 feature blocks", fixed = TRUE)
+    expect_match(error$reason, "at least 80 features", fixed = TRUE)
     expect_match(
         conditionMessage(error),
-        "supply a manual cutoff for `B`",
+        "supply a named manual cutoff for `B`",
         fixed = TRUE
     )
     expect_identical(error$diagnostic$source, "automatic")

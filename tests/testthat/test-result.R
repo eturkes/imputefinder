@@ -13,7 +13,7 @@ test_that("the state vocabulary is stable and exhaustive", {
     )
 })
 
-test_that("the result skeleton has typed auditable components", {
+test_that("the result skeleton contains the expected typed components", {
     fixture <- matrix_input_fixture()
     groups_by_sample <- setNames(fixture$group, colnames(fixture$x))
 
@@ -242,15 +242,15 @@ test_that("result and summary print methods are concise and return invisibly", {
         result_output,
         c(
             "<imputefinder_result>",
-            "Features: 4/7 retained; 3 dropped",
-            "Samples: 8 across 2 conditions; seed insertions: 1",
+            "Retained 4 of 7 features; dropped 3.",
+            "Analysed 8 samples in 2 conditions; inserted 1 rescue value.",
             paste0(
-                "A: retained MNAR=2, MAR=1, complete=1; ",
-                "cutoff=12 (manual)"
+                "A: retained features include 2 MNAR, 1 MAR, 1 complete; ",
+                "cutoff 12 (manual)"
             ),
             paste0(
-                "B: retained MNAR=0, MAR=1, complete=3; ",
-                "cutoff=12 (manual)"
+                "B: retained features include 0 MNAR, 1 MAR, 3 complete; ",
+                "cutoff 12 (manual)"
             )
         )
     )
@@ -267,16 +267,18 @@ test_that("result and summary print methods are concise and return invisibly", {
         summary_output,
         c(
             "<summary.imputefinder_result>",
-            "Features: 4/7 retained; 3 dropped",
-            "Samples: 8 across 2 conditions; seed insertions: 1",
-            "States (all classified features):",
-            "A: complete=1, MNAR=3, MAR=1, insufficient=1",
-            "B: complete=4, MNAR=1, MAR=1, insufficient=0",
-            paste0(
-                "Dropped: all_missing=1; insufficient:A=1; ",
-                "MNAR_all_conditions=1"
-            ),
-            "Cutoffs: A=12 (manual); B=12 (manual)"
+            "Retained 4 of 7 features; dropped 3.",
+            "Analysed 8 samples in 2 conditions; inserted 1 rescue value.",
+            "All classified feature-condition blocks:",
+            "A: 1 complete, 3 MNAR, 1 MAR, 1 insufficient",
+            "B: 4 complete, 1 MNAR, 1 MAR, 0 insufficient",
+            "Dropped features:",
+            "  all values missing: 1",
+            "  insufficient observations in A: 1",
+            "  MNAR in every condition: 1",
+            "Cutoffs:",
+            "  A: 12 (manual)",
+            "  B: 12 (manual)"
         )
     )
 })
@@ -300,6 +302,7 @@ test_that("presentation handles no drops and conditions without cutoffs", {
             stringsAsFactors = FALSE
         )
     )
-    expect_true(any(output == "Dropped: none"))
-    expect_true(any(output == "Cutoffs: A=not needed; B=not needed"))
+    expect_true(any(output == "Dropped features: none"))
+    expect_true(any(output == "  A: not needed"))
+    expect_true(any(output == "  B: not needed"))
 })

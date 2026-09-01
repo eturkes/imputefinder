@@ -2,7 +2,7 @@
 % Please edit documentation in R/imputefinder.R
 \name{classify_missingness}
 \alias{classify_missingness}
-\title{Classify Missingness by Condition}
+\title{Classify missing values by condition}
 \usage{
 classify_missingness(
   x,
@@ -14,31 +14,33 @@ classify_missingness(
 )
 }
 \arguments{
-\item{x}{Numeric matrix or a \code{SummarizedExperiment} object.}
+\item{x}{An ordinary numeric matrix or a \code{SummarizedExperiment}. Put
+features in rows and samples in columns.}
 
-\item{group}{Atomic condition vector or aligned design data frame for matrix
-input; omitted for \code{SummarizedExperiment} input.}
+\item{group}{A condition vector or an aligned design data frame for matrix
+input. Do not supply it for \code{SummarizedExperiment} input.}
 
-\item{group_col}{Condition column for design or
-\code{SummarizedExperiment} input.}
+\item{group_col}{The condition column in a design data frame or
+\code{SummarizedExperiment} object.}
 
-\item{assay}{Assay name for \code{SummarizedExperiment} input.}
+\item{assay}{The assay name for \code{SummarizedExperiment} input.}
 
 \item{cutoffs}{Optional named numeric vector of manual condition cutoffs.
-Automatic selection fills omitted conditions containing missing values;
-conditions without missing values need no cutoff.}
+Automatic estimation is used for omitted conditions that contain missing
+values. Conditions without missing values need no cutoff.}
 
-\item{seed}{Integer rescue seed.}
+\item{seed}{An integer that controls which sample receives each rescue value.}
 }
 \value{
-An \code{imputefinder_result} containing filtered seed-modified data,
-per-condition classifications and groups, feature audit status, cutoffs,
-explicit missingness profiles, diagnostics, and seed provenance.
+An \code{imputefinder_result} containing filtered data,
+feature-condition classifications, downstream groups, feature-level
+decisions, cutoffs, diagnostic profiles, and a log of rescue values.
 }
 \description{
-Rescue condition-specific absences, classify missingness independently within
-each condition, and retain features suitable for condition-aware downstream
-imputation. Input values must be unnormalised log2 protein intensities.
+Classify each feature separately within each experimental condition. Fully
+missing condition blocks receive one recorded low-intensity rescue value so
+that condition-specific on/off patterns can be retained. Input values must be
+unnormalised log2 protein intensities.
 }
 \examples{
 x <- rbind(

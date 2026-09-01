@@ -5,17 +5,15 @@ Authors@R:
     person("Emir", "Turkes", email = "emir.turkes@eturkes.com",
         role = c("aut", "cre", "cph"),
         comment = c(ORCID = "0000-0002-7447-1476"))
-Description: Classifies protein-intensity missingness independently within
-    experimental conditions instead of pooling conditions. This can preserve
-    biologically plausible condition-specific on/off features that a pooled
-    strict-majority rule would discard. ImputeFinder distinguishes likely
-    missing-not-at-random (MNAR) blocks from likely missing-at-random (MAR) or
-    complete blocks using condition-specific intensity profiles, automatic or
-    manual cutoffs, and strict-majority evidence. It accepts unnormalised log2
-    quantitative-proteomics intensities in ordinary matrices or
-    SummarizedExperiment objects and returns filtered, seed-modified data with
-    auditable classifications, cutoff diagnostics, and seed provenance for
-    downstream normalisation and imputation.
+Description: Classifies missing protein intensities separately within
+    experimental conditions. This can retain condition-specific on/off proteins
+    that would be lost when all samples are pooled. Each feature-condition block
+    is labelled likely missing-not-at-random (MNAR), likely missing-at-random
+    (MAR), complete, or insufficient using observed intensities,
+    condition-specific cutoffs, and a strict majority rule. The package accepts
+    unnormalised log2 quantitative-proteomics intensities in ordinary matrices
+    or SummarizedExperiment objects. It returns filtered data and records the
+    classification, cutoff, rescue values, and drop reason for each feature.
 License: GPL (>= 3)
 Encoding: UTF-8
 URL: https://github.com/eturkes/imputefinder

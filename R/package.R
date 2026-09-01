@@ -1,18 +1,13 @@
-# Assisted-by: OpenAI GPT-5.6 Pro
-# Scope: submission-readiness metadata and documentation, 2026-09-01.
-
 #' ImputeFinder: Condition-Aware Missingness Classification
 #'
 #' ImputeFinder classifies protein-intensity missingness independently within
-#' each experimental condition. It preserves evidence-backed,
-#' condition-specific on/off features, then returns retained features in
-#' condition-specific groups for downstream mixed imputation.
+#' each experimental condition. This keeps condition-specific on/off patterns
+#' visible and prepares retained features for downstream imputation.
 #'
-#' The `MNAR` and `MAR` labels describe likely mechanisms supported by the
-#' observed intensity and missingness pattern; they do not prove the true
-#' missingness mechanism. Results retain the classifications, cutoff profiles
-#' and diagnostics, rescue-seed provenance, and feature-level drop reasons
-#' needed to audit those decisions.
+#' The `MNAR` and `MAR` labels are working classifications based on observed
+#' intensity and missingness. They do not prove the underlying mechanism. The
+#' result includes classifications, cutoff information, a rescue log, and the
+#' reason each feature was retained or dropped.
 #'
 #' @section Expected input:
 #' [classify_missingness()] accepts unnormalised log2 protein intensities with
@@ -22,10 +17,9 @@
 #' same matrix core.
 #'
 #' @section Workflow boundary:
-#' ImputeFinder filters and seed-modifies the input; it does not normalise or
-#' impute it. Use the returned data for normalisation, split it by condition,
-#' and apply the chosen MNAR and MAR methods using the corresponding retained
-#' feature groups.
+#' ImputeFinder filters the input and adds recorded rescue values where needed.
+#' It does not normalise or impute the data. Normalise the returned data, split
+#' it by condition, and apply the chosen methods to the supplied feature groups.
 #'
 #' @seealso [classify_missingness()], [plot_missingness()],
 #'   `vignette("imputefinder")`, and `citation("imputefinder")`.

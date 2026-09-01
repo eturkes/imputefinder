@@ -244,7 +244,7 @@ test_that("an all-ineligible result preserves samples and audit rows", {
     expect_true(all(!result$classifications$retained))
 })
 
-test_that("seed provenance retains rescues on features later dropped", {
+test_that("the rescue log includes features that are later dropped", {
     x <- rbind(
         rescued_then_dropped = c(NA, NA, NA, NA, 9, NA, NA, NA),
         support = rep(8, 8)

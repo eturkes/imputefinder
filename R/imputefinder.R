@@ -16,25 +16,27 @@
 #
 #    Emir Turkes can be contacted at emir.turkes@eturkes.com
 
-#' Classify Missingness by Condition
+#' Classify missing values by condition
 #'
-#' Rescue condition-specific absences, classify missingness independently within
-#' each condition, and retain features suitable for condition-aware downstream
-#' imputation. Input values must be unnormalised log2 protein intensities.
+#' Classify each feature separately within each experimental condition. Fully
+#' missing condition blocks receive one recorded low-intensity rescue value so
+#' that condition-specific on/off patterns can be retained. Input values must be
+#' unnormalised log2 protein intensities.
 #'
-#' @param x Numeric matrix or a \code{SummarizedExperiment} object.
-#' @param group Atomic condition vector or aligned design data frame for matrix
-#'   input; omitted for \code{SummarizedExperiment} input.
-#' @param group_col Condition column for design or
-#'   \code{SummarizedExperiment} input.
-#' @param assay Assay name for \code{SummarizedExperiment} input.
+#' @param x An ordinary numeric matrix or a \code{SummarizedExperiment}. Put
+#'   features in rows and samples in columns.
+#' @param group A condition vector or an aligned design data frame for matrix
+#'   input. Do not supply it for \code{SummarizedExperiment} input.
+#' @param group_col The condition column in a design data frame or
+#'   \code{SummarizedExperiment} object.
+#' @param assay The assay name for \code{SummarizedExperiment} input.
 #' @param cutoffs Optional named numeric vector of manual condition cutoffs.
-#'   Automatic selection fills omitted conditions containing missing values;
-#'   conditions without missing values need no cutoff.
-#' @param seed Integer rescue seed.
-#' @return An \code{imputefinder_result} containing filtered seed-modified data,
-#'   per-condition classifications and groups, feature audit status, cutoffs,
-#'   explicit missingness profiles, diagnostics, and seed provenance.
+#'   Automatic estimation is used for omitted conditions that contain missing
+#'   values. Conditions without missing values need no cutoff.
+#' @param seed An integer that controls which sample receives each rescue value.
+#' @return An \code{imputefinder_result} containing filtered data,
+#'   feature-condition classifications, downstream groups, feature-level
+#'   decisions, cutoffs, diagnostic profiles, and a log of rescue values.
 #' @seealso \code{\link{plot_missingness}},
 #'   \code{vignette("imputefinder")}, and
 #'   \code{citation("imputefinder")}.

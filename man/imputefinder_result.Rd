@@ -5,7 +5,7 @@
 \alias{print.imputefinder_result}
 \alias{summary.imputefinder_result}
 \alias{print.summary.imputefinder_result}
-\title{Present an ImputeFinder Result}
+\title{Print or summarise an ImputeFinder result}
 \usage{
 \method{print}{imputefinder_result}(x, ...)
 
@@ -28,8 +28,8 @@ feature-condition blocks and the retained subset separately.
 \code{print.summary.imputefinder_result()} returns \code{x} invisibly.
 }
 \description{
-Print a compact overview or calculate structured feature, condition-state,
-drop-reason, cutoff, and seed-insertion counts for an ImputeFinder result.
+Print a compact overview or calculate feature, condition-state, drop-reason,
+cutoff, and rescue-value counts for an ImputeFinder result.
 }
 \examples{
 x <- rbind(
