@@ -27,7 +27,7 @@
 #' and apply the chosen MNAR and MAR methods using the corresponding retained
 #' feature groups.
 #'
-#' @seealso [classify_missingness()], [plot_missingness()], and
-#'   `vignette("imputefinder")`.
+#' @seealso [classify_missingness()], [plot_missingness()],
+#'   `vignette("imputefinder")`, and `citation("imputefinder")`.
 #' @keywords internal
 "_PACKAGE"

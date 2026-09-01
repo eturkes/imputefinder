@@ -1,3 +1,12 @@
+# imputefinder 0.99.4 (2026-09-01)
+
+- Adds an explicit pooled-versus-condition-specific counterexample that shows
+  why on/off features need separate condition states.
+- Surfaces deterministic scientific-regression metrics and their limitations in
+  the user-facing documentation.
+- Adds a package citation and removes a stale reference to deleted development
+  validation tooling.
+
 # imputefinder 0.99.3 (2026-09-01)
 
 - Records the maintainer ORCID and regenerates package documentation with the

@@ -61,6 +61,7 @@ fit$seed_log
 
 }
 \seealso{
-\code{\link{plot_missingness}} and
-\code{vignette("imputefinder")}.
+\code{\link{plot_missingness}},
+\code{vignette("imputefinder")}, and
+\code{citation("imputefinder")}.
 }

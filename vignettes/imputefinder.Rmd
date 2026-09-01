@@ -175,6 +175,69 @@ fit$classifications[
 ]
 ```
 
+# What pooling conditions would lose
+
+The package's distinctive decision is easiest to see by applying the same
+cutoff and majority rule to `on_off` as one pooled block. This counterfactual
+uses the original values, before condition-specific rescue.
+
+```{r pooled-counterfactual}
+pooled_values <- unname(x["on_off", ])
+pooled_observed <- sum(!is.na(pooled_values))
+pooled_mean <- mean(pooled_values, na.rm = TRUE)
+pooled_state <- if (all(!is.na(pooled_values))) {
+    "complete"
+} else if (pooled_mean < 12) {
+    "MNAR"
+} else if (pooled_observed > length(pooled_values) / 2) {
+    "MAR"
+} else {
+    "insufficient"
+}
+
+on_off_states <- fit$classifications[
+    fit$classifications$feature == "on_off",
+    c("condition", "observed_count", "sample_count", "mean_intensity", "state")
+]
+pooled_comparison <- rbind(
+    data.frame(
+        scope = "Pooled original samples",
+        observed_count = pooled_observed,
+        sample_count = length(pooled_values),
+        mean_intensity = pooled_mean,
+        state = pooled_state
+    ),
+    data.frame(
+        scope = paste("Condition", on_off_states$condition),
+        observed_count = on_off_states$observed_count,
+        sample_count = on_off_states$sample_count,
+        mean_intensity = on_off_states$mean_intensity,
+        state = on_off_states$state
+    )
+)
+knitr::kable(pooled_comparison, digits = 2)
+
+on_off_status <- fit$feature_status[
+    fit$feature_status$feature == "on_off",
+    ,
+    drop = FALSE
+]
+stopifnot(
+    identical(pooled_state, "insufficient"),
+    identical(
+        on_off_states$state[match(c("A", "B"), on_off_states$condition)],
+        c("MNAR", "complete")
+    ),
+    isTRUE(on_off_status$retained)
+)
+```
+
+Pooling produces four observations from eight samples. The mean is above the
+cutoff, but there is no strict observed majority, so the feature becomes
+`insufficient` and would be dropped. Condition-aware classification instead
+records A as `MNAR`, B as `complete`, and retains the biologically plausible
+on/off feature.
+
 ## Result components
 
 - `data` - retained rows in the input representation, with logged rescue
@@ -400,6 +463,15 @@ intensity-dependent MNAR, condition-specific on/off features, several group
 sizes and cutoffs, rescue seeds, and name permutations. Synthetic evidence
 supports those tested behaviors but does not establish performance for every
 proteomics experiment.
+
+# Citation {.unnumbered}
+
+The package citation includes the software and the thesis that defines its
+scientific intent.
+
+```{r citation}
+citation("imputefinder")
+```
 
 # Related methods and references {.unnumbered}
 

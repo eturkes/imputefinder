@@ -1,13 +1,14 @@
 Package: imputefinder
 Title: Condition-Aware Missingness Classification for Proteomics
-Version: 0.99.3
+Version: 0.99.4
 Authors@R:
     person("Emir", "Turkes", email = "emir.turkes@eturkes.com",
         role = c("aut", "cre", "cph"),
         comment = c(ORCID = "0000-0002-7447-1476"))
 Description: Classifies protein-intensity missingness independently within
-    experimental conditions while preserving biologically plausible
-    condition-specific on/off features. ImputeFinder distinguishes likely
+    experimental conditions instead of pooling conditions. This can preserve
+    biologically plausible condition-specific on/off features that a pooled
+    strict-majority rule would discard. ImputeFinder distinguishes likely
     missing-not-at-random (MNAR) blocks from likely missing-at-random (MAR) or
     complete blocks using condition-specific intensity profiles, automatic or
     manual cutoffs, and strict-majority evidence. It accepts unnormalised log2

@@ -60,7 +60,8 @@ BiocManager::install("imputefinder")
 After installation, run `vignette("imputefinder")` for an executable walkthrough
 of cutoff selection, on/off rescue, diagnostics, and downstream branching. The
 [vignette source](vignettes/imputefinder.Rmd) is also available in this
-repository.
+repository. Run `citation("imputefinder")` to cite the package and its scientific
+source.
 
 ## Minimal worked example
 
@@ -110,6 +111,23 @@ The complete feature audit explains both retention and exclusion:
 | `all_mnar` | MNAR | MNAR | no | `MNAR_all_conditions` |
 | `globally_absent` | not classified | not classified | no | `all_missing` |
 | `complete_low` | complete | complete | yes | |
+
+### What pooling conditions would lose
+
+Apply the same cutoff and strict-majority rule to the original `on_off` row as
+one pooled eight-sample block:
+
+| Scope | Observed | Mean intensity | State | Consequence |
+|---|---:|---:|---|---|
+| Pooled original samples | 4/8 | 15.75 | `insufficient` | Drop |
+| Condition A after logged rescue | 1/4 | 8.00 | `MNAR` | Retain because B is complete |
+| Condition B | 4/4 | 15.75 | `complete` | Retain |
+
+The pooled block is above the cutoff but has no strict observed majority, so it
+looks unsupported. ImputeFinder instead retains the feature and preserves its
+different state in each condition. This counterexample is the package's central
+value: it prevents the design from being collapsed before missingness is
+classified.
 
 Inspect the long evidence table and condition-specific downstream groups
 directly:
@@ -272,7 +290,28 @@ condition_data[mar_rows, , drop = FALSE]
 Normalisation and actual kNN, MinProb, MinDet, QRILC, BPCA, or other imputation
 remain downstream choices, not ImputeFinder defaults or runtime dependencies.
 
-## Limitations and evidence
+## Validation evidence
+
+The frozen routine regressions compare public output with a causal oracle from
+the deterministic synthetic generator in
+[`test-scientific-regression.R`](tests/testthat/test-scientific-regression.R).
+The current package produces:
+
+| Scenario and path | MNAR F1 | MAR F1 | Macro-F1 | Retention F1 | Eligible on/off retention |
+|---|---:|---:|---:|---:|---:|
+| 25% MAR, four samples/condition, manual cutoff | 0.9438 | 0.9674 | 0.9681 | 0.9509 | 1.0000 |
+| 5% MAR, eight samples/condition, automatic cutoff | 0.9777 | 0.9670 | 0.9816 | 0.9898 | 1.0000 |
+
+The automatic scenario recovers cutoffs 11.9727 and 11.8855 from a generating
+boundary of 12. Both scenarios rescue every eligible structural off block. The
+tests enforce predeclared lower bounds, exact on/off retention and rescue, and
+named-order invariance.
+
+These are frozen synthetic regression results. They show that the implementation
+recovers its intended rules under the tested model; they are not estimates of
+accuracy on arbitrary proteomics experiments.
+
+## Limitations
 
 - ImputeFinder cannot infer whether values are log2 transformed or suitably
   unnormalised. It validates structure and finite values, then trusts the input
@@ -290,15 +329,12 @@ remain downstream choices, not ImputeFinder defaults or runtime dependencies.
 - The package classifies and coordinates a workflow. It neither proves causal
   missingness mechanisms nor chooses, runs, or validates an imputation method.
 
-The deterministic [scientific regression
-tests](tests/testthat/test-scientific-regression.R) cover 5% and 25%
+The broader deterministic regression suite covers 5% and 25%
 intensity-independent MAR, intensity-dependent MNAR, on/off features, group
 sizes 4, 8, and 20, condition-specific cutoffs, rescue seeds, and named
 permutations. The [automatic-cutoff tests](tests/testthat/test-cutoff-auto.R)
-exercise successful transitions and structured failure cases. These synthetic
-results support the tested behavior; they do not establish performance for
-every proteomics dataset. The package vignette and exported help pages define
-the public contract.
+exercise successful transitions and structured failure cases. The package
+vignette and exported help pages define the public contract.
 
 ## License
 

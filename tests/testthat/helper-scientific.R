@@ -1,5 +1,5 @@
-# Compact protocol-v1 mirror for routine M7 regressions. The independent long
-# benchmark and normative protocol remain in dev/scientific-validation.R.
+# Compact deterministic fixtures and causal oracles for routine scientific
+# regressions.
 
 .routine_scientific_conditions <- c("A", "B")
 .routine_scientific_states <- c("complete", "MNAR", "MAR", "insufficient")
