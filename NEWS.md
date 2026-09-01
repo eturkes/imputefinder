@@ -1,3 +1,12 @@
+# imputefinder 0.99.3 (2026-09-01)
+
+- Records the maintainer ORCID and regenerates package documentation with the
+  current roxygen2 release.
+- Removes development-only scientific, cutoff, and performance tooling from
+  the default submission branch so it contains package source only.
+- Repairs repository documentation links and records AI-assisted
+  submission-preparation provenance in source control.
+
 # imputefinder 0.99.2 (2026-07-15)
 
 - Completes release-candidate audits of public claims, edge cases, process

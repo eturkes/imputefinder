@@ -3,6 +3,7 @@ title: "Condition-aware proteomics missingness with ImputeFinder"
 author:
 - name: Emir Turkes
   email: emir.turkes@eturkes.com
+date: "1 September 2026"
 package: imputefinder
 output:
   BiocStyle::html_document:

@@ -1,9 +1,10 @@
 Package: imputefinder
 Title: Condition-Aware Missingness Classification for Proteomics
-Version: 0.99.2
+Version: 0.99.3
 Authors@R:
     person("Emir", "Turkes", email = "emir.turkes@eturkes.com",
-           role = c("aut", "cre", "cph"))
+        role = c("aut", "cre", "cph"),
+        comment = c(ORCID = "0000-0002-7447-1476"))
 Description: Classifies protein-intensity missingness independently within
     experimental conditions while preserving biologically plausible
     condition-specific on/off features. ImputeFinder distinguishes likely
@@ -23,7 +24,7 @@ biocViews: Classification, MassSpectrometry, Proteomics, Preprocessing,
 Depends:
     R (>= 4.6.0)
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 8.0.0
+RoxygenNote: 8.1.0
 Imports:
     SummarizedExperiment,
     ggplot2,
@@ -36,4 +37,4 @@ Suggests:
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0

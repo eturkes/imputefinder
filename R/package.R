@@ -1,3 +1,6 @@
+# Assisted-by: OpenAI GPT-5.6 Pro
+# Scope: submission-readiness metadata and documentation, 2026-09-01.
+
 #' ImputeFinder: Condition-Aware Missingness Classification
 #'
 #' ImputeFinder classifies protein-intensity missingness independently within

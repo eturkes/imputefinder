@@ -40,11 +40,11 @@ feature groups.
 \code{vignette("imputefinder")}.
 }
 \author{
-\strong{Maintainer}: Emir Turkes \email{emir.turkes@eturkes.com} [copyright holder]
+\strong{Maintainer}: Emir Turkes \email{emir.turkes@eturkes.com} (\href{https://orcid.org/0000-0002-7447-1476}{ORCID}) [copyright holder]
 
 Authors:
 \itemize{
-  \item Emir Turkes \email{emir.turkes@eturkes.com} [copyright holder]
+  \item Emir Turkes \email{emir.turkes@eturkes.com} (\href{https://orcid.org/0000-0002-7447-1476}{ORCID}) [copyright holder]
 }
 
 }

@@ -290,21 +290,15 @@ remain downstream choices, not ImputeFinder defaults or runtime dependencies.
 - The package classifies and coordinates a workflow. It neither proves causal
   missingness mechanisms nor chooses, runs, or validates an imputation method.
 
-The repository's [scientific validation
-report](https://github.com/eturkes/imputefinder/blob/main/dev/scientific-validation.md)
-uses deterministic simulations with 5% and 25% intensity-independent MAR,
-intensity-dependent MNAR, on/off features, group sizes 4, 8, and 20,
-condition-specific cutoffs, rescue seeds, and named permutations. The [cutoff
-validation
-report](https://github.com/eturkes/imputefinder/blob/main/dev/cutoff-validation.md)
-records the automatic-method comparison and failure criteria. The
-[release-candidate performance report](https://github.com/eturkes/imputefinder/blob/main/dev/performance-validation.md)
-records the deterministic 10,000-feature, 50-sample runtime and allocation
-gate. These synthetic results support the tested behavior; they are not a
-claim of performance on every proteomics dataset.
-
-The normative behavior and release gates are maintained in
-[PLAN.md](https://github.com/eturkes/imputefinder/blob/main/PLAN.md).
+The deterministic [scientific regression
+tests](tests/testthat/test-scientific-regression.R) cover 5% and 25%
+intensity-independent MAR, intensity-dependent MNAR, on/off features, group
+sizes 4, 8, and 20, condition-specific cutoffs, rescue seeds, and named
+permutations. The [automatic-cutoff tests](tests/testthat/test-cutoff-auto.R)
+exercise successful transitions and structured failure cases. These synthetic
+results support the tested behavior; they do not establish performance for
+every proteomics dataset. The package vignette and exported help pages define
+the public contract.
 
 ## License
 

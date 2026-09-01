@@ -1,4 +1,6 @@
 ^imputefinder\.Rproj$
 ^\.Rproj\.user$
 ^dev$
+^.*\.Rcheck$
 ^.*\.BiocCheck$
+^imputefinder_.*\.tar\.gz$
