@@ -67,6 +67,10 @@ it preserves condition-specific state and coordinates separate downstream
 branches while returning either an ordinary matrix or a
 `SummarizedExperiment`.
 
+Within a pipeline, those states can form an auditable routing layer. MNAR blocks
+can enter a detection-limit branch, MAR blocks can enter a relationship-based
+branch, and complete blocks can pass through unchanged.
+
 # Installation
 
 Once ImputeFinder is available from a Bioconductor package repository, install
@@ -412,9 +416,68 @@ c(
 )
 ```
 
-Thus `on_off` is routed to an MNAR method in A but to the complete/MAR branch in
-B. Complete blocks need no replacement; grouping them with MAR rows supplies a
-single non-MNAR branch while preserving their explicit `complete` state in the
+## An illustrative routing manifest
+
+Suppose the analysis plan assigns an MNAR-aware method to low-intensity blocks,
+a MAR-aware method to supported incomplete blocks, and no replacement to
+complete blocks. The selected algorithms remain external to ImputeFinder. The
+classification table can express that plan as a condition-specific manifest.
+
+```{r routing-manifest}
+manifest_features <- c("on_off", "mar_both", "sparse_mnar")
+routing_manifest <- fit$classifications[
+    fit$classifications$retained &
+        fit$classifications$feature %in% manifest_features,
+    c("feature", "condition", "observed_count", "missing_count", "state")
+]
+routing_manifest <- routing_manifest[
+    order(
+        match(routing_manifest$feature, manifest_features),
+        routing_manifest$condition
+    ),
+    ,
+    drop = FALSE
+]
+rownames(routing_manifest) <- NULL
+
+pipeline_actions <- c(
+    MNAR = "send to the MNAR branch",
+    MAR = "send to the MAR branch",
+    complete = "carry forward unchanged"
+)
+routing_manifest$pipeline_action <- unname(
+    pipeline_actions[as.character(routing_manifest$state)]
+)
+knitr::kable(routing_manifest)
+```
+
+```{r routing-manifest-check, include=FALSE}
+on_off_route <- routing_manifest[
+    routing_manifest$feature == "on_off",
+    ,
+    drop = FALSE
+]
+stopifnot(
+    identical(as.character(on_off_route$state), c("MNAR", "complete")),
+    identical(
+        on_off_route$pipeline_action,
+        c("send to the MNAR branch", "carry forward unchanged")
+    )
+)
+```
+
+The manifest sends `on_off` to the MNAR branch only in A. Its four measured
+values in B pass through unchanged. `mar_both` enters the MAR branch in both
+conditions, while `sparse_mnar` enters the MNAR branch in A and passes through B.
+
+After branch outputs are recombined, the on/off protein remains available to a
+condition-comparison model. A pooled classifier would have dropped it before
+normalisation or imputation. The manifest records each block's state and
+destination, while `fit$classifications` retains the supporting evidence.
+Together they support review and reproducible reruns.
+
+Complete blocks need no replacement. Grouping them with MAR rows supplies a
+single non-MNAR branch while preserving each explicit `complete` state in the
 classification table.
 
 # `SummarizedExperiment` input
