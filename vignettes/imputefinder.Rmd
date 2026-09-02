@@ -16,8 +16,9 @@ abstract: |
   ImputeFinder classifies quantitative-proteomics missingness separately within
   experimental conditions. This vignette shows how on/off rescue, manual and
   automatic cutoffs, result tables, and condition-specific downstream groups
-  work in practice. A synthetic IFN-γ study connects those states to a realistic
-  downstream routing decision.
+  work in practice. A synthetic amyloid-beta study in induced pluripotent stem
+  cell-derived microglia connects those states to an Alzheimer's disease-related
+  routing decision.
 vignette: |
   %\VignetteIndexEntry{Classifying proteomics missingness by condition}
   %\VignetteEngine{knitr::rmarkdown}
@@ -35,8 +36,17 @@ knitr::opts_chunk$set(
 )
 library(imputefinder)
 manual_profile_caption <- paste(
-    "Vehicle-condition missingness profile. The vertical line is the recorded",
-    "manual cutoff; the bottom tick marks the rescued on/off block."
+    "Vehicle-condition missingness profile for the synthetic amyloid-beta",
+    "microglia study. The vertical line is the recorded manual cutoff; the",
+    "bottom tick marks the rescued on/off block."
+)
+manual_heatmap_caption <- paste(
+    "Synthetic Alzheimer's disease-related microglial proteomics matrix. Tiles show",
+    "observed log2 intensities; grey crossed tiles are missing observations."
+)
+manual_state_caption <- paste(
+    "Condition-specific states after rescue. Feature labels identify rows that",
+    "are filtered after classification."
 )
 automatic_profile_caption <- paste(
     "Automatic condition A profile. The recorded cutoff marks the lower",
@@ -120,27 +130,28 @@ including mixtures such as MNAR in one condition and complete in another. An
 `insufficient` block cannot support a MAR branch, while an all-MNAR feature has
 no complete or MAR-like condition to support retention.
 
-# Research use case: IFN-γ stimulation with a manual cutoff
+# Research use case: amyloid-beta challenge in an Alzheimer's disease model
 
 Consider a pilot label-free proteomics study with four vehicle cultures and four
-IFN-γ-treated epithelial-cell cultures. The synthetic matrix uses gene
-symbols as protein identifiers and contains each possible state. It illustrates
-a research workflow rather than reproducing a published experiment. The values
-are unnormalised log2 intensities, and both manual cutoffs are 12.
+amyloid-beta-challenged microglial cultures differentiated from patient-derived
+induced pluripotent stem cells. The synthetic matrix uses gene symbols as protein
+identifiers and contains each possible state. It illustrates an Alzheimer's
+disease-related workflow rather than reproducing a published experiment. The
+values are unnormalised log2 intensities, and both manual cutoffs are 12.
 
 ```{r manual-fixture}
 x <- rbind(
-    ISG15 = c(NA, NA, NA, NA, 15, 16, 15, 17),
-    STAT1 = c(14, 15, NA, 16, 14, NA, 15, 16),
-    EIF4A1 = c(20, NA, NA, NA, 20, 21, 22, 23),
-    LGALS3BP = c(8, NA, NA, NA, 14, 15, 16, 17),
+    TREM2 = c(NA, NA, NA, NA, 15, 16, 15, 17),
+    APOE = c(14, 15, NA, 16, 14, NA, 15, 16),
+    ATP5F1A = c(20, NA, NA, NA, 20, 21, 22, 23),
+    CST7 = c(8, NA, NA, NA, 14, 15, 16, 17),
     low_abundance_protein = c(8, NA, NA, NA, 9, NA, NA, NA),
     unidentified_feature = rep(NA, 8),
-    KRT18 = c(8, 8, 8, 8, 9, 9, 9, 9)
+    ACTB = c(8, 8, 8, 8, 9, 9, 9, 9)
 )
 sample_metadata <- data.frame(
-    sample = c(paste0("vehicle_", 1:4), paste0("IFNG_", 1:4)),
-    condition = rep(c("vehicle", "IFNG"), each = 4),
+    sample = c(paste0("vehicle_", 1:4), paste0("amyloid_beta_", 1:4)),
+    condition = rep(c("vehicle", "amyloid_beta"), each = 4),
     replicate = rep(1:4, times = 2),
     stringsAsFactors = FALSE
 )
@@ -150,10 +161,77 @@ condition <- sample_metadata$condition
 fit <- classify_missingness(
     x,
     group = condition,
-    cutoffs = c(vehicle = 12, IFNG = 12),
+    cutoffs = c(vehicle = 12, amyloid_beta = 12),
     seed = 1L
 )
 fit
+```
+
+```{r manual-heatmap, echo=FALSE, fig.width=7.5, fig.height=4.5, fig.cap=manual_heatmap_caption}
+manual_heatmap <- data.frame(
+    feature = rep(rownames(x), times = ncol(x)),
+    sample = rep(colnames(x), each = nrow(x)),
+    intensity = as.vector(x),
+    stringsAsFactors = FALSE
+)
+manual_heatmap$feature <- factor(
+    manual_heatmap$feature,
+    levels = rev(rownames(x))
+)
+manual_heatmap$sample <- factor(
+    manual_heatmap$sample,
+    levels = colnames(x)
+)
+manual_heatmap$condition <- factor(
+    sample_metadata$condition[
+        match(as.character(manual_heatmap$sample), sample_metadata$sample)
+    ],
+    levels = c("vehicle", "amyloid_beta"),
+    labels = c("Vehicle", "Amyloid-beta")
+)
+heatmap_sample_labels <- setNames(
+    c(paste0("V", 1:4), paste0("Aβ", 1:4)),
+    colnames(x)
+)
+
+ggplot2::ggplot(
+    manual_heatmap,
+    ggplot2::aes(x = sample, y = feature, fill = intensity)
+) +
+    ggplot2::geom_tile(colour = "white", linewidth = 0.7) +
+    ggplot2::geom_point(
+        data = manual_heatmap[is.na(manual_heatmap$intensity), , drop = FALSE],
+        mapping = ggplot2::aes(x = sample, y = feature),
+        inherit.aes = FALSE,
+        shape = 4,
+        size = 2.1,
+        stroke = 0.7,
+        colour = "#555555"
+    ) +
+    ggplot2::facet_grid(
+        cols = ggplot2::vars(condition),
+        scales = "free_x",
+        space = "free_x"
+    ) +
+    ggplot2::scale_x_discrete(labels = heatmap_sample_labels) +
+    ggplot2::scale_fill_gradient(
+        low = "#F7FBFF",
+        high = "#08519C",
+        na.value = "#E0E0E0",
+        name = "log2 intensity"
+    ) +
+    ggplot2::labs(x = "Sample", y = "Protein") +
+    ggplot2::theme_minimal(base_size = 11) +
+    ggplot2::theme(
+        panel.grid = ggplot2::element_blank(),
+        strip.background = ggplot2::element_rect(
+            fill = "#F2F2F2",
+            colour = NA
+        ),
+        strip.text = ggplot2::element_text(face = "bold"),
+        axis.text.x = ggplot2::element_text(size = 9),
+        legend.position = "right"
+    )
 ```
 
 Before classification, a feature missing everywhere is marked `all_missing`
@@ -170,7 +248,7 @@ receives one artificial anchor:
 
 ```{r rescue-log}
 fit$seed_log
-fit$data["ISG15", ]
+fit$data["TREM2", ]
 ```
 
 The anchor makes the absent condition classifiable; it is not a completed
@@ -186,21 +264,84 @@ feature-condition state.
 fit$feature_status
 fit$classifications[
     fit$classifications$feature %in%
-        c("ISG15", "EIF4A1", "low_abundance_protein"),
+        c("TREM2", "ATP5F1A", "low_abundance_protein"),
     c("feature", "condition", "observed_count", "missing_count",
         "mean_intensity", "cutoff", "state", "retained", "drop_reason")
 ]
 ```
 
+```{r manual-state-map, echo=FALSE, fig.width=7.5, fig.height=4.8, fig.cap=manual_state_caption}
+state_features <- setdiff(rownames(x), "unidentified_feature")
+state_plot <- fit$classifications[
+    fit$classifications$feature %in% state_features,
+    ,
+    drop = FALSE
+]
+state_plot$feature <- factor(
+    state_plot$feature,
+    levels = rev(state_features)
+)
+state_plot$condition <- factor(
+    state_plot$condition,
+    levels = c("vehicle", "amyloid_beta"),
+    labels = c("Vehicle", "Amyloid-beta")
+)
+state_plot$state <- factor(
+    state_plot$state,
+    levels = c("complete", "MAR", "MNAR", "insufficient")
+)
+status_by_feature <- setNames(
+    fit$feature_status$retained,
+    fit$feature_status$feature
+)
+state_feature_labels <- setNames(
+    ifelse(
+        status_by_feature[state_features],
+        state_features,
+        paste0(state_features, " (filtered)")
+    ),
+    state_features
+)
+
+ggplot2::ggplot(
+    state_plot,
+    ggplot2::aes(x = condition, y = feature, fill = state)
+) +
+    ggplot2::geom_tile(colour = "white", linewidth = 0.9) +
+    ggplot2::geom_text(
+        ggplot2::aes(label = state),
+        size = 3.3,
+        colour = "#222222"
+    ) +
+    ggplot2::scale_y_discrete(labels = state_feature_labels) +
+    ggplot2::scale_fill_manual(
+        values = c(
+            complete = "#D9EAF7",
+            MAR = "#DDECCB",
+            MNAR = "#FBE3C3",
+            insufficient = "#F2C9C9"
+        ),
+        drop = FALSE,
+        name = "State"
+    ) +
+    ggplot2::labs(x = NULL, y = "Protein") +
+    ggplot2::theme_minimal(base_size = 11) +
+    ggplot2::theme(
+        panel.grid = ggplot2::element_blank(),
+        axis.text.x = ggplot2::element_text(face = "bold"),
+        legend.position = "bottom"
+    )
+```
+
 # What pooling conditions would lose
 
 The effect of pooling is easiest to see by applying the same cutoff and majority
-rule to `ISG15` as one block across all samples. In this synthetic study, `ISG15`
-is absent from every vehicle run and detected in every IFN-γ run. The
+rule to `TREM2` as one block across all samples. In this synthetic study, `TREM2`
+is absent from every vehicle run and detected in every amyloid-beta run. The
 comparison uses the original values, before condition-specific rescue.
 
 ```{r pooled-comparison}
-pooled_values <- unname(x["ISG15", ])
+pooled_values <- unname(x["TREM2", ])
 pooled_observed <- sum(!is.na(pooled_values))
 pooled_mean <- mean(pooled_values, na.rm = TRUE)
 pooled_state <- if (all(!is.na(pooled_values))) {
@@ -213,12 +354,12 @@ pooled_state <- if (all(!is.na(pooled_values))) {
     "insufficient"
 }
 
-isg15_states <- fit$classifications[
-    fit$classifications$feature == "ISG15",
+trem2_states <- fit$classifications[
+    fit$classifications$feature == "TREM2",
     c("condition", "observed_count", "sample_count", "mean_intensity", "state")
 ]
-isg15_states <- isg15_states[
-    match(unique(condition), isg15_states$condition),
+trem2_states <- trem2_states[
+    match(unique(condition), trem2_states$condition),
     ,
     drop = FALSE
 ]
@@ -231,11 +372,11 @@ pooled_comparison <- rbind(
         state = pooled_state
     ),
     data.frame(
-        scope = paste(isg15_states$condition, "condition"),
-        observed_count = isg15_states$observed_count,
-        sample_count = isg15_states$sample_count,
-        mean_intensity = isg15_states$mean_intensity,
-        state = isg15_states$state
+        scope = paste(trem2_states$condition, "condition"),
+        observed_count = trem2_states$observed_count,
+        sample_count = trem2_states$sample_count,
+        mean_intensity = trem2_states$mean_intensity,
+        state = trem2_states$state
     )
 )
 knitr::kable(
@@ -244,27 +385,27 @@ knitr::kable(
     col.names = c("Scope", "Observed", "Samples", "Mean intensity", "State")
 )
 
-isg15_status <- fit$feature_status[
-    fit$feature_status$feature == "ISG15",
+trem2_status <- fit$feature_status[
+    fit$feature_status$feature == "TREM2",
     ,
     drop = FALSE
 ]
 stopifnot(
     identical(pooled_state, "insufficient"),
     identical(
-        isg15_states$state[
-            match(c("vehicle", "IFNG"), isg15_states$condition)
+        trem2_states$state[
+            match(c("vehicle", "amyloid_beta"), trem2_states$condition)
         ],
         c("MNAR", "complete")
     ),
-    isTRUE(isg15_status$retained)
+    isTRUE(trem2_status$retained)
 )
 ```
 
 Pooling produces four observations from eight samples. The mean is above the
 cutoff, but there is no strict observed majority, so the feature becomes
 `insufficient` and would be dropped. Condition-aware classification instead
-records the vehicle block as `MNAR`, the IFN-γ block as `complete`, and
+records the vehicle block as `MNAR`, the amyloid-beta block as `complete`, and
 retains the treatment-responsive on/off feature.
 
 ## Result components
@@ -433,9 +574,9 @@ names(downstream) <- names(fit$groups)
 vapply(downstream, function(branch) nrow(branch$MNAR), integer(1))
 vapply(downstream, function(branch) nrow(branch$MAR_or_complete), integer(1))
 c(
-    ISG15_in_vehicle_MNAR = "ISG15" %in% rownames(downstream$vehicle$MNAR),
-    ISG15_in_IFNG_MAR_or_complete =
-        "ISG15" %in% rownames(downstream$IFNG$MAR_or_complete)
+    TREM2_in_vehicle_MNAR = "TREM2" %in% rownames(downstream$vehicle$MNAR),
+    TREM2_in_amyloid_beta_MAR_or_complete =
+        "TREM2" %in% rownames(downstream$amyloid_beta$MAR_or_complete)
 )
 ```
 
@@ -447,7 +588,7 @@ complete blocks. The selected algorithms remain external to ImputeFinder. The
 classification table can express that plan as a condition-specific manifest.
 
 ```{r routing-manifest}
-manifest_features <- c("ISG15", "STAT1", "LGALS3BP")
+manifest_features <- c("TREM2", "APOE", "CST7")
 routing_manifest <- fit$classifications[
     fit$classifications$retained &
         fit$classifications$feature %in% manifest_features,
@@ -478,26 +619,26 @@ knitr::kable(
 ```
 
 ```{r routing-manifest-check, include=FALSE}
-isg15_route <- routing_manifest[
-    routing_manifest$feature == "ISG15",
+trem2_route <- routing_manifest[
+    routing_manifest$feature == "TREM2",
     ,
     drop = FALSE
 ]
 stopifnot(
-    identical(as.character(isg15_route$state), c("MNAR", "complete")),
+    identical(as.character(trem2_route$state), c("MNAR", "complete")),
     identical(
-        isg15_route$pipeline_action,
+        trem2_route$pipeline_action,
         c("send to the MNAR branch", "carry forward unchanged")
     )
 )
 ```
 
-The manifest sends `ISG15` to the MNAR branch only for vehicle samples. Its four
-measured IFN-γ values pass through unchanged. `STAT1` enters the MAR branch
-in both conditions. `LGALS3BP` enters the MNAR branch for vehicle samples and
-passes through the IFN-γ branch unchanged.
+The manifest sends `TREM2` to the MNAR branch only for vehicle samples. Its four
+measured amyloid-beta values pass through unchanged. `APOE` enters the MAR branch
+in both conditions. `CST7` enters the MNAR branch for vehicle samples and passes
+through the amyloid-beta branch unchanged.
 
-After branch outputs are recombined, `ISG15` remains available to a treatment
+After branch outputs are recombined, `TREM2` remains available to a treatment
 comparison model. A pooled classifier would have dropped it before normalisation
 or imputation. The manifest records each block's state and destination, while
 `fit$classifications` retains the supporting evidence. Together they support
@@ -527,7 +668,7 @@ fit_se <- classify_missingness(
     se,
     group_col = "condition",
     assay = "log2_intensity",
-    cutoffs = c(vehicle = 12, IFNG = 12)
+    cutoffs = c(vehicle = 12, amyloid_beta = 12)
 )
 identical(
     SummarizedExperiment::assay(fit_se$data, "log2_intensity"),
