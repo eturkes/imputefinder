@@ -17,8 +17,8 @@ abstract: |
   experimental conditions. This vignette shows how on/off rescue, manual and
   automatic cutoffs, result tables, and condition-specific downstream groups
   work in practice. A controlled two-condition panel explains the rules, while
-  a real Alzheimer’s disease brain extracellular-vesicle matrix shows
-  how the same states vary across real density fractions.
+  an independent human Tau phosphoproteomics extract shows the same states in
+  public experimental data.
 vignette: |
   %\VignetteIndexEntry{Classifying proteomics missingness by condition}
   %\VignetteEngine{knitr::rmarkdown}
@@ -58,15 +58,14 @@ cutoff_benchmark_caption <- paste(
     "intensity ranges overlap around the design boundary of 12, shown by the",
     "vertical dashed line."
 )
-pxd037708_profile_caption <- paste(
-    "Stored missingness profile for Fraction 1 of the PXD037708 brain",
-    "extracellular-vesicle proteome. The vertical line is the recorded manual",
-    "cutoff of 14.9; the bottom rug marks rescue anchors."
+tau_heatmap_caption <- paste(
+    "Selected log2 Tau phosphosite intensities from three control and three",
+    "Alzheimer's disease soluble BA46 samples in PXD020717. Grey crossed tiles",
+    "are zero source intensities represented as missing observations."
 )
-pxd037708_state_caption <- paste(
-    "Condition-specific states for representative PXD037708 proteins across",
-    "eight density fractions. GSTM1 is filtered because every fraction lacks",
-    "a strict observed majority on the MAR side of its cutoff."
+tau_state_caption <- paste(
+    "Condition-specific states for the selected PXD020717 Tau phosphosites.",
+    "Labels identify sites filtered after classification."
 )
 ```
 
@@ -529,159 +528,177 @@ relationship-based method such as k-nearest neighbours can create the same
 problem when it borrows information across groups. Impute each routed block
 within its condition, then restore the original sample order.
 
-# Real-data case study: Alzheimer’s disease brain extracellular vesicles
+# Real-data case study: Tau phosphosites in human brain
 
-ImputeFinder was first used in an Alzheimer's disease brain
-extracellular-vesicle proteomics study. The associated work by
-[Fowler et al.](https://doi.org/10.1038/s41593-024-01801-5) separated vesicles
-into eight density fractions and profiled their proteins by quantitative mass
-spectrometry. The processed data are available through PRIDE accession
-[PXD037708](https://www.ebi.ac.uk/pride/archive/projects/PXD037708).
+An independent study by
+[Wesseling et al. (2020)](https://doi.org/10.1016/j.cell.2020.10.029)
+mapped Tau post-translational modifications in post-mortem human control and
+Alzheimer's disease tissue. The underlying mass-spectrometry data are available
+under PRIDE accession
+[PXD020717](https://www.ebi.ac.uk/pride/archive/projects/PXD020717).
 
-This vignette ships the complete processed protein-group matrix from the PRIDE
-workbook. It contains 6,107 protein groups and 61 retained samples: eight donors
-in fractions 1-7 and five donors in fraction 8. The three omitted fraction-8
-samples match the source analysis. Positive intensities were transformed with
-`log2`; blank or non-positive entries were stored as `NA`. No normalisation or
-imputation was applied before classification.
+This vignette ships a seven-site extract from three control and three
+Alzheimer's disease soluble BA46 samples. The values reproduce MaxQuant
+`Intensity` columns in the archived `Phospho (STY)Sites.txt` table. Site numbers
+follow the P10636-8, 2N4R Tau positions. Zero entries are represented as `NA`,
+and positive raw intensities are log2-transformed and rounded to three decimals.
+No between-sample normalisation is applied.
 
-Here, each density fraction is an experimental condition. The labels do not
-represent disease groups because every specimen in this matrix came from an
-Alzheimer's disease donor. The manual cutoffs below are the fraction-specific
-values recorded in the source analysis.
+The samples and sites were selected to expose several classification states.
+Both manual cutoffs are 24.5, chosen for this example rather than copied from the
+source study. This compact extract is not intended to estimate a disease effect.
+The source repository includes a range-request builder under `data-raw/` that
+regenerates the fixture from the public MaxQuant archive.
 
-```{r pxd037708-data}
-ev_matrix_path <- system.file(
+```{r pxd020717-data}
+tau_path <- system.file(
     "extdata",
-    "PXD037708_brain_EV_log2.tsv.gz",
+    "PXD020717_tau_phosphosites.csv",
     package = "imputefinder"
 )
-ev_samples_path <- system.file(
-    "extdata",
-    "PXD037708_brain_EV_samples.csv",
-    package = "imputefinder"
-)
-stopifnot(nzchar(ev_matrix_path), nzchar(ev_samples_path))
-
-ev_proteins <- utils::read.delim(
-    gzfile(ev_matrix_path),
+stopifnot(nzchar(tau_path))
+tau_samples <- utils::read.csv(
+    tau_path,
     check.names = FALSE,
     stringsAsFactors = FALSE,
-    na.strings = c("", "NA", "NaN")
+    na.strings = ""
 )
-ev_samples <- utils::read.csv(
-    ev_samples_path,
-    stringsAsFactors = FALSE
-)
-ev_intensities <- as.matrix(
-    ev_proteins[, ev_samples$sample, drop = FALSE]
-)
-rownames(ev_intensities) <- ev_proteins$Protein.Group
-storage.mode(ev_intensities) <- "double"
+tau_features <- grep("^MAPT_", names(tau_samples), value = TRUE)
+tau_x <- t(as.matrix(tau_samples[, tau_features, drop = FALSE]))
+colnames(tau_x) <- tau_samples$sample
+storage.mode(tau_x) <- "double"
+tau_condition <- tau_samples$condition
 
-ev_condition_levels <- paste("Fraction", 1:8)
-ev_cutoffs <- stats::setNames(
-    c(14.9, 14.7, 14.9, 14.3, 14.6, 14.5, 15.3, 15.2),
-    ev_condition_levels
-)
-ev_fit <- classify_missingness(
-    ev_intensities,
-    group = ev_samples$condition,
-    cutoffs = ev_cutoffs,
+tau_fit <- classify_missingness(
+    tau_x,
+    group = tau_condition,
+    cutoffs = c(control = 24.5, AD = 24.5),
     seed = 1L
 )
-ev_fit
+tau_fit
 ```
 
-One protein group is absent globally and therefore has no condition-level rows.
-The table below summarises the remaining 6,106 groups before feature-level
-filtering. It shows that the real matrix contains all four possible states, but
-their frequencies differ substantially across fractions.
+The raw extract shows why a condition-aware label can carry more information
+than a pooled label. It also includes incomplete blocks above and below the
+manual boundary, complete blocks, one site absent throughout the extract, and
+one site that lacks a strict observed majority.
 
-```{r pxd037708-state-counts}
-ev_state_levels <- c("complete", "MAR", "MNAR", "insufficient")
-ev_state_table <- with(
-    ev_fit$classifications,
-    table(
-        condition = factor(condition, levels = ev_condition_levels),
-        state = factor(state, levels = ev_state_levels)
-    )
-)
-ev_state_summary <- data.frame(
-    fraction = rownames(ev_state_table),
-    as.data.frame.matrix(ev_state_table),
-    check.names = FALSE,
-    row.names = NULL
-)
-knitr::kable(
-    ev_state_summary,
-    col.names = c("Fraction", "Complete", "MAR", "MNAR", "Insufficient")
-)
-```
-
-Unlike the nine-feature teaching panel, this matrix provides a full empirical
-intensity distribution. Its stored profile shows the transition used to define
-the manual Fraction 1 boundary.
-
-```{r pxd037708-profile, fig.cap=pxd037708_profile_caption}
-plot_missingness(ev_fit, "Fraction 1")
-```
-
-Several representative proteins make the condition-aware routing visible.
-`A2M` is complete throughout. `AAK1` is MNAR in Fraction 1 but complete
-elsewhere. `CNOT3` moves from MNAR to MAR and complete states. `TSPAN8` is MAR
-in the lighter fractions and complete in the denser fractions. `ABCA8` is
-complete through Fraction 7 but MNAR in Fraction 8. `GSTM1` remains too sparse
-for the MAR branch in every fraction and is filtered.
-
-```{r pxd037708-state-map, echo=FALSE, fig.width=8.5, fig.height=4.9, fig.cap=pxd037708_state_caption}
-ev_examples <- data.frame(
-    feature = c("P01023", "Q2M2I8", "O75175", "P19075", "O94911", "P09488"),
-    gene = c("A2M", "AAK1", "CNOT3", "TSPAN8", "ABCA8", "GSTM1"),
+```{r pxd020717-heatmap, echo=FALSE, fig.width=7.5, fig.height=4.6, fig.cap=tau_heatmap_caption}
+tau_heatmap <- data.frame(
+    feature = rep(rownames(tau_x), times = ncol(tau_x)),
+    sample = rep(colnames(tau_x), each = nrow(tau_x)),
+    intensity = as.vector(tau_x),
     stringsAsFactors = FALSE
 )
-ev_examples$display <- paste0(
-    ev_examples$gene,
-    " (",
-    ev_examples$feature,
-    ")"
+tau_heatmap$feature <- factor(
+    tau_heatmap$feature,
+    levels = rev(rownames(tau_x))
 )
-ev_examples$display[ev_examples$gene == "GSTM1"] <- paste0(
-    ev_examples$display[ev_examples$gene == "GSTM1"],
-    " — filtered"
+tau_heatmap$sample <- factor(
+    tau_heatmap$sample,
+    levels = colnames(tau_x)
 )
-ev_example_states <- ev_fit$classifications[
-    ev_fit$classifications$feature %in% ev_examples$feature,
+tau_heatmap$condition <- factor(
+    tau_samples$condition[
+        match(as.character(tau_heatmap$sample), tau_samples$sample)
+    ],
+    levels = c("control", "AD"),
+    labels = c("Control", "Alzheimer's disease")
+)
+tau_sample_labels <- setNames(tau_samples$subject, tau_samples$sample)
+
+ggplot2::ggplot(
+    tau_heatmap,
+    ggplot2::aes(x = sample, y = feature, fill = intensity)
+) +
+    ggplot2::geom_tile(colour = "white", linewidth = 0.7) +
+    ggplot2::geom_point(
+        data = tau_heatmap[is.na(tau_heatmap$intensity), , drop = FALSE],
+        mapping = ggplot2::aes(x = sample, y = feature),
+        inherit.aes = FALSE,
+        shape = 4,
+        size = 2.1,
+        stroke = 0.7,
+        colour = "#555555"
+    ) +
+    ggplot2::facet_grid(
+        cols = ggplot2::vars(condition),
+        scales = "free_x",
+        space = "free_x"
+    ) +
+    ggplot2::scale_x_discrete(labels = tau_sample_labels) +
+    ggplot2::scale_fill_gradient(
+        low = "#F7FBFF",
+        high = "#08519C",
+        na.value = "#E0E0E0",
+        name = "log2 intensity"
+    ) +
+    ggplot2::labs(x = "Sample", y = "Tau phosphosite") +
+    ggplot2::theme_minimal(base_size = 11) +
+    ggplot2::theme(
+        panel.grid = ggplot2::element_blank(),
+        strip.background = ggplot2::element_rect(
+            fill = "#F2F2F2",
+            colour = NA
+        ),
+        strip.text = ggplot2::element_text(face = "bold"),
+        axis.text.x = ggplot2::element_text(size = 9),
+        legend.position = "right"
+    )
+```
+
+`MAPT_pS404` is MNAR-like in the selected control samples and complete in the
+selected Alzheimer's disease samples. `MAPT_pS202` and `MAPT_pT181` are
+MAR-like in both groups. `MAPT_pT403` is MNAR-like in both groups and is filtered.
+`MAPT_pT231` is filtered because its control block is above the cutoff but has
+only one observed sample. A complete block is classified as complete even when
+its mean lies below the cutoff, as shown by `MAPT_pS404` in the Alzheimer's
+disease group.
+
+```{r pxd020717-state-map, echo=FALSE, fig.width=7.5, fig.height=4.8, fig.cap=tau_state_caption}
+tau_state_features <- setdiff(rownames(tau_x), "MAPT_pS199")
+tau_state_plot <- tau_fit$classifications[
+    tau_fit$classifications$feature %in% tau_state_features,
     ,
     drop = FALSE
 ]
-ev_example_states$display <- ev_examples$display[
-    match(ev_example_states$feature, ev_examples$feature)
-]
-ev_example_states$display <- factor(
-    ev_example_states$display,
-    levels = rev(ev_examples$display)
+tau_state_plot$feature <- factor(
+    tau_state_plot$feature,
+    levels = rev(tau_state_features)
 )
-ev_example_states$condition <- factor(
-    ev_example_states$condition,
-    levels = ev_condition_levels,
-    labels = paste0("F", 1:8)
+tau_state_plot$condition <- factor(
+    tau_state_plot$condition,
+    levels = c("control", "AD"),
+    labels = c("Control", "Alzheimer's disease")
 )
-ev_example_states$state <- factor(
-    ev_example_states$state,
-    levels = ev_state_levels
+tau_state_plot$state <- factor(
+    tau_state_plot$state,
+    levels = c("complete", "MAR", "MNAR", "insufficient")
+)
+tau_status_by_feature <- setNames(
+    tau_fit$feature_status$retained,
+    tau_fit$feature_status$feature
+)
+tau_state_labels <- setNames(
+    ifelse(
+        tau_status_by_feature[tau_state_features],
+        tau_state_features,
+        paste0(tau_state_features, " (filtered)")
+    ),
+    tau_state_features
 )
 
 ggplot2::ggplot(
-    ev_example_states,
-    ggplot2::aes(x = condition, y = display, fill = state)
+    tau_state_plot,
+    ggplot2::aes(x = condition, y = feature, fill = state)
 ) +
-    ggplot2::geom_tile(colour = "white", linewidth = 0.8) +
+    ggplot2::geom_tile(colour = "white", linewidth = 0.9) +
     ggplot2::geom_text(
         ggplot2::aes(label = state),
-        size = 2.7,
+        size = 3.3,
         colour = "#222222"
     ) +
+    ggplot2::scale_y_discrete(labels = tau_state_labels) +
     ggplot2::scale_fill_manual(
         values = c(
             complete = "#D9EAF7",
@@ -692,7 +709,7 @@ ggplot2::ggplot(
         drop = FALSE,
         name = "State"
     ) +
-    ggplot2::labs(x = "Density fraction", y = NULL) +
+    ggplot2::labs(x = NULL, y = "Tau phosphosite") +
     ggplot2::theme_minimal(base_size = 11) +
     ggplot2::theme(
         panel.grid = ggplot2::element_blank(),
@@ -701,102 +718,138 @@ ggplot2::ggplot(
     )
 ```
 
-The classification evidence for the state transitions remains inspectable.
+The classification table retains the evidence behind those labels.
 
-```{r pxd037708-details}
-ev_key_pairs <- data.frame(
-    feature = c("Q2M2I8", "O75175", "O75175", "O75175", "O94911", "P09488"),
-    condition = c(
-        "Fraction 1", "Fraction 1", "Fraction 2",
-        "Fraction 4", "Fraction 8", "Fraction 1"
-    ),
-    stringsAsFactors = FALSE
-)
-ev_classification_keys <- paste(
-    ev_fit$classifications$feature,
-    ev_fit$classifications$condition,
-    sep = "::"
-)
-ev_key_indices <- match(
-    paste(ev_key_pairs$feature, ev_key_pairs$condition, sep = "::"),
-    ev_classification_keys
-)
-ev_key_classifications <- ev_fit$classifications[ev_key_indices, , drop = FALSE]
-ev_key_table <- data.frame(
-    gene = ev_examples$gene[
-        match(ev_key_classifications$feature, ev_examples$feature)
-    ],
-    protein_group = ev_key_classifications$feature,
-    fraction = ev_key_classifications$condition,
-    observed = ev_key_classifications$observed_count,
-    samples = ev_key_classifications$sample_count,
-    mean_intensity = ev_key_classifications$mean_intensity,
-    cutoff = ev_key_classifications$cutoff,
-    state = ev_key_classifications$state,
-    retained = ev_key_classifications$retained,
-    check.names = FALSE
-)
+```{r pxd020717-details}
+tau_details <- tau_fit$classifications[
+    tau_fit$classifications$feature %in%
+        c("MAPT_pS404", "MAPT_pS202", "MAPT_pT217", "MAPT_pT231"),
+    c(
+        "feature",
+        "condition",
+        "observed_count",
+        "sample_count",
+        "mean_intensity",
+        "cutoff",
+        "state",
+        "retained",
+        "drop_reason"
+    )
+]
 knitr::kable(
-    ev_key_table,
-    digits = 2,
+    tau_details,
+    digits = 3,
     col.names = c(
-        "Gene",
-        "Protein group",
-        "Fraction",
+        "Site",
+        "Condition",
         "Observed",
         "Samples",
         "Mean intensity",
         "Cutoff",
         "State",
-        "Retained"
+        "Retained",
+        "Drop reason"
     )
 )
 ```
 
-```{r pxd037708-check, include=FALSE}
-ev_state_lookup <- stats::setNames(
-    as.character(ev_fit$classifications$state),
-    ev_classification_keys
+The condition-specific pattern is clearest for `MAPT_pT217`. It is absent from
+all three selected control samples and detected in all three selected
+Alzheimer's disease samples. The comparison below applies the same cutoff and
+majority rule to the original values as one pooled block.
+
+```{r pxd020717-pooling}
+tau_pooled_values <- unname(tau_x["MAPT_pT217", ])
+tau_pooled_observed <- sum(!is.na(tau_pooled_values))
+tau_pooled_mean <- mean(tau_pooled_values, na.rm = TRUE)
+tau_pooled_state <- if (all(!is.na(tau_pooled_values))) {
+    "complete"
+} else if (tau_pooled_mean < 24.5) {
+    "MNAR"
+} else if (tau_pooled_observed > length(tau_pooled_values) / 2) {
+    "MAR"
+} else {
+    "insufficient"
+}
+
+tau_pt217_states <- tau_fit$classifications[
+    tau_fit$classifications$feature == "MAPT_pT217",
+    c("condition", "observed_count", "sample_count", "mean_intensity", "state")
+]
+tau_pt217_states <- tau_pt217_states[
+    match(c("control", "AD"), tau_pt217_states$condition),
+    ,
+    drop = FALSE
+]
+tau_pooling_summary <- rbind(
+    data.frame(
+        scope = "Pooled original samples",
+        observed_count = tau_pooled_observed,
+        sample_count = length(tau_pooled_values),
+        mean_intensity = tau_pooled_mean,
+        state = tau_pooled_state
+    ),
+    data.frame(
+        scope = paste(tau_pt217_states$condition, "condition"),
+        observed_count = tau_pt217_states$observed_count,
+        sample_count = tau_pt217_states$sample_count,
+        mean_intensity = tau_pt217_states$mean_intensity,
+        state = tau_pt217_states$state
+    )
 )
-ev_retained_lookup <- stats::setNames(
-    ev_fit$feature_status$retained,
-    ev_fit$feature_status$feature
+knitr::kable(
+    tau_pooling_summary,
+    digits = 3,
+    col.names = c("Scope", "Observed", "Samples", "Mean intensity", "State")
+)
+```
+
+```{r pxd020717-check, include=FALSE}
+tau_classification_keys <- paste(
+    tau_fit$classifications$feature,
+    tau_fit$classifications$condition,
+    sep = "::"
+)
+tau_state_lookup <- stats::setNames(
+    as.character(tau_fit$classifications$state),
+    tau_classification_keys
+)
+tau_retained_lookup <- stats::setNames(
+    tau_fit$feature_status$retained,
+    tau_fit$feature_status$feature
 )
 stopifnot(
-    identical(dim(ev_intensities), c(6107L, 61L)),
-    sum(ev_fit$feature_status$retained) == 4584L,
-    nrow(ev_fit$seed_log) == 2649L,
+    identical(dim(tau_x), c(7L, 6L)),
+    sum(tau_fit$feature_status$retained) == 4L,
+    nrow(tau_fit$seed_log) == 3L,
+    identical(tau_pooled_state, "MNAR"),
     identical(
-        as.integer(ev_state_table[
-            "Fraction 1",
-            c("complete", "MAR", "MNAR", "insufficient")
-        ]),
-        c(2375L, 22L, 3693L, 16L)
-    ),
-    identical(
-        unname(ev_state_lookup[c(
-            "Q2M2I8::Fraction 1",
-            "O75175::Fraction 1",
-            "O75175::Fraction 2",
-            "O75175::Fraction 4",
-            "O94911::Fraction 8",
-            "P09488::Fraction 1"
+        unname(tau_state_lookup[c(
+            "MAPT_pS404::control",
+            "MAPT_pS404::AD",
+            "MAPT_pS202::control",
+            "MAPT_pS202::AD",
+            "MAPT_pT217::control",
+            "MAPT_pT217::AD",
+            "MAPT_pT231::control",
+            "MAPT_pT231::AD"
         )]),
-        c("MNAR", "MNAR", "MAR", "complete", "MNAR", "insufficient")
+        c("MNAR", "complete", "MAR", "MAR", "MNAR", "complete", "insufficient", "MNAR")
     ),
     identical(
-        unname(ev_retained_lookup[c("Q2M2I8", "O75175", "O94911", "P09488")]),
-        c(TRUE, TRUE, TRUE, FALSE)
+        unname(tau_retained_lookup[
+            c("MAPT_pS404", "MAPT_pS202", "MAPT_pT403", "MAPT_pT217", "MAPT_pT231")
+        ]),
+        c(TRUE, TRUE, FALSE, TRUE, FALSE)
     )
 )
 ```
 
-The result retains 4,584 protein groups and records 2,649 rescue anchors. Those
-figures are descriptive properties of this processed matrix under the recorded
-cutoffs. The source analysis subsequently routed MAR-like and MNAR-like blocks
-to different fraction-specific imputation branches. This vignette stops at the
-auditable classification layer; it does not claim that the heuristic labels are
-the true causes of missingness.
+The pooled pT217 block has three observations from six samples and a mean below
+the cutoff, so it receives one MNAR-like label. Condition-aware classification
+instead records the control block as MNAR-like, the Alzheimer's disease block
+as complete, and retains the site. This is a routing example, not evidence that
+missingness has a known mechanism or that pT217 differs between populations.
 
 # Result components
 
@@ -1262,10 +1315,10 @@ citation("imputefinder")[1L]
 
 # Related methods and references {.unnumbered}
 
-- Fowler SL, Behr TS, Turkes E, et al. (2025). [Tau filaments are tethered
-    within brain extracellular vesicles in Alzheimer's
-    disease](https://doi.org/10.1038/s41593-024-01801-5). *Nature Neuroscience*
-    28:40-48. Proteomics data: PRIDE PXD037708.
+- Wesseling H, Mair W, Kumar M, et al. (2020). [Tau PTM profiles identify
+    patient heterogeneity and stages of Alzheimer's
+    disease](https://doi.org/10.1016/j.cell.2020.10.029). *Cell*
+    183:1699-1713.e13. Proteomics data: PRIDE PXD020717.
 - Karpievitch YV, Dabney AR, Smith RD (2012). [Normalization and missing value
     imputation for label-free LC-MS
     analysis](https://doi.org/10.1186/1471-2105-13-S16-S5). *BMC Bioinformatics*
