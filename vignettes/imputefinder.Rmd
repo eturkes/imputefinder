@@ -16,7 +16,8 @@ abstract: |
   ImputeFinder classifies quantitative-proteomics missingness separately within
   experimental conditions. This vignette shows how on/off rescue, manual and
   automatic cutoffs, result tables, and condition-specific downstream groups
-  work in practice.
+  work in practice. A synthetic IFN-γ study connects those states to a realistic
+  downstream routing decision.
 vignette: |
   %\VignetteIndexEntry{Classifying proteomics missingness by condition}
   %\VignetteEngine{knitr::rmarkdown}
@@ -34,7 +35,7 @@ knitr::opts_chunk$set(
 )
 library(imputefinder)
 manual_profile_caption <- paste(
-    "Condition A missingness profile. The vertical line is the recorded",
+    "Vehicle-condition missingness profile. The vertical line is the recorded",
     "manual cutoff; the bottom tick marks the rescued on/off block."
 )
 automatic_profile_caption <- paste(
@@ -115,32 +116,41 @@ available evidence near the detection limit.
 
 A feature is dropped if it is absent globally, `insufficient` in any condition,
 or `MNAR` in every condition. Otherwise its complete state matrix is retained,
-including mixtures such as MNAR in A and complete in B. An `insufficient` block
-cannot support a MAR branch, while an all-MNAR feature has no complete or
-MAR-like condition to support retention.
+including mixtures such as MNAR in one condition and complete in another. An
+`insufficient` block cannot support a MAR branch, while an all-MNAR feature has
+no complete or MAR-like condition to support retention.
 
-# On/off rescue and a manual cutoff
+# Research use case: IFN-γ stimulation with a manual cutoff
 
-This example includes each possible state. Both conditions have four samples,
-and the manual cutoffs are 12.
+Consider a pilot label-free proteomics study with four vehicle cultures and four
+IFN-γ-treated epithelial-cell cultures. The synthetic matrix uses gene
+symbols as protein identifiers and contains each possible state. It illustrates
+a research workflow rather than reproducing a published experiment. The values
+are unnormalised log2 intensities, and both manual cutoffs are 12.
 
 ```{r manual-fixture}
 x <- rbind(
-    on_off = c(NA, NA, NA, NA, 15, 16, 15, 17),
-    mar_both = c(14, 15, NA, 16, 14, NA, 15, 16),
-    sparse_mar = c(20, NA, NA, NA, 20, 21, 22, 23),
-    sparse_mnar = c(8, NA, NA, NA, 14, 15, 16, 17),
-    all_mnar = c(8, NA, NA, NA, 9, NA, NA, NA),
-    globally_absent = rep(NA, 8),
-    complete_low = c(8, 8, 8, 8, 9, 9, 9, 9)
+    ISG15 = c(NA, NA, NA, NA, 15, 16, 15, 17),
+    STAT1 = c(14, 15, NA, 16, 14, NA, 15, 16),
+    EIF4A1 = c(20, NA, NA, NA, 20, 21, 22, 23),
+    LGALS3BP = c(8, NA, NA, NA, 14, 15, 16, 17),
+    low_abundance_protein = c(8, NA, NA, NA, 9, NA, NA, NA),
+    unidentified_feature = rep(NA, 8),
+    KRT18 = c(8, 8, 8, 8, 9, 9, 9, 9)
 )
-colnames(x) <- paste0("sample_", seq_len(ncol(x)))
-condition <- rep(c("A", "B"), each = 4)
+sample_metadata <- data.frame(
+    sample = c(paste0("vehicle_", 1:4), paste0("IFNG_", 1:4)),
+    condition = rep(c("vehicle", "IFNG"), each = 4),
+    replicate = rep(1:4, times = 2),
+    stringsAsFactors = FALSE
+)
+colnames(x) <- sample_metadata$sample
+condition <- sample_metadata$condition
 
 fit <- classify_missingness(
     x,
     group = condition,
-    cutoffs = c(A = 12, B = 12),
+    cutoffs = c(vehicle = 12, IFNG = 12),
     seed = 1L
 )
 fit
@@ -160,7 +170,7 @@ receives one artificial anchor:
 
 ```{r rescue-log}
 fit$seed_log
-fit$data["on_off", ]
+fit$data["ISG15", ]
 ```
 
 The anchor makes the absent condition classifiable; it is not a completed
@@ -175,7 +185,8 @@ feature-condition state.
 ```{r classification-details}
 fit$feature_status
 fit$classifications[
-    fit$classifications$feature %in% c("on_off", "sparse_mar", "all_mnar"),
+    fit$classifications$feature %in%
+        c("ISG15", "EIF4A1", "low_abundance_protein"),
     c("feature", "condition", "observed_count", "missing_count",
         "mean_intensity", "cutoff", "state", "retained", "drop_reason")
 ]
@@ -184,11 +195,12 @@ fit$classifications[
 # What pooling conditions would lose
 
 The effect of pooling is easiest to see by applying the same cutoff and majority
-rule to `on_off` as one block across all samples. This comparison uses the
-original values, before condition-specific rescue.
+rule to `ISG15` as one block across all samples. In this synthetic study, `ISG15`
+is absent from every vehicle run and detected in every IFN-γ run. The
+comparison uses the original values, before condition-specific rescue.
 
 ```{r pooled-comparison}
-pooled_values <- unname(x["on_off", ])
+pooled_values <- unname(x["ISG15", ])
 pooled_observed <- sum(!is.na(pooled_values))
 pooled_mean <- mean(pooled_values, na.rm = TRUE)
 pooled_state <- if (all(!is.na(pooled_values))) {
@@ -201,9 +213,14 @@ pooled_state <- if (all(!is.na(pooled_values))) {
     "insufficient"
 }
 
-on_off_states <- fit$classifications[
-    fit$classifications$feature == "on_off",
+isg15_states <- fit$classifications[
+    fit$classifications$feature == "ISG15",
     c("condition", "observed_count", "sample_count", "mean_intensity", "state")
+]
+isg15_states <- isg15_states[
+    match(unique(condition), isg15_states$condition),
+    ,
+    drop = FALSE
 ]
 pooled_comparison <- rbind(
     data.frame(
@@ -214,11 +231,11 @@ pooled_comparison <- rbind(
         state = pooled_state
     ),
     data.frame(
-        scope = paste("Condition", on_off_states$condition),
-        observed_count = on_off_states$observed_count,
-        sample_count = on_off_states$sample_count,
-        mean_intensity = on_off_states$mean_intensity,
-        state = on_off_states$state
+        scope = paste(isg15_states$condition, "condition"),
+        observed_count = isg15_states$observed_count,
+        sample_count = isg15_states$sample_count,
+        mean_intensity = isg15_states$mean_intensity,
+        state = isg15_states$state
     )
 )
 knitr::kable(
@@ -227,26 +244,28 @@ knitr::kable(
     col.names = c("Scope", "Observed", "Samples", "Mean intensity", "State")
 )
 
-on_off_status <- fit$feature_status[
-    fit$feature_status$feature == "on_off",
+isg15_status <- fit$feature_status[
+    fit$feature_status$feature == "ISG15",
     ,
     drop = FALSE
 ]
 stopifnot(
     identical(pooled_state, "insufficient"),
     identical(
-        on_off_states$state[match(c("A", "B"), on_off_states$condition)],
+        isg15_states$state[
+            match(c("vehicle", "IFNG"), isg15_states$condition)
+        ],
         c("MNAR", "complete")
     ),
-    isTRUE(on_off_status$retained)
+    isTRUE(isg15_status$retained)
 )
 ```
 
 Pooling produces four observations from eight samples. The mean is above the
 cutoff, but there is no strict observed majority, so the feature becomes
 `insufficient` and would be dropped. Condition-aware classification instead
-records A as `MNAR`, B as `complete`, and retains the biologically plausible
-on/off feature.
+records the vehicle block as `MNAR`, the IFN-γ block as `complete`, and
+retains the treatment-responsive on/off feature.
 
 ## Result components
 
@@ -284,16 +303,16 @@ counts, warnings, and cutoff details are stored in the result. Plotting uses
 those stored values directly.
 
 ```{r stored-profile}
-fit$profiles$A$metadata[c("class_counts", "bandwidth", "kernel")]
+fit$profiles$vehicle$metadata[c("class_counts", "bandwidth", "kernel")]
 head(
-    fit$profiles$A$grid[
+    fit$profiles$vehicle$grid[
         , c("intensity", "missing_proportion", "supported")
     ]
 )
 ```
 
 ```{r manual-profile, fig.cap=manual_profile_caption}
-plot_missingness(fit, "A")
+plot_missingness(fit, "vehicle")
 ```
 
 This seven-feature example is designed to show classification rules, not to
@@ -414,9 +433,9 @@ names(downstream) <- names(fit$groups)
 vapply(downstream, function(branch) nrow(branch$MNAR), integer(1))
 vapply(downstream, function(branch) nrow(branch$MAR_or_complete), integer(1))
 c(
-    on_off_in_A_MNAR = "on_off" %in% rownames(downstream$A$MNAR),
-    on_off_in_B_MAR_or_complete =
-        "on_off" %in% rownames(downstream$B$MAR_or_complete)
+    ISG15_in_vehicle_MNAR = "ISG15" %in% rownames(downstream$vehicle$MNAR),
+    ISG15_in_IFNG_MAR_or_complete =
+        "ISG15" %in% rownames(downstream$IFNG$MAR_or_complete)
 )
 ```
 
@@ -428,7 +447,7 @@ complete blocks. The selected algorithms remain external to ImputeFinder. The
 classification table can express that plan as a condition-specific manifest.
 
 ```{r routing-manifest}
-manifest_features <- c("on_off", "mar_both", "sparse_mnar")
+manifest_features <- c("ISG15", "STAT1", "LGALS3BP")
 routing_manifest <- fit$classifications[
     fit$classifications$retained &
         fit$classifications$feature %in% manifest_features,
@@ -437,7 +456,7 @@ routing_manifest <- fit$classifications[
 routing_manifest <- routing_manifest[
     order(
         match(routing_manifest$feature, manifest_features),
-        routing_manifest$condition
+        match(routing_manifest$condition, unique(condition))
     ),
     ,
     drop = FALSE
@@ -459,29 +478,30 @@ knitr::kable(
 ```
 
 ```{r routing-manifest-check, include=FALSE}
-on_off_route <- routing_manifest[
-    routing_manifest$feature == "on_off",
+isg15_route <- routing_manifest[
+    routing_manifest$feature == "ISG15",
     ,
     drop = FALSE
 ]
 stopifnot(
-    identical(as.character(on_off_route$state), c("MNAR", "complete")),
+    identical(as.character(isg15_route$state), c("MNAR", "complete")),
     identical(
-        on_off_route$pipeline_action,
+        isg15_route$pipeline_action,
         c("send to the MNAR branch", "carry forward unchanged")
     )
 )
 ```
 
-The manifest sends `on_off` to the MNAR branch only in A. Its four measured
-values in B pass through unchanged. `mar_both` enters the MAR branch in both
-conditions, while `sparse_mnar` enters the MNAR branch in A and passes through B.
+The manifest sends `ISG15` to the MNAR branch only for vehicle samples. Its four
+measured IFN-γ values pass through unchanged. `STAT1` enters the MAR branch
+in both conditions. `LGALS3BP` enters the MNAR branch for vehicle samples and
+passes through the IFN-γ branch unchanged.
 
-After branch outputs are recombined, the on/off protein remains available to a
-condition-comparison model. A pooled classifier would have dropped it before
-normalisation or imputation. The manifest records each block's state and
-destination, while `fit$classifications` retains the supporting evidence.
-Together they support review and reproducible reruns.
+After branch outputs are recombined, `ISG15` remains available to a treatment
+comparison model. A pooled classifier would have dropped it before normalisation
+or imputation. The manifest records each block's state and destination, while
+`fit$classifications` retains the supporting evidence. Together they support
+review and reproducible reruns.
 
 Complete blocks need no replacement. Grouping them with MAR rows supplies a
 single non-MNAR branch while preserving each explicit `complete` state in the
@@ -507,7 +527,7 @@ fit_se <- classify_missingness(
     se,
     group_col = "condition",
     assay = "log2_intensity",
-    cutoffs = c(A = 12, B = 12)
+    cutoffs = c(vehicle = 12, IFNG = 12)
 )
 identical(
     SummarizedExperiment::assay(fit_se$data, "log2_intensity"),
