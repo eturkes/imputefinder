@@ -1,6 +1,7 @@
 ^imputefinder\.Rproj$
 ^\.Rproj\.user$
 ^dev$
+^data-raw$
 ^.*\.Rcheck$
 ^.*\.BiocCheck$
 ^imputefinder_.*\.tar\.gz$
