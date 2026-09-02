@@ -3,7 +3,7 @@ title: "Classifying proteomics missingness by condition"
 author:
 - name: Emir Turkes
   email: emir.turkes@eturkes.com
-date: "1 September 2026"
+date: "2 September 2026"
 package: imputefinder
 output:
   BiocStyle::html_document:
@@ -16,9 +16,9 @@ abstract: |
   ImputeFinder classifies quantitative-proteomics missingness separately within
   experimental conditions. This vignette shows how on/off rescue, manual and
   automatic cutoffs, result tables, and condition-specific downstream groups
-  work in practice. A compact control-versus-K63 extract from the DiUbi
-  ubiquitin-affinity dataset connects those states to a real-data routing
-  decision.
+  work in practice. A compact control-versus-Alzheimer's disease extract from a
+  human Tau post-translational-modification map connects those states to a
+  real-data routing decision.
 vignette: |
   %\VignetteIndexEntry{Classifying proteomics missingness by condition}
   %\VignetteEngine{knitr::rmarkdown}
@@ -36,13 +36,14 @@ knitr::opts_chunk$set(
 )
 library(imputefinder)
 manual_profile_caption <- paste(
-    "Control-condition missingness profile for the DiUbi extract. The vertical",
-    "line is the recorded manual cutoff; the",
-    "bottom tick marks the rescued on/off block."
+    "Control-condition missingness profile for the Tau phosphosite extract.",
+    "The vertical",
+    "line is the recorded manual cutoff; the bottom rug marks recorded",
+    "rescue anchors."
 )
 manual_heatmap_caption <- paste(
-    "Raw DiUbi protein intensities for control and K63-linked diubiquitin",
-    "affinity-enrichment samples. Tiles show log2 intensities; grey crossed",
+    "Tau phosphosite intensities in soluble BA46 tissue from control and",
+    "Alzheimer's disease samples. Tiles show log2 intensities; grey crossed",
     "tiles are missing observations."
 )
 manual_state_caption <- paste(
@@ -57,10 +58,10 @@ automatic_profile_caption <- paste(
 
 # Introduction
 
-Missing protein intensities can follow more than one pattern. Some values are
+Missing quantitative-proteomics intensities can follow more than one pattern. Some values are
 absent for approximately intensity-independent, MAR-like reasons. Low-abundance
 features can instead fall below detection and produce MNAR-like missingness. A
-protein can also be present throughout one condition and absent throughout
+quantified feature can also be present throughout one condition and absent throughout
 another. A single label across all samples can hide that on/off pattern.
 
 ImputeFinder takes unnormalised log2 protein intensities, classifies each
@@ -100,8 +101,9 @@ library(imputefinder)
 # Inputs and classification rules
 
 The input must be an ordinary numeric matrix, or a selected numeric assay in a
-`SummarizedExperiment`, with named protein features in rows and uniquely named
-samples in columns. Missing values are `NA`; `NaN` and infinite values are
+`SummarizedExperiment`, with named quantitative features such as protein groups,
+peptides, or PTM sites in rows and uniquely named samples in columns. Missing
+values are `NA`; `NaN` and infinite values are
 rejected. Condition labels must align one-to-one with samples. ImputeFinder
 trusts the scientific input contract: it does not infer or apply a log
 transform, normalisation, centring, or scaling, and it does not reinterpret
@@ -131,35 +133,41 @@ including mixtures such as MNAR in one condition and complete in another. An
 `insufficient` block cannot support a MAR branch, while an all-MNAR feature has
 no complete or MAR-like condition to support retention.
 
-# Real-data example: K63-linked diubiquitin affinity enrichment
+# Real-data example: Tau phosphosites in human Alzheimer's disease brain
 
-The [`DEP`](https://bioconductor.org/packages/DEP) package includes `DiUbi`, a
-published ubiquitin-affinity proteomics dataset from
-[Zhang et al. (2017)](https://doi.org/10.1016/j.molcel.2017.01.004). The full
-experiment compares controls with several linkage-specific diubiquitin baits.
+[Wesseling et al. (2020)](https://doi.org/10.1016/j.cell.2020.10.029) mapped 95
+Tau post-translational modifications in post-mortem human control and
+Alzheimer's disease tissue. The underlying mass-spectrometry data are available
+under PRIDE accession
+[PXD020717](https://www.ebi.ac.uk/pride/archive/projects/PXD020717).
 
-To make every classification state visible, this vignette embeds seven protein
-rows from the three controls and three K63-linked samples. The values reproduce
-the original MaxQuant `Intensity` columns archived under PRIDE accession
-[PXD004185](https://www.ebi.ac.uk/pride/archive/projects/PXD004185). Zero entries
-were converted to `NA`, and non-zero raw intensities were log2-transformed and
-rounded to three decimals. No between-sample normalisation was applied. Both
-manual cutoffs are 22.
+To make every classification state visible, this vignette embeds seven Tau
+phosphosite rows from three control and three Alzheimer's disease soluble BA46
+samples. The values reproduce the MaxQuant `Intensity` columns in the archived
+`Phospho (STY)Sites.txt` table. Site numbers follow the P10636-8, 2N4R Tau
+positions reported in that table. Zero entries were converted to `NA`, and
+non-zero raw intensities were log2-transformed and rounded to three decimals.
+No between-sample normalisation was applied. Both manual cutoffs are 24.5.
+The sites and subjects were selected to exercise the classification rules, not
+to estimate an Alzheimer's disease effect.
 
 ```{r manual-fixture}
 x <- rbind(
-    VEGFA = c(NA, NA, NA, 22.850, 22.408, 22.795),
-    UBE2I = c(22.135, 23.049, NA, 24.574, 24.966, 25.468),
-    MED20 = c(24.193, 22.755, 23.093, NA, 20.445, 24.145),
-    TXNRD1 = c(NA, NA, 22.639, NA, 17.848, 19.665),
-    ATP11C = c(21.585, 20.692, NA, NA, NA, NA),
-    UBA6 = rep(NA_real_, 6),
-    ACO2 = c(26.351, 26.496, 27.103, 25.714, 25.753, 26.093)
+    MAPT_pS404 = c(NA, 24.050, NA, 24.759, 23.064, 23.379),
+    MAPT_pS199 = rep(NA_real_, 6),
+    MAPT_pS202 = c(NA, 27.189, 26.364, 26.930, NA, 26.595),
+    MAPT_pT403 = c(NA, NA, NA, 24.245, 21.405, NA),
+    MAPT_pT217 = c(NA, NA, NA, 25.245, 22.434, 24.325),
+    MAPT_pT181 = c(NA, 25.659, 25.562, 25.677, NA, 24.516),
+    MAPT_pT231 = c(NA, NA, 24.623, NA, NA, NA)
 )
 sample_metadata <- data.frame(
-    sample = c(paste0("control_", 1:3), paste0("K63_", 1:3)),
-    condition = rep(c("control", "K63"), each = 3),
-    replicate = rep(1:3, times = 2),
+    sample = c(
+        "CTR03_SOLUBLE_01", "CTR06_SOLUBLE_01", "CTR45_SOLUBLE_01",
+        "AD03_SOLUBLE_01", "AD50_SOLUBLE_01", "AD51_SOLUBLE_01"
+    ),
+    condition = rep(c("control", "AD"), each = 3),
+    subject = c("CTR03", "CTR06", "CTR45", "AD03", "AD50", "AD51"),
     stringsAsFactors = FALSE
 )
 colnames(x) <- sample_metadata$sample
@@ -168,7 +176,7 @@ condition <- sample_metadata$condition
 fit <- classify_missingness(
     x,
     group = condition,
-    cutoffs = c(control = 22, K63 = 22),
+    cutoffs = c(control = 24.5, AD = 24.5),
     seed = 1L
 )
 fit
@@ -193,11 +201,11 @@ manual_heatmap$condition <- factor(
     sample_metadata$condition[
         match(as.character(manual_heatmap$sample), sample_metadata$sample)
     ],
-    levels = c("control", "K63"),
-    labels = c("Control", "K63-linked diubiquitin")
+    levels = c("control", "AD"),
+    labels = c("Control", "Alzheimer's disease")
 )
 heatmap_sample_labels <- setNames(
-    c(paste0("C", 1:3), paste0("K63-", 1:3)),
+    sample_metadata$subject,
     colnames(x)
 )
 
@@ -227,7 +235,7 @@ ggplot2::ggplot(
         na.value = "#E0E0E0",
         name = "log2 intensity"
     ) +
-    ggplot2::labs(x = "Sample", y = "Protein") +
+    ggplot2::labs(x = "Sample", y = "Tau phosphosite") +
     ggplot2::theme_minimal(base_size = 11) +
     ggplot2::theme(
         panel.grid = ggplot2::element_blank(),
@@ -255,7 +263,7 @@ receives one artificial anchor:
 
 ```{r rescue-log}
 fit$seed_log
-fit$data["VEGFA", ]
+fit$data["MAPT_pT217", ]
 ```
 
 The anchor makes the absent condition classifiable; it is not a completed
@@ -271,14 +279,14 @@ feature-condition state.
 fit$feature_status
 fit$classifications[
     fit$classifications$feature %in%
-        c("VEGFA", "MED20", "ATP11C"),
+        c("MAPT_pT217", "MAPT_pS202", "MAPT_pT231"),
     c("feature", "condition", "observed_count", "missing_count",
         "mean_intensity", "cutoff", "state", "retained", "drop_reason")
 ]
 ```
 
 ```{r manual-state-map, echo=FALSE, fig.width=7.5, fig.height=4.8, fig.cap=manual_state_caption}
-state_features <- setdiff(rownames(x), "UBA6")
+state_features <- setdiff(rownames(x), "MAPT_pS199")
 state_plot <- fit$classifications[
     fit$classifications$feature %in% state_features,
     ,
@@ -290,8 +298,8 @@ state_plot$feature <- factor(
 )
 state_plot$condition <- factor(
     state_plot$condition,
-    levels = c("control", "K63"),
-    labels = c("Control", "K63-linked diubiquitin")
+    levels = c("control", "AD"),
+    labels = c("Control", "Alzheimer's disease")
 )
 state_plot$state <- factor(
     state_plot$state,
@@ -331,7 +339,7 @@ ggplot2::ggplot(
         drop = FALSE,
         name = "State"
     ) +
-    ggplot2::labs(x = NULL, y = "Protein") +
+    ggplot2::labs(x = NULL, y = "Tau phosphosite") +
     ggplot2::theme_minimal(base_size = 11) +
     ggplot2::theme(
         panel.grid = ggplot2::element_blank(),
@@ -343,17 +351,18 @@ ggplot2::ggplot(
 # What pooling conditions would lose
 
 The effect of pooling is easiest to see by applying the same cutoff and majority
-rule to `VEGFA` as one block across all samples. In this extract, `VEGFA` is
-absent from every control run and detected in every K63-linked run. The
+rule to `MAPT_pT217` as one block across all samples. In this extract, pT217 is
+absent from every selected control sample and detected in every selected
+Alzheimer's disease sample. The
 comparison uses the original values, before condition-specific rescue.
 
 ```{r pooled-comparison}
-pooled_values <- unname(x["VEGFA", ])
+pooled_values <- unname(x["MAPT_pT217", ])
 pooled_observed <- sum(!is.na(pooled_values))
 pooled_mean <- mean(pooled_values, na.rm = TRUE)
 pooled_state <- if (all(!is.na(pooled_values))) {
     "complete"
-} else if (pooled_mean < 22) {
+} else if (pooled_mean < 24.5) {
     "MNAR"
 } else if (pooled_observed > length(pooled_values) / 2) {
     "MAR"
@@ -361,12 +370,12 @@ pooled_state <- if (all(!is.na(pooled_values))) {
     "insufficient"
 }
 
-vegfa_states <- fit$classifications[
-    fit$classifications$feature == "VEGFA",
+pt217_states <- fit$classifications[
+    fit$classifications$feature == "MAPT_pT217",
     c("condition", "observed_count", "sample_count", "mean_intensity", "state")
 ]
-vegfa_states <- vegfa_states[
-    match(unique(condition), vegfa_states$condition),
+pt217_states <- pt217_states[
+    match(unique(condition), pt217_states$condition),
     ,
     drop = FALSE
 ]
@@ -379,11 +388,11 @@ pooled_comparison <- rbind(
         state = pooled_state
     ),
     data.frame(
-        scope = paste(vegfa_states$condition, "condition"),
-        observed_count = vegfa_states$observed_count,
-        sample_count = vegfa_states$sample_count,
-        mean_intensity = vegfa_states$mean_intensity,
-        state = vegfa_states$state
+        scope = paste(pt217_states$condition, "condition"),
+        observed_count = pt217_states$observed_count,
+        sample_count = pt217_states$sample_count,
+        mean_intensity = pt217_states$mean_intensity,
+        state = pt217_states$state
     )
 )
 knitr::kable(
@@ -392,28 +401,28 @@ knitr::kable(
     col.names = c("Scope", "Observed", "Samples", "Mean intensity", "State")
 )
 
-vegfa_status <- fit$feature_status[
-    fit$feature_status$feature == "VEGFA",
+pt217_status <- fit$feature_status[
+    fit$feature_status$feature == "MAPT_pT217",
     ,
     drop = FALSE
 ]
 stopifnot(
-    identical(pooled_state, "insufficient"),
+    identical(pooled_state, "MNAR"),
     identical(
-        vegfa_states$state[
-            match(c("control", "K63"), vegfa_states$condition)
+        pt217_states$state[
+            match(c("control", "AD"), pt217_states$condition)
         ],
         c("MNAR", "complete")
     ),
-    isTRUE(vegfa_status$retained)
+    isTRUE(pt217_status$retained)
 )
 ```
 
-Pooling produces three observations from six samples. The mean is above the
-cutoff, but there is no strict observed majority, so the feature becomes
-`insufficient` and would be dropped. Condition-aware classification instead
-records the control block as `MNAR`, the K63-linked block as `complete`, and
-retains the affinity-enrichment on/off feature.
+Pooling produces three observations from six samples with a mean below the
+cutoff. The single pooled block is therefore `MNAR`, and an all-MNAR feature
+would be dropped. Condition-aware classification instead records the control
+block as `MNAR`, the Alzheimer's disease block as `complete`, and retains the
+condition-specific pT217 on/off feature.
 
 ## Result components
 
@@ -463,7 +472,7 @@ head(
 plot_missingness(fit, "control")
 ```
 
-This seven-protein extract is selected to show classification rules, not to
+This seven-phosphosite extract is selected to show classification rules, not to
 estimate the full study profile. Its curve illustrates the stored profile,
 manual cutoff, and rescue value, but it is too small for automatic selection or
 scientific interpretation of the transition.
@@ -581,9 +590,10 @@ names(downstream) <- names(fit$groups)
 vapply(downstream, function(branch) nrow(branch$MNAR), integer(1))
 vapply(downstream, function(branch) nrow(branch$MAR_or_complete), integer(1))
 c(
-    VEGFA_in_control_MNAR = "VEGFA" %in% rownames(downstream$control$MNAR),
-    VEGFA_in_K63_MAR_or_complete =
-        "VEGFA" %in% rownames(downstream$K63$MAR_or_complete)
+    pT217_in_control_MNAR =
+        "MAPT_pT217" %in% rownames(downstream$control$MNAR),
+    pT217_in_AD_MAR_or_complete =
+        "MAPT_pT217" %in% rownames(downstream$AD$MAR_or_complete)
 )
 ```
 
@@ -595,7 +605,7 @@ complete blocks. The selected algorithms remain external to ImputeFinder. The
 classification table can express that plan as a condition-specific manifest.
 
 ```{r routing-manifest}
-manifest_features <- c("VEGFA", "UBE2I", "MED20")
+manifest_features <- c("MAPT_pT217", "MAPT_pS202", "MAPT_pS404")
 routing_manifest <- fit$classifications[
     fit$classifications$retained &
         fit$classifications$feature %in% manifest_features,
@@ -626,28 +636,26 @@ knitr::kable(
 ```
 
 ```{r routing-manifest-check, include=FALSE}
-vegfa_route <- routing_manifest[
-    routing_manifest$feature == "VEGFA",
+pt217_route <- routing_manifest[
+    routing_manifest$feature == "MAPT_pT217",
     ,
     drop = FALSE
 ]
 stopifnot(
-    identical(as.character(vegfa_route$state), c("MNAR", "complete")),
+    identical(as.character(pt217_route$state), c("MNAR", "complete")),
     identical(
-        vegfa_route$pipeline_action,
+        pt217_route$pipeline_action,
         c("send to the MNAR branch", "carry forward unchanged")
     )
 )
 ```
 
-The manifest sends `VEGFA` to the MNAR branch only for control samples. Its
-three measured K63-linked values pass through unchanged. `UBE2I` enters the MAR
-branch for controls and passes through the K63-linked branch unchanged. `MED20`
-passes through the control branch unchanged and enters the K63-linked MAR
-branch.
+The manifest sends `MAPT_pT217` and `MAPT_pS404` to the MNAR branch only for
+control samples. Their three measured Alzheimer's disease values pass through
+unchanged. `MAPT_pS202` enters the MAR branch in both conditions.
 
-After branch outputs are recombined, `VEGFA` remains available to an enrichment
-comparison model. A pooled classifier would have dropped it before
+After branch outputs are recombined, `MAPT_pT217` remains available to a
+site-level comparison model. A pooled classifier would have dropped it before
 normalisation or imputation. The manifest records each block's state and
 destination, while `fit$classifications` retains the supporting evidence.
 Together they support review and reproducible reruns.
@@ -676,7 +684,7 @@ fit_se <- classify_missingness(
     se,
     group_col = "condition",
     assay = "log2_intensity",
-    cutoffs = c(control = 22, K63 = 22)
+    cutoffs = c(control = 24.5, AD = 24.5)
 )
 identical(
     SummarizedExperiment::assay(fit_se$data, "log2_intensity"),
@@ -721,9 +729,10 @@ citation("imputefinder")
     data sets to compare imputation
     strategies](https://doi.org/10.1021/acs.jproteome.5b00981). *Journal of
     Proteome Research* 15:1116-1125.
-- Zhang X, Smits AH, van Tilburg GBA, et al. (2017). [An interaction landscape
-    of ubiquitin signaling](https://doi.org/10.1016/j.molcel.2017.01.004).
-    *Molecular Cell* 65:941-955.e8.
+- Wesseling H, Mair W, Kumar M, et al. (2020). [Tau PTM profiles identify
+    patient heterogeneity and stages of Alzheimer's
+    disease](https://doi.org/10.1016/j.cell.2020.10.029). *Cell*
+    183:1699-1713.e13.
 
 # Session information {.unnumbered}
 
