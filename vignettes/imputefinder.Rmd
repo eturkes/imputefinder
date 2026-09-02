@@ -17,7 +17,7 @@ abstract: |
   experimental conditions. This vignette shows how on/off rescue, manual and
   automatic cutoffs, result tables, and condition-specific downstream groups
   work in practice. A controlled two-condition panel explains the rules, while
-  a thesis-linked Alzheimer’s disease brain extracellular-vesicle matrix shows
+  a real Alzheimer’s disease brain extracellular-vesicle matrix shows
   how the same states vary across real density fractions.
 vignette: |
   %\VignetteIndexEntry{Classifying proteomics missingness by condition}
@@ -531,7 +531,7 @@ within its condition, then restore the original sample order.
 
 # Real-data case study: Alzheimer’s disease brain extracellular vesicles
 
-The thesis describes ImputeFinder's initial use in an Alzheimer's disease brain
+ImputeFinder was first used in an Alzheimer's disease brain
 extracellular-vesicle proteomics study. The associated work by
 [Fowler et al.](https://doi.org/10.1038/s41593-024-01801-5) separated vesicles
 into eight density fractions and profiled their proteins by quantitative mass
@@ -853,7 +853,7 @@ scientific interpretation of the transition.
 
 # Cutoff sensitivity with known states
 
-The thesis benchmark swept the MNAR cutoff and compared downstream detection
+A prior benchmark swept the MNAR cutoff and compared downstream detection
 metrics. The compact experiment below applies the same sensitivity-analysis
 logic to ImputeFinder's narrower package responsibility: classification. It
 creates known MAR and MNAR blocks with overlapping intensity ranges, adds
@@ -1254,11 +1254,10 @@ cases but do not establish performance for every proteomics experiment.
 
 # Citation {.unnumbered}
 
-The package citation includes the software and the thesis that describes the
-method.
+Use the package citation below.
 
 ```{r citation}
-citation("imputefinder")
+citation("imputefinder")[1L]
 ```
 
 # Related methods and references {.unnumbered}
