@@ -53,6 +53,11 @@ automatic_profile_caption <- paste(
     "Automatic control-condition profile. The recorded cutoff marks the lower",
     "boundary of the dominant descending transition."
 )
+cutoff_benchmark_caption <- paste(
+    "Vignette-scale cutoff benchmark with known MAR and MNAR states. The",
+    "intensity ranges overlap around the design boundary of 12, shown by the",
+    "vertical dashed line."
+)
 ```
 
 # Introduction
@@ -566,6 +571,164 @@ This nine-feature panel is selected to show classification rules, not to
 estimate a population profile. Its curve illustrates the stored profile,
 manual cutoff, and rescue value, but it is too small for automatic selection or
 scientific interpretation of the transition.
+
+# Cutoff sensitivity with known states
+
+The thesis benchmark swept the MNAR cutoff and compared downstream detection
+metrics. The compact experiment below applies the same sensitivity-analysis
+logic to ImputeFinder's narrower package responsibility: classification. It
+creates known MAR and MNAR blocks with overlapping intensity ranges, adds
+complete blocks, and repeats classification at manual cutoffs from 8 to 14.
+Metrics focus on the incomplete blocks because complete blocks do not use the
+cutoff.
+
+```{r cutoff-benchmark-data, include=FALSE}
+make_benchmark_block <- function(
+    means,
+    observed_count,
+    sample_count = 6L
+) {
+    block <- matrix(
+        NA_real_,
+        nrow = length(means),
+        ncol = sample_count
+    )
+    offsets <- seq(-0.15, 0.15, length.out = observed_count)
+
+    for (feature_index in seq_along(means)) {
+        observed <- (
+            feature_index - 1L + seq_len(observed_count) - 1L
+        ) %% sample_count + 1L
+        block[feature_index, observed] <-
+            means[[feature_index]] + offsets
+    }
+    block
+}
+
+features_per_state <- 120L
+benchmark_mnar <- make_benchmark_block(
+    seq(8.5, 12.4, length.out = features_per_state),
+    observed_count = 2L
+)
+benchmark_mar <- make_benchmark_block(
+    seq(11.6, 15.5, length.out = features_per_state),
+    observed_count = 4L
+)
+benchmark_complete <- make_benchmark_block(
+    seq(9, 16, length.out = 60L),
+    observed_count = 6L
+)
+cutoff_benchmark_x <- rbind(
+    benchmark_mnar,
+    benchmark_mar,
+    benchmark_complete
+)
+rownames(cutoff_benchmark_x) <- c(
+    sprintf("mnar_%03d", seq_len(nrow(benchmark_mnar))),
+    sprintf("mar_%03d", seq_len(nrow(benchmark_mar))),
+    sprintf("complete_%03d", seq_len(nrow(benchmark_complete)))
+)
+colnames(cutoff_benchmark_x) <- paste0(
+    "benchmark_sample_",
+    seq_len(ncol(cutoff_benchmark_x))
+)
+cutoff_benchmark_truth <- setNames(
+    c(
+        rep("MNAR", nrow(benchmark_mnar)),
+        rep("MAR", nrow(benchmark_mar)),
+        rep("complete", nrow(benchmark_complete))
+    ),
+    rownames(cutoff_benchmark_x)
+)
+
+cutoff_benchmark_metrics <- do.call(
+    rbind,
+    lapply(8:14, function(cutoff) {
+        benchmark_fit <- classify_missingness(
+            cutoff_benchmark_x,
+            group = rep("benchmark", ncol(cutoff_benchmark_x)),
+            cutoffs = c(benchmark = cutoff),
+            seed = 1L
+        )
+        prediction <- setNames(
+            as.character(benchmark_fit$classifications$state),
+            benchmark_fit$classifications$feature
+        )
+        prediction <- prediction[names(cutoff_benchmark_truth)]
+        mnar_recall <- mean(
+            prediction[cutoff_benchmark_truth == "MNAR"] == "MNAR"
+        )
+        mar_recall <- mean(
+            prediction[cutoff_benchmark_truth == "MAR"] == "MAR"
+        )
+
+        data.frame(
+            cutoff = cutoff,
+            metric = c(
+                "MNAR recall",
+                "MAR recall",
+                "Balanced accuracy"
+            ),
+            value = c(
+                mnar_recall,
+                mar_recall,
+                mean(c(mnar_recall, mar_recall))
+            ),
+            stringsAsFactors = FALSE
+        )
+    })
+)
+cutoff_benchmark_metrics$metric <- factor(
+    cutoff_benchmark_metrics$metric,
+    levels = c("MNAR recall", "MAR recall", "Balanced accuracy")
+)
+balanced_accuracy <- cutoff_benchmark_metrics[
+    cutoff_benchmark_metrics$metric == "Balanced accuracy",
+    ,
+    drop = FALSE
+]
+stopifnot(identical(
+    balanced_accuracy$cutoff[which.max(balanced_accuracy$value)],
+    12L
+))
+```
+
+```{r cutoff-benchmark-figure, echo=FALSE, fig.width=7.5, fig.height=3.8, fig.cap=cutoff_benchmark_caption}
+ggplot2::ggplot(
+    cutoff_benchmark_metrics,
+    ggplot2::aes(x = cutoff, y = value)
+) +
+    ggplot2::geom_vline(
+        xintercept = 12,
+        linetype = 2,
+        colour = "#555555"
+    ) +
+    ggplot2::geom_line(linewidth = 0.9, colour = "#2C7FB8") +
+    ggplot2::geom_point(size = 2.3, colour = "#2C7FB8") +
+    ggplot2::facet_wrap(ggplot2::vars(metric), nrow = 1) +
+    ggplot2::scale_x_continuous(breaks = 8:14) +
+    ggplot2::scale_y_continuous(
+        limits = c(0, 1),
+        breaks = seq(0, 1, 0.25),
+        labels = function(value) paste0(round(value * 100), "%")
+    ) +
+    ggplot2::labs(x = "Manual cutoff", y = NULL) +
+    ggplot2::theme_minimal(base_size = 11) +
+    ggplot2::theme(
+        panel.grid.minor = ggplot2::element_blank(),
+        strip.background = ggplot2::element_rect(
+            fill = "#F2F2F2",
+            colour = NA
+        ),
+        strip.text = ggplot2::element_text(face = "bold")
+    )
+```
+
+Lower cutoffs favour MAR recall and higher cutoffs favour MNAR recall. Balanced
+accuracy peaks at the design boundary, but the overlapping distributions prevent
+perfect separation. This is a controlled classification benchmark. It does not
+establish a universal cutoff or measure downstream imputation and differential
+analysis performance.
 
 # Automatic cutoffs
 
