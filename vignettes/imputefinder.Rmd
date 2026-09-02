@@ -221,7 +221,11 @@ pooled_comparison <- rbind(
         state = on_off_states$state
     )
 )
-knitr::kable(pooled_comparison, digits = 2)
+knitr::kable(
+    pooled_comparison,
+    digits = 2,
+    col.names = c("Scope", "Observed", "Samples", "Mean intensity", "State")
+)
 
 on_off_status <- fit$feature_status[
     fit$feature_status$feature == "on_off",
@@ -448,7 +452,10 @@ pipeline_actions <- c(
 routing_manifest$pipeline_action <- unname(
     pipeline_actions[as.character(routing_manifest$state)]
 )
-knitr::kable(routing_manifest)
+knitr::kable(
+    routing_manifest,
+    col.names = c("Feature", "Condition", "Observed", "Missing", "State", "Action")
+)
 ```
 
 ```{r routing-manifest-check, include=FALSE}
