@@ -1,5 +1,5 @@
-test_that("post-seed statistics follow the long result contract", {
-    fixture <- normative_fixture()
+test_that("post-seed statistics have stable columns and types", {
+    fixture <- classification_fixture()
     calculated <- post_seed_statistics(fixture$x, fixture$group)
     statistics <- calculated$statistics
     rescued <- calculated$rescued
@@ -42,7 +42,7 @@ test_that("post-seed statistics follow the long result contract", {
 })
 
 test_that("post-seed statistics audit counts, arithmetic means, and seeds", {
-    fixture <- normative_fixture()
+    fixture <- classification_fixture()
     statistics <- post_seed_statistics(fixture$x, fixture$group)$statistics
 
     on_off_a <- statistics[
@@ -90,7 +90,7 @@ test_that("statistics reject a surviving all-missing condition block", {
 })
 
 test_that("profiles implement the count-weighted density formula", {
-    fixture <- normative_fixture()
+    fixture <- classification_fixture()
     statistics <- post_seed_statistics(fixture$x, fixture$group)$statistics
     profiles <- missingness_profiles(statistics)
 
@@ -211,7 +211,7 @@ test_that("one-class profile proportions are explicit", {
 })
 
 test_that("public results store raw evidence and profile grids", {
-    result <- classify_normative_fixture()
+    result <- classify_fixture()
 
     expect_identical(names(result$profiles), c("A", "B"))
     expect_identical(
@@ -241,7 +241,7 @@ test_that("public results store raw evidence and profile grids", {
 })
 
 test_that("profile grids are invariant to statistics row order", {
-    fixture <- normative_fixture()
+    fixture <- classification_fixture()
     statistics <- post_seed_statistics(fixture$x, fixture$group)$statistics
     baseline <- missingness_profiles(statistics)
     permuted <- missingness_profiles(statistics[rev(seq_len(nrow(statistics))), ])

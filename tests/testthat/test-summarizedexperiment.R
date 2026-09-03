@@ -34,7 +34,7 @@ test_that("a single SummarizedExperiment assay is selected implicitly", {
     expect_identical(fixture$se, original)
 })
 
-test_that("matrix and SummarizedExperiment adapters feed one core contract", {
+test_that("matrix and SummarizedExperiment adapters produce identical inputs", {
     fixture <- summarized_experiment_input_fixture()
 
     matrix_prepared <- prepare_input(fixture$x, fixture$group)
@@ -132,7 +132,7 @@ test_that("SummarizedExperiment routing validates metadata arguments", {
     )
 })
 
-test_that("SummarizedExperiment assays satisfy the matrix value contract", {
+test_that("SummarizedExperiment assays follow the matrix value rules", {
     fixture <- summarized_experiment_input_fixture()
 
     nonnumeric <- fixture$se

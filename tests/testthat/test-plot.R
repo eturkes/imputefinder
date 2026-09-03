@@ -7,7 +7,7 @@ plot_geom_classes <- function(plot) {
 }
 
 test_that("missingness plots use the stored profile and recorded cutoff", {
-    result <- classify_normative_fixture()
+    result <- classify_fixture()
     stored_grid <- result$profiles$A$grid
 
     # Conflicting live values make profile recomputation detectable.
@@ -42,7 +42,7 @@ test_that("missingness plots use the stored profile and recorded cutoff", {
 })
 
 test_that("missingness plots mark blocks that received rescue values", {
-    result <- classify_normative_fixture()
+    result <- classify_fixture()
     plot <- plot_missingness(result, "A")
     geom_classes <- plot_geom_classes(plot)
 
@@ -58,7 +58,7 @@ test_that("missingness plots mark blocks that received rescue values", {
 })
 
 test_that("missingness plots show stored warnings without a default warning", {
-    result <- classify_normative_fixture()
+    result <- classify_fixture()
     expect_null(plot_missingness(result, "B")$labels$caption)
 
     result$profiles$B$metadata$warnings <- "Profile support warning."
@@ -95,7 +95,7 @@ test_that("complete-only plots omit irrelevant cutoff and seed layers", {
 })
 
 test_that("missingness plots reject invalid results and conditions", {
-    result <- classify_normative_fixture()
+    result <- classify_fixture()
 
     expect_error(
         plot_missingness(list(), "A"),

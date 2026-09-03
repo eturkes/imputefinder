@@ -62,7 +62,7 @@ expect_experiment_representation <- function(
 }
 
 test_that("manual matrix and experiment paths preserve ordered representation", {
-    fixture <- normative_fixture()
+    fixture <- classification_fixture()
     feature_order <- c(7L, 1L, 5L, 2L, 6L, 4L, 3L)
     sample_order <- c(8L, 1L, 5L, 4L, 7L, 2L, 6L, 3L)
     x <- fixture$x[feature_order, sample_order, drop = FALSE]

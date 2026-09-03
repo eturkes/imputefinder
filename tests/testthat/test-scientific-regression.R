@@ -1,4 +1,4 @@
-test_that("manual cutoff recovers the frozen causal on/off case", {
+test_that("manual cutoff recovers expected on/off classifications", {
     simulation <- scientific_routine_fixture("manual_on_off")
     result <- classify_missingness(
         simulation$data,
@@ -16,7 +16,7 @@ test_that("manual cutoff recovers the frozen causal on/off case", {
     expect_identical(score[["on_off_seed_recall"]], 1)
 })
 
-test_that("automatic cutoff passes the frozen cliff and permutation gates", {
+test_that("automatic cutoff meets accuracy bounds and is order-invariant", {
     simulation <- scientific_routine_fixture("automatic_cliff")
     manual <- classify_missingness(
         simulation$data,

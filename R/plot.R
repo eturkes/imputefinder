@@ -28,12 +28,16 @@ utils::globalVariables(c("intensity", "mean_intensity", "missing_proportion"))
 #'
 #' @export
 plot_missingness <- function(result, condition) {
-    profile <- .stored_plot_profile(result, condition)
-    cutoff <- .stored_plot_cutoff(result, condition)
-    diagnostic <- .stored_plot_diagnostic(result, condition)
-    plot <- .base_missingness_plot(profile)
-    plot <- .add_missingness_markers(plot, profile, cutoff)
-    .label_missingness_plot(plot, condition, cutoff, diagnostic, profile)
+    stored <- .stored_plot_inputs(result, condition)
+    plot <- .base_missingness_plot(stored$profile)
+    plot <- .add_missingness_markers(plot, stored$profile, stored$cutoff)
+    .label_missingness_plot(
+        plot,
+        condition,
+        stored$cutoff,
+        stored$diagnostic,
+        stored$profile
+    )
 }
 
 .base_missingness_plot <- function(profile) {
@@ -113,7 +117,7 @@ plot_missingness <- function(result, condition) {
         )
 }
 
-.stored_plot_profile <- function(result, condition) {
+.stored_plot_inputs <- function(result, condition) {
     if (!inherits(result, "imputefinder_result")) {
         stop(
             "`result` must be returned by `classify_missingness()`.",
@@ -156,7 +160,52 @@ plot_missingness <- function(result, condition) {
         )
     }
     .validate_stored_plot_profile(profile, condition)
-    profile
+
+    cutoffs <- result$cutoffs
+    valid_cutoffs <- is.numeric(cutoffs) &&
+        is.null(dim(cutoffs)) &&
+        !is.null(names(cutoffs)) &&
+        condition %in% names(cutoffs)
+    if (!valid_cutoffs) {
+        stop(
+            sprintf(
+                "Result has no recorded cutoff for condition `%s`.",
+                condition
+            ),
+            call. = FALSE
+        )
+    }
+
+    cutoff <- unname(cutoffs[[condition]])
+    if (length(cutoff) != 1L || is.nan(cutoff) ||
+        (!is.na(cutoff) && !is.finite(cutoff))) {
+        stop(
+            sprintf(
+                "Recorded cutoff for condition `%s` is invalid.",
+                condition
+            ),
+            call. = FALSE
+        )
+    }
+
+    diagnostics <- result$cutoff_diagnostics
+    diagnostic <- if (!is.list(diagnostics) || is.null(names(diagnostics)) ||
+        !condition %in% names(diagnostics)) {
+        NULL
+    } else {
+        diagnostics[[condition]]
+    }
+    if (!is.null(diagnostic) && !is.list(diagnostic)) {
+        stop(
+            sprintf(
+                "Stored cutoff diagnostic for condition `%s` is invalid.",
+                condition
+            ),
+            call. = FALSE
+        )
+    }
+
+    list(profile = profile, cutoff = cutoff, diagnostic = diagnostic)
 }
 
 .validate_stored_plot_profile <- function(profile, condition) {
@@ -205,57 +254,6 @@ plot_missingness <- function(result, condition) {
     }
 
     invisible(profile)
-}
-
-.stored_plot_cutoff <- function(result, condition) {
-    cutoffs <- result$cutoffs
-    valid <- is.numeric(cutoffs) &&
-        is.null(dim(cutoffs)) &&
-        !is.null(names(cutoffs)) &&
-        condition %in% names(cutoffs)
-    if (!valid) {
-        stop(
-            sprintf(
-                "Result has no recorded cutoff for condition `%s`.",
-                condition
-            ),
-            call. = FALSE
-        )
-    }
-
-    cutoff <- unname(cutoffs[[condition]])
-    if (length(cutoff) != 1L || is.nan(cutoff) ||
-        (!is.na(cutoff) && !is.finite(cutoff))) {
-        stop(
-            sprintf(
-                "Recorded cutoff for condition `%s` is invalid.",
-                condition
-            ),
-            call. = FALSE
-        )
-    }
-
-    cutoff
-}
-
-.stored_plot_diagnostic <- function(result, condition) {
-    diagnostics <- result$cutoff_diagnostics
-    if (!is.list(diagnostics) || is.null(names(diagnostics)) ||
-        !condition %in% names(diagnostics)) {
-        return(NULL)
-    }
-
-    diagnostic <- diagnostics[[condition]]
-    if (!is.null(diagnostic) && !is.list(diagnostic)) {
-        stop(
-            sprintf(
-                "Stored cutoff diagnostic for condition `%s` is invalid.",
-                condition
-            ),
-            call. = FALSE
-        )
-    }
-    diagnostic
 }
 
 .cutoff_subtitle <- function(cutoff, diagnostic) {

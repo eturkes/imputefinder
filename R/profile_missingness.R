@@ -342,7 +342,18 @@
         "mean_intensity",
         "seeded"
     )
-    if (!.valid_profile_statistics_schema(statistics, required) ||
+    valid_schema <- is.data.frame(statistics) &&
+        all(required %in% names(statistics)) &&
+        nrow(statistics) > 0L &&
+        is.character(statistics$feature) &&
+        is.character(statistics$condition) &&
+        is.integer(statistics$sample_count) &&
+        is.integer(statistics$observed_count) &&
+        is.integer(statistics$missing_count) &&
+        is.numeric(statistics$missing_fraction) &&
+        is.numeric(statistics$mean_intensity) &&
+        is.logical(statistics$seeded)
+    if (!valid_schema ||
         anyNA(statistics[, required, drop = FALSE])) {
         stop(
             "`statistics` does not satisfy the profile-input schema.",
@@ -374,18 +385,4 @@
     }
 
     invisible(statistics)
-}
-
-.valid_profile_statistics_schema <- function(statistics, required) {
-    is.data.frame(statistics) &&
-        all(required %in% names(statistics)) &&
-        nrow(statistics) > 0L &&
-        is.character(statistics$feature) &&
-        is.character(statistics$condition) &&
-        is.integer(statistics$sample_count) &&
-        is.integer(statistics$observed_count) &&
-        is.integer(statistics$missing_count) &&
-        is.numeric(statistics$missing_fraction) &&
-        is.numeric(statistics$mean_intensity) &&
-        is.logical(statistics$seeded)
 }

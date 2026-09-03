@@ -1,5 +1,5 @@
-reconcile_normative_states <- function() {
-    fixture <- normative_fixture()
+reconcile_fixture_states <- function() {
+    fixture <- classification_fixture()
     post_seed <- post_seed_statistics(fixture$x, fixture$group)
     resolved <- imputefinder:::.resolve_manual_cutoffs(
         post_seed$statistics,
@@ -44,7 +44,7 @@ three_condition_fixture <- function() {
 }
 
 test_that("reconciliation applies every drop rule in deterministic precedence", {
-    reconciled <- reconcile_normative_states()
+    reconciled <- reconcile_fixture_states()
 
     expect_identical(
         reconciled$feature_status,
@@ -90,7 +90,7 @@ test_that("reconciliation applies every drop rule in deterministic precedence", 
 })
 
 test_that("condition groups contain retained features in original order", {
-    reconciled <- reconcile_normative_states()
+    reconciled <- reconcile_fixture_states()
     groups <- imputefinder:::.retained_condition_groups(
         reconciled$classifications,
         reconciled$feature_status$feature
@@ -166,8 +166,8 @@ test_that("public reconciliation generalizes to three conditions", {
     expect_false("all_mnar" %in% rownames(result$data))
 })
 
-test_that("the public matrix result satisfies the manual M3 contract", {
-    fixture <- normative_fixture()
+test_that("the public matrix result preserves classifications and audit data", {
+    fixture <- classification_fixture()
     original <- fixture$x
 
     result <- classify_missingness(
@@ -270,7 +270,7 @@ test_that("the rescue log includes features that are later dropped", {
 
 test_that("public SummarizedExperiment and matrix classifications agree", {
     skip_if_not_installed("SummarizedExperiment")
-    fixture <- normative_fixture()
+    fixture <- classification_fixture()
     auxiliary <- fixture$x + 100
     experiment <- SummarizedExperiment::SummarizedExperiment(
         assays = list(intensity = fixture$x, auxiliary = auxiliary),
@@ -282,11 +282,11 @@ test_that("public SummarizedExperiment and matrix classifications agree", {
             condition = fixture$group,
             row.names = colnames(fixture$x)
         ),
-        metadata = list(source = "M3 integration fixture")
+        metadata = list(source = "integration fixture")
     )
     original <- experiment
 
-    matrix_result <- classify_normative_fixture()
+    matrix_result <- classify_fixture()
     experiment_result <- classify_missingness(
         experiment,
         group_col = "condition",

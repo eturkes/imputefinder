@@ -148,7 +148,7 @@ test_that("the result constructor rejects invalid state and group schemas", {
     )
 })
 
-test_that("the public classifier exposes the decided argument contract", {
+test_that("the public classifier has the documented arguments", {
     expect_identical(
         names(formals(classify_missingness)),
         c("x", "group", "group_col", "assay", "cutoffs", "seed")
@@ -156,7 +156,7 @@ test_that("the public classifier exposes the decided argument contract", {
 })
 
 test_that("summary exposes exact feature, state, drop, and cutoff counts", {
-    result <- classify_normative_fixture()
+    result <- classify_fixture()
 
     result_summary <- summary(result)
 
@@ -230,7 +230,7 @@ test_that("summary exposes exact feature, state, drop, and cutoff counts", {
 })
 
 test_that("result and summary print methods are concise and return invisibly", {
-    result <- classify_normative_fixture()
+    result <- classify_fixture()
     result_visibility <- NULL
     result_output <- capture.output(
         result_visibility <- withVisible(print(result))

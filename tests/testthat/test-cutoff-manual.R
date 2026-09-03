@@ -1,5 +1,5 @@
 manual_cutoff_statistics <- function() {
-    fixture <- normative_fixture()
+    fixture <- classification_fixture()
     post_seed_statistics(fixture$x, fixture$group)$statistics
 }
 

@@ -23,7 +23,7 @@ test_that("automatic cutoff records the selected algorithm and quality", {
     expect_gte(quality$selected_transition$peak_to_noise, 1.5)
 })
 
-test_that("automatic cutoff passes frozen stress profiles", {
+test_that("automatic cutoff remains stable across stress profiles", {
     fixtures <- list(
         heavy_mar = list(
             profile = automatic_cutoff_profile(
@@ -243,7 +243,7 @@ test_that("public automatic decisions are exact under input order", {
 })
 
 test_that("automatic failure carries its condition and diagnostic profile", {
-    fixture <- normative_fixture()
+    fixture <- classification_fixture()
     error <- tryCatch(
         classify_missingness(
             fixture$x,

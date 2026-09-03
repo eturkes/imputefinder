@@ -21,11 +21,11 @@
 
     rescue_count <- sum(lengths(rescue_plan))
     if (rescue_count == 0L) {
-        return(.condition_rescue_result(
-            surviving_data,
-            feature_status,
-            condition_minima,
-            .empty_seed_log()
+        return(list(
+            data = surviving_data,
+            feature_status = feature_status,
+            condition_minima = condition_minima,
+            seed_log = .empty_seed_log()
         ))
     }
 
@@ -38,11 +38,11 @@
         rescue_count
     )
 
-    .condition_rescue_result(
-        rescued$data,
-        feature_status,
-        condition_minima,
-        rescued$seed_log
+    list(
+        data = rescued$data,
+        feature_status = feature_status,
+        condition_minima = condition_minima,
+        seed_log = rescued$seed_log
     )
 }
 
@@ -81,20 +81,6 @@
         add = TRUE
     )
     force(code)
-}
-
-.condition_rescue_result <- function(
-    data,
-    feature_status,
-    condition_minima,
-    seed_log
-) {
-    list(
-        data = data,
-        feature_status = feature_status,
-        condition_minima = condition_minima,
-        seed_log = seed_log
-    )
 }
 
 .normalise_rescue_seed <- function(seed) {

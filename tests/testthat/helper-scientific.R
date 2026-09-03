@@ -1,5 +1,4 @@
-# Compact deterministic fixtures and causal oracles for routine scientific
-# regressions.
+# Deterministic simulations and expected classifications for regression tests.
 
 .routine_scientific_conditions <- c("A", "B")
 .routine_scientific_states <- c("complete", "MNAR", "MAR", "insufficient")
@@ -73,7 +72,7 @@
     force(code)
 }
 
-.scientific_routine_oracle <- function(
+.scientific_routine_truth <- function(
     data,
     groups,
     mnar_mask,
@@ -145,7 +144,7 @@
         }
     }
 
-    feature_truth$oracle_retained <- feature_status$retained[
+    feature_truth$expected_retained <- feature_status$retained[
         match(feature_truth$feature, feature_status$feature)
     ]
     list(
@@ -260,7 +259,7 @@ scientific_routine_fixture <- function(name, seed = 104677L) {
             simulation_seed = as.integer(seed),
             data = data,
             groups = groups,
-            oracle = .scientific_routine_oracle(
+            truth = .scientific_routine_truth(
                 data,
                 groups,
                 mnar_mask,
@@ -294,7 +293,7 @@ scientific_routine_fixture <- function(name, seed = 104677L) {
 }
 
 score_scientific_routine <- function(result, simulation) {
-    truth <- simulation$oracle$classifications
+    truth <- simulation$truth$classifications
     truth_keys <- paste(truth$feature, truth$condition, sep = "\r")
     predicted_keys <- paste(
         result$classifications$feature,
@@ -333,7 +332,7 @@ score_scientific_routine <- function(result, simulation) {
         predicted_state == "MAR"
     )
 
-    truth_status <- simulation$oracle$feature_status
+    truth_status <- simulation$truth$feature_status
     status_match <- match(truth_status$feature, result$feature_status$feature)
     stopifnot(
         !anyDuplicated(result$feature_status$feature),
@@ -346,9 +345,9 @@ score_scientific_routine <- function(result, simulation) {
         truth_status$retained,
         predicted_retained
     )
-    feature_truth <- simulation$oracle$feature_truth
+    feature_truth <- simulation$truth$feature_truth
     on_off <- !is.na(feature_truth$off_condition)
-    eligible_on_off <- on_off & feature_truth$oracle_retained
+    eligible_on_off <- on_off & feature_truth$expected_retained
     not_globally_absent <- is.na(truth_status$drop_reason) |
         truth_status$drop_reason != "all_missing"
     expected_on_off_seed <- on_off & not_globally_absent

@@ -285,25 +285,16 @@ condition_data[mar_rows, , drop = FALSE]
 Normalisation and actual kNN, MinProb, MinDet, QRILC, BPCA, or other imputation
 remain downstream choices, not ImputeFinder defaults or runtime dependencies.
 
-## How the method is tested
+## Verification
 
-The regression tests compare package output with known classifications from the
-deterministic synthetic generator in
-[`test-scientific-regression.R`](tests/testthat/test-scientific-regression.R).
-The current package produces:
+Deterministic regression tests compare package output with known classifications
+under both manual and automatic cutoffs. They cover intensity-independent MAR,
+intensity-dependent MNAR, condition-specific on/off features, unequal group
+sizes, rescue reproducibility, and input-order invariance. The automatic-cutoff
+tests also include profiles for which no defensible boundary can be estimated.
 
-| Scenario and path | MNAR F1 | MAR F1 | Macro-F1 | Retention F1 | Eligible on/off retention |
-|---|---:|---:|---:|---:|---:|
-| 25% MAR, four samples/condition, manual cutoff | 0.9438 | 0.9674 | 0.9681 | 0.9509 | 1.0000 |
-| 5% MAR, eight samples/condition, automatic cutoff | 0.9777 | 0.9670 | 0.9816 | 0.9898 | 1.0000 |
-
-The automatic scenario recovers cutoffs 11.9727 and 11.8855 from a generating
-boundary of 12. Both scenarios rescue every eligible structural off block. The
-tests enforce predeclared lower bounds, exact on/off retention and rescue, and
-named-order invariance.
-
-These synthetic results show how the implementation behaves under the tested
-model. They are not estimates of accuracy for arbitrary proteomics experiments.
+These simulations verify implementation behavior under their stated model; they
+are not estimates of accuracy for arbitrary proteomics experiments.
 
 ## Limitations
 
@@ -321,14 +312,6 @@ model. They are not estimates of accuracy for arbitrary proteomics experiments.
   log. Record its role and assess its downstream effect.
 - The package classifies and coordinates a workflow. It neither proves causal
   missingness mechanisms nor chooses, runs, or validates an imputation method.
-
-Additional regression tests cover 5% and 25%
-intensity-independent MAR, intensity-dependent MNAR, on/off features, group
-sizes 4, 8, and 20, condition-specific cutoffs, rescue seeds, and named
-permutations. The [automatic-cutoff tests](tests/testthat/test-cutoff-auto.R)
-include both profiles with clear transitions and profiles for which no cutoff
-can be estimated. See the vignette and help pages for the user-facing workflow
-and API.
 
 ## License
 

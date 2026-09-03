@@ -1,4 +1,4 @@
-normative_fixture <- function() {
+classification_fixture <- function() {
     x <- rbind(
         on_off = c(NA, NA, NA, NA, 15, 16, 15, 17),
         mar_both = c(14, 15, NA, 16, 14, NA, 15, 16),
@@ -17,8 +17,8 @@ normative_fixture <- function() {
     )
 }
 
-classify_normative_fixture <- function() {
-    fixture <- normative_fixture()
+classify_fixture <- function() {
+    fixture <- classification_fixture()
     classify_missingness(
         x = fixture$x,
         group = fixture$group,
@@ -233,7 +233,7 @@ rich_summarized_experiment <- function(x, group) {
             row.names = colnames(x)
         ),
         metadata = list(
-            source = "M6b representation fixture",
+            source = "representation fixture",
             nested = list(preserved = TRUE)
         )
     )

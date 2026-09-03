@@ -4,30 +4,23 @@
 
 - Adds a worked comparison showing why on/off features need separate condition
   states.
-- Documents the synthetic regression results and explains their limitations.
-- Adds a benchmark-style cutoff sweep with known MAR and MNAR states to show the
-  classifier's state-recall trade-off.
+- Adds a cutoff-sensitivity example with known MAR and MNAR states and explains
+  the limits of synthetic validation.
 - Adds a classification workflow, a cell-level replacement audit, and annotated
   cutoff confusion heatmaps with explicit pre-filter denominators.
-- Adds a package citation and removes a stale reference to deleted development
-  validation tooling.
+- Adds a package citation.
 
 # imputefinder 0.99.3 (2026-09-01)
 
-- Records the maintainer ORCID and regenerates package documentation with the
-  current roxygen2 release.
-- Removes development-only scientific, cutoff, and performance tooling from
-  the default submission branch so it contains package source only.
+- Records the maintainer ORCID.
 - Repairs repository documentation links.
 
 # imputefinder 0.99.2 (2026-07-15)
 
-- Completes release-candidate audits of public claims, edge cases, process
-  side effects, named-order invariance, and seed-only output mutation.
-- Excludes local check artefacts from source packages and passes the full local
-  `R CMD check --as-cran` and repository-controlled `BiocCheck` gates.
-- Validates the manual and automatic paths on a deterministic 10,000-feature,
-  50-sample workload with predeclared runtime and allocation limits.
+- Stabilizes results across input order and caller RNG state.
+- Ensures rescue insertions are the only changes made to retained matrix values.
+- Tightens manual and automatic cutoff handling for unsupported profiles and
+  numerical warnings.
 
 # imputefinder 0.99.1 (2026-07-15)
 

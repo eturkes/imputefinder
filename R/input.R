@@ -82,6 +82,14 @@
 
     assay_names <- SummarizedExperiment::assayNames(x)
     assay_index <- .resolve_assay_index(assay, assay_names, assay_count)
+    assay_name <- if (length(assay_names) >= assay_index) {
+        assay_names[[assay_index]]
+    } else {
+        NA_character_
+    }
+    if (is.na(assay_name) || !nzchar(assay_name)) {
+        assay_name <- NA_character_
+    }
     data <- SummarizedExperiment::assay(x, assay_index)
     .validate_matrix_data(data, subject = "The selected assay")
 
@@ -106,15 +114,8 @@
         ),
         representation = "SummarizedExperiment",
         assay_index = assay_index,
-        assay_name = .selected_assay_name(assay_names, assay_index)
+        assay_name = assay_name
     )
-}
-
-.selected_assay_name <- function(assay_names, assay_index) {
-    named <- length(assay_names) >= assay_index &&
-        !is.na(assay_names[[assay_index]]) &&
-        nzchar(assay_names[[assay_index]])
-    if (named) assay_names[[assay_index]] else NA_character_
 }
 
 .resolve_assay_index <- function(assay, assay_names, assay_count) {

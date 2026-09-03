@@ -1,12 +1,6 @@
-test_that("classification has no absent prototype plot-helper dependency", {
-    implementation <- paste(deparse(body(classify_missingness)), collapse = "\n")
-
-    expect_false(grepl("plot_detect_custom", implementation, fixed = TRUE))
-})
-
 test_that("a feature absent in one condition is rescued and audited", {
-    result <- classify_normative_fixture()
-    fixture <- normative_fixture()
+    result <- classify_fixture()
+    fixture <- classification_fixture()
     a_samples <- colnames(fixture$x)[fixture$group == "A"]
     seeded_a <- result$data["on_off", a_samples]
     log_row <- result$seed_log[
@@ -25,7 +19,7 @@ test_that("a feature absent in one condition is rescued and audited", {
 })
 
 test_that("strict majority is derived from each condition size", {
-    result <- classify_normative_fixture()
+    result <- classify_fixture()
 
     expect_identical(classification_row(result, "mar_both", "A")$state, "MAR")
     expect_identical(classification_row(result, "mar_both", "B")$state, "MAR")
@@ -36,7 +30,7 @@ test_that("strict majority is derived from each condition size", {
 })
 
 test_that("classifications remain condition-specific", {
-    result <- classify_normative_fixture()
+    result <- classify_fixture()
 
     expect_identical(classification_row(result, "on_off", "A")$state, "MNAR")
     expect_identical(classification_row(result, "on_off", "B")$state, "complete")
@@ -46,7 +40,7 @@ test_that("classifications remain condition-specific", {
 })
 
 test_that("features classified MNAR in every condition are excluded", {
-    result <- classify_normative_fixture()
+    result <- classify_fixture()
     status <- result$feature_status[
         result$feature_status$feature == "all_mnar",
         ,

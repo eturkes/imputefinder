@@ -39,7 +39,7 @@ classified_state <- function(classifications, feature, condition) {
     ]
 }
 
-test_that("four-state boundaries follow the normative decision order", {
+test_that("four-state boundaries follow the documented decision order", {
     classified <- classified_boundaries()
 
     expect_identical(classified_state(classified, "complete_low", "A"), "complete")
@@ -128,7 +128,7 @@ test_that("the arithmetic mean drives intensity classification", {
     expect_identical(classified_state(recut, "arithmetic_mean", "A"), "MAR")
 })
 
-test_that("state assignment produces the typed classification skeleton", {
+test_that("state assignment returns stable columns and types", {
     classified <- classified_boundaries()
 
     expect_identical(names(classified), names(imputefinder:::.empty_classifications()))

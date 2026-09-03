@@ -21,7 +21,7 @@ rescue_fixture <- function() {
 }
 
 test_that("globally absent features are audited, excluded, and never seeded", {
-    fixture <- normative_fixture()
+    fixture <- classification_fixture()
 
     rescued <- seed_missing_conditions(fixture$x, fixture$group)
     absent_status <- rescued$feature_status[
