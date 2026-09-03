@@ -105,7 +105,7 @@ cutoff, rescue value, and drop reason. The labels mean **likely MAR** and
 cause of missingness. ImputeFinder neither normalises nor imputes values.
 
 Bioconductor packages such as
-[`DEP`](https://bioconductor.org/packages/DEP),
+[`DEP`][dep-guide],
 [`MSnbase`](https://bioconductor.org/packages/MSnbase), and
 [`msImpute`](https://bioconductor.org/packages/msImpute) provide broader
 proteomics analysis or imputation machinery. ImputeFinder has a narrower role:
@@ -116,6 +116,9 @@ branches while returning either an ordinary matrix or a
 Within a pipeline, those states can form an auditable routing layer. MNAR blocks
 can enter a detection-limit branch, MAR blocks can enter a relationship-based
 branch, and complete blocks can pass through unchanged.
+
+The [comparison with state-of-the-art methods](#state-of-the-art-comparison)
+distinguishes this routing role from imputation and direct statistical inference.
 
 # Installation
 
@@ -1474,6 +1477,97 @@ identical(
     fit$data
 )
 ```
+
+# Comparison with state-of-the-art methods {#state-of-the-art-comparison}
+
+ImputeFinder addresses condition-aware missingness classification, not missing
+value estimation. Relevant proteomics comparators therefore include mixed
+imputation workflows, modern reconstruction methods, and models that avoid
+imputation. Their outputs and evaluation targets differ.
+
+## Classification, imputation, and inference
+
+| Method or workflow | Missingness treatment and output | Comparison with ImputeFinder |
+|:--|:--|:--|
+| **ImputeFinder** | Condition-specific intensity cutoffs, a majority rule, and logged rescue anchors produce states and filtered data. | Makes routing and exclusions explicit. It does not estimate all missing intensities, assign mechanism probabilities, or test differential abundance. |
+| [**DEP / MSnbase mixed imputation**][dep-missing] | Applies MAR and MNAR imputers to specified subsets. DEP documents condition-aware row selection and sample-subset imputation. | Existing workflows already handle condition information. ImputeFinder supplies a feature-by-condition state table, cutoff evidence, rescue log, and drop reasons instead of the imputation itself. |
+| [**QRILC and MinProb**][dep-guide] | QRILC estimates a left-censored distribution by quantile regression; MinProb draws low-intensity replacements. | Potential MNAR-branch comparators when left censoring is plausible. They replace values rather than decide which feature-condition blocks belong in that branch. |
+| [**msImpute**][msimpute-paper] | Combines low-rank MAR reconstruction with an MNAR distribution using entropy-based evidence about group missingness. | Integrates missingness awareness with imputation. Its group-aware barycentric mixture differs from ImputeFinder's hard, condition-specific routing decisions. |
+| [**PIMMS (2024)**][pimms-paper] | Self-supervised collaborative filtering and autoencoders learn structure to reconstruct missing intensities. | A reconstruction comparator, not a classifier of the four ImputeFinder states. Learned relationships replace explicit intensity-cutoff routing. |
+| [**msBayesImpute (2026)**][msbayes-paper] | Bayesian matrix factorization with a probabilistic dropout model reconstructs mixed MAR/MNAR data without predefined experimental groups. | Jointly models abundance and missingness instead of routing each condition through a hard cutoff. It requires model fitting rather than just classification. |
+| [**proDA**][proda-guide] | Fits probabilistic dropout curves and moderated linear models to test differential abundance without imputing missing values. | An alternative to an imputation pipeline, not a downstream imputer. It models missingness uncertainty directly rather than producing ImputeFinder's routing states. |
+
+Condition awareness is not unique to ImputeFinder. DEP's example marks proteins
+that are absent in every replicate of at least one condition, then applies a
+mixed imputation. It also demonstrates imputing different sample subsets
+separately ([DEP missing-value workflow][dep-missing]). The
+[`msImpute` group-aware workflow][msimpute-guide] explicitly supplies experimental
+groups for its MNAR-aware mode. These methods must not be represented by a
+condition-blind pooled baseline.
+
+ImputeFinder instead records a separate state for each feature-condition block.
+The `mixed_mechanism` example can therefore route one condition to an MNAR
+branch and another to a MAR branch. This is a difference from a single
+row-wide routing label, not proof that other workflows cannot express such
+subsets. The `condition_on_off` example tests the consequences of this package's
+rules; it is not a benchmark against DEP, msImpute, or proDA.
+
+## Choosing an analysis route
+
+Use ImputeFinder when the analysis requires explicit, inspectable decisions
+before separate external branches. Validate its cutoffs, exclusions, and rescue
+anchors together with the chosen normalization and imputation methods.
+Automatic cutoffs do not make the resulting labels established missingness
+mechanisms.
+
+Use a full reconstruction method when a completed matrix is the target.
+msImpute, PIMMS, and msBayesImpute supply such estimators, with different
+assumptions about groups, latent structure, and dropout
+([msImpute][msimpute-paper]; [PIMMS][pimms-paper];
+[msBayesImpute][msbayes-paper]). They are alternative pipelines, not methods that
+must all receive ImputeFinder's filtered, seed-modified matrix. Unnecessary
+splitting can also remove information that a joint model is designed to use.
+
+For differential abundance without a completed matrix, consider proDA's direct
+dropout model ([proDA documentation][proda-guide]). Start that comparison from
+the original missingness-preserving data, with proDA-appropriate preprocessing,
+not a matrix in which rescue anchors are treated as genuine observations.
+Choose this route separately from the vignette's normalize-then-impute workflow.
+
+## What the evidence does and does not establish
+
+The cited msImpute, PIMMS, and msBayesImpute studies evaluate reconstruction or
+downstream analysis on their respective datasets. Their results are not
+measurements of ImputeFinder, and they do not establish one winner for every
+acquisition mode or sample size. In particular, msBayesImpute reports limitations
+for very small studies despite its favorable benchmark results
+([msBayesImpute][msbayes-paper]).
+
+This vignette contains methodological comparisons, not a head-to-head SOTA
+performance benchmark. Its cutoff sweep measures recovery of simulated
+classification states. Its arithmetic-mean stand-ins demonstrate donor-pool
+effects; they are not substitutes for running the cited imputers. The Tau
+extract has no known values for its genuinely missing entries, so it cannot
+establish imputation accuracy or the true missingness mechanism.
+
+A fair performance study must compare complete analysis routes on shared data
+and prespecified endpoints. Include random masking and abundance-dependent
+masking, independent spike-in or dilution data, and condition-specific absence.
+For reconstruction, measure error only at held-out values and stratify it by
+abundance and missingness design. For differential abundance, measure effect
+bias, sensitivity, and empirical false discovery rate against known contrasts.
+Report feature retention alongside performance so aggressive filtering cannot
+hide difficult cases. Record versions, preprocessing, tuning, seeds, runtime,
+and memory. Tune cutoffs and model choices without using the evaluation truth;
+classification accuracy alone cannot establish valid downstream inference.
+
+[dep-missing]: https://bioconductor.org/packages/3.22/bioc/vignettes/DEP/inst/doc/MissingValues.html
+[dep-guide]: https://bioconductor.org/packages/3.22/bioc/vignettes/DEP/inst/doc/DEP.html
+[msimpute-paper]: https://doi.org/10.1016/j.mcpro.2023.100558
+[msimpute-guide]: https://bioconductor.org/packages/release/bioc/vignettes/msImpute/inst/doc/msImpute-vignette.html
+[pimms-paper]: https://doi.org/10.1038/s41467-024-48711-5
+[msbayes-paper]: https://doi.org/10.1038/s42004-026-02106-3
+[proda-guide]: https://bioconductor.org/packages/release/bioc/vignettes/proDA/inst/doc/Introduction.html
 
 # Limitations
 
