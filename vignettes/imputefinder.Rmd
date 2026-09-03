@@ -3,7 +3,7 @@ title: "Classifying proteomics missingness by condition"
 author:
 - name: Emir Turkes
   email: emir.turkes@eturkes.com
-date: "2 September 2026"
+date: "3 September 2026"
 package: imputefinder
 output:
   BiocStyle::html_document:
@@ -29,9 +29,10 @@ vignette: |
 knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>",
+    fig.align = "center",
     fig.width = 7,
     fig.height = 4.5,
-    dpi = 96,
+    dpi = 144,
     crop = NULL
 )
 library(imputefinder)
@@ -66,6 +67,24 @@ tau_heatmap_caption <- paste(
 tau_state_caption <- paste(
     "Condition-specific states for the selected PXD020717 Tau phosphosites.",
     "Labels identify sites filtered after classification."
+)
+workflow_caption <- paste(
+    "ImputeFinder separates classification from external analysis choices.",
+    "The dashed boundary encloses package operations. Rescue inserts a logged",
+    "anchor into each surviving, fully absent feature-condition block; it does",
+    "not complete an imputation. Normalisation and imputation remain external."
+)
+imputation_audit_caption <- paste(
+    "Cell-level audit of the arithmetic-mean stand-ins for differential_mar.",
+    "Crosses mark missing observations; orange borders mark inserted values.",
+    "Row labels give the treated-minus-control mean difference. These",
+    "stand-ins explain donor-pool effects, not validated imputation methods."
+)
+confusion_caption <- paste(
+    "Known design states versus pre-filter classifier labels at three cutoffs.",
+    "Cells report counts and percentages within each 120-feature truth row.",
+    "The 60 complete blocks are excluded. Insufficient blocks remain explicit",
+    "rather than being counted as MAR or removed from the denominator."
 )
 ```
 
@@ -146,6 +165,51 @@ or `MNAR` in every condition. Otherwise its complete state matrix is retained,
 including mixtures such as MNAR in one condition and complete in another. An
 `insufficient` block cannot support a MAR branch, while an all-MNAR feature has
 no complete or MAR-like condition to support retention.
+
+```{r classification-workflow, echo=FALSE, fig.width=7.5, fig.height=4.7, fig.cap=workflow_caption}
+workflow_nodes <- data.frame(
+    x = c(0, 1, 2, 2, 1, 0, 0, 1, 2),
+    y = c(3, 3, 3, 1.9, 1.9, 1.9, 0.4, 0.4, 0.4),
+    scope = c(rep("package", 6L), rep("external", 3L)),
+    label = c(
+        "Unnormalised log2\nmatrix + conditions",
+        "Drop globally absent\nAnchor fully absent blocks",
+        "Profile each condition\nChoose its intensity cutoff",
+        "Classify each block\ncomplete / MAR / MNAR\n/ insufficient",
+        "Drop whole features\nAny insufficient or\nall conditions MNAR",
+        "Return filtered data\nStates + rescue log",
+        "Normalise the\nreturned matrix",
+        "Split by condition\nUse recorded labels",
+        "Impute within condition\nRestore sample order"
+    )
+)
+workflow_edges <- data.frame(
+    x = c(0.43, 1.43, 2, 1.57, 0.57, 0, 0.43, 1.43),
+    xend = c(0.57, 1.57, 2, 1.43, 0.43, 0, 0.57, 1.57),
+    y = c(3, 3, 2.73, 1.9, 1.9, 1.62, 0.4, 0.4),
+    yend = c(3, 3, 2.29, 1.9, 1.9, 0.7, 0.4, 0.4)
+)
+ggplot2::ggplot() +
+    ggplot2::annotate("rect", xmin = -0.53, xmax = 2.53, ymin = 1.3, ymax = 3.55,
+        fill = NA, colour = "#8297A5", linetype = "dashed") +
+    ggplot2::annotate("text", x = -0.48, y = 3.42, label = "ImputeFinder",
+        hjust = 0, fontface = "bold", size = 3.5) +
+    ggplot2::annotate("text", x = 1, y = 1.05, label = "External analysis choices",
+        fontface = "bold", size = 3.5) +
+    ggplot2::geom_segment(data = workflow_edges,
+        ggplot2::aes(x = x, xend = xend, y = y, yend = yend),
+        arrow = grid::arrow(length = grid::unit(0.055, "inches"), type = "closed"),
+        colour = "#52636D", linewidth = 0.6) +
+    ggplot2::geom_label(data = workflow_nodes,
+        ggplot2::aes(x = x, y = y, label = label, fill = scope),
+        size = 3.5, lineheight = 1.15, linewidth = 0.35,
+        label.padding = grid::unit(0.3, "lines"), colour = "#222222") +
+    ggplot2::scale_fill_manual(values = c(package = "#EAF2F8", external = "#F2F2F2"),
+        guide = "none") +
+    ggplot2::coord_cartesian(xlim = c(-0.58, 2.58), ylim = c(0, 3.65), expand = FALSE) +
+    ggplot2::labs(title = "Condition-aware classification and routing") +
+    ggplot2::theme_void(base_size = 11)
+```
 
 # Controlled example: mixed missingness across conditions
 
@@ -518,6 +582,63 @@ stopifnot(isTRUE(all.equal(
     c(6, 4.5),
     tolerance = 1e-12
 )))
+```
+
+```{r condition-imputation-audit, echo=FALSE, fig.width=7.5, fig.height=3.8, fig.cap=imputation_audit_caption}
+imputation_audit_values <- rbind(
+    Observed = differential_values,
+    `Within-condition stand-in` = within_condition_values,
+    `Pooled stand-in` = pooled_values
+)
+colnames(imputation_audit_values) <- colnames(x)
+imputation_inserted <- rbind(rep(FALSE, ncol(x)),
+    is.na(differential_values), is.na(differential_values))
+imputation_audit <- data.frame(
+    strategy = factor(rep(rownames(imputation_audit_values), ncol(x)),
+        levels = rev(rownames(imputation_audit_values))),
+    sample = factor(rep(colnames(x), each = 3L), levels = colnames(x)),
+    condition = factor(rep(condition, each = 3L),
+        levels = c("control", "treated"), labels = c("Control", "Treated")),
+    intensity = as.vector(imputation_audit_values),
+    inserted = as.vector(imputation_inserted)
+)
+imputation_audit_gaps <- c(
+    condition_means[["treated"]] - condition_means[["control"]],
+    imputation_comparison$difference
+)
+imputation_audit_labels <- setNames(paste0(
+    rownames(imputation_audit_values), "\nDifference = ", imputation_audit_gaps
+), rownames(imputation_audit_values))
+ggplot2::ggplot(imputation_audit,
+    ggplot2::aes(x = sample, y = strategy, fill = intensity)) +
+    ggplot2::geom_tile(colour = "white", linewidth = 0.7) +
+    ggplot2::geom_tile(data = imputation_audit[imputation_audit$inserted, ],
+        fill = NA, colour = "#D55E00", linewidth = 1.2, width = 0.94, height = 0.88) +
+    ggplot2::geom_text(data = imputation_audit[!is.na(imputation_audit$intensity), ],
+        ggplot2::aes(label = sprintf("%.0f", intensity), colour = intensity > 18),
+        size = 3.3) +
+    ggplot2::geom_point(data = imputation_audit[is.na(imputation_audit$intensity), ],
+        shape = 4, size = 2.4, colour = "#555555") +
+    ggplot2::facet_grid(cols = ggplot2::vars(condition), scales = "free_x", space = "free_x") +
+    ggplot2::scale_x_discrete(labels = heatmap_sample_labels) +
+    ggplot2::scale_y_discrete(labels = imputation_audit_labels) +
+    ggplot2::scale_colour_manual(values = c(`FALSE` = "#222222", `TRUE` = "white"),
+        guide = "none") +
+    ggplot2::scale_fill_gradient(low = "#F7FBFF", high = "#08519C",
+        na.value = "#E0E0E0", limits = range(imputation_audit_values, na.rm = TRUE),
+        name = "log2-like intensity") +
+    ggplot2::labs(x = "Sample", y = NULL, title = "Inspect what each stand-in inserts") +
+    ggplot2::theme_minimal(base_size = 11) +
+    ggplot2::theme(panel.grid = ggplot2::element_blank(), legend.position = "bottom",
+        strip.background = ggplot2::element_rect(fill = "#F2F2F2", colour = NA),
+        strip.text = ggplot2::element_text(face = "bold"))
+
+stopifnot(sum(imputation_inserted) == 4L)
+for (strategy in seq_len(nrow(imputation_audit_values))) {
+    observed <- !is.na(differential_values)
+    stopifnot(identical(unname(imputation_audit_values[strategy, observed]),
+        differential_values[observed]))
+}
 ```
 
 The within-condition stand-in preserves the six-unit separation between the
@@ -973,15 +1094,19 @@ cutoff_benchmark_truth <- setNames(
     rownames(cutoff_benchmark_x)
 )
 
+cutoff_benchmark_fits <- lapply(8:14, function(cutoff) {
+    classify_missingness(
+        cutoff_benchmark_x,
+        group = rep("benchmark", ncol(cutoff_benchmark_x)),
+        cutoffs = c(benchmark = cutoff),
+        seed = 1L
+    )
+})
+names(cutoff_benchmark_fits) <- as.character(8:14)
 cutoff_benchmark_metrics <- do.call(
     rbind,
     lapply(8:14, function(cutoff) {
-        benchmark_fit <- classify_missingness(
-            cutoff_benchmark_x,
-            group = rep("benchmark", ncol(cutoff_benchmark_x)),
-            cutoffs = c(benchmark = cutoff),
-            seed = 1L
-        )
+        benchmark_fit <- cutoff_benchmark_fits[[as.character(cutoff)]]
         prediction <- setNames(
             as.character(benchmark_fit$classifications$state),
             benchmark_fit$classifications$feature
@@ -1061,6 +1186,68 @@ accuracy peaks at the design boundary, but the overlapping distributions prevent
 perfect separation. This is a controlled classification benchmark. It does not
 establish a universal cutoff or measure downstream imputation and differential
 analysis performance.
+
+```{r cutoff-confusion-heatmap, echo=FALSE, fig.width=7.5, fig.height=3.5, fig.cap=confusion_caption}
+confusion_truth <- cutoff_benchmark_truth[cutoff_benchmark_truth != "complete"]
+confusion_states <- c("MNAR", "MAR", "insufficient")
+cutoff_confusion <- do.call(rbind, lapply(c(10L, 12L, 14L), function(cutoff) {
+    classifications <- cutoff_benchmark_fits[[as.character(cutoff)]]$classifications
+    predicted <- setNames(as.character(classifications$state), classifications$feature)
+    predicted <- predicted[names(confusion_truth)]
+    stopifnot(!anyNA(predicted), all(predicted %in% confusion_states))
+    counts <- table(
+        truth = factor(confusion_truth, levels = c("MNAR", "MAR")),
+        predicted = factor(predicted, levels = confusion_states)
+    )
+    recalls <- cutoff_benchmark_metrics[
+        cutoff_benchmark_metrics$cutoff == cutoff &
+            cutoff_benchmark_metrics$metric != "Balanced accuracy", "value"
+    ]
+    stopifnot(
+        all(rowSums(counts) == features_per_state),
+        isTRUE(all.equal(
+            unname(c(counts["MNAR", "MNAR"], counts["MAR", "MAR"])) /
+                features_per_state,
+            recalls, tolerance = 1e-12
+        )),
+        !any(classifications$retained[classifications$state %in% c("MNAR", "insufficient")])
+    )
+    cells <- as.data.frame(counts, responseName = "count")
+    cells$fraction <- cells$count / features_per_state
+    cells$cutoff <- paste("Cutoff", cutoff)
+    cells
+}))
+cutoff_confusion$truth <- factor(cutoff_confusion$truth, levels = c("MAR", "MNAR"))
+ggplot2::ggplot(cutoff_confusion,
+    ggplot2::aes(x = predicted, y = truth, fill = fraction)) +
+    ggplot2::geom_tile(colour = "white", linewidth = 0.8) +
+    ggplot2::geom_text(
+        ggplot2::aes(label = sprintf("%d\n(%.1f%%)", count, 100 * fraction),
+            colour = fraction > 0.55), size = 3.1
+    ) +
+    ggplot2::facet_wrap(ggplot2::vars(cutoff), nrow = 1L) +
+    ggplot2::scale_x_discrete(labels = c(MNAR = "MNAR", MAR = "MAR",
+        insufficient = "Insufficient")) +
+    ggplot2::scale_colour_manual(values = c(`FALSE` = "#222222", `TRUE` = "white"),
+        guide = "none") +
+    ggplot2::scale_fill_gradient(low = "#F7FBFF", high = "#08519C",
+        limits = c(0, 1), breaks = c(0, 0.5, 1), labels = c("0%", "50%", "100%"),
+        name = "Within-truth fraction") +
+    ggplot2::labs(x = "Classifier label before filtering", y = "Known design state") +
+    ggplot2::theme_minimal(base_size = 11) +
+    ggplot2::theme(panel.grid = ggplot2::element_blank(), legend.position = "bottom",
+        axis.text.x = ggplot2::element_text(size = 8),
+        strip.background = ggplot2::element_rect(fill = "#F2F2F2", colour = NA),
+        strip.text = ggplot2::element_text(face = "bold"))
+
+stopifnot(sum(cutoff_confusion$count) == 3L * length(confusion_truth))
+```
+
+The confusion heatmaps expose the errors behind the recall curves. A low cutoff
+can label sparse MNAR-designed blocks `insufficient`, while a high cutoff can
+label MAR-designed blocks `MNAR`. These are classifications before filtering.
+In this one-condition benchmark, every MNAR-labelled feature is subsequently
+dropped by the all-MNAR rule. State recall therefore does not measure retention.
 
 # Automatic cutoffs
 

@@ -7,6 +7,8 @@
 - Documents the synthetic regression results and explains their limitations.
 - Adds a benchmark-style cutoff sweep with known MAR and MNAR states to show the
   classifier's state-recall trade-off.
+- Adds a classification workflow, a cell-level replacement audit, and annotated
+  cutoff confusion heatmaps with explicit pre-filter denominators.
 - Adds a package citation and removes a stale reference to deleted development
   validation tooling.
 
