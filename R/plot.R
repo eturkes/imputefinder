@@ -11,7 +11,8 @@ utils::globalVariables(c("intensity", "mean_intensity", "missing_proportion"))
 #' @param condition One condition label in \code{result}.
 #' @return A \code{ggplot} object. The cutoff is shown as a vertical line, and
 #'   bottom ticks mark blocks that received a rescue value. Any stored warnings
-#'   appear in the caption.
+#'   appear in the caption. Unobserved blocks do not enter the intensity fit.
+#'   A condition without observed means produces a labelled empty plot.
 #' @seealso \code{\link{classify_missingness}} and
 #'   \code{vignette("imputefinder")}.
 #' @examples
@@ -41,6 +42,11 @@ plot_missingness <- function(result, condition) {
 }
 
 .base_missingness_plot <- function(profile) {
+    if (nrow(profile$grid) == 0L) {
+        return(ggplot2::ggplot(profile$grid) + ggplot2::annotate(
+            "text", x = 0, y = 0.5, label = "No observed feature means"
+        ))
+    }
     ggplot2::ggplot(
         profile$grid,
         ggplot2::aes(x = intensity, y = missing_proportion)
@@ -225,7 +231,10 @@ plot_missingness <- function(result, condition) {
     raw <- profile$raw
     required_grid <- c("intensity", "missing_proportion", "supported")
     valid_grid <- all(required_grid %in% names(grid)) &&
-        nrow(grid) > 0L &&
+        (nrow(grid) > 0L ||
+            (isTRUE(profile$metadata$profile_type %in% c("absent_only", "empty")) &&
+                "observed_count" %in% names(raw) &&
+                !any(raw$observed_count > 0L))) &&
         is.numeric(grid$intensity) &&
         is.numeric(grid$missing_proportion) &&
         is.logical(grid$supported) &&
@@ -243,9 +252,8 @@ plot_missingness <- function(result, condition) {
     valid_raw <- all(c("mean_intensity", "seeded") %in% names(raw)) &&
         is.numeric(raw$mean_intensity) &&
         is.logical(raw$seeded) &&
-        !anyNA(raw$mean_intensity) &&
         !anyNA(raw$seeded) &&
-        all(is.finite(raw$mean_intensity))
+        all(.valid_block_means(raw))
     if (!valid_grid || !valid_raw) {
         stop(
             sprintf("Stored profile for condition `%s` is invalid.", condition),

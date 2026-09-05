@@ -1,6 +1,6 @@
 Package: imputefinder
 Title: Condition-Aware Missingness Classification for Proteomics
-Version: 0.99.5
+Version: 0.99.6
 Authors@R:
     person("Emir", "Turkes", email = "emir.turkes@eturkes.com",
         role = c("aut", "cre", "cph"),
@@ -9,11 +9,12 @@ Description: Classifies missing protein intensities separately within
     experimental conditions. This can retain condition-specific on/off proteins
     that would be lost when all samples are pooled. Each feature-condition block
     is labelled likely missing-not-at-random (MNAR), likely missing-at-random
-    (MAR), complete, or insufficient using observed intensities,
+    (MAR), complete, insufficient, or absent using observed intensities,
     condition-specific cutoffs, and a strict majority rule. The package accepts
     unnormalised log2 quantitative-proteomics intensities in ordinary matrices
     or SummarizedExperiment objects. It returns filtered data and records the
-    classification, cutoff, rescue values, and drop reason for each feature.
+    classification, cutoff, optional rescue values, original observation
+    counts, and drop reason for each feature.
 License: GPL (>= 3)
 Encoding: UTF-8
 URL: https://github.com/eturkes/imputefinder

@@ -15,7 +15,8 @@ plot_missingness(result, condition)
 \value{
 A \code{ggplot} object. The cutoff is shown as a vertical line, and
 bottom ticks mark blocks that received a rescue value. Any stored warnings
-appear in the caption.
+appear in the caption. Unobserved blocks do not enter the intensity fit.
+A condition without observed means produces a labelled empty plot.
 }
 \description{
 Plot the estimated proportion of features with missing values across the

@@ -70,7 +70,7 @@ test_that("post-seed statistics audit counts, arithmetic means, and seeds", {
     expect_false("globally_absent" %in% statistics$feature)
 })
 
-test_that("statistics reject a surviving all-missing condition block", {
+test_that("statistics represent a surviving unobserved block without a mean", {
     x <- rbind(
         invalid = c(NA, NA, 5, 6),
         valid = c(1, 2, 3, 4)
@@ -78,15 +78,14 @@ test_that("statistics reject a surviving all-missing condition block", {
     colnames(x) <- paste0("s", seq_len(ncol(x)))
     groups <- stats::setNames(rep(c("A", "B"), each = 2L), colnames(x))
 
-    expect_error(
-        imputefinder:::.feature_condition_statistics(
-            x,
-            groups,
-            imputefinder:::.empty_seed_log()
-        ),
-        "Every surviving feature-condition block must have a finite mean",
-        fixed = TRUE
+    statistics <- imputefinder:::.feature_condition_statistics(
+        x, groups, imputefinder:::.empty_seed_log()
     )
+    absent <- statistics[statistics$feature == "invalid" &
+        statistics$condition == "A", ]
+    expect_identical(absent$observed_count, 0L)
+    expect_identical(absent$missing_count, 2L)
+    expect_identical(absent$mean_intensity, NA_real_)
 })
 
 test_that("profiles implement the count-weighted density formula", {

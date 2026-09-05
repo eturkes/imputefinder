@@ -1,6 +1,9 @@
 ^imputefinder\.Rproj$
 ^\.Rproj\.user$
 ^dev$
+^\.github$
+^\.checks$
+^tools$
 ^data-raw$
 ^.*\.Rcheck$
 ^.*\.BiocCheck$

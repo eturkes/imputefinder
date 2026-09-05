@@ -27,7 +27,8 @@
             ,
             drop = FALSE
         ]
-        has_missing <- any(condition_statistics$missing_count > 0L)
+        has_missing <- any(condition_statistics$missing_count > 0L &
+            is.finite(condition_statistics$mean_intensity))
 
         if (!has_missing) {
             diagnostics[[condition_index]] <- .not_needed_cutoff_diagnostic()
@@ -37,7 +38,9 @@
             diagnostics[[condition_index]] <- .manual_cutoff_diagnostic(
                 condition,
                 cutoff,
-                condition_statistics$mean_intensity
+                condition_statistics$mean_intensity[
+                    is.finite(condition_statistics$mean_intensity)
+                ]
             )
         }
     }
@@ -49,7 +52,8 @@
     statistics,
     profiles,
     cutoffs,
-    conditions = NULL
+    conditions = NULL,
+    ambiguity = "warn"
 ) {
     resolved <- .resolve_manual_cutoffs(statistics, cutoffs, conditions)
     conditions <- names(resolved$cutoffs)
@@ -73,6 +77,7 @@
         profile <- profiles[[condition]]
         decision <- .detect_automatic_cutoff(profile)
         diagnostic <- .automatic_cutoff_diagnostic(decision)
+        diagnostic$ambiguity_policy <- ambiguity
         if (!identical(decision$status, "ok")) {
             .abort_automatic_cutoff(
                 condition,
@@ -81,11 +86,46 @@
                 profile
             )
         }
+        .apply_cutoff_ambiguity_policy(
+            condition, decision, diagnostic, profile, ambiguity
+        )
         resolved$cutoffs[[condition]] <- decision$cutoff
         resolved$diagnostics[[condition]] <- diagnostic
     }
 
     resolved
+}
+
+.apply_cutoff_ambiguity_policy <- function(
+    condition, decision, diagnostic, profile, ambiguity
+) {
+    if (!isTRUE(diagnostic$quality$derivative$credible_lobe_count > 1L)) {
+        return(invisible(NULL))
+    }
+    if (ambiguity == "error") {
+        decision$status <- "ambiguous"
+        decision$reason <- paste(
+            "Multiple credible downward transitions remain.",
+            "The ambiguity policy requires a manual cutoff."
+        )
+        diagnostic$warnings <- decision$reason
+        .abort_automatic_cutoff(condition, decision, diagnostic, profile)
+    }
+    if (ambiguity == "warn") {
+        signal <- structure(
+            list(
+                message = sprintf("Condition `%s`: %s", condition,
+                    paste(diagnostic$warnings, collapse = " ")),
+                call = NULL,
+                condition = condition,
+                diagnostic = diagnostic
+            ),
+            class = c("imputefinder_cutoff_ambiguity_warning",
+                "warning", "condition")
+        )
+        warning(signal)
+    }
+    invisible(NULL)
 }
 
 .normalise_cutoff_conditions <- function(conditions) {
@@ -195,7 +235,7 @@
 .automatic_cutoff_specification <- function() {
     list(
         method = "derivative_boundary",
-        method_version = "2",
+        method_version = "3",
         minimum_features = 80L,
         minimum_class_features = 12L,
         trend_alpha = 0.001,
@@ -345,6 +385,9 @@
 
 .automatic_cutoff_evidence <- function(profile, quality, specification) {
     raw <- profile$raw
+    if ("observed_count" %in% names(raw)) {
+        raw <- raw[raw$observed_count > 0L, , drop = FALSE]
+    }
     valid <- is.numeric(raw$mean_intensity) &&
         is.logical(raw$has_missing) &&
         !anyNA(raw$has_missing) &&
@@ -939,6 +982,9 @@
     )
     cutoff <- transition$cutoff
     quality$selected_transition <- transition$quality
+    quality$candidate_transitions <- .automatic_transition_table(
+        candidate, filtered, lobes, specification
+    )
     if (!is.finite(cutoff) ||
         cutoff <= min(candidate$x) ||
         cutoff >= max(candidate$x)) {
@@ -957,6 +1003,26 @@
         specification = specification,
         warnings = derivative$warnings
     )
+}
+
+.automatic_transition_table <- function(candidate, filtered, lobes, specification) {
+    alternatives <- lapply(lobes, function(lobe) {
+        .select_automatic_cutoff_transition(
+            candidate, filtered, list(lobe), specification
+        )
+    })
+    peaks <- vapply(alternatives, function(x) x$quality$peak_intensity,
+        numeric(1L))
+    table <- data.frame(
+        cutoff = vapply(alternatives, `[[`, numeric(1L), "cutoff"),
+        peak_intensity = peaks,
+        drop = vapply(alternatives, function(x) x$quality$drop, numeric(1L)),
+        peak_to_noise = vapply(alternatives,
+            function(x) x$quality$peak_to_noise, numeric(1L)),
+        selected = seq_along(alternatives) == which.min(peaks)
+    )[order(peaks, method = "radix"), , drop = FALSE]
+    rownames(table) <- NULL
+    table
 }
 
 .automatic_cutoff_diagnostic <- function(decision) {
@@ -996,7 +1062,11 @@
             profile = profile
         ),
         class = c(
-            "imputefinder_cutoff_unidentifiable",
+            if (identical(decision$status, "ambiguous")) {
+                "imputefinder_cutoff_ambiguous"
+            } else {
+                "imputefinder_cutoff_unidentifiable"
+            },
             "imputefinder_cutoff_error",
             "error",
             "condition"
@@ -1016,7 +1086,7 @@
         )
     }
     if (anyNA(statistics$condition) || any(!nzchar(statistics$condition)) ||
-        any(!is.finite(statistics$mean_intensity))) {
+        any(!.valid_block_means(statistics))) {
         stop("`statistics` contains invalid cutoff inputs.", call. = FALSE)
     }
 

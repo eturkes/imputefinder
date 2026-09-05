@@ -17,9 +17,12 @@
 #' same matrix core.
 #'
 #' @section Workflow boundary:
-#' ImputeFinder filters the input and adds recorded rescue values where needed.
+#' ImputeFinder filters the input. The default minimum-rescue policy adds
+#' recorded anchors; `rescue = "none"` keeps fully unobserved blocks `absent`.
 #' It does not normalise or impute the data. Normalise the returned data, split
 #' it by condition, and apply the chosen methods to the supplied feature groups.
+#' Absent blocks require a separate downstream decision; they are not assigned
+#' to either imputation branch.
 #'
 #' @seealso [classify_missingness()], [plot_missingness()],
 #'   `vignette("imputefinder")`, and `citation("imputefinder")`.

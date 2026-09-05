@@ -19,18 +19,19 @@ samples before classification can hide that on/off pattern.
 
 ImputeFinder therefore assigns one state to each feature-condition block:
 
-| State | Rule after rescue | Downstream group |
+| State | Rule after the selected rescue policy | Downstream group |
 |---|---|---|
 | `complete` | No values are missing | `MAR_or_complete` |
 | `MNAR` | Values are missing and the observed arithmetic mean is below the condition cutoff | `MNAR` |
 | `MAR` | Values are missing, the mean is at or above the cutoff, and strictly more than half of the samples are observed | `MAR_or_complete` |
 | `insufficient` | Values are missing, the mean is at or above the cutoff, and no strict observed majority exists | Feature is dropped |
+| `absent` | No original values are observed and `rescue = "none"` | `absent`; no mechanism is assigned |
 
 A mean equal to the cutoff is on the MAR side. The majority rule applies only
 to MAR candidates: one low-intensity observation can still support a sparse
 MNAR block. A feature is retained only when no condition is `insufficient` and
 at least one condition is `complete` or `MAR`. Features absent globally and
-features classified as `MNAR` in every condition are dropped.
+features classified as `MNAR` or `absent` in every condition are dropped.
 
 The labels mean **likely MNAR** and **likely MAR** given the observed data. They
 are practical classifications, not proof of the underlying missingness
@@ -97,8 +98,8 @@ fit
 <imputefinder_result>
 Retained 4 of 7 features; dropped 3.
 Analysed 8 samples in 2 conditions; inserted 1 rescue value.
-A: retained features include 2 MNAR, 1 MAR, 1 complete; cutoff 12 (manual)
-B: retained features include 0 MNAR, 1 MAR, 3 complete; cutoff 12 (manual)
+A: retained features include 2 MNAR, 1 MAR, 1 complete, 0 absent; cutoff 12 (manual)
+B: retained features include 0 MNAR, 1 MAR, 3 complete, 0 absent; cutoff 12 (manual)
 ```
 
 The feature-level summary explains both retention and exclusion:
@@ -150,7 +151,7 @@ the recorded rescue value.
 ## How rescue works
 
 An on/off feature has no observed value from which to calculate its mean in the
-absent condition. ImputeFinder handles that block before classification:
+absent condition. The default `rescue = "minimum"` handles it before classification:
 
 1. Features missing in every sample are marked `all_missing` and removed.
 2. The minimum finite intensity in each condition is calculated once, before
@@ -168,11 +169,43 @@ fit$seed_log
 #> 1  on_off         A     s1        NA              8    1
 ```
 
-The rescue value is a low-intensity anchor used only for classification; it is
+The rescue value is a low-intensity anchor used to enable classification; it is
 not a completed imputation. With a fixed dataset and `seed`, the selected sample
 does not change when rows or columns are reordered. The default is `seed = 1L`.
 ImputeFinder leaves the global random-number state unchanged, does not modify
-the input, and preserves all originally observed values.
+the input, and preserves all originally observed values. The inserted value
+remains in `fit$data` and can affect later normalization and inference.
+
+### Classify without synthetic values
+
+Use `rescue = "none"` to preserve missing cells and record absence separately:
+
+```r
+unseeded <- classify_missingness(
+    x,
+    group = condition,
+    cutoffs = c(A = 12, B = 12),
+    rescue = "none"
+)
+unseeded$groups$A$absent
+#> [1] "on_off"
+unseeded$classifications[
+    unseeded$classifications$feature == "on_off",
+    c("condition", "state", "original_observed_count",
+      "original_missing_count", "original_mean_intensity")
+]
+```
+
+The absent block has zero observations, an undefined mean, and no cutoff.
+It does not enter density estimation or automatic-cutoff evidence.
+An entirely unobserved condition receives an empty, labelled diagnostic plot.
+Globally missing features are still dropped with `all_missing` records.
+Features that are MNAR or absent everywhere receive `MNAR_or_absent_all_conditions`
+when at least one block is absent.
+
+Absence is not evidence for either a MAR or MNAR mechanism. Keep the `absent`
+group separate until the analysis specifies how to handle unobserved blocks.
+This mode prevents synthetic values; it does not establish biological absence.
 
 ## Manual and automatic cutoffs
 
@@ -181,9 +214,9 @@ plan. Supply a named, finite value for each relevant condition. A partial vector
 is allowed; automatic selection fills the omitted conditions. A cutoff outside
 the observed feature-mean range is accepted but recorded with a warning.
 
-With `cutoffs = NULL`, the default, each condition containing missing values is
-assessed independently for an automatic cutoff. A condition without missing
-values needs no cutoff:
+With `cutoffs = NULL`, each condition containing partially observed blocks is
+assessed independently for an automatic cutoff. Complete or fully absent blocks
+need no cutoff:
 
 ```r
 fit_auto <- classify_missingness(
@@ -204,10 +237,18 @@ n_missing f_missing(x) + n_complete f_complete(x)
 
 The detector uses the lower, right-hand boundary of the lowest-intensity
 credible downward transition. The method version, supporting values, and
-warnings are stored in `cutoff_diagnostics`. Multiple credible transitions
-produce a stored warning, also shown in the plot caption. This selection policy
-does not establish a unique biological boundary. Inspect the profile and
-supply a manual cutoff when appropriate.
+warnings are stored in `cutoff_diagnostics`. Multiple credible transitions now
+signal a warning by default, as well as appearing in the plot caption.
+Use `ambiguity = "error"` to require a manual decision in such cases.
+Use `ambiguity = "lowest"` to accept the lowest transition explicitly without
+signalling a warning. Stored warnings remain available under every policy.
+The `quality$candidate_transitions` table records candidate cutoffs and support.
+These candidates are not confidence intervals or calibrated probabilities.
+This selection policy does not establish a unique biological boundary.
+
+Strict failures inherit from `imputefinder_cutoff_ambiguous` and
+`imputefinder_cutoff_error`. They retain `profile`, `diagnostic`, and `condition`
+fields. A named manual cutoff bypasses automatic ambiguity for that condition.
 
 When the profile is too small, flat, or unsupported, the function reports why
 it could not estimate a cutoff and asks for a manual value.
@@ -229,9 +270,9 @@ is the recorded cutoff.
 
 | Component | Contents |
 |---|---|
-| `data` | Filtered data with recorded rescue values; matrix input returns a matrix, while `SummarizedExperiment` input preserves its representation and metadata |
-| `classifications` | One row per surviving feature and condition, with the values used for classification and the final state |
-| `groups` | Retained `MNAR`, `MAR`, `complete`, and `MAR_or_complete` feature names for every condition |
+| `data` | Filtered data with any recorded rescue values; the input representation and metadata are preserved |
+| `classifications` | Processed statistics, original observed and missing counts, original means, and final states for each surviving feature-condition block |
+| `groups` | Retained `MNAR`, `MAR`, `complete`, `MAR_or_complete`, and `absent` feature names for every condition |
 | `feature_status` | One row per original feature with its retention decision and drop reason |
 | `cutoffs` | Named condition-specific numeric cutoffs |
 | `cutoff_diagnostics` | Whether each cutoff was manual, automatic, or unnecessary, together with method details and warnings |
@@ -239,9 +280,13 @@ is the recorded cutoff.
 | `seed_log` | The feature, condition, selected sample, inserted value, and seed for every rescue, including rescues on features later dropped |
 | `groups_by_sample` | Condition vector named and ordered by output samples |
 | `call` | The matched call used to create the result |
+| `policies` | Resolved rescue and ambiguity policies |
 
 `summary(fit)` reports all state and drop counts. `plot_missingness()` displays
 the profile stored in the result, so it does not need the original input.
+`summary(fit)$seeded_complete` counts blocks that became complete solely through
+rescue. Original provenance uses `original_observed_count`,
+`original_missing_count`, and `original_mean_intensity` in `classifications`.
 
 For a `SummarizedExperiment`, select the condition column explicitly and select
 the assay whenever more than one is present:
@@ -269,6 +314,10 @@ The intended pipeline is:
    `fit$groups[[condition]]$MNAR` and a MAR method only to rows named in
    `fit$groups[[condition]]$MAR_or_complete`.
 6. Recombine conditions in the original sample order.
+
+With `rescue = "none"`, handle `fit$groups[[condition]]$absent` separately.
+The package does not route unobserved blocks to either imputation branch.
+The returned object can still contain missing values under either policy.
 
 For example, these indices isolate the two branches without imposing an
 imputation package:
@@ -301,6 +350,18 @@ tests also include profiles for which no defensible boundary can be estimated.
 These simulations verify implementation behavior under their stated model; they
 are not estimates of accuracy for arbitrary proteomics experiments.
 
+Run the committed build and check from the repository root:
+
+```sh
+Rscript tools/check-package.R
+Rscript tools/check-package.R --bioc
+```
+
+Install the package dependencies first. The second command also runs BiocCheck.
+Logs remain under `.checks/`. The checks execute examples, tests, and vignettes.
+CI is configured for Linux, macOS, Windows, and Linux with R-devel.
+Hosted results are established only when those jobs actually run.
+
 ## Limitations
 
 - ImputeFinder cannot determine whether values are log2 transformed or
@@ -316,8 +377,8 @@ are not estimates of accuracy for arbitrary proteomics experiments.
 - A rescue value is artificial and remains visible in the returned data and
   log. Record its role and assess its downstream effect.
 - With one sample in a condition, rescue fills the entire block, which becomes
-  `complete`. Inspect `seeded` and `seed_log` to distinguish artificial from
-  observed completeness. Replicated conditions are needed to assess
+  `complete`. Inspect original counts, `seeded`, and `seed_log`, or select
+  `rescue = "none"` to keep the block absent. Replicated conditions are needed to assess
   within-condition missingness.
 - The package classifies and coordinates a workflow. It neither proves causal
   missingness mechanisms nor chooses, runs, or validates an imputation method.

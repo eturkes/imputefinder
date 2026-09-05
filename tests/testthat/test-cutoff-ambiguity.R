@@ -15,7 +15,10 @@ ambiguous_cutoff_fixture <- function() {
 
 test_that("competing credible cutoff transitions expose the selection policy", {
     fixture <- ambiguous_cutoff_fixture()
-    result <- classify_missingness(fixture$x, fixture$group)
+    expect_warning(
+        result <- classify_missingness(fixture$x, fixture$group),
+        class = "imputefinder_cutoff_ambiguity_warning"
+    )
     diagnostic <- result$cutoff_diagnostics$A
     expect_match(
         diagnostic$warnings,
@@ -41,4 +44,29 @@ test_that("competing credible cutoff transitions expose the selection policy", {
     expect_identical(manual$cutoffs[["A"]], 15)
     expect_identical(manual$cutoff_diagnostics$A$source, "manual")
     expect_identical(manual$cutoff_diagnostics$B$source, "not_needed")
+})
+
+test_that("strict ambiguity errors preserve alternatives and allow manual override", {
+    fixture <- ambiguous_cutoff_fixture()
+    error <- tryCatch(
+        classify_missingness(fixture$x, fixture$group, ambiguity = "error"),
+        imputefinder_cutoff_ambiguous = identity
+    )
+    expect_s3_class(error, "imputefinder_cutoff_error")
+    expect_identical(error$condition, "A")
+    expect_identical(error$diagnostic$ambiguity_policy, "error")
+    alternatives <- error$diagnostic$quality$candidate_transitions
+    expect_identical(nrow(alternatives), 2L)
+    expect_true(all(is.finite(alternatives$cutoff)))
+    expect_true(all(diff(alternatives$peak_intensity) > 0))
+    expect_identical(sum(alternatives$selected), 1L)
+    expect_type(error$profile$raw$mean_intensity, "double")
+
+    expect_silent(lowest <- classify_missingness(fixture$x, fixture$group,
+        ambiguity = "lowest"))
+    expect_identical(lowest$cutoff_diagnostics$A$ambiguity_policy, "lowest")
+    expect_identical(lowest$cutoffs[["A"]], alternatives$cutoff[[1]])
+    expect_silent(manual <- classify_missingness(fixture$x, fixture$group,
+        ambiguity = "error", cutoffs = c(A = 15)))
+    expect_identical(manual$cutoffs[["A"]], 15)
 })

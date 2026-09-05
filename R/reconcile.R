@@ -1,11 +1,17 @@
 .assign_condition_states <- function(statistics, cutoffs) {
     .validate_state_statistics(statistics)
+    if (nrow(statistics) == 0L) {
+        return(.empty_classifications())
+    }
     row_cutoffs <- .classification_row_cutoffs(statistics, cutoffs)
     state <- rep(NA_character_, nrow(statistics))
     complete <- statistics$missing_count == 0L
     state[complete] <- "complete"
+    absent <- statistics$observed_count == 0L
+    state[absent] <- "absent"
+    row_cutoffs[absent] <- NA_real_
 
-    incomplete <- !complete
+    incomplete <- !complete & !absent
     below_cutoff <- incomplete &
         statistics$mean_intensity < row_cutoffs
     state[below_cutoff] <- "MNAR"
@@ -38,7 +44,8 @@
     cutoffs <- .normalise_resolved_cutoffs(cutoffs, conditions)
     for (condition in conditions) {
         rows <- statistics$condition == condition
-        has_missing <- any(statistics$missing_count[rows] > 0L)
+        has_missing <- any(statistics$missing_count[rows] > 0L &
+            statistics$observed_count[rows] > 0L)
         if (!has_missing) {
             cutoffs[[condition]] <- NA_real_
         } else if (is.na(cutoffs[[condition]])) {
@@ -56,6 +63,10 @@
 
 .reconcile_condition_states <- function(classifications, feature_status) {
     .validate_reconciliation_inputs(classifications, feature_status)
+    if (nrow(classifications) == 0L) {
+        return(list(classifications = classifications,
+            feature_status = feature_status))
+    }
 
     features <- feature_status$feature[is.na(feature_status$retained)]
     conditions <- sort(unique(classifications$condition), method = "radix")
@@ -97,10 +108,13 @@
 .reconciled_feature_decision <- function(state_matrix, conditions) {
     insufficient <- state_matrix == "insufficient"
     has_insufficient <- rowSums(insufficient) > 0L
-    all_mnar <- rowSums(state_matrix == "MNAR") == ncol(state_matrix)
+    absent <- state_matrix == "absent"
+    all_mnar <- rowSums(state_matrix == "MNAR" | absent) == ncol(state_matrix)
     retained <- !has_insufficient & !all_mnar
     drop_reason <- rep(NA_character_, nrow(state_matrix))
     drop_reason[all_mnar] <- "MNAR_all_conditions"
+    drop_reason[all_mnar & rowSums(absent) > 0L] <-
+        "MNAR_or_absent_all_conditions"
     drop_reason[has_insufficient] <- apply(
         insufficient[has_insufficient, , drop = FALSE],
         1L,
@@ -115,9 +129,11 @@
     list(retained = retained, drop_reason = drop_reason)
 }
 
-.retained_condition_groups <- function(classifications, feature_order) {
+.retained_condition_groups <- function(
+    classifications, feature_order,
+    conditions = sort(unique(classifications$condition), method = "radix")
+) {
     .validate_reconciled_classifications(classifications, feature_order)
-    conditions <- sort(unique(classifications$condition), method = "radix")
     retained_features <- feature_order[
         feature_order %in%
             unique(classifications$feature[classifications$retained])
@@ -140,7 +156,8 @@
                 complete = retained_features[states == "complete"],
                 MAR_or_complete = retained_features[
                     states %in% c("MAR", "complete")
-                ]
+                ],
+                absent = retained_features[states == "absent"]
             )
         }
     )
@@ -206,7 +223,8 @@
         factor(classifications$feature, levels = expected_features),
         factor(classifications$condition, levels = conditions)
     )
-    if (length(conditions) == 0L || any(coverage != 1L)) {
+    if ((length(conditions) == 0L && length(expected_features) > 0L) ||
+        any(coverage != 1L)) {
         stop(
             "Every surviving feature must have exactly one state per ",
             "condition.",
@@ -273,7 +291,7 @@
         factor(retained_rows$feature, levels = retained),
         factor(retained_rows$condition, levels = conditions)
     )
-    valid_states <- retained_rows$state %in% c("complete", "MAR", "MNAR")
+    valid_states <- retained_rows$state %in% c("complete", "MAR", "MNAR", "absent")
     if (any(coverage != 1L) || any(!valid_states)) {
         stop(
             "Every retained feature must have one eligible state per ",
@@ -329,9 +347,9 @@
         statistics$missing_count >= 0L &
         statistics$observed_count + statistics$missing_count ==
             statistics$sample_count
-    valid <- !anyNA(statistics[, required]) &&
+    valid <- !anyNA(statistics[, setdiff(required, "mean_intensity")]) &&
         all(valid_counts) &&
-        all(is.finite(statistics$mean_intensity))
+        all(.valid_block_means(statistics))
     if (!valid) {
         stop("`statistics` contains invalid state inputs.", call. = FALSE)
     }

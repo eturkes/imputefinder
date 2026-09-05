@@ -72,7 +72,8 @@ test_that("public classification leaves process-global state unchanged", {
         automatic <- classify_missingness(
             simulation$data,
             simulation$groups,
-            seed = 17L
+            seed = 17L,
+            ambiguity = "lowest"
         )
         stored_plot <- plot_missingness(automatic, "A")
         after <- .capture_process_state()
@@ -96,7 +97,8 @@ test_that("final matrix changes are exactly the retained logged seeds", {
     automatic <- classify_missingness(
         simulation$data,
         simulation$groups,
-        seed = 29L
+        seed = 29L,
+        ambiguity = "lowest"
     )
 
     expect_identical(simulation$data, original)

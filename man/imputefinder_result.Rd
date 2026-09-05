@@ -25,6 +25,8 @@
 \code{summary.imputefinder_result()} returns a list of class
 \code{summary.imputefinder_result}. Its count tables include all classified
 feature-condition blocks and the retained subset separately.
+\code{seeded_complete} counts blocks that became complete after rescue,
+despite having no original observations.
 \code{print.summary.imputefinder_result()} returns \code{x} invisibly.
 }
 \description{

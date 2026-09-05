@@ -9,7 +9,7 @@ new_result_skeleton <- function(data, groups_by_sample) {
 test_that("the state vocabulary is stable and exhaustive", {
     expect_identical(
         imputefinder:::.missingness_states(),
-        c("complete", "MNAR", "MAR", "insufficient")
+        c("complete", "MNAR", "MAR", "insufficient", "absent")
     )
 })
 
@@ -32,7 +32,8 @@ test_that("the result skeleton contains the expected typed components", {
             "profiles",
             "seed_log",
             "groups_by_sample",
-            "call"
+            "call",
+            "policies"
         )
     )
     expect_identical(result$data, fixture$x)
@@ -88,7 +89,7 @@ test_that("the result skeleton contains the expected typed components", {
     expect_identical(names(result$groups), c("A", "B"))
     expect_identical(
         names(result$groups$A),
-        c("MNAR", "MAR", "complete", "MAR_or_complete")
+        c("MNAR", "MAR", "complete", "MAR_or_complete", "absent")
     )
     expect_true(all(lengths(result$groups$A) == 0L))
     expect_identical(result$cutoffs, c(A = NA_real_, B = NA_real_))
@@ -151,7 +152,8 @@ test_that("the result constructor rejects invalid state and group schemas", {
 test_that("the public classifier has the documented arguments", {
     expect_identical(
         names(formals(classify_missingness)),
-        c("x", "group", "group_col", "assay", "cutoffs", "seed")
+        c("x", "group", "group_col", "assay", "cutoffs", "seed",
+            "rescue", "ambiguity")
     )
 })
 
@@ -168,6 +170,7 @@ test_that("summary exposes exact feature, state, drop, and cutoff counts", {
             "features",
             "samples",
             "seed_insertions",
+            "seeded_complete",
             "states",
             "retained_states",
             "drops",
@@ -183,6 +186,7 @@ test_that("summary exposes exact feature, state, drop, and cutoff counts", {
         c(total = 8L, conditions = 2L)
     )
     expect_identical(result_summary$seed_insertions, 1L)
+    expect_identical(result_summary$seeded_complete, 0L)
     expect_identical(
         result_summary$states,
         data.frame(
@@ -191,6 +195,7 @@ test_that("summary exposes exact feature, state, drop, and cutoff counts", {
             MNAR = c(3L, 1L),
             MAR = c(1L, 1L),
             insufficient = c(1L, 0L),
+            absent = c(0L, 0L),
             stringsAsFactors = FALSE
         )
     )
@@ -202,6 +207,7 @@ test_that("summary exposes exact feature, state, drop, and cutoff counts", {
             MNAR = c(2L, 0L),
             MAR = c(1L, 1L),
             insufficient = c(0L, 0L),
+            absent = c(0L, 0L),
             stringsAsFactors = FALSE
         )
     )
@@ -245,11 +251,11 @@ test_that("result and summary print methods are concise and return invisibly", {
             "Retained 4 of 7 features; dropped 3.",
             "Analysed 8 samples in 2 conditions; inserted 1 rescue value.",
             paste0(
-                "A: retained features include 2 MNAR, 1 MAR, 1 complete; ",
+                "A: retained features include 2 MNAR, 1 MAR, 1 complete, 0 absent; ",
                 "cutoff 12 (manual)"
             ),
             paste0(
-                "B: retained features include 0 MNAR, 1 MAR, 3 complete; ",
+                "B: retained features include 0 MNAR, 1 MAR, 3 complete, 0 absent; ",
                 "cutoff 12 (manual)"
             )
         )
@@ -270,8 +276,8 @@ test_that("result and summary print methods are concise and return invisibly", {
             "Retained 4 of 7 features; dropped 3.",
             "Analysed 8 samples in 2 conditions; inserted 1 rescue value.",
             "All classified feature-condition blocks:",
-            "A: 1 complete, 3 MNAR, 1 MAR, 1 insufficient",
-            "B: 4 complete, 1 MNAR, 1 MAR, 0 insufficient",
+            "A: 1 complete, 3 MNAR, 1 MAR, 1 insufficient, 0 absent",
+            "B: 4 complete, 1 MNAR, 1 MAR, 0 insufficient, 0 absent",
             "Dropped features:",
             "  all values missing: 1",
             "  insufficient observations in A: 1",
@@ -305,4 +311,15 @@ test_that("presentation handles no drops and conditions without cutoffs", {
     expect_true(any(output == "Dropped features: none"))
     expect_true(any(output == "  A: not needed"))
     expect_true(any(output == "  B: not needed"))
+})
+
+test_that("previously saved summaries remain printable without new fields", {
+    legacy <- summary(classify_fixture())
+    legacy$seeded_complete <- NULL
+    legacy$states$absent <- NULL
+    legacy$retained_states$absent <- NULL
+    output <- capture.output(visibility <- withVisible(print(legacy)))
+    expect_true(any(grepl("A: 1 complete, 3 MNAR", output, fixed = TRUE)))
+    expect_false(visibility$visible)
+    expect_identical(visibility$value, legacy)
 })

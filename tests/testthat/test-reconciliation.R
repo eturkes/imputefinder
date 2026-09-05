@@ -103,7 +103,8 @@ test_that("condition groups contain retained features in original order", {
                 MNAR = c("on_off", "sparse_mnar"),
                 MAR = "mar_both",
                 complete = "complete_low",
-                MAR_or_complete = c("mar_both", "complete_low")
+                MAR_or_complete = c("mar_both", "complete_low"),
+                absent = character()
             ),
             B = list(
                 MNAR = character(),
@@ -114,7 +115,8 @@ test_that("condition groups contain retained features in original order", {
                     "mar_both",
                     "sparse_mnar",
                     "complete_low"
-                )
+                ),
+                absent = character()
             )
         )
     )

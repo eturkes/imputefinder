@@ -5,7 +5,8 @@ state_boundary_fixture <- function() {
         equal_majority = c(10, 10, NA, 10, 10, NA, 10),
         above_majority = c(11, 11, NA, 11, 11, NA, 11),
         exactly_half = c(11, 11, NA, NA, 11, NA, NA),
-        arithmetic_mean = c(1, 1, 20, NA, 20, 20, 20)
+        arithmetic_mean = c(1, 1, 20, NA, 20, 20, 20),
+        absent = c(NA, NA, NA, NA, 20, 20, 20)
     )
     colnames(x) <- paste0("s", seq_len(ncol(x)))
 

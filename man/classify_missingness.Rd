@@ -10,7 +10,9 @@ classify_missingness(
   group_col = NULL,
   assay = NULL,
   cutoffs = NULL,
-  seed = 1L
+  seed = 1L,
+  rescue = "minimum",
+  ambiguity = "warn"
 )
 }
 \arguments{
@@ -26,28 +28,50 @@ input. Do not supply it for \code{SummarizedExperiment} input.}
 \item{assay}{The assay name for \code{SummarizedExperiment} input.}
 
 \item{cutoffs}{Optional named numeric vector of manual condition cutoffs.
-Automatic estimation is used for omitted conditions that contain missing
-values. Conditions without missing values need no cutoff.}
+Automatic estimation is used for omitted conditions with partially observed
+blocks. Complete and fully absent blocks need no cutoff.}
 
 \item{seed}{An integer that controls which sample receives each rescue value.}
+
+\item{rescue}{Either \code{"minimum"}, the legacy default, or \code{"none"}.
+Minimum rescue inserts one condition-minimum value into each fully missing
+block. With no rescue, these blocks remain missing and receive the state
+\code{absent}. This state does not identify a missingness mechanism.}
+
+\item{ambiguity}{Policy for multiple credible automatic transitions:
+\code{"warn"} selects the lowest transition and signals a warning;
+\code{"error"} requires a manual cutoff; \code{"lowest"} explicitly accepts
+the lowest transition with stored diagnostics only. The default is
+\code{"warn"}.}
 }
 \value{
 An \code{imputefinder_result} containing filtered data,
 feature-condition classifications, downstream groups, feature-level
 decisions, cutoffs, diagnostic profiles, and a log of rescue values.
+Classifications include \code{original_observed_count},
+\code{original_missing_count}, and \code{original_mean_intensity} before
+rescue. The resolved \code{rescue} and \code{ambiguity} policies are stored
+in \code{policies}.
 }
 \description{
 Classify each feature separately within each experimental condition. Fully
-missing condition blocks receive one recorded low-intensity rescue value so
-that condition-specific on/off patterns can be retained. Input values must be
+missing condition blocks can be retained without inserting values. The
+legacy minimum-rescue mode remains the default. Input values must be
 unnormalised log2 protein intensities.
 }
 \details{
 When several credible downward transitions exist, automatic estimation
-selects the lowest-intensity transition and records a diagnostic warning.
+follows \code{ambiguity}. Candidate transitions remain in the diagnostics.
 Inspect the stored profile and supply a manual cutoff when appropriate.
 
-With one sample in a condition, rescue fills the entire missing block, which
+With \code{rescue = "none"}, absent blocks do not contribute to intensity
+profiles or cutoff estimation. They need no cutoff. A condition can contain
+no observations. Features are dropped when all values are missing, any
+condition is insufficient, or every condition is MNAR or absent. Other
+on/off features remain available through each condition's \code{absent}
+group. No missing value is replaced in this mode.
+
+With one sample in a condition, minimum rescue fills the missing block, which
 then becomes \code{complete}. Inspect \code{seeded} and \code{seed_log} to
 distinguish these blocks from originally complete measurements. Replicated
 conditions are needed to assess within-condition missingness.

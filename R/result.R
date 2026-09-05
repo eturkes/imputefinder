@@ -1,5 +1,5 @@
 .missingness_states <- function() {
-    c("complete", "MNAR", "MAR", "insufficient")
+    c("complete", "MNAR", "MAR", "insufficient", "absent")
 }
 
 .empty_classifications <- function() {
@@ -51,7 +51,8 @@
     cutoffs = NULL,
     cutoff_diagnostics = NULL,
     profiles = NULL,
-    seed_log = .empty_seed_log()
+    seed_log = .empty_seed_log(),
+    policies = list(rescue = "minimum", ambiguity = "warn")
 ) {
     groups_by_sample <- .validate_result_groups(data, groups_by_sample)
     conditions <- sort(unique(unname(groups_by_sample)), method = "radix")
@@ -62,7 +63,8 @@
                     MNAR = character(),
                     MAR = character(),
                     complete = character(),
-                    MAR_or_complete = character()
+                    MAR_or_complete = character(),
+                    absent = character()
                 )
             }),
             conditions
@@ -99,7 +101,8 @@
             profiles = profiles,
             seed_log = seed_log,
             groups_by_sample = groups_by_sample,
-            call = call
+            call = call,
+            policies = policies
         ),
         class = "imputefinder_result"
     )
@@ -157,6 +160,8 @@
 #'   \code{summary.imputefinder_result()} returns a list of class
 #'   \code{summary.imputefinder_result}. Its count tables include all classified
 #'   feature-condition blocks and the retained subset separately.
+#'   \code{seeded_complete} counts blocks that became complete after rescue,
+#'   despite having no original observations.
 #'   \code{print.summary.imputefinder_result()} returns \code{x} invisibly.
 #'
 #' @seealso \code{\link{classify_missingness}},
@@ -187,13 +192,15 @@ print.imputefinder_result <- function(x, ...) {
         cutoff <- result_summary$cutoffs[index, , drop = FALSE]
         cat(sprintf(
             paste0(
-                "%s: retained features include %d MNAR, %d MAR, %d complete; ",
+                "%s: retained features include %d MNAR, %d MAR, ",
+                "%d complete, %d absent; ",
                 "cutoff %s\n"
             ),
             states$condition,
             states$MNAR,
             states$MAR,
             states$complete,
+            states$absent,
             .format_result_cutoff(cutoff$cutoff, cutoff$source)
         ))
     }
@@ -221,6 +228,8 @@ summary.imputefinder_result <- function(object, ...) {
                 conditions = as.integer(length(conditions))
             ),
             seed_insertions = as.integer(nrow(object$seed_log)),
+            seeded_complete = as.integer(sum(object$classifications$seeded &
+                object$classifications$state == "complete")),
             states = .result_state_counts(
                 object$classifications,
                 conditions
@@ -245,12 +254,13 @@ print.summary.imputefinder_result <- function(x, ...) {
     for (index in seq_len(nrow(x$states))) {
         states <- x$states[index, , drop = FALSE]
         cat(sprintf(
-            "%s: %d complete, %d MNAR, %d MAR, %d insufficient\n",
+            "%s: %d complete, %d MNAR, %d MAR, %d insufficient, %d absent\n",
             states$condition,
             states$complete,
             states$MNAR,
             states$MAR,
-            states$insufficient
+            states$insufficient,
+            if (is.null(states$absent)) 0L else states$absent
         ))
     }
 
@@ -351,7 +361,7 @@ print.summary.imputefinder_result <- function(x, ...) {
         unique_reasons[startsWith(unique_reasons, "insufficient:")],
         method = "radix"
     )
-    fixed <- c("all_missing", "MNAR_all_conditions")
+    fixed <- c("all_missing", "MNAR_all_conditions", "MNAR_or_absent_all_conditions")
     other <- sort(
         setdiff(unique_reasons, c(fixed, insufficient)),
         method = "radix"
@@ -360,6 +370,7 @@ print.summary.imputefinder_result <- function(x, ...) {
         intersect("all_missing", unique_reasons),
         insufficient,
         intersect("MNAR_all_conditions", unique_reasons),
+        intersect("MNAR_or_absent_all_conditions", unique_reasons),
         other
     )
     counts <- table(factor(reasons, levels = ordered_reasons))
@@ -423,6 +434,13 @@ print.summary.imputefinder_result <- function(x, ...) {
         result_summary$seed_insertions,
         .plural_noun(result_summary$seed_insertions, "value")
     ))
+    if (!is.null(result_summary$seeded_complete) &&
+        result_summary$seeded_complete > 0L) {
+        cat(sprintf(
+            "%d blocks have synthetic completeness after rescue; original observations: zero.\n",
+            result_summary$seeded_complete
+        ))
+    }
 }
 
 .plural_noun <- function(count, singular) {
@@ -435,6 +453,9 @@ print.summary.imputefinder_result <- function(x, ...) {
     }
     if (identical(reason, "MNAR_all_conditions")) {
         return("MNAR in every condition")
+    }
+    if (identical(reason, "MNAR_or_absent_all_conditions")) {
+        return("MNAR or absent in every condition")
     }
     if (startsWith(reason, "insufficient:")) {
         conditions <- sub("^insufficient:", "", reason)

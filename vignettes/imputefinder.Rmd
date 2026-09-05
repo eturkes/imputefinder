@@ -145,7 +145,8 @@ trusts the scientific input contract: it does not infer or apply a log
 transform, normalisation, centring, or scaling, and it does not reinterpret
 zero.
 
-After rescue, each feature-condition block receives exactly one state:
+The worked examples use the legacy `rescue = "minimum"` policy. Each
+feature-condition block receives exactly one state after that policy:
 
 - `complete` - no value is missing.
 - `MNAR` - at least one value is missing and the arithmetic mean of observed
@@ -154,6 +155,10 @@ After rescue, each feature-condition block receives exactly one state:
     and strictly more than half the samples are observed.
 - `insufficient` - the block is on the MAR side of the cutoff but lacks a
     strict observed majority.
+
+With `rescue = "none"`, fully missing blocks instead receive `absent`.
+They have no mean or assigned missingness mechanism and do not enter intensity
+fitting. Other blocks follow the same rules. No missing values are replaced.
 
 The arithmetic mean is deliberate: one strong observation can move a partly
 observed block toward the MAR side, and a mean equal to the cutoff is also on
@@ -164,7 +169,7 @@ low-intensity block can remain MNAR because one observation may be the only
 available evidence near the detection limit.
 
 A feature is dropped if it is absent globally, `insufficient` in any condition,
-or `MNAR` in every condition. Otherwise its complete state matrix is retained,
+or `MNAR` or `absent` in every condition. Otherwise its complete state matrix is retained,
 including mixtures such as MNAR in one condition and complete in another. An
 `insufficient` block cannot support a MAR branch, while an all-MNAR feature has
 no complete or MAR-like condition to support retention.
@@ -978,10 +983,10 @@ missingness has a known mechanism or that pT217 differs between populations.
 # Result components
 
 - `data` - retained rows in the input representation, with recorded rescue
-    values inserted.
+    values inserted only under the minimum-rescue policy.
 - `classifications` - one row per feature and condition, with the values used
-    for classification, the assigned state, and the retention decision.
-- `groups` - retained `MNAR`, `MAR`, `complete`, and `MAR_or_complete` feature
+    for classification, original counts and means, the state, and the retention decision.
+- `groups` - retained `MNAR`, `MAR`, `complete`, `MAR_or_complete`, and `absent` feature
     names for each condition.
 - `feature_status` - one retention decision for every original feature.
 - `cutoffs`, `cutoff_diagnostics` - condition boundaries, how they were chosen,
@@ -991,6 +996,46 @@ missingness has a known mechanism or that pT217 differs between populations.
     features later dropped.
 - `groups_by_sample` - aligned condition label for every output sample.
 - `call` - the matched call used to create the result.
+- `policies` - the resolved rescue and ambiguity choices.
+
+## Preserve absence without rescue
+
+An unobserved block cannot supply an intensity mean. The no-rescue mode keeps
+it absent instead of inserting a value to support classification.
+
+```{r no-rescue-policy}
+absence_example <- rbind(
+    on_off = c(NA, NA, NA, 15, 16, 17),
+    mar = c(15, NA, 16, 15, 16, 17),
+    low = c(8, NA, NA, 15, 16, 17)
+)
+colnames(absence_example) <- paste0("s", seq_len(ncol(absence_example)))
+absence_fit <- classify_missingness(
+    absence_example,
+    rep(c("A", "B"), each = 3),
+    cutoffs = c(A = 12),
+    rescue = "none"
+)
+knitr::kable(absence_fit$classifications[, c(
+    "feature", "condition", "state", "original_observed_count",
+    "original_missing_count", "original_mean_intensity"
+)])
+stopifnot(identical(absence_fit$data, absence_example))
+absence_fit$groups$A$absent
+absence_fit$profiles$A$metadata[c(
+    "estimated_feature_count", "excluded_absent_feature_count"
+)]
+```
+
+The absent block remains outside the MAR and MNAR groups. Its downstream
+treatment must be specified separately. Entirely unobserved conditions need no
+cutoff and receive a labelled empty plot. Globally missing features are dropped.
+This mode preserves observations; it does not prove a biological on/off mechanism.
+
+Under minimum rescue, a singleton block can become `complete` with no original
+observations. `summary(fit)$seeded_complete` counts these blocks, and printing
+flags their synthetic completeness. Inspect `original_observed_count` and the
+seed log rather than interpreting processed completeness as measured support.
 
 # The stored missingness profile
 
@@ -1310,12 +1355,16 @@ plot_missingness(automatic_fit, "control")
 An automatic estimate is returned only when there are enough complete and
 incomplete features, enough support across the intensity range, a decreasing
 missingness trend, and a credible downward transition. When several transitions
-qualify, the lowest-intensity transition is selected. A warning is stored in
-`cutoff_diagnostics` and shown in the plot caption. This rule does not establish
+qualify, the default `ambiguity = "warn"` selects the lowest transition and
+signals a warning. The warning remains in `cutoff_diagnostics` and the caption.
+Use `ambiguity = "error"` to require a manual cutoff, or `"lowest"` to accept
+the existing selection explicitly with stored diagnostics only. Candidate
+transitions are recorded in `quality$candidate_transitions`; these alternatives
+are not confidence intervals or calibrated probabilities. This rule does not establish
 a unique biological boundary; inspect the profile and consider a manual cutoff.
 Flat, missing-only, sparse, or unsupported profiles raise a condition-specific
 `imputefinder_cutoff_error` with the profile and diagnostic attached.
-Complete-only conditions need no cutoff.
+Complete-only and absent-only conditions need no cutoff.
 Inspect the stored profile and supply a named manual cutoff when automatic
 estimation fails.
 
@@ -1324,7 +1373,9 @@ estimation fails.
 `fit$data` contains only retained features and includes their logged rescue
 anchors. `seed_log` also audits pre-filter rescues on features later dropped.
 `fit$groups` divides the retained rows independently within each condition into
-`MNAR`, `MAR`, `complete`, and the combined `MAR_or_complete` group.
+`MNAR`, `MAR`, `complete`, `absent`, and the combined `MAR_or_complete` group.
+The examples below use minimum rescue. With no rescue, handle `absent` rows
+separately; the package does not assign them to either imputation branch.
 
 The intended order is:
 
@@ -1581,7 +1632,8 @@ classification accuracy alone cannot establish valid downstream inference.
     When the data do not support a clear transition, use a manual cutoff.
 - Arithmetic means are sensitive to strong observations by design.
 - Rescue anchors are artificial values. Preserve `seed_log` with the analysis
-    and assess their influence downstream.
+    and assess their influence downstream. Select `rescue = "none"` to preserve
+    missing cells instead. Neither policy establishes a missingness mechanism.
 - Classification is heuristic. ImputeFinder does not prove mechanisms, choose
     an imputation algorithm, or validate the final biological analysis.
 

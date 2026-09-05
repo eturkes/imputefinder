@@ -1,3 +1,21 @@
+# imputefinder 0.99.6
+
+- Adds `rescue = "none"` to retain on/off patterns without inserting values.
+  Fully missing blocks receive an `absent` state and a separate downstream
+  group. They do not contribute to intensity fitting or need a cutoff.
+- Handles unobserved conditions and globally empty data in no-rescue mode,
+  including labelled empty plots and complete feature-drop records.
+- Adds original observed counts, missing counts, and means to classifications.
+  Result printing flags complete blocks supported only by synthetic rescue.
+- Adds `ambiguity = "warn"` as the default for competing automatic transitions.
+  Use `"error"` to require a manual cutoff, or `"lowest"` to accept the existing
+  selection explicitly. Diagnostics retain all candidate transitions.
+- Advances automatic diagnostics to version 3 without changing cutoff values
+  under the existing lowest-transition policy.
+- Keeps minimum rescue as the default. State, group, result, and summary schemas
+  gain additive fields; code that assumes exact field lists must be updated.
+- Adds a reproducible package-check command and cross-platform CI configuration.
+
 # imputefinder 0.99.5
 
 - Records a diagnostic warning when multiple credible downward transitions

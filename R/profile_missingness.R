@@ -4,7 +4,7 @@
     seed_log = .empty_seed_log()
 ) {
     groups_by_sample <- .validate_result_groups(data, groups_by_sample)
-    features <- rownames(data)
+    features <- as.character(rownames(data))
     conditions <- sort(unique(unname(groups_by_sample)), method = "radix")
     condition_count <- length(conditions)
     statistics <- .empty_feature_condition_statistics(features, conditions)
@@ -64,10 +64,10 @@
     observed_count <- as.integer(rowSums(!is.na(condition_data)))
     missing_count <- as.integer(ncol(condition_data) - observed_count)
     mean_intensity <- rowMeans(condition_data, na.rm = TRUE)
-    if (any(!is.finite(mean_intensity))) {
+    mean_intensity[observed_count == 0L] <- NA_real_
+    if (any(!is.finite(mean_intensity[observed_count > 0L]))) {
         stop(
-            "Every surviving feature-condition block must have a ",
-            "finite mean; run condition rescue before statistics.",
+            "Every observed feature-condition block must have a finite mean.",
             call. = FALSE
         )
     }
@@ -112,9 +112,11 @@
     seeded
 }
 
-.build_missingness_profiles <- function(statistics) {
+.build_missingness_profiles <- function(statistics, conditions = NULL) {
     .validate_profile_statistics(statistics)
-    conditions <- sort(unique(statistics$condition), method = "radix")
+    if (is.null(conditions)) {
+        conditions <- sort(unique(statistics$condition), method = "radix")
+    }
     profiles <- lapply(
         conditions,
         function(condition) {
@@ -133,10 +135,14 @@
 .condition_missingness_profile <- function(statistics) {
     raw <- statistics
     raw$has_missing <- raw$missing_count > 0L
-    means <- raw$mean_intensity
+    observed <- raw[raw$observed_count > 0L, , drop = FALSE]
+    means <- observed$mean_intensity
+    if (length(means) == 0L) {
+        return(.unobserved_missingness_profile(raw))
+    }
     class_counts <- c(
-        missing = as.integer(sum(raw$has_missing)),
-        complete = as.integer(sum(!raw$has_missing))
+        missing = as.integer(sum(observed$has_missing)),
+        complete = as.integer(sum(!observed$has_missing))
     )
     bandwidth <- .profile_bandwidth(means)
     grid_points <- 512L
@@ -147,7 +153,7 @@
     grid_range <- .profile_grid_range(observed_range, bandwidth$value)
     densities <- .profile_class_densities(
         means,
-        raw$has_missing,
+        observed$has_missing,
         bandwidth$value,
         grid_points,
         grid_range
@@ -164,6 +170,21 @@
     )
 
     list(raw = raw, grid = grid, metadata = metadata)
+}
+
+.unobserved_missingness_profile <- function(raw) {
+    counts <- c(missing = 0L, complete = 0L)
+    densities <- list(intensity = numeric(), missing = numeric(),
+        complete = numeric())
+    range <- c(minimum = NA_real_, maximum = NA_real_)
+    metadata <- .profile_metadata(raw, counts,
+        list(value = NA_real_, method = "not_available"), 0L,
+        range, range, logical())
+    metadata$profile_type <- if (nrow(raw)) "absent_only" else "empty"
+    metadata$warnings <- c(metadata$warnings,
+        "No observed feature means are available; no intensity profile was estimated.")
+    list(raw = raw, grid = .profile_grid(densities, counts, 0L),
+        metadata = metadata)
 }
 
 .profile_class_densities <- function(
@@ -229,6 +250,8 @@
 ) {
     list(
         feature_count = as.integer(nrow(raw)),
+        estimated_feature_count = as.integer(sum(class_counts)),
+        excluded_absent_feature_count = as.integer(sum(raw$observed_count == 0L)),
         class_counts = class_counts,
         profile_type = .profile_type(class_counts),
         seeded_feature_count = as.integer(sum(raw$seeded)),
@@ -241,14 +264,17 @@
         observed_mean_range = observed_range,
         grid_range = grid_range,
         unsupported_grid_points = as.integer(sum(!supported)),
-        warnings = if (all(supported)) {
+        warnings = c(if (any(raw$observed_count == 0L)) {
+            sprintf("%d fully unobserved blocks were excluded from intensity fitting.",
+                sum(raw$observed_count == 0L))
+        }, if (all(supported)) {
             character()
         } else {
             sprintf(
                 "%d profile grid points have no numerical density support.",
                 sum(!supported)
             )
-        }
+        })
     )
 }
 
@@ -349,7 +375,6 @@
     )
     valid_schema <- is.data.frame(statistics) &&
         all(required %in% names(statistics)) &&
-        nrow(statistics) > 0L &&
         is.character(statistics$feature) &&
         is.character(statistics$condition) &&
         is.integer(statistics$sample_count) &&
@@ -359,7 +384,7 @@
         is.numeric(statistics$mean_intensity) &&
         is.logical(statistics$seeded)
     if (!valid_schema ||
-        anyNA(statistics[, required, drop = FALSE])) {
+        anyNA(statistics[, setdiff(required, "mean_intensity"), drop = FALSE])) {
         stop(
             "`statistics` does not satisfy the profile-input schema.",
             call. = FALSE
@@ -372,7 +397,7 @@
             statistics[, c("feature", "condition"), drop = FALSE]
         )
     valid_counts <- statistics$sample_count > 0L &
-        statistics$observed_count > 0L &
+        statistics$observed_count >= 0L &
         statistics$missing_count >= 0L &
         statistics$observed_count + statistics$missing_count ==
             statistics$sample_count
@@ -383,11 +408,21 @@
             statistics$missing_fraction -
                 statistics$missing_count / statistics$sample_count
         ) <= sqrt(.Machine$double.eps)
-    valid_means <- is.finite(statistics$mean_intensity)
+    valid_means <- .valid_block_means(statistics)
     if (!all(valid_names) || !all(valid_counts) || !all(valid_fraction) ||
         !all(valid_means)) {
         stop("`statistics` contains invalid profile inputs.", call. = FALSE)
     }
 
     invisible(statistics)
+}
+
+.valid_block_means <- function(statistics) {
+    means <- statistics$mean_intensity
+    absent <- if ("observed_count" %in% names(statistics)) {
+        !is.na(statistics$observed_count) & statistics$observed_count == 0L
+    } else {
+        rep(FALSE, length(means))
+    }
+    is.finite(means) | (is.na(means) & !is.nan(means) & absent)
 }

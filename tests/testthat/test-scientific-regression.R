@@ -27,7 +27,8 @@ test_that("automatic cutoff meets accuracy bounds and is order-invariant", {
     automatic <- classify_missingness(
         simulation$data,
         simulation$groups,
-        seed = 1L
+        seed = 1L,
+        ambiguity = "lowest"
     )
     manual_score <- score_scientific_routine(manual, simulation)
     automatic_score <- score_scientific_routine(automatic, simulation)
@@ -79,7 +80,8 @@ test_that("automatic cutoff meets accuracy bounds and is order-invariant", {
             ),
             colnames(simulation$data)[permutation$samples]
         ),
-        seed = 1L
+        seed = 1L,
+        ambiguity = "lowest"
     )
 
     expect_identical(

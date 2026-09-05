@@ -1,11 +1,8 @@
-.seed_missing_conditions <- function(data, groups_by_sample, seed = 1L) {
+.seed_missing_conditions <- function(
+    data, groups_by_sample, seed = 1L, rescue = "minimum"
+) {
     seed <- .normalise_rescue_seed(seed)
     conditions <- sort(unique(unname(groups_by_sample)), method = "radix")
-    condition_minima <- .condition_minima(
-        data,
-        groups_by_sample,
-        conditions
-    )
 
     globally_absent <- rowSums(!is.na(data)) == 0L
     feature_status <- .initial_feature_status(
@@ -13,6 +10,17 @@
         globally_absent
     )
     surviving_data <- data[!globally_absent, , drop = FALSE]
+    if (rescue == "none") {
+        return(list(
+            data = surviving_data,
+            feature_status = feature_status,
+            condition_minima = stats::setNames(
+                rep(NA_real_, length(conditions)), conditions
+            ),
+            seed_log = .empty_seed_log()
+        ))
+    }
+    condition_minima <- .condition_minima(data, groups_by_sample, conditions)
     rescue_plan <- .condition_rescue_plan(
         surviving_data,
         groups_by_sample,

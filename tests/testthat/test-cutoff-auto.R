@@ -5,7 +5,7 @@ test_that("automatic cutoff records the selected algorithm and quality", {
     expect_identical(decision$status, "ok")
     expect_equal(decision$cutoff, 11.7719792534904, tolerance = 1e-12)
     expect_identical(decision$method, "derivative_boundary")
-    expect_identical(decision$method_version, "2")
+    expect_identical(decision$method_version, "3")
     expect_identical(decision$reason, "")
     expect_identical(decision$warnings, character())
 
@@ -172,7 +172,7 @@ test_that("public automatic cutoffs are condition-specific and overridable", {
         c(A = "automatic", B = "automatic")
     )
     expect_identical(result$cutoff_diagnostics$A$method, "derivative_boundary")
-    expect_identical(result$cutoff_diagnostics$A$method_version, "2")
+    expect_identical(result$cutoff_diagnostics$A$method_version, "3")
     expect_true(all(
         result$classifications$cutoff[
             result$classifications$condition == "A"
@@ -264,7 +264,7 @@ test_that("automatic failure carries its condition and diagnostic profile", {
     )
     expect_identical(error$diagnostic$source, "automatic")
     expect_identical(error$diagnostic$method, "derivative_boundary")
-    expect_identical(error$diagnostic$method_version, "2")
+    expect_identical(error$diagnostic$method_version, "3")
     expect_identical(error$diagnostic$profile, error$profile$metadata)
     expect_identical(error$profile$metadata$feature_count, 6L)
 })
