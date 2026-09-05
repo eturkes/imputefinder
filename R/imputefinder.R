@@ -34,6 +34,15 @@
 #'   Automatic estimation is used for omitted conditions that contain missing
 #'   values. Conditions without missing values need no cutoff.
 #' @param seed An integer that controls which sample receives each rescue value.
+#' @details
+#' When several credible downward transitions exist, automatic estimation
+#' selects the lowest-intensity transition and records a diagnostic warning.
+#' Inspect the stored profile and supply a manual cutoff when appropriate.
+#'
+#' With one sample in a condition, rescue fills the entire missing block, which
+#' then becomes \code{complete}. Inspect \code{seeded} and \code{seed_log} to
+#' distinguish these blocks from originally complete measurements. Replicated
+#' conditions are needed to assess within-condition missingness.
 #' @return An \code{imputefinder_result} containing filtered data,
 #'   feature-condition classifications, downstream groups, feature-level
 #'   decisions, cutoffs, diagnostic profiles, and a log of rescue values.

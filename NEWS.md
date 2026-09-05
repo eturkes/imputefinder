@@ -1,3 +1,14 @@
+# imputefinder 0.99.5
+
+- Records a diagnostic warning when multiple credible downward transitions
+  exist. The plot caption shows the warning. The automatic method version is
+  now 2; the existing lowest-intensity selection rule and cutoff calculations
+  are unchanged.
+- Uses a fixed sample order for feature means so numerical cancellation cannot
+  change classifications when input columns are reordered.
+- Documents that rescue in a one-sample condition produces a `complete` block,
+  with its artificial value recorded in `seeded` and `seed_log`.
+
 # imputefinder 0.99.4 (2026-09-01)
 
 ## Documentation and examples

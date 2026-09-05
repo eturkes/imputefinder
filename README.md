@@ -202,10 +202,15 @@ n_missing f_missing(x)
 n_missing f_missing(x) + n_complete f_complete(x)
 ```
 
-The detector uses the lower, right-hand boundary of the main downward
-transition. The method version, supporting values, and warnings are stored in
-`cutoff_diagnostics`. When the profile is too small, flat, or ambiguous, the
-function reports why it could not estimate a cutoff and asks for a manual value.
+The detector uses the lower, right-hand boundary of the lowest-intensity
+credible downward transition. The method version, supporting values, and
+warnings are stored in `cutoff_diagnostics`. Multiple credible transitions
+produce a stored warning, also shown in the plot caption. This selection policy
+does not establish a unique biological boundary. Inspect the profile and
+supply a manual cutoff when appropriate.
+
+When the profile is too small, flat, or unsupported, the function reports why
+it could not estimate a cutoff and asks for a manual value.
 Small examples such as the one above should use manual cutoffs.
 
 Plotting uses the stored profile and cutoff:
@@ -310,6 +315,10 @@ are not estimates of accuracy for arbitrary proteomics experiments.
   data do not support a clear cutoff, supply a manual value.
 - A rescue value is artificial and remains visible in the returned data and
   log. Record its role and assess its downstream effect.
+- With one sample in a condition, rescue fills the entire block, which becomes
+  `complete`. Inspect `seeded` and `seed_log` to distinguish artificial from
+  observed completeness. Replicated conditions are needed to assess
+  within-condition missingness.
 - The package classifies and coordinates a workflow. It neither proves causal
   missingness mechanisms nor chooses, runs, or validates an imputation method.
 

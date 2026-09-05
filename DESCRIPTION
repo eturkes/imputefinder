@@ -1,6 +1,6 @@
 Package: imputefinder
 Title: Condition-Aware Missingness Classification for Proteomics
-Version: 0.99.4
+Version: 0.99.5
 Authors@R:
     person("Emir", "Turkes", email = "emir.turkes@eturkes.com",
         role = c("aut", "cre", "cph"),
@@ -23,7 +23,6 @@ biocViews: Classification, MassSpectrometry, Proteomics, Preprocessing,
 Depends:
     R (>= 4.6.0)
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 8.1.0
 Imports:
     SummarizedExperiment,
     ggplot2,

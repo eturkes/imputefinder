@@ -195,7 +195,7 @@
 .automatic_cutoff_specification <- function() {
     list(
         method = "derivative_boundary",
-        method_version = "1",
+        method_version = "2",
         minimum_features = 80L,
         minimum_class_features = 12L,
         trend_alpha = 0.001,
@@ -849,7 +849,15 @@
         quality = quality,
         filtered = filtered,
         lobes = lobes,
-        warnings = character()
+        warnings = if (length(lobes) > 1L) {
+            paste(
+                "The profile contains multiple credible downward transitions.",
+                "The lowest-intensity transition was selected.",
+                "Inspect the profile and consider a named manual cutoff."
+            )
+        } else {
+            character()
+        }
     )
 }
 
@@ -946,7 +954,8 @@
         cutoff = unname(as.numeric(cutoff)),
         reason = "",
         quality = quality,
-        specification = specification
+        specification = specification,
+        warnings = derivative$warnings
     )
 }
 

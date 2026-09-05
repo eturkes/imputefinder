@@ -51,9 +51,14 @@
 }
 
 .condition_statistics <- function(data, groups_by_sample, condition) {
+    # Fix summation order: cancellation must not depend on input column order.
+    samples <- sort(
+        colnames(data)[groups_by_sample == condition],
+        method = "radix"
+    )
     condition_data <- data[
         ,
-        groups_by_sample == condition,
+        samples,
         drop = FALSE
     ]
     observed_count <- as.integer(rowSums(!is.na(condition_data)))

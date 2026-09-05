@@ -42,6 +42,16 @@ missing condition blocks receive one recorded low-intensity rescue value so
 that condition-specific on/off patterns can be retained. Input values must be
 unnormalised log2 protein intensities.
 }
+\details{
+When several credible downward transitions exist, automatic estimation
+selects the lowest-intensity transition and records a diagnostic warning.
+Inspect the stored profile and supply a manual cutoff when appropriate.
+
+With one sample in a condition, rescue fills the entire missing block, which
+then becomes \code{complete}. Inspect \code{seeded} and \code{seed_log} to
+distinguish these blocks from originally complete measurements. Replicated
+conditions are needed to assess within-condition missingness.
+}
 \examples{
 x <- rbind(
     on_off = c(NA, NA, NA, NA, 15, 16, 15, 17),
