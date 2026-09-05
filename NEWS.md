@@ -1,3 +1,13 @@
+# imputefinder 0.99.7
+
+- Adds `missingness_mask()` to select remaining missing cells by MNAR, MAR,
+  or absent state. Masks exclude observed values, rescue values, and dropped
+  features. No imputation method is selected or run.
+- Preserves result dimensions and order, including empty retained results.
+- Records `assay_index` for experiment results so masks use the classified
+  assay. This field is NULL for matrix input. Older multi-assay results need
+  reclassification before using masks; matrix and single-assay results work.
+
 # imputefinder 0.99.6
 
 - Adds `rescue = "none"` to retain on/off patterns without inserting values.

@@ -1433,6 +1433,29 @@ c(
 )
 ```
 
+## Cell-level replacement masks
+
+Use `missingness_mask()` to select only remaining missing cells within each
+state. Observed and rescue values stay outside the masks:
+
+```{r missingness-masks}
+mnar_mask <- missingness_mask(fit, "MNAR")
+mar_mask <- missingness_mask(fit, "MAR")
+absent_mask <- missingness_mask(fit, "absent")
+stopifnot(
+    identical(mnar_mask | mar_mask | absent_mask, is.na(fit$data)),
+    !any(mnar_mask & mar_mask),
+    !any((mnar_mask | mar_mask | absent_mask)[!is.na(fit$data)])
+)
+colSums(mnar_mask)
+colSums(mar_mask)
+```
+
+Create masks before downstream processing. Align replacement matrices to the
+same feature and sample names before assigning selected cells. Masks identify
+targets, not the full training data needed by an imputation method. Handle
+absent blocks separately; this label does not assign a missingness mechanism.
+
 ## An illustrative routing manifest
 
 Suppose the analysis plan assigns an MNAR-aware method to low-intensity blocks,
@@ -1531,7 +1554,11 @@ identical(
     SummarizedExperiment::assay(fit_se$data, "log2_intensity"),
     fit$data
 )
+stopifnot(identical(missingness_mask(fit_se), missingness_mask(fit)))
 ```
+
+The result records `assay_index`, so the mask uses the classified assay without
+repeating its name. Keep the result's assay order unchanged.
 
 # Comparison with state-of-the-art methods {#state-of-the-art-comparison}
 

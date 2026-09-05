@@ -51,7 +51,8 @@ decisions, cutoffs, diagnostic profiles, and a log of rescue values.
 Classifications include \code{original_observed_count},
 \code{original_missing_count}, and \code{original_mean_intensity} before
 rescue. The resolved \code{rescue} and \code{ambiguity} policies are stored
-in \code{policies}.
+in \code{policies}. For experiment input, \code{assay_index} records the
+selected assay's position. It is \code{NULL} for matrix input.
 }
 \description{
 Classify each feature separately within each experimental condition. Fully
@@ -97,7 +98,7 @@ fit$seed_log
 
 }
 \seealso{
-\code{\link{plot_missingness}},
+\code{\link{plot_missingness}}, \code{\link{missingness_mask}},
 \code{vignette("imputefinder")}, and
 \code{citation("imputefinder")}.
 }

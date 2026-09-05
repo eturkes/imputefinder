@@ -52,7 +52,8 @@
     cutoff_diagnostics = NULL,
     profiles = NULL,
     seed_log = .empty_seed_log(),
-    policies = list(rescue = "minimum", ambiguity = "warn")
+    policies = list(rescue = "minimum", ambiguity = "warn"),
+    assay_index = NULL
 ) {
     groups_by_sample <- .validate_result_groups(data, groups_by_sample)
     conditions <- sort(unique(unname(groups_by_sample)), method = "radix")
@@ -102,7 +103,8 @@
             seed_log = seed_log,
             groups_by_sample = groups_by_sample,
             call = call,
-            policies = policies
+            policies = policies,
+            assay_index = assay_index
         ),
         class = "imputefinder_result"
     )

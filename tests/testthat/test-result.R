@@ -33,10 +33,12 @@ test_that("the result skeleton contains the expected typed components", {
             "seed_log",
             "groups_by_sample",
             "call",
-            "policies"
+            "policies",
+            "assay_index"
         )
     )
     expect_identical(result$data, fixture$x)
+    expect_null(result$assay_index)
     expect_identical(
         names(result$classifications),
         c(

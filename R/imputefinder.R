@@ -65,8 +65,9 @@
 #'   Classifications include \code{original_observed_count},
 #'   \code{original_missing_count}, and \code{original_mean_intensity} before
 #'   rescue. The resolved \code{rescue} and \code{ambiguity} policies are stored
-#'   in \code{policies}.
-#' @seealso \code{\link{plot_missingness}},
+#'   in \code{policies}. For experiment input, \code{assay_index} records the
+#'   selected assay's position. It is \code{NULL} for matrix input.
+#' @seealso \code{\link{plot_missingness}}, \code{\link{missingness_mask}},
 #'   \code{vignette("imputefinder")}, and
 #'   \code{citation("imputefinder")}.
 #' @examples
@@ -204,6 +205,7 @@ classify_missingness <- function(
         seed_log = rescued$seed_log,
         groups_by_sample = prepared$groups_by_sample,
         call = matched_call,
-        policies = policies
+        policies = policies,
+        assay_index = prepared$assay_index
     )
 }

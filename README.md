@@ -281,6 +281,7 @@ is the recorded cutoff.
 | `groups_by_sample` | Condition vector named and ordered by output samples |
 | `call` | The matched call used to create the result |
 | `policies` | Resolved rescue and ambiguity policies |
+| `assay_index` | Position of the classified experiment assay, or `NULL` for matrix input |
 
 `summary(fit)` reports all state and drop counts. `plot_missingness()` displays
 the profile stored in the result, so it does not need the original input.
@@ -335,6 +336,30 @@ mar_rows <- fit$groups[[condition_name]]$MAR_or_complete
 condition_data[mnar_rows, , drop = FALSE]
 condition_data[mar_rows, , drop = FALSE]
 ```
+
+### Select only missing cells
+
+Use `missingness_mask()` to identify replacement targets in the retained data:
+
+```r
+mnar_mask <- missingness_mask(fit, "MNAR")
+mar_mask <- missingness_mask(fit, "MAR")
+absent_mask <- missingness_mask(fit, "absent")
+stopifnot(identical(mnar_mask | mar_mask | absent_mask, is.na(fit$data)))
+```
+
+Each mask has the same dimensions, names, and order as the classified data.
+Only remaining missing cells are `TRUE`. Observed and rescue values are
+`FALSE`; dropped features have no rows. Keep absent blocks separate until
+the analysis specifies how to handle them.
+
+Create masks before normalisation or imputation. Align downstream replacement
+matrices to the same feature and sample names before assigning selected cells.
+Masks select targets, not the complete training data an imputation method needs.
+
+For experiment results, the helper uses the recorded classified assay without
+repeating its name. Keep the result's assay order unchanged. Older multi-assay
+results without `assay_index` need reclassification before using this helper.
 
 Normalisation and actual kNN, MinProb, MinDet, QRILC, BPCA, or other imputation
 remain downstream choices, not ImputeFinder defaults or runtime dependencies.
