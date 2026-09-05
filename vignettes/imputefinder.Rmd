@@ -122,17 +122,28 @@ distinguishes this routing role from imputation and direct statistical inference
 
 # Installation
 
-Once ImputeFinder is available from a Bioconductor package repository, install
-and load it as follows. Installation code is intentionally not evaluated while
+Install the development package from GitHub. It requires R 4.6 or later and a
+compatible Bioconductor library. Installation code is not evaluated while
 building the vignette.
 
 ```{r installation, eval=FALSE}
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-BiocManager::install("imputefinder")
+install.packages(c("BiocManager", "remotes"))
+BiocManager::install("eturkes/imputefinder")
 
 library(imputefinder)
 ```
+
+For a small first result, run the installed example from a writable folder:
+
+```{r first-result, eval=FALSE}
+source(system.file("examples", "quickstart.R", package = "imputefinder",
+    mustWork = TRUE))
+```
+
+It saves a labelled classification figure, result tables, and rescue records
+under `imputefinder-results/`. Re-running replaces those example files.
+The seven synthetic features explain retention and exclusion with manual
+cutoffs. The examples below cover automatic cutoffs and real-data use.
 
 # Inputs and classification rules
 

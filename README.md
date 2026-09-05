@@ -9,89 +9,33 @@ feature was retained or dropped.
 The package expects **unnormalised log2 protein intensities**. It classifies and
 prepares data; it does not normalise or impute them.
 
-## Why condition-specific classification?
-
-Missing protein intensities do not all follow the same pattern. Scattered
-values may be absent for approximately intensity-independent, MAR-like reasons,
-while low-abundance proteins may fall below detection in an MNAR-like way. A
-protein can also be present in one condition and absent in another. Pooling all
-samples before classification can hide that on/off pattern.
-
-ImputeFinder therefore assigns one state to each feature-condition block:
-
-| State | Rule after the selected rescue policy | Downstream group |
-|---|---|---|
-| `complete` | No values are missing | `MAR_or_complete` |
-| `MNAR` | Values are missing and the observed arithmetic mean is below the condition cutoff | `MNAR` |
-| `MAR` | Values are missing, the mean is at or above the cutoff, and strictly more than half of the samples are observed | `MAR_or_complete` |
-| `insufficient` | Values are missing, the mean is at or above the cutoff, and no strict observed majority exists | Feature is dropped |
-| `absent` | No original values are observed and `rescue = "none"` | `absent`; no mechanism is assigned |
-
-A mean equal to the cutoff is on the MAR side. The majority rule applies only
-to MAR candidates: one low-intensity observation can still support a sparse
-MNAR block. A feature is retained only when no condition is `insufficient` and
-at least one condition is `complete` or `MAR`. Features absent globally and
-features classified as `MNAR` or `absent` in every condition are dropped.
-
-The labels mean **likely MNAR** and **likely MAR** given the observed data. They
-are practical classifications, not proof of the underlying missingness
-mechanism.
+Use it when you need separate downstream treatment for low-intensity missing
+blocks and better-observed blocks, without pooling experimental conditions.
+The labels mean **likely missing-not-at-random (MNAR)** and **likely
+missing-at-random (MAR)** under the cutoff rule. They do not establish why a
+measurement is missing.
 
 ## Installation
 
 ImputeFinder is under development and is not yet available from a Bioconductor
 package repository. The current development package requires R 4.6 or later
-and a compatible Bioconductor library. Install the GitHub version with
-[`BiocManager`](https://bioconductor.org/install/):
+and a compatible Bioconductor library. Install the GitHub version in R:
 
 ```r
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
+install.packages(c("BiocManager", "remotes"))
 BiocManager::install("eturkes/imputefinder")
 ```
 
-After the package enters a Bioconductor release, the repository installation
-will be:
+## First result
+
+Run this from a writable working folder after installation. It uses seven
+synthetic features in two conditions, downloads no data, and saves the figure
+shown below. The manual cutoffs are illustrative, not recommendations for your
+experiment.
 
 ```r
-BiocManager::install("imputefinder")
-```
-
-After installation, run `vignette("imputefinder")` for an executable walkthrough
-of cutoff selection, on/off rescue, diagnostics, and downstream branching. The
-[vignette source](vignettes/imputefinder.Rmd) is also available in this
-repository. Run `citation("imputefinder")` to cite the package and the thesis
-that describes the method.
-
-## Quick start
-
-This example includes an on/off protein, MAR-like and MNAR-like blocks, an
-unsupported sparse block, and a globally absent feature. Conditions A and B
-each contain four samples, and both manual cutoffs are 12.
-
-```r
-library(imputefinder)
-
-x <- rbind(
-    on_off = c(NA, NA, NA, NA, 15, 16, 15, 17),
-    mar_both = c(14, 15, NA, 16, 14, NA, 15, 16),
-    sparse_mar = c(20, NA, NA, NA, 20, 21, 22, 23),
-    sparse_mnar = c(8, NA, NA, NA, 14, 15, 16, 17),
-    all_mnar = c(8, NA, NA, NA, 9, NA, NA, NA),
-    globally_absent = rep(NA, 8),
-    complete_low = c(8, 8, 8, 8, 9, 9, 9, 9)
-)
-colnames(x) <- paste0("s", seq_len(ncol(x)))
-condition <- rep(c("A", "B"), each = 4)
-
-fit <- classify_missingness(
-    x,
-    group = condition,
-    cutoffs = c(A = 12, B = 12),
-    seed = 1L
-)
-fit
+source(system.file("examples", "quickstart.R", package = "imputefinder",
+    mustWork = TRUE))
 ```
 
 ```text
@@ -102,51 +46,81 @@ A: retained features include 2 MNAR, 1 MAR, 1 complete, 0 absent; cutoff 12 (man
 B: retained features include 0 MNAR, 1 MAR, 3 complete, 0 absent; cutoff 12 (manual)
 ```
 
-The feature-level summary explains both retention and exclusion:
+![Classification by condition and retention for seven synthetic features. Four are kept; three are dropped. The on_off feature is MNAR after rescue in A and complete in B.](man/figures/quickstart.png)
 
-| Feature | A | B | Retained | Drop reason |
-|---|---|---|---:|---|
-| `on_off` | MNAR after rescue | complete | yes | |
-| `mar_both` | MAR | MAR | yes | |
-| `sparse_mar` | insufficient | complete | no | `insufficient:A` |
-| `sparse_mnar` | MNAR | complete | yes | |
-| `all_mnar` | MNAR | MNAR | no | `MNAR_all_conditions` |
-| `globally_absent` | not classified | not classified | no | `all_missing` |
-| `complete_low` | complete | complete | yes | |
+Read each row across conditions A and B, then inspect its retention decision.
+The `on_off` feature stays because B is complete. One logged artificial value
+allows classification in A; it does not complete an imputation.
 
-### What pooling conditions would lose
+The sparse, high-intensity `sparse_mar` block lacks an observed majority in A,
+so the whole feature is dropped. Low intensity alone does not cause exclusion:
+`complete_low` stays because nothing is missing.
 
-Apply the same cutoff and strict-majority rule to the original `on_off` row as
-one pooled eight-sample block:
+The script writes these files under `imputefinder-results/`:
 
-| Scope | Observed | Mean intensity | State | Consequence |
-|---|---:|---:|---|---|
-| Pooled original samples | 4/8 | 15.75 | `insufficient` | Drop |
-| Condition A after rescue | 1/4 | 8.00 | `MNAR` | Retain because B is complete |
-| Condition B | 4/4 | 15.75 | `complete` | Retain |
+| File | Contents |
+|---|---|
+| `classifications.png` | The labelled state and retention figure, at 180 dpi |
+| `classifications.csv` | Original counts, processed means, cutoffs, states, and rescue flags |
+| `feature-status.csv` | Every original feature's retention decision and drop reason |
+| `retained-intensities.csv` | The four retained rows, including the rescue value |
+| `seed-log.csv` | Every inserted value and its location |
+| `result.rds` | The full result, for `readRDS()` |
 
-The pooled block is above the cutoff but has no strict observed majority, so it
-would be dropped. ImputeFinder instead records the feature as MNAR in A and
-complete in B, then retains it. The condition-specific states preserve an
-on/off pattern that pooling would lose.
+Re-running replaces these example files. The script leaves `x`, `condition`,
+`fit`, and `state_plot` in your R session. Read the
+[example script](inst/examples/quickstart.R) to change the inputs or figure.
 
-Inspect the classifications and condition-specific downstream groups directly:
+## Classify your data
+
+Replace `x` with your unnormalised log2 intensity matrix. Give its rows feature
+identifiers and its columns unique sample names. Align `condition` with the
+matrix columns. Use `NA` for missing values; zero remains an observed value.
+
+Choose cutoffs for your experiment rather than copying 12 from this example.
+The same public call runs the demonstration:
 
 ```r
-fit$classifications[
-    , c("feature", "condition", "observed_count", "mean_intensity",
-        "cutoff", "state", "seeded", "retained")
-]
+library(imputefinder)
 
-fit$groups$A$MNAR
-#> [1] "on_off"     "sparse_mnar"
-
-fit$groups$A$MAR_or_complete
-#> [1] "mar_both"    "complete_low"
+fit <- classify_missingness(
+    x, group = condition, cutoffs = c(A = 12, B = 12),
+    rescue = "minimum", seed = 1L
+)
+fit$feature_status
+fit$seed_log
+plot_missingness(fit, "A")
 ```
 
-The input `x` remains unchanged. `fit$data` contains the four retained rows and
-the recorded rescue value.
+The diagnostic plot shows the missingness profile and the recorded cutoff.
+Its vertical line is the manual value here, not an estimated boundary.
+For larger datasets, `cutoffs = NULL` requests automatic selection; unsupported
+profiles require a manual decision.
+
+Use `rescue = "none"` to keep unobserved blocks `absent` without inserting values.
+Keep those blocks separate from the MAR and MNAR branches. The result still
+needs downstream normalisation and imputation choices.
+
+<details>
+<summary>Classification rules, rescue, cutoffs, and downstream workflow</summary>
+
+## Classification rules
+
+Each feature-condition block receives one state after the selected rescue policy:
+
+| State | Rule | Downstream group |
+|---|---|---|
+| `complete` | No values are missing | `MAR_or_complete` |
+| `MNAR` | Values are missing and the observed arithmetic mean is below the condition cutoff | `MNAR` |
+| `MAR` | Values are missing, the mean is at or above the cutoff, and strictly more than half of the samples are observed | `MAR_or_complete` |
+| `insufficient` | Values are missing, the mean is at or above the cutoff, and no strict observed majority exists | Feature is dropped |
+| `absent` | No original values are observed and `rescue = "none"` | `absent`; no mechanism is assigned |
+
+A mean equal to the cutoff is on the MAR side. The majority rule applies only
+to MAR candidates. A feature is retained only when no condition is
+`insufficient` and at least one condition is `complete` or `MAR`.
+Globally missing features and features that are MNAR or absent everywhere are
+dropped.
 
 ## How rescue works
 
@@ -363,6 +337,22 @@ results without `assay_index` need reclassification before using this helper.
 
 Normalisation and actual kNN, MinProb, MinDet, QRILC, BPCA, or other imputation
 remain downstream choices, not ImputeFinder defaults or runtime dependencies.
+
+</details>
+
+## Further reading
+
+The [vignette](vignettes/imputefinder.Rmd) covers automatic cutoffs, sensitivity
+checks, downstream branching, and a bundled PXD020717 Tau-phosphosite extract.
+The selected real-data example demonstrates classification, not disease effects.
+
+For a rendered local vignette, install with `build_vignettes = TRUE` and its
+suggested dependencies, then run `vignette("imputefinder")`. The first-run script
+does not need a vignette build. Run `citation("imputefinder")` for citation details.
+
+Regenerate the README figure from the example with
+`Rscript tools/render-quickstart.R`. The package tests run the same example and
+check its classifications and exported files.
 
 ## Verification
 

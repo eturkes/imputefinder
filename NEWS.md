@@ -1,3 +1,11 @@
+# imputefinder 0.99.8
+
+- Adds an installed first-run example that saves classifications, retention
+  decisions, rescue provenance, and a labelled figure without downloading data.
+- Adds a README figure generated from that example and tests its exports.
+- Places the first result before the detailed workflow reference. The
+  classification API and rules are unchanged.
+
 # imputefinder 0.99.7
 
 - Adds `missingness_mask()` to select remaining missing cells by MNAR, MAR,

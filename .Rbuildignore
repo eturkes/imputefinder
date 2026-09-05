@@ -5,6 +5,7 @@
 ^\.checks$
 ^tools$
 ^data-raw$
+^imputefinder-results$
 ^.*\.Rcheck$
 ^.*\.BiocCheck$
 ^imputefinder_.*\.tar\.gz$

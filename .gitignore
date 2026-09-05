@@ -33,6 +33,9 @@
 *.Rprof
 *.Rprofmem
 
+# First-run example output
+/imputefinder-results/
+
 # Operating-system metadata
 .DS_Store
 ._*
