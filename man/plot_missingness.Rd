@@ -19,9 +19,8 @@ appear in the caption. Unobserved blocks do not enter the intensity fit.
 A condition without observed means produces a labelled empty plot.
 }
 \description{
-Plot the estimated proportion of features with missing values across the
-intensity range for one condition. The function uses the profile already
-stored in \code{result}; it does not recalculate the classification.
+Plot the estimated proportion of incomplete features across intensity for
+one condition. The plot uses the stored profile without reclassification.
 }
 \examples{
 x <- rbind(

@@ -25,13 +25,12 @@
 \code{summary.imputefinder_result()} returns a list of class
 \code{summary.imputefinder_result}. Its count tables include all classified
 feature-condition blocks and the retained subset separately.
-\code{seeded_complete} counts blocks that became complete after rescue,
-despite having no original observations.
+\code{seeded_complete} counts blocks made complete solely through rescue.
 \code{print.summary.imputefinder_result()} returns \code{x} invisibly.
 }
 \description{
-Print a compact overview or calculate feature, condition-state, drop-reason,
-cutoff, and rescue-value counts for an ImputeFinder result.
+Print an overview or count features, condition states, drop reasons,
+cutoffs, and rescue values.
 }
 \examples{
 x <- rbind(

@@ -6,33 +6,28 @@
 \alias{imputefinder-package}
 \title{ImputeFinder: Condition-Aware Missingness Classification}
 \description{
-ImputeFinder classifies protein-intensity missingness independently within
-each experimental condition. This keeps condition-specific on/off patterns
-visible and prepares retained features for downstream imputation.
+ImputeFinder classifies protein-intensity missingness by condition, preserving
+on/off patterns and preparing retained features for downstream imputation.
 }
 \details{
-The \code{MNAR} and \code{MAR} labels are working classifications based on observed
-intensity and missingness. They do not prove the underlying mechanism. The
-result includes classifications, cutoff information, a rescue log, and the
-reason each feature was retained or dropped.
+\code{MNAR} and \code{MAR} are intensity-based classifications, not proven mechanisms.
+Results record states, cutoffs, rescue values, and retention or drop reasons.
 }
 \section{Expected input}{
 
 \code{\link[=classify_missingness]{classify_missingness()}} accepts unnormalised log2 protein intensities with
-features in rows, named samples in columns, and one condition label per
-sample. Missing observations must be represented by \code{NA}. Ordinary numeric
-matrices and \link[SummarizedExperiment:SummarizedExperiment]{SummarizedExperiment::SummarizedExperiment} objects share the
-same matrix core.
+features in rows, named samples in columns, and one condition per sample.
+Use \code{NA} for missingness. Numeric matrices and
+\link[SummarizedExperiment:SummarizedExperiment]{SummarizedExperiment::SummarizedExperiment} objects share the same matrix core.
 }
 
 \section{Workflow boundary}{
 
-ImputeFinder filters the input. The default minimum-rescue policy adds
-recorded anchors; \code{rescue = "none"} keeps fully unobserved blocks \code{absent}.
-It does not normalise or impute the data. Normalise the returned data, split
-it by condition, and apply the chosen methods to the supplied feature groups.
-Absent blocks require a separate downstream decision; they are not assigned
-to either imputation branch.
+The default minimum-rescue policy adds logged anchors to filtered data;
+\code{rescue = "none"} keeps unobserved blocks \code{absent}. ImputeFinder neither
+normalises nor imputes. Normalise returned data, split by condition, and
+apply chosen methods to the supplied groups. Handle absent blocks separately
+from both imputation branches.
 }
 
 \seealso{

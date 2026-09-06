@@ -18,10 +18,8 @@
 
 #' Classify missing values by condition
 #'
-#' Classify each feature separately within each experimental condition. Fully
-#' missing condition blocks can be retained without inserting values. The
-#' legacy minimum-rescue mode remains the default. Input values must be
-#' unnormalised log2 protein intensities.
+#' Classify features by condition using unnormalised log2 protein intensities.
+#' Fully missing blocks can remain absent; minimum rescue remains the default.
 #'
 #' @param x An ordinary numeric matrix or a \code{SummarizedExperiment}. Put
 #'   features in rows and samples in columns.
@@ -44,21 +42,18 @@
 #'   the lowest transition with stored diagnostics only. The default is
 #'   \code{"warn"}.
 #' @details
-#' When several credible downward transitions exist, automatic estimation
-#' follows \code{ambiguity}. Candidate transitions remain in the diagnostics.
-#' Inspect the stored profile and supply a manual cutoff when appropriate.
+#' Diagnostics retain candidate transitions under every \code{ambiguity} policy.
+#' Inspect the profile and supply a manual cutoff when appropriate.
 #'
-#' With \code{rescue = "none"}, absent blocks do not contribute to intensity
-#' profiles or cutoff estimation. They need no cutoff. A condition can contain
-#' no observations. Features are dropped when all values are missing, any
-#' condition is insufficient, or every condition is MNAR or absent. Other
-#' on/off features remain available through each condition's \code{absent}
-#' group. No missing value is replaced in this mode.
+#' With \code{rescue = "none"}, absent blocks need no cutoff and do not enter
+#' intensity profiles or cutoff estimation. Entirely unobserved conditions are
+#' valid. Features are dropped when globally missing, insufficient in any
+#' condition, or MNAR/absent everywhere. Other on/off features remain in
+#' condition-specific \code{absent} groups. No values are replaced.
 #'
-#' With one sample in a condition, minimum rescue fills the missing block, which
-#' then becomes \code{complete}. Inspect \code{seeded} and \code{seed_log} to
-#' distinguish these blocks from originally complete measurements. Replicated
-#' conditions are needed to assess within-condition missingness.
+#' In one-sample conditions, minimum rescue makes missing blocks \code{complete}.
+#' Inspect \code{seeded} and \code{seed_log} to distinguish synthetic completeness.
+#' Within-condition missingness assessment needs replication.
 #' @return An \code{imputefinder_result} containing filtered data,
 #'   feature-condition classifications, downstream groups, feature-level
 #'   decisions, cutoffs, diagnostic profiles, and a log of rescue values.

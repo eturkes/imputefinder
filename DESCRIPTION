@@ -6,15 +6,13 @@ Authors@R:
         role = c("aut", "cre", "cph"),
         comment = c(ORCID = "0000-0002-7447-1476"))
 Description: Classifies missing protein intensities separately within
-    experimental conditions. This can retain condition-specific on/off proteins
-    that would be lost when all samples are pooled. Each feature-condition block
-    is labelled likely missing-not-at-random (MNAR), likely missing-at-random
-    (MAR), complete, insufficient, or absent using observed intensities,
-    condition-specific cutoffs, and a strict majority rule. The package accepts
-    unnormalised log2 quantitative-proteomics intensities in ordinary matrices
-    or SummarizedExperiment objects. It returns filtered data and records the
-    classification, cutoff, optional rescue values, original observation
-    counts, and drop reason for each feature.
+    experimental conditions, preserving on/off patterns that pooling can hide.
+    Intensity cutoffs and a strict majority rule label feature-condition blocks
+    likely missing-not-at-random (MNAR), likely missing-at-random (MAR), complete,
+    insufficient, or absent. Inputs are unnormalised log2 proteomics intensities
+    in ordinary matrices or SummarizedExperiment objects. Results include
+    filtered data, classifications, cutoffs, optional rescue values, original
+    observation counts, and feature drop reasons.
 License: GPL (>= 3)
 Encoding: UTF-8
 URL: https://github.com/eturkes/imputefinder

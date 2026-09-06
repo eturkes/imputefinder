@@ -20,24 +20,21 @@ A base logical matrix with the dimensions, names, and order of
 contains no missing logical values. An empty retained result has zero rows.
 }
 \description{
-Return a logical mask for the remaining missing values in selected
-feature-condition states. Use it to restrict downstream replacements without
-selecting observed values or synthetic rescue values.
+Mask remaining missing cells in selected feature-condition states.
+The mask excludes observed and rescue values.
 }
 \details{
-A cell is selected only when it is currently missing and its retained
-feature-condition block has a selected state. Dropped features are excluded.
-Absence remains separate from MAR and MNAR; selecting it does not assign a
-missingness mechanism or an imputation method.
+Only missing cells in retained blocks with selected states enter the mask.
+Absent blocks remain separate from MAR and MNAR; selecting them assigns
+neither a mechanism nor an imputation method.
 
-For experiment results, the recorded \code{assay_index} identifies the assay
-that was classified. Older single-assay results also work. Re-run
-\code{classify_missingness()} for older multi-assay results without this
-record. Keep the result's assay order unchanged.
+Experiment results use the recorded \code{assay_index}. Older single-assay
+results also work; multi-assay results without this record need
+reclassification. Keep assay order unchanged.
 
-Create masks before downstream processing. Align any replacement matrix to
-the mask's feature and sample names before assigning values. The function
-does not normalize, impute, change the result, or restore rescued cells.
+Create masks before downstream processing. Align replacements to the mask's
+feature and sample names. This function does not normalize, impute, change
+results, or restore rescued cells.
 }
 \examples{
 x <- rbind(

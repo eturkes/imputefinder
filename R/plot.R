@@ -2,9 +2,8 @@ utils::globalVariables(c("intensity", "mean_intensity", "missing_proportion"))
 
 #' Plot a missingness profile
 #'
-#' Plot the estimated proportion of features with missing values across the
-#' intensity range for one condition. The function uses the profile already
-#' stored in \code{result}; it does not recalculate the classification.
+#' Plot the estimated proportion of incomplete features across intensity for
+#' one condition. The plot uses the stored profile without reclassification.
 #'
 #' @param result An \code{imputefinder_result} returned by
 #'   \code{\link{classify_missingness}}.
