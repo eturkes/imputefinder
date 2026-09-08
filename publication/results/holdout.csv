@@ -1,0 +1,315 @@
+"mask","seed","method","heldout_cells","reason","warnings","available","retained_fraction","reconstructed_fraction","missing_RMSE","mean_bias"
+"MCAR",1,"uniform_KNN",3268,"","",1,1,1,1.09589375622701,0.0482232909176407
+"MCAR",1,"uniform_MinProb",3268,"","",1,1,1,6.27437716220384,-5.36089341331006
+"MCAR",1,"DEP_absence",3268,"","",1,1,1,1.09589375622701,0.0482232909176407
+"MCAR",1,"automatic_minimum",3268,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",1,"automatic_none",3268,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",2,"uniform_KNN",3171,"","",1,1,1,1.07762996278265,0.0185979066935601
+"MCAR",2,"uniform_MinProb",3171,"","",1,1,1,6.38381054253965,-5.4760714197996
+"MCAR",2,"DEP_absence",3171,"","",1,1,1,1.07762996278265,0.0185979066935601
+"MCAR",2,"automatic_minimum",3171,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",2,"automatic_none",3171,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",3,"uniform_KNN",3090,"","",1,1,1,1.07359797355226,0.0333247015442088
+"MCAR",3,"uniform_MinProb",3090,"","",1,1,1,6.23188133371233,-5.28709532368174
+"MCAR",3,"DEP_absence",3090,"","",1,1,1,1.07359797355226,0.0333247015442088
+"MCAR",3,"automatic_minimum",3090,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",3,"automatic_none",3090,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",4,"uniform_KNN",3166,"","",1,1,1,1.07137027497257,0.0552982795545834
+"MCAR",4,"uniform_MinProb",3166,"","",1,1,1,6.34886979234455,-5.3940578821328
+"MCAR",4,"DEP_absence",3166,"","",1,1,1,1.07137027497257,0.0552982795545834
+"MCAR",4,"automatic_minimum",3166,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",4,"automatic_none",3166,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",5,"uniform_KNN",3162,"","",1,1,1,1.04135680937847,0.0492903065772225
+"MCAR",5,"uniform_MinProb",3162,"","",1,1,1,6.32688591825356,-5.39391550962912
+"MCAR",5,"DEP_absence",3162,"","",1,1,1,1.04135680937847,0.0492903065772225
+"MCAR",5,"automatic_minimum",3162,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",5,"automatic_none",3162,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",6,"uniform_KNN",3106,"","",1,1,1,1.02282547231267,0.0507043496354307
+"MCAR",6,"uniform_MinProb",3106,"","",1,1,1,6.28956253484491,-5.3764828261123
+"MCAR",6,"DEP_absence",3106,"","",1,1,1,1.02282547231267,0.0507043496354307
+"MCAR",6,"automatic_minimum",3106,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",6,"automatic_none",3106,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",7,"uniform_KNN",3104,"","",1,1,1,1.03168205967704,0.0289876803382731
+"MCAR",7,"uniform_MinProb",3104,"","",1,1,1,6.26426449423024,-5.32940017274089
+"MCAR",7,"DEP_absence",3104,"","",1,1,1,1.03168205967704,0.0289876803382731
+"MCAR",7,"automatic_minimum",3104,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",7,"automatic_none",3104,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",8,"uniform_KNN",3136,"","",1,1,1,1.03929904390161,0.0438599508845361
+"MCAR",8,"uniform_MinProb",3136,"","",1,1,1,6.34751875296583,-5.45013023446783
+"MCAR",8,"DEP_absence",3136,"","",1,1,1,1.03929904390161,0.0438599508845361
+"MCAR",8,"automatic_minimum",3136,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",8,"automatic_none",3136,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",9,"uniform_KNN",3185,"","",1,1,1,1.04853947290874,-0.0180398173871807
+"MCAR",9,"uniform_MinProb",3185,"","",1,1,1,6.40417921140117,-5.49681321464741
+"MCAR",9,"DEP_absence",3185,"","",1,1,1,1.04853947290874,-0.0180398173871807
+"MCAR",9,"automatic_minimum",3185,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",9,"automatic_none",3185,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",10,"uniform_KNN",3199,"","",1,1,1,1.06130813847315,0.0207724054099175
+"MCAR",10,"uniform_MinProb",3199,"","",1,1,1,6.40154280398715,-5.49173095957912
+"MCAR",10,"DEP_absence",3199,"","",1,1,1,1.06130813847315,0.0207724054099175
+"MCAR",10,"automatic_minimum",3199,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",10,"automatic_none",3199,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",11,"uniform_KNN",3226,"","",1,1,1,1.02885778003572,0.0144545292849881
+"MCAR",11,"uniform_MinProb",3226,"","",1,1,1,6.42003565498182,-5.46192751258582
+"MCAR",11,"DEP_absence",3226,"","",1,1,1,1.02885778003572,0.0144545292849881
+"MCAR",11,"automatic_minimum",3226,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",11,"automatic_none",3226,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",12,"uniform_KNN",3153,"","",1,1,1,1.04762520232374,0.0624661174457992
+"MCAR",12,"uniform_MinProb",3153,"","",1,1,1,6.43586758711298,-5.54417830258174
+"MCAR",12,"DEP_absence",3153,"","",1,1,1,1.04762520232374,0.0624661174457992
+"MCAR",12,"automatic_minimum",3153,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",12,"automatic_none",3153,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",13,"uniform_KNN",3158,"","",1,1,1,1.04583422302262,0.0619196546133345
+"MCAR",13,"uniform_MinProb",3158,"","",1,1,1,6.20926891764303,-5.31679052542969
+"MCAR",13,"DEP_absence",3158,"","",1,1,1,1.04583422302262,0.0619196546133345
+"MCAR",13,"automatic_minimum",3158,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",13,"automatic_none",3158,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",14,"uniform_KNN",3171,"","",1,1,1,1.04010962985342,0.0283180901104422
+"MCAR",14,"uniform_MinProb",3171,"","",1,1,1,6.40347287015389,-5.46140137596061
+"MCAR",14,"DEP_absence",3171,"","",1,1,1,1.04010962985342,0.0283180901104422
+"MCAR",14,"automatic_minimum",3171,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",14,"automatic_none",3171,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",15,"uniform_KNN",3132,"","",1,1,1,1.04417694727799,0.0319522321128928
+"MCAR",15,"uniform_MinProb",3132,"","",1,1,1,6.3071019298018,-5.42324135405375
+"MCAR",15,"DEP_absence",3132,"","",1,1,1,1.04417694727799,0.0319522321128928
+"MCAR",15,"automatic_minimum",3132,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",15,"automatic_none",3132,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",16,"uniform_KNN",3177,"","",1,1,1,1.12155147503199,0.0679951413984067
+"MCAR",16,"uniform_MinProb",3177,"","",1,1,1,6.28050721162015,-5.34244232141106
+"MCAR",16,"DEP_absence",3177,"","",1,1,1,1.12155147503199,0.0679951413984067
+"MCAR",16,"automatic_minimum",3177,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",16,"automatic_none",3177,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",17,"uniform_KNN",3054,"","",1,1,1,1.02676308460865,0.0288995244036952
+"MCAR",17,"uniform_MinProb",3054,"","",1,1,1,6.39648736409925,-5.49614871983277
+"MCAR",17,"DEP_absence",3054,"","",1,1,1,1.02676308460865,0.0288995244036952
+"MCAR",17,"automatic_minimum",3054,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",17,"automatic_none",3054,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",18,"uniform_KNN",3114,"","",1,1,1,1.03462679603538,0.0211274155549364
+"MCAR",18,"uniform_MinProb",3114,"","",1,1,1,6.36756787432093,-5.44632320972148
+"MCAR",18,"DEP_absence",3114,"","",1,1,1,1.03462679603538,0.0211274155549364
+"MCAR",18,"automatic_minimum",3114,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",18,"automatic_none",3114,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",19,"uniform_KNN",3178,"","",1,1,1,1.05116644906585,0.0133260750275977
+"MCAR",19,"uniform_MinProb",3178,"","",1,1,1,6.34916181018241,-5.4035837441254
+"MCAR",19,"DEP_absence",3178,"","",1,1,1,1.05116644906585,0.0133260750275977
+"MCAR",19,"automatic_minimum",3178,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",19,"automatic_none",3178,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",20,"uniform_KNN",3176,"","",1,1,1,1.06143528576848,0.0107321390990896
+"MCAR",20,"uniform_MinProb",3176,"","",1,1,1,6.40277116870285,-5.50231372645667
+"MCAR",20,"DEP_absence",3176,"","",1,1,1,1.06143528576848,0.0107321390990896
+"MCAR",20,"automatic_minimum",3176,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",20,"automatic_none",3176,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",21,"uniform_KNN",3106,"","",1,1,1,1.09715710093756,0.0376795027910871
+"MCAR",21,"uniform_MinProb",3106,"","",1,1,1,6.40406492604523,-5.51116140102494
+"MCAR",21,"DEP_absence",3106,"","",1,1,1,1.09715710093756,0.0376795027910871
+"MCAR",21,"automatic_minimum",3106,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",21,"automatic_none",3106,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",22,"uniform_KNN",3157,"","",1,1,1,1.06451000747845,0.0146329347543469
+"MCAR",22,"uniform_MinProb",3157,"","",1,1,1,6.36213487559417,-5.46398978468718
+"MCAR",22,"DEP_absence",3157,"","",1,1,1,1.06451000747845,0.0146329347543469
+"MCAR",22,"automatic_minimum",3157,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",22,"automatic_none",3157,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",23,"uniform_KNN",3098,"","",1,1,1,1.07497060401215,0.0563677816503796
+"MCAR",23,"uniform_MinProb",3098,"","",1,1,1,6.27351820538557,-5.32174748288897
+"MCAR",23,"DEP_absence",3098,"","",1,1,1,1.07497060401215,0.0563677816503796
+"MCAR",23,"automatic_minimum",3098,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",23,"automatic_none",3098,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",24,"uniform_KNN",3150,"","",1,1,1,1.04103004467386,0.0491021279327978
+"MCAR",24,"uniform_MinProb",3150,"","",1,1,1,6.35540109616167,-5.4196686458743
+"MCAR",24,"DEP_absence",3150,"","",1,1,1,1.04103004467386,0.0491021279327978
+"MCAR",24,"automatic_minimum",3150,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",24,"automatic_none",3150,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",25,"uniform_KNN",3141,"","",1,1,1,1.06957354258386,0.0624265209395574
+"MCAR",25,"uniform_MinProb",3141,"","",1,1,1,6.3461647636283,-5.46083699780606
+"MCAR",25,"DEP_absence",3141,"","",1,1,1,1.06957354258386,0.0624265209395574
+"MCAR",25,"automatic_minimum",3141,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",25,"automatic_none",3141,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",26,"uniform_KNN",3110,"","",1,1,1,1.09319763684499,0.0927804837503004
+"MCAR",26,"uniform_MinProb",3110,"","",1,1,1,6.2320730562806,-5.29832445191791
+"MCAR",26,"DEP_absence",3110,"","",1,1,1,1.09319763684499,0.0927804837503004
+"MCAR",26,"automatic_minimum",3110,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",26,"automatic_none",3110,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",27,"uniform_KNN",3124,"","",1,1,1,1.01815661408553,0.0417672209103234
+"MCAR",27,"uniform_MinProb",3124,"","",1,1,1,6.46032883988146,-5.53923940999729
+"MCAR",27,"DEP_absence",3124,"","",1,1,1,1.01815661408553,0.0417672209103234
+"MCAR",27,"automatic_minimum",3124,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",27,"automatic_none",3124,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",28,"uniform_KNN",3176,"","",1,1,1,1.07921642998005,0.0554777407883189
+"MCAR",28,"uniform_MinProb",3176,"","",1,1,1,6.26684051028725,-5.33416469261309
+"MCAR",28,"DEP_absence",3176,"","",1,1,1,1.07921642998005,0.0554777407883189
+"MCAR",28,"automatic_minimum",3176,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",28,"automatic_none",3176,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",29,"uniform_KNN",3242,"","",1,1,1,1.05673562319923,0.0202197655368387
+"MCAR",29,"uniform_MinProb",3242,"","",1,1,1,6.37862872883133,-5.47354293814185
+"MCAR",29,"DEP_absence",3242,"","",1,1,1,1.05673562319923,0.0202197655368387
+"MCAR",29,"automatic_minimum",3242,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",29,"automatic_none",3242,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",30,"uniform_KNN",3180,"","",1,1,1,1.05250242767294,-0.00312537508936382
+"MCAR",30,"uniform_MinProb",3180,"","",1,1,1,6.32577945752303,-5.43732474363746
+"MCAR",30,"DEP_absence",3180,"","",1,1,1,1.05250242767294,-0.00312537508936382
+"MCAR",30,"automatic_minimum",3180,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"MCAR",30,"automatic_none",3180,"Could not estimate an automatic cutoff for condition `AD`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `AD` through `cutoffs`.","",0,0,0,NA,NA
+"low_tail",1,"uniform_KNN",2513,"","",1,1,1,1.62671995551666,0.739820879861243
+"low_tail",1,"uniform_MinProb",2513,"","",1,1,1,3.56413358396244,-2.42471575074727
+"low_tail",1,"DEP_absence",2513,"","",1,1,1,1.62671995551666,0.739820879861243
+"low_tail",1,"automatic_minimum",2513,"","",1,0.854077253218884,0.631516116195782,1.78412475125397,0.58285696788635
+"low_tail",1,"automatic_none",2513,"","",1,0.854077253218884,0.631516116195782,1.78412475125397,0.58285696788635
+"low_tail",2,"uniform_KNN",2438,"","",1,1,1,1.63799925349384,0.713365000149771
+"low_tail",2,"uniform_MinProb",2438,"","",1,1,1,3.47151641619368,-2.37456905124792
+"low_tail",2,"DEP_absence",2438,"","",1,1,1,1.63799925349384,0.713365000149771
+"low_tail",2,"automatic_minimum",2438,"","",1,0.825107296137339,0.579163248564397,1.87876062911029,0.511951260616569
+"low_tail",2,"automatic_none",2438,"","",1,0.825107296137339,0.579163248564397,1.87876062911029,0.511951260616569
+"low_tail",3,"uniform_KNN",2473,"","",1,1,1,1.6069729446176,0.73770019612057
+"low_tail",3,"uniform_MinProb",2473,"","",1,1,1,3.52225897056212,-2.42253819520915
+"low_tail",3,"DEP_absence",2473,"","",1,1,1,1.6069729446176,0.73770019612057
+"low_tail",3,"automatic_minimum",2473,"","",1,0.759656652360515,0.480388192478771,1.90346581913413,0.377210832448258
+"low_tail",3,"automatic_none",2473,"","",1,0.759656652360515,0.480388192478771,1.90346581913413,0.377210832448258
+"low_tail",4,"uniform_KNN",2475,"","1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,1,1,2.14963467738604,0.698229208123197
+"low_tail",4,"uniform_MinProb",2475,"","",1,1,1,3.6021910231624,-2.49198523289228
+"low_tail",4,"DEP_absence",2475,"","1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,1,1,1.66639678426935,0.779410095606256
+"low_tail",4,"automatic_minimum",2475,"","",1,0.824034334763948,0.583030303030303,1.77842590013112,0.578799725316569
+"low_tail",4,"automatic_none",2475,"","",1,0.824034334763948,0.583030303030303,1.77842590013112,0.578799725316569
+"low_tail",5,"uniform_KNN",2434,"","",1,1,1,1.57610217162354,0.718022495619769
+"low_tail",5,"uniform_MinProb",2434,"","",1,1,1,3.50317118444061,-2.43565888824164
+"low_tail",5,"DEP_absence",2434,"","",1,1,1,1.57610217162354,0.718022495619769
+"low_tail",5,"automatic_minimum",2434,"","",1,0.80793991416309,0.570665571076417,2.09807248441025,-0.111213675138205
+"low_tail",5,"automatic_none",2434,"","",1,0.80793991416309,0.570665571076417,2.09807248441025,-0.111213675138205
+"low_tail",6,"uniform_KNN",2472,"","",1,1,1,1.61563180036581,0.756219219435394
+"low_tail",6,"uniform_MinProb",2472,"","",1,1,1,3.50609325809944,-2.4496546531452
+"low_tail",6,"DEP_absence",2472,"","",1,1,1,1.61563180036581,0.756219219435394
+"low_tail",6,"automatic_minimum",2472,"","",1,0.781115879828326,0.52831715210356,1.75541191833178,0.444046111515414
+"low_tail",6,"automatic_none",2472,"","",1,0.781115879828326,0.52831715210356,1.75541191833178,0.444046111515414
+"low_tail",7,"uniform_KNN",2442,"","",1,1,1,1.60388469403172,0.689760931640518
+"low_tail",7,"uniform_MinProb",2442,"","",1,1,1,3.53626073791418,-2.49860891796714
+"low_tail",7,"DEP_absence",2442,"","",1,1,1,1.60388469403172,0.689760931640518
+"low_tail",7,"automatic_minimum",2442,"","",1,0.777896995708155,0.515561015561016,1.8152903971271,0.354343287123729
+"low_tail",7,"automatic_none",2442,"","",1,0.777896995708155,0.515561015561016,1.8152903971271,0.354343287123729
+"low_tail",8,"uniform_KNN",2453,"","",1,1,1,1.63541996599019,0.73018233174372
+"low_tail",8,"uniform_MinProb",2453,"","",1,1,1,3.64252521448337,-2.50746499357232
+"low_tail",8,"DEP_absence",2453,"","",1,1,1,1.63541996599019,0.73018233174372
+"low_tail",8,"automatic_minimum",2453,"","",1,0.833690987124464,0.598858540562576,2.03794005440299,0.246258283958581
+"low_tail",8,"automatic_none",2453,"","",1,0.833690987124464,0.598858540562576,2.03794005440299,0.246258283958581
+"low_tail",9,"uniform_KNN",2499,"","",1,1,1,1.55984540859901,0.661248315856462
+"low_tail",9,"uniform_MinProb",2499,"","",1,1,1,3.55374846159024,-2.4826610581724
+"low_tail",9,"DEP_absence",2499,"","",1,1,1,1.55984540859901,0.661248315856462
+"low_tail",9,"automatic_minimum",2499,"","",1,0.863733905579399,0.639855942376951,2.22335372972736,-0.003139438769833
+"low_tail",9,"automatic_none",2499,"","",1,0.863733905579399,0.639855942376951,2.22335372972736,-0.003139438769833
+"low_tail",10,"uniform_KNN",2448,"","",1,1,1,1.59751198554627,0.742194074837604
+"low_tail",10,"uniform_MinProb",2448,"","",1,1,1,3.54185705659527,-2.46125276388108
+"low_tail",10,"DEP_absence",2448,"","",1,1,1,1.59751198554627,0.742194074837604
+"low_tail",10,"automatic_minimum",2448,"","",1,0.841201716738197,0.602941176470588,2.1605925172491,0.191126747502158
+"low_tail",10,"automatic_none",2448,"","",1,0.841201716738197,0.602941176470588,2.1605925172491,0.191126747502158
+"low_tail",11,"uniform_KNN",2435,"","",1,1,1,1.56063673044062,0.723297275381299
+"low_tail",11,"uniform_MinProb",2435,"","",1,1,1,3.48296739230705,-2.37474963338785
+"low_tail",11,"DEP_absence",2435,"","",1,1,1,1.56063673044062,0.723297275381299
+"low_tail",11,"automatic_minimum",2435,"","",1,0.859442060085837,0.642710472279261,1.68082716717648,0.555890173787707
+"low_tail",11,"automatic_none",2435,"","",1,0.859442060085837,0.642710472279261,1.68082716717648,0.555890173787707
+"low_tail",12,"uniform_KNN",2438,"","",1,1,1,1.59823940798565,0.737476224414744
+"low_tail",12,"uniform_MinProb",2438,"","",1,1,1,3.53959284326949,-2.45797155308772
+"low_tail",12,"DEP_absence",2438,"","",1,1,1,1.59823940798565,0.737476224414744
+"low_tail",12,"automatic_minimum",2438,"","",1,0.805793991416309,0.547990155865464,2.02938054765195,0.411437987245706
+"low_tail",12,"automatic_none",2438,"","",1,0.805793991416309,0.547990155865464,2.02938054765195,0.411437987245706
+"low_tail",13,"uniform_KNN",2518,"","",1,1,1,1.60369500651125,0.738215515753937
+"low_tail",13,"uniform_MinProb",2518,"","",1,1,1,3.40834294950062,-2.29686641907273
+"low_tail",13,"DEP_absence",2518,"","",1,1,1,1.60369500651125,0.738215515753937
+"low_tail",13,"automatic_minimum",2518,"","",1,0.873390557939914,0.67077045274027,1.76462958725103,0.521000880294465
+"low_tail",13,"automatic_none",2518,"","",1,0.873390557939914,0.67077045274027,1.76462958725103,0.521000880294465
+"low_tail",14,"uniform_KNN",2421,"","",1,1,1,1.6032085359957,0.763310855395597
+"low_tail",14,"uniform_MinProb",2421,"","",1,1,1,3.60117102455487,-2.54550689526092
+"low_tail",14,"DEP_absence",2421,"","",1,1,1,1.6032085359957,0.763310855395597
+"low_tail",14,"automatic_minimum",2421,"","",1,0.671673819742489,0.342833539859562,1.99914690222757,0.124207847652707
+"low_tail",14,"automatic_none",2421,"","",1,0.671673819742489,0.342833539859562,1.99914690222757,0.124207847652707
+"low_tail",15,"uniform_KNN",2429,"","1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,1,1,2.02666858036803,0.6828402569073
+"low_tail",15,"uniform_MinProb",2429,"","",1,1,1,3.40803053833001,-2.29047094693106
+"low_tail",15,"DEP_absence",2429,"","1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,1,1,1.59366905184631,0.749370309501295
+"low_tail",15,"automatic_minimum",2429,"","",1,0.912017167381974,0.737340469328942,1.63695880663119,0.649531912284838
+"low_tail",15,"automatic_none",2429,"","",1,0.912017167381974,0.737340469328942,1.63695880663119,0.649531912284838
+"low_tail",16,"uniform_KNN",2471,"","",1,1,1,1.63221032984298,0.756356960732382
+"low_tail",16,"uniform_MinProb",2471,"","",1,1,1,3.44242024568164,-2.34149920286388
+"low_tail",16,"DEP_absence",2471,"","",1,1,1,1.63221032984298,0.756356960732382
+"low_tail",16,"automatic_minimum",2471,"","",1,0.710300429184549,0.392148927559692,2.09294045858269,0.146727819489376
+"low_tail",16,"automatic_none",2471,"","",1,0.710300429184549,0.392148927559692,2.09294045858269,0.146727819489376
+"low_tail",17,"uniform_KNN",2385,"","1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,1,1,2.12942973187372,0.693994699959055
+"low_tail",17,"uniform_MinProb",2385,"","",1,1,1,3.53319426969809,-2.45964550294432
+"low_tail",17,"DEP_absence",2385,"","1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,1,1,1.63224823752226,0.777420239526309
+"low_tail",17,"automatic_minimum",2385,"","",1,0.789699570815451,0.530817610062893,1.90899677424547,0.269754541834301
+"low_tail",17,"automatic_none",2385,"","",1,0.786480686695279,0.526205450733753,1.88753259457979,0.336237395936459
+"low_tail",18,"uniform_KNN",2429,"","",1,1,1,1.69352597701374,0.823503302213901
+"low_tail",18,"uniform_MinProb",2429,"","",1,1,1,3.35133699468551,-2.23062830925819
+"low_tail",18,"DEP_absence",2429,"","",1,1,1,1.69352597701374,0.823503302213901
+"low_tail",18,"automatic_minimum",2429,"","",1,0.695278969957081,0.368052696582956,1.94863751325169,0.158469332244823
+"low_tail",18,"automatic_none",2429,"","",1,0.695278969957081,0.368052696582956,1.94863751325169,0.158469332244823
+"low_tail",19,"uniform_KNN",2441,"","",1,1,1,1.60235388577869,0.731250626981165
+"low_tail",19,"uniform_MinProb",2441,"","",1,1,1,3.46306033407711,-2.38103475351723
+"low_tail",19,"DEP_absence",2441,"","",1,1,1,1.60235388577869,0.731250626981165
+"low_tail",19,"automatic_minimum",2441,"","",1,0.883047210300429,0.692748873412536,2.0421229783049,0.00140919362061948
+"low_tail",19,"automatic_none",2441,"","",1,0.883047210300429,0.692748873412536,2.0421229783049,0.00140919362061948
+"low_tail",20,"uniform_KNN",2438,"","1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,1,1,2.07474690508529,0.646561699665567
+"low_tail",20,"uniform_MinProb",2438,"","",1,1,1,3.5669628050661,-2.45043104716991
+"low_tail",20,"DEP_absence",2438,"","1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,1,1,1.62682485475892,0.720022514122727
+"low_tail",20,"automatic_minimum",2438,"","",1,0.706008583690987,0.380639868744873,1.99213838706378,0.290080585548489
+"low_tail",20,"automatic_none",2438,"","",1,0.847639484978541,0.618129614438064,1.84823488769962,0.0871838169834223
+"low_tail",21,"uniform_KNN",2435,"","1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,1,1,2.11257417611836,0.705915666734079
+"low_tail",21,"uniform_MinProb",2435,"","",1,1,1,3.4588348007493,-2.39546967047149
+"low_tail",21,"DEP_absence",2435,"","1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,1,1,1.67863963583573,0.775763373758274
+"low_tail",21,"automatic_minimum",2435,"","",1,0.724248927038627,0.411498973305955,2.05452217077642,-0.0296413497835276
+"low_tail",21,"automatic_none",2435,"","",1,0.726394849785408,0.415605749486653,1.96552208339519,0.0296617281945458
+"low_tail",22,"uniform_KNN",2419,"","1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,1,1,2.09657023135947,0.655935406875476
+"low_tail",22,"uniform_MinProb",2419,"","",1,1,1,3.57904481845886,-2.44602898281241
+"low_tail",22,"DEP_absence",2419,"","1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,1,1,1.6263605934774,0.721281017308362
+"low_tail",22,"automatic_minimum",2419,"","",1,0.898068669527897,0.713931376601902,1.96701807302281,0.013910562697618
+"low_tail",22,"automatic_none",2419,"","",1,0.898068669527897,0.713931376601902,1.96701807302281,0.013910562697618
+"low_tail",23,"uniform_KNN",2473,"","",1,1,1,1.65513128863461,0.762520094862457
+"low_tail",23,"uniform_MinProb",2473,"","",1,1,1,3.36444703972631,-2.1868596772692
+"low_tail",23,"DEP_absence",2473,"","",1,1,1,1.65513128863461,0.762520094862457
+"low_tail",23,"automatic_minimum",2473,"","",1,0.816523605150215,0.566922765871411,2.12998329434011,-0.058718553786649
+"low_tail",23,"automatic_none",2473,"","",1,0.816523605150215,0.566922765871411,2.12998329434011,-0.058718553786649
+"low_tail",24,"uniform_KNN",2437,"","",1,1,1,1.65569379933041,0.802271895868311
+"low_tail",24,"uniform_MinProb",2437,"","",1,1,1,3.43898116406309,-2.38161514903499
+"low_tail",24,"DEP_absence",2437,"","",1,1,1,1.65569379933041,0.802271895868311
+"low_tail",24,"automatic_minimum",2437,"","",1,0.847639484978541,0.629052113254001,2.1867129467664,-0.188607490997839
+"low_tail",24,"automatic_none",2437,"","",1,0.847639484978541,0.629052113254001,2.1867129467664,-0.188607490997839
+"low_tail",25,"uniform_KNN",2437,"","",1,1,1,1.54463288591606,0.693844051530349
+"low_tail",25,"uniform_MinProb",2437,"","",1,1,1,3.62645993064789,-2.56309307129663
+"low_tail",25,"DEP_absence",2437,"","",1,1,1,1.54463288591606,0.693844051530349
+"low_tail",25,"automatic_minimum",2437,"","",1,0.88412017167382,0.689372178908494,1.57845548091006,0.516426594260718
+"low_tail",25,"automatic_none",2437,"","",1,0.88412017167382,0.689372178908494,1.57845548091006,0.516426594260718
+"low_tail",26,"uniform_KNN",2433,"","1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,1,1,2.1400829628139,0.727619291412255
+"low_tail",26,"uniform_MinProb",2433,"","",1,1,1,3.43097878226899,-2.37815217601976
+"low_tail",26,"DEP_absence",2433,"","1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,1,1,1.66068141569682,0.788529197002074
+"low_tail",26,"automatic_minimum",2433,"","",1,0.86480686695279,0.654747225647349,1.6858019561375,0.606522671628059
+"low_tail",26,"automatic_none",2433,"","",1,0.866952789699571,0.658446362515413,1.68648301055891,0.607771533077686
+"low_tail",27,"uniform_KNN",2479,"","",1,1,1,1.64977133455774,0.799293845651018
+"low_tail",27,"uniform_MinProb",2479,"","",1,1,1,3.56444043953174,-2.48461824764051
+"low_tail",27,"DEP_absence",2479,"","",1,1,1,1.64977133455774,0.799293845651018
+"low_tail",27,"automatic_minimum",2479,"","",1,0.82618025751073,0.586123436869705,2.03649782005939,0.34351314497449
+"low_tail",27,"automatic_none",2479,"","",1,0.82618025751073,0.586123436869705,2.03649782005939,0.34351314497449
+"low_tail",28,"uniform_KNN",2465,"","",1,1,1,1.65296378595036,0.748579614024162
+"low_tail",28,"uniform_MinProb",2465,"","",1,1,1,3.4748702723539,-2.40315907675368
+"low_tail",28,"DEP_absence",2465,"","",1,1,1,1.65296378595036,0.748579614024162
+"low_tail",28,"automatic_minimum",2465,"","",1,0.656652360515021,0.329411764705882,2.03426490541118,0.364411326161762
+"low_tail",28,"automatic_none",2465,"","",1,0.656652360515021,0.329411764705882,2.03426490541118,0.364411326161762
+"low_tail",29,"uniform_KNN",2495,"","",1,1,1,1.63311613237975,0.743478785198122
+"low_tail",29,"uniform_MinProb",2495,"","",1,1,1,3.56391650170637,-2.43182328201977
+"low_tail",29,"DEP_absence",2495,"","",1,1,1,1.63311613237975,0.743478785198122
+"low_tail",29,"automatic_minimum",2495,"","",1,0.894849785407725,0.715831663326653,1.74510427831467,0.529399884425942
+"low_tail",29,"automatic_none",2495,"","",1,0.894849785407725,0.715831663326653,1.74510427831467,0.529399884425942
+"low_tail",30,"uniform_KNN",2448,"","",1,1,1,1.62900970400327,0.722288231599753
+"low_tail",30,"uniform_MinProb",2448,"","",1,1,1,3.46622633017759,-2.37141342848125
+"low_tail",30,"DEP_absence",2448,"","",1,1,1,1.62900970400327,0.722288231599753
+"low_tail",30,"automatic_minimum",2448,"","",1,0.858369098712446,0.633986928104575,1.71864334213457,0.551118451884276
+"low_tail",30,"automatic_none",2448,"","",1,0.858369098712446,0.633986928104575,1.71864334213457,0.551118451884276

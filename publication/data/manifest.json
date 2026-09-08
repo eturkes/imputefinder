@@ -1,0 +1,18 @@
+{
+  "url": "https://ftp.pride.ebi.ac.uk/pride/data/archive/2020/12/PXD020717/MaxQuant_BA46_SOLUBLE.zip",
+  "archive_bytes": 933534392,
+  "member": "txt/proteinGroups.txt",
+  "member_sha256": "d7defecb4f3a0acf2e031844e2f17521df7aa57a8d89d966c4162e2c550a1a7f",
+  "input_rows": 3002,
+  "retained_rows": 2645,
+  "excluded_flagged_rows": 357,
+  "runs": 18,
+  "donors": 17,
+  "transform": "Mean positive linear intensities within donor; zero-only = missing; log2.",
+  "files": {
+    "pxd020717-donors.csv": "8e29e823eec89b61156fbd465bfdae7d9c8b151fdae36a1aba663f251d030fc2",
+    "pxd020717-features.csv": "517680aedcd2b7db969c9c1294a16fec95ee20174a42a0d2489e09f8050b7af6",
+    "pxd020717-runs.csv": "fcbe50a588574da24e667b86ad7d85fad308baf0795fa93bc671869deac5437b",
+    "pxd020717-samples.csv": "5b5fe46d4686dd40701e6298bac125a43299812e010a78a18b845dd05156fd4f"
+  }
+}

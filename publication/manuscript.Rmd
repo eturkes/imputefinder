@@ -1,0 +1,521 @@
+---
+title: "ImputeFinder: auditable condition-specific routing of missing proteomics intensities"
+author: "Emir Turkes"
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_depth: 2
+    number_sections: true
+    theme: readable
+    mathjax: null
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE,message=FALSE,warning=FALSE)
+s <- read.csv("publication/results/simulation-summary.csv")
+d <- read.csv("publication/results/downstream-summary.csv")
+downstream_raw <- read.csv("publication/results/downstream.csv")
+h <- read.csv("publication/results/holdout-summary.csv")
+real <- read.csv("publication/results/real-summary.csv")
+quality <- read.csv("publication/results/real-quality.csv")
+bootstrap <- read.csv("publication/results/real-bootstrap.csv")
+rescue_seeds <- read.csv("publication/results/real-rescue-seeds.csv")
+spikein <- read.csv("publication/results/spikein.csv")
+spike_effects <- read.csv("publication/results/spikein-effects.csv")
+metric <- function(data,method,metric,scenario=NULL,nrep=NULL,mask=NULL) {
+    take <- data$method==method & data$metric==metric
+    if(!is.null(scenario)) take <- take & data$scenario==scenario
+    if(!is.null(nrep)) take <- take & data$nrep==nrep
+    if(!is.null(mask)) take <- take & data$mask==mask
+    out <- data[take,];stopifnot(nrow(out)==1L);out
+}
+pct <- function(x) sprintf("%.1f%%",100*x)
+number <- function(x) sprintf("%.2f",x)
+bootstrap_range <- function(condition) paste(number(quantile(
+    bootstrap$cutoff[bootstrap$rescue=="none" & bootstrap$condition==condition],
+    c(.025,.975))),collapse="–")
+estimate <- function(...) metric(...)$estimate
+interval <- function(row,percent=TRUE) {
+    if(!is.finite(row$estimate)) return(paste0("Not available (",row$n,"/",row$total,")"))
+    f <- if(percent) pct else number
+    paste0(f(row$estimate)," [",f(row$lower),", ",f(row$upper),"]")
+}
+labels <- c(automatic_minimum="Automatic + rescue",automatic_none="Automatic, no rescue",
+    manual_12="Manual 12",DEP_absence="DEP absence rule",uniform_KNN="Uniform kNN",
+    uniform_MinProb="Uniform MinProb",observed_only="Observed-only limma",proDA="proDA")
+```
+
+# Abstract
+
+**Background.** Missing proteomics intensities often require condition-specific treatment, but observed patterns alone do not identify their underlying mechanisms.
+Existing workflows already support mixed imputation and condition-aware handling.
+The remaining practical problem is making routing, filtering, uncertainty, and artificial observations explicit and reproducible.
+
+**Methods.** ImputeFinder records feature-condition states, intensity cutoffs, original observation counts, retention decisions, and optional minimum-value rescue.
+We evaluated eight generative missingness scenarios, three replication levels, and 30 independent datasets per setting.
+We compared ten operational routes and eight downstream pipelines, including observed-only limma and dropout-aware proDA.
+We also analysed the full filtered PXD020717 BA46 soluble protein-group table and masked measured values in its complete-feature subset.
+An external iPRG2015 experiment provided six known spike effects in a constant yeast background.
+
+**Results.** Automatic selection was strongly scenario-dependent and did not establish missingness mechanisms.
+At six samples per condition, the no-rescue detector accepted `r pct(estimate(s,"automatic_none","available","covariate_MAR",6))` of observed-covariate MAR datasets.
+Its MAR recall was only `r pct(estimate(s,"automatic_none","MAR_recall","covariate_MAR",6))` in that setting.
+It declined all MCAR-background and high-tail MNAR datasets at this replication level.
+In mixed-missingness simulations, no-rescue routing followed by mixed imputation produced mean FDP `r pct(estimate(d,"automatic_none","FDP","mixed"))` and power `r pct(estimate(d,"automatic_none","power","mixed"))`.
+Observed-only limma produced corresponding values of `r pct(estimate(d,"observed_only","FDP","mixed"))` and `r pct(estimate(d,"observed_only","power","mixed"))`.
+The public table contained `r quality$features` retained protein groups and `r quality$donors` donors.
+Every full-table and feature-bootstrap condition profile contained multiple candidate transitions.
+
+**Conclusions.** ImputeFinder provides auditable operational routing, not mechanism identification or a generally superior inference pipeline.
+Its abstention, rescue, filtering, and cutoff sensitivity must remain visible when interpreting downstream results.
+
+# Introduction
+
+Missing values in label-free proteomics can arise through several acquisition and processing processes.
+An association between observed intensity and missingness does not establish a unique cause.
+MAR and MNAR describe conditional missing-data models, not directly observable labels for individual blank cells [1,2].
+Gradual intensity-dependent detection also challenges a simple division between random loss and hard left censoring [3].
+
+Condition-aware mixed treatment is established prior art.
+DEP demonstrates mixed MAR/MNAR imputation using complete condition absence and separate condition subsets [4,5].
+DAPAR/ProStaR distinguishes partially observed values from values missing throughout a condition [6].
+msImpute uses group-aware information to combine MAR and MNAR reconstructions [7].
+Intensity and missingness-rate sector routing provides another direct precedent [8].
+These contributions preclude claiming that condition-wise or intensity-based mixed imputation is itself new.
+
+An earlier hybrid strategy was used in Fowler and colleagues' extracellular-vesicle study and described in Turkes' thesis [9,10].
+That application used manually selected cutoffs and evaluated a particular simulation.
+The current software formalises the operational states, adds automatic transition diagnostics, preserves original evidence, and exposes rescue and abstention policies.
+We do not reuse historical recovery percentages as independent evidence for this implementation.
+
+The scientific question is therefore narrower than finding the best imputer.
+Can an explicit routing interface preserve decisions and expose situations where its assumptions fail?
+We assess implementation behaviour, routing coverage, downstream consequences, and real-data cutoff stability.
+We report unfavourable findings because reconstruction accuracy and differential-analysis performance need not agree [11].
+
+# Methods
+
+## Input, states, and retention
+
+ImputeFinder accepts ordinary numeric matrices or `SummarizedExperiment` assays containing unnormalised log2 intensities.
+Rows identify features; columns identify samples; an aligned vector defines experimental conditions.
+Missing cells use `NA`; zero remains observed.
+Input validation checks structure and finiteness, but cannot verify the claimed preprocessing history.
+
+For each feature-condition block, the software counts observations and calculates the arithmetic mean of observed log2 intensities.
+This mean corresponds to a geometric mean on the original intensity scale.
+Complete blocks remain complete, regardless of their intensity.
+The following rules apply after the selected rescue policy.
+
+| State | Operational rule |
+|---|---|
+| `complete` | Every sample is observed. |
+| `MNAR` | Some values are missing and the observed mean is below the condition cutoff. |
+| `MAR` | Some values are missing, the mean reaches the cutoff, and strictly more than half the samples are observed. |
+| `insufficient` | The mean reaches the cutoff, but no strict observed majority exists. |
+| `absent` | No value was observed and rescue is disabled. |
+
+The MAR and MNAR names are compatibility labels for operational routes.
+They are neither posterior mechanism probabilities nor validated diagnoses of blank cells.
+Equality belongs to the MAR side of the cutoff.
+A feature is retained only when no condition is insufficient and at least one condition is MAR or complete.
+Globally missing features and features that are MNAR or absent everywhere are dropped.
+Thus, good diagnostic classification does not imply that a missing cell remains actionable after filtering.
+
+## Rescue and provenance
+
+The default minimum-rescue policy inserts one condition-minimum value into each surviving fully missing block.
+The minimum uses finite intensities before any insertions.
+The selected sample follows a reproducible random draw over sorted identifiers.
+Globally absent features receive no rescue.
+No-rescue mode preserves fully missing blocks as `absent` and excludes them from intensity fitting.
+
+Every insertion records the feature, condition, sample, value, and seed.
+Original observation counts and means remain available separately from processed statistics.
+The result also preserves dropped-feature reasons and the selected assay metadata.
+Rescue changes the returned data; it is not merely a plotting device.
+In one-sample conditions, rescue creates synthetic completeness, so meaningful within-condition assessment requires replication.
+
+## Automatic transition selection
+
+For a condition, let `nI` and `nC` denote incomplete and complete feature counts.
+Let `fI(z)` and `fC(z)` denote their kernel density estimates over observed mean intensity `z`.
+The displayed curve is:
+
+```text
+q(z) = nI fI(z) / [nI fI(z) + nC fC(z)]
+```
+
+This curve estimates an intensity-indexed incomplete-feature proportion.
+It does not estimate the fraction of missing cells or their causal mechanisms.
+Both densities use Gaussian kernels, a shared pooled `bw.nrd0` bandwidth, and a 512-point grid.
+
+Method version 3 requires at least 80 observed feature means and 12 features in each completeness class.
+It retains the density-supported interval around the dominant density peak, using a relative-density floor of 0.1.
+A logistic incomplete-feature trend must decrease with intensity and pass a likelihood-ratio screen at 0.001.
+This screen is an algorithmic criterion, not a calibrated biological hypothesis test.
+Feature dependence can affect its calibration.
+
+A degree-three local polynomial estimates the derivative over a half-window of approximately half a bandwidth.
+Candidate downward transitions require a proportion drop of at least 0.05 and a derivative peak-to-noise ratio of at least 1.5.
+The algorithm selects the lowest-intensity credible transition.
+If `r` denotes its right half-depth crossing, `p` its derivative minimum, and `h` the bandwidth, the cutoff is `min(r − h, p + 0.5h)`.
+These fixed heuristics are not estimated confidence bounds or a physical detection limit.
+The source and stored diagnostics define all numerical safeguards.
+
+Unsupported profiles raise structured errors that retain the profile and failure reason.
+Multiple transitions warn by default; strict mode raises an ambiguity error.
+Our benchmarks explicitly accept the lowest transition and retain ambiguity records.
+Consequently, reported availability is permissive detector availability, not availability under the strict policy.
+
+## Independent simulations and routing comparators
+
+We generated 720 datasets: eight scenarios, three replication levels, and 30 seeds per setting.
+Each dataset contained 600 features and two conditions with 3, 6, or 10 samples each.
+Baseline feature means followed `Normal(14, 2.5²)`.
+Twenty percent initially received a condition effect of either −1.5 or +1.5 log2 units.
+Ordinary measurement noise had standard deviation 0.4.
+Five percent were forced on/off features, with condition means 9 and 16.
+This overwrite can increase the final number of changed features; power uses the final recorded effects.
+Their absent blocks were recorded separately from simulated MAR and MNAR causes.
+Thus, the MCAR setting has an MCAR background plus explicitly scored on/off features, not exclusively MCAR missingness.
+
+The generator records cell causes before calling the package.
+It does not construct truth by reproducing ImputeFinder's cutoff or retention rules.
+Random loss is applied first; any additional intensity-dependent loss receives an MNAR cause.
+The cell labels identify simulated loss components, not individually identifiable mechanisms in observational data.
+
+| Scenario | Missingness beyond forced on/off blocks |
+|---|---|
+| MCAR | Independent loss probability 0.25. |
+| Observed-covariate MAR | Loss depends on a fully observed covariate correlated with feature intensity, not on unobserved intensities conditional on that covariate. |
+| Smooth MNAR | Low-tail logistic loss, maximum 0.85, midpoint 12, width 0.8; background random loss 0.03. |
+| Hard censoring | Loss probability 0.95 below intensity 12; background random loss 0.03. |
+| Dual transition | Two low-tail logistic components centred at 11 and 15; background random loss 0.03. |
+| High-tail MNAR | Increasing logistic loss centred at 15; background random loss 0.03. |
+| Heteroscedastic/batch | Intensity-dependent noise, balanced sample shifts, random loss 0.10, and smooth low-tail loss. |
+| Mixed | Random loss 0.12 and smooth low-tail loss. |
+
+The observed MAR covariate is intentionally unavailable to this intensity-only classifier.
+That scenario probes a realistic confounding limitation, not whether a covariate-aware model could succeed.
+The exact equations, seeds, and input matrices are reproducible from `benchmark.R`.
+Simulation conditions were not adjusted to improve the resulting scores.
+
+We compared automatic selection with and without rescue; no-rescue manual cutoffs at 11, 12, and 13; and five simple routes.
+The simple routes use pooled intensity Q25, condition intensity Q25, observed majority, all-MAR assignment, or DEP-style complete-condition absence.
+The DEP-style rule routes a feature to MNAR if it is fully absent in any condition.
+Simple baselines retain every feature with an observation somewhere.
+Their broader retention is reported, not hidden by a common post hoc subset.
+Manual cutoffs are illustrative fixed boundaries, not recommendations for arbitrary instruments or input scales.
+
+## Estimands and uncertainty
+
+Diagnostic coverage counts original MAR/MNAR-caused missing cells receiving either operational route, including subsequently dropped features.
+Diagnostic correctness counts cells whose route agrees with their recorded simulated cause.
+Actionable coverage and correctness additionally require feature retention.
+Fully absent structural blocks are excluded from mechanism-scoring denominators and assessed through on/off retention.
+Selective accuracy uses only assigned cells and must be interpreted with its coverage.
+
+Every requested method-dataset pair appears in the output, including errors.
+Failed pipelines receive zero availability, unconditional coverage, correctness, retention, and discovery power.
+Reconstruction error, effect error, and FDP remain undefined for unexecuted analyses.
+Their summary tables report the number of successful finite evaluations.
+An executed analysis with no discoveries has FDP zero.
+
+Uncertainty uses datasets as independent units, not cells or features.
+We report 95% Student-t Monte Carlo intervals across seeds and Wilson intervals for binary availability.
+Paired contrasts subtract outcomes within the same simulated dataset.
+Intervals describe variation under the specified generator, not uncertainty about a patient population.
+The data are not a model of peptide identification, correlated pathways, or every mass-spectrometry acquisition regime.
+
+## Downstream pipelines
+
+We evaluated 90 paired datasets with six samples per condition from the MCAR, mixed, and heteroscedastic/batch scenarios.
+Uniform kNN and uniform MinProb used `imputeLCMD` [20], with `K=10`, `q=0.01`, and `tune.sigma=1`.
+Mixed pipelines fitted both candidates within each condition using the available retained matrix.
+They selected MinProb for MNAR or absent blocks and kNN elsewhere.
+Original finite values remained unchanged.
+Conditions and imputers used distinct deterministic random streams, shared consistently across compared methods.
+
+The DEP comparator reproduces its absence-based routing rule with these shared imputers.
+It does not reproduce the complete DEP normalization and inference workflow.
+Likewise, these comparisons do not benchmark every DAPAR, msImpute, or sector-routing implementation.
+ImputeFinder pipelines also change retention and, under rescue, the imputer training matrix.
+They are therefore complete processing comparisons, not pure routing-only ablations.
+
+We fitted the same two-condition linear model with limma to observed or completed matrices [12].
+The observed-only branch kept missing values.
+The proDA branch fitted a dropout-aware model to those original missing values and used its Wald contrast [13].
+proDA is an inference comparator, not a reconstruction or routing algorithm.
+Its random initialization used a separate fixed seed for each dataset or contrast.
+We recorded numerical convergence, iteration counts, and final parameter-change errors with a uniform 100-iteration limit and unchanged 0.001 tolerance.
+A numerical audit found one default fit that required 22 iterations, exceeding the package's default limit of 20.
+The larger limit changes the numerical stopping allowance, not the model or tolerance.
+The recorded stopping iteration also identifies fits that would converge within the default limit, using the same fixed initialization.
+A returned fit without numerical convergence was unavailable for primary inference, even if the API returned estimates.
+Solver-only probes compared limits of 20 and 100 iterations with identical initial random states on one dataset from each downstream scenario.
+These probes did not use discovery performance to choose settings.
+No pipeline received additional normalization; simulated sample offsets were balanced within conditions.
+The balanced design isolates missingness effects but does not validate a real-data normalization choice.
+
+For comparability, untested or filtered features received `p=1` before Benjamini–Hochberg adjustment over all 600 original features [14].
+This common universe differs from adjusting only retained features.
+Power counts discoveries among all truly changed features, including filtered features.
+FDP counts unchanged features among discoveries at adjusted `p<0.05`.
+Single imputation does not propagate missing-value uncertainty and does not guarantee nominal FDR control.
+Missing-cell reconstruction and effect errors are conditional on the returned features; retention and reconstructed fractions accompany them.
+
+## Public-data extraction and sensitivity
+
+We used the complete `proteinGroups.txt` member from the PXD020717 BA46 soluble MaxQuant archive [15].
+The extraction verifies archive size, member size and CRC, and a pinned SHA256 digest.
+It excludes reverse hits, potential contaminants, and rows identified only by site.
+All other protein groups and intensity columns remain eligible, without disease- or protein-based selection.
+
+The source contains 3,002 rows and 18 runs.
+The filtered table contains 2,645 protein groups.
+Two AD04 runs share a donor identifier.
+We collapse them using the mean of positive linear intensities before log2 transformation, producing nine AD and eight control donors.
+All-zero donor blocks remain missing.
+This choice preserves any detection but can conceal run-level missingness; a separate 18-run sensitivity analysis records its effect.
+Protein-group identifiers remain groups, not asserted one-to-one gene measurements.
+
+We ran both rescue policies, perturbed each selected cutoff by ±1 log2 unit, and performed 100 feature-bootstrap resamples per policy.
+These resamples describe algorithmic stability, not independent-protein or donor-level confidence intervals.
+Twenty rescue seeds tested classification invariance and changes in sample medians.
+No disease association, diagnostic performance, or missingness mechanism is inferred from this observational table.
+
+For measured-value holdout, we used all `r quality$complete_features` features observed in every donor.
+Thirty seeds applied either 20% random masking or smooth low-tail masking.
+The hidden measurements provide reconstruction targets, not experimental knowledge of naturally missing values.
+Complete-feature selection favours observable proteins and excludes the original absent blocks.
+This analysis is a semi-synthetic sensitivity check, not independent experimental validation of missingness mechanisms.
+
+## External controlled-mixture calibration
+
+The iPRG2015 study added six proteins at known amounts to four mixtures containing 200 ng of the same yeast digest [16].
+Each mixture had three technical runs, not independent biological replicates.
+We used the complete MaxQuant 1.6.17.0 raw-intensity table from its PXD028038 reprocessing [17].
+Match-between-runs was enabled upstream.
+We did not rerun peptide identification, alignment, or protein grouping.
+The source checksum and original accession MSV000079843 are recorded with the extract.
+
+Filtering retained 3,262 groups, including all six declared spikes.
+Known spike identifiers override generic contaminant exclusion; reverse and site-only exclusions remain.
+The blinded spike accessions are study labels, not current organism annotations.
+The source has approximately 2.4% missing cells, so this is a relatively complete-table calibration.
+
+We analysed all six pairwise contrasts with seven pipelines, omitting the simulation-specific manual cutoff of 12.
+Classification used unnormalised log2 intensities.
+The primary inference analysis then subtracted prespecified sample offsets calculated from medians of the original observed intensities.
+The same offsets applied to every pipeline, including proDA.
+A second analysis omitted normalization to expose preprocessing sensitivity.
+
+The added amounts imply six nonzero spike effects per contrast, with 36 nonzero effects across the six contrasts.
+Only 30 exceed an absolute log2 fold change of one.
+Our zero-null tests therefore count all 36 nonzero effects as positives, including small effects.
+Every denominator includes all six spikes, even when a pipeline drops or cannot test them.
+The background-discovery count uses all other retained source groups as the expected constant yeast background.
+Common-universe BH adjustment assigns untested features `p=1`.
+Effect error reports the number of estimable spikes.
+
+These are correlated contrasts from one controlled experiment.
+We report realised FDP and counts without independent-contrast confidence intervals or claims of calibrated general FDR control.
+Added concentrations provide effect truth, not causes for individual missing cells.
+
+# Results
+
+## Availability and routing failures are informative
+
+Figure 1 reports permissive availability and correctly routed actionable missing cells at six samples per condition.
+The complete supplement includes all replication levels and failure messages.
+The no-rescue detector accepted every smooth, mixed, dual-transition, covariate-MAR, and heteroscedastic/batch dataset at this replication level.
+It accepted `r pct(estimate(s,"automatic_none","available","hard_censor",6))` of hard-censoring datasets and none of the MCAR-background or high-tail datasets.
+Abstention under incompatible profiles prevents forced cutoff selection, but also limits automatic coverage.
+
+The observed-covariate MAR scenario illustrates a central identification failure.
+Its decreasing incomplete-feature curve looked compatible with the detector despite having no MNAR-caused cells outside the separately labelled structural absence.
+Only `r interval(metric(s,"automatic_none","MAR_recall","covariate_MAR",6))` of MAR-caused missing cells received a MAR route.
+Automatic success therefore cannot be interpreted as evidence that MNAR mechanisms exist.
+
+Filtering substantially reduced actionable coverage compared with diagnostic classification.
+In the mixed scenario, no-rescue diagnostic correctness was `r pct(estimate(s,"automatic_none","correct_all_missing","mixed",6))`, while actionable correctness was `r pct(estimate(s,"automatic_none","actionable_correct","mixed",6))`.
+The denominator includes original MAR/MNAR-caused missing cells, not only retained or successfully routed cells.
+This difference is a consequence of the retention rule and must remain visible in evaluations.
+
+```{r simulation-figure, fig.cap="Figure 1. Scenario-specific routing. Each cell aggregates 30 independent datasets. Availability intervals and complete metrics appear in the supplement. Actionable correctness includes filtering and treats pipeline failures as unassigned."}
+knitr::include_graphics(normalizePath("publication/figures/simulation.png"),rel_path=FALSE)
+```
+
+## Downstream consequences do not support universal superiority
+
+Figure 2 and Table 1 show discovery trade-offs under the fixed processing choices.
+In mixed missingness, minimum rescue produced mean FDP `r interval(metric(d,"automatic_minimum","FDP","mixed"))` and power `r interval(metric(d,"automatic_minimum","power","mixed"))`.
+Disabling rescue produced mean FDP `r interval(metric(d,"automatic_none","FDP","mixed"))` and power `r interval(metric(d,"automatic_none","power","mixed"))`.
+The DEP-style route retained more features and reached power `r pct(estimate(d,"DEP_absence","power","mixed"))`, but its mean FDP was `r pct(estimate(d,"DEP_absence","FDP","mixed"))`.
+These results do not make one route universally preferable.
+Observed-only and dropout-aware inference address a different trade-off without requiring an imputed matrix as input.
+proDA satisfied the recorded convergence criterion in `r sum(downstream_raw$proda_converged[downstream_raw$method=="proDA"]==1,na.rm=TRUE)` of 90 simulated datasets.
+Of these, `r sum(downstream_raw$proda_default_converged[downstream_raw$method=="proDA"]==1,na.rm=TRUE)` stopped within the default 20 iterations.
+
+```{r downstream-table}
+rows <- lapply(names(labels),function(method) {
+    data.frame(Method=labels[[method]],
+        Availability=interval(metric(d,method,"available","mixed")),
+        Retained=pct(estimate(d,method,"retained_fraction","mixed")),
+        FDP=interval(metric(d,method,"FDP","mixed")),
+        Power=interval(metric(d,method,"power","mixed")),check.names=FALSE)
+})
+knitr::kable(do.call(rbind,rows),caption="Table 1. Mixed-missingness downstream results. Brackets show 95% Monte Carlo intervals; availability uses Wilson intervals.")
+```
+
+Uniform MinProb often reduced discoveries, whereas kNN could produce substantial false discoveries.
+The observed-only branch also failed to recover every changed feature, especially forced on/off features.
+Filtering, imputed variance, censoring bias, and imputer choice all contribute to these differences.
+We do not attribute every downstream difference solely to routing accuracy.
+Paired contrasts, conditional reconstruction errors, successful-run counts, and complete warning logs are supplied as CSV tables.
+
+```{r downstream-figure, fig.cap="Figure 2. Downstream power and FDP. Points are dataset means with 95% Monte Carlo intervals. The dashed line marks 5% FDP, not a guarantee. Missing FDP points represent unavailable analyses; failed pipelines contribute zero unconditional power."}
+knitr::include_graphics(normalizePath("publication/figures/downstream.png"),rel_path=FALSE)
+```
+
+## Public profiles have multiple plausible transitions
+
+The donor-collapsed table had `r pct(quality$missing_fraction)` missing cells and `r quality$globally_absent` globally absent protein groups.
+No-rescue automatic selection retained `r real$retained[real$rescue=="none" & real$mode=="automatic"]` groups.
+Minimum rescue retained `r real$retained[real$rescue=="minimum" & real$mode=="automatic"]` and inserted `r real$rescued[real$rescue=="minimum" & real$mode=="automatic"]` values before final filtering.
+Both condition profiles contained multiple candidate transitions under both policies.
+Every bootstrap profile was also ambiguous.
+Strict ambiguity handling would therefore require manual decisions rather than accept these full-table outputs.
+
+The full-table no-rescue cutoffs were `r number(real$cutoff_AD[real$rescue=="none" & real$mode=="automatic"])` for AD and `r number(real$cutoff_control[real$rescue=="none" & real$mode=="automatic"])` for controls.
+The bootstrap distributions were broad and differed from these selected values (Figure 3).
+The no-rescue 2.5th–97.5th percentile ranges were `r bootstrap_range("AD")` for AD and `r bootstrap_range("control")` for controls.
+These are descriptive stability ranges, not calibrated confidence intervals.
+Changing both no-rescue cutoffs by ±1 altered retention from `r min(real$retained[real$rescue=="none"])` to `r max(real$retained[real$rescue=="none"])` groups.
+These changes are not evidence of disease effects.
+They show that a numerically returned cutoff is not necessarily a stable scientific boundary.
+
+```{r real-figure, fig.cap="Figure 3. Feature-bootstrap cutoff stability in PXD020717. All 100 draws per rescue policy returned a cutoff but had multiple transitions. Red lines mark full-table selections. These distributions are descriptive, not donor-level confidence intervals."}
+knitr::include_graphics(normalizePath("publication/figures/real-cutoffs.png"),rel_path=FALSE)
+```
+
+The 20 rescue seeds preserved classifications, cutoffs, and retention exactly.
+They changed the logged sample receiving each artificial value, but all 71 rescued blocks belonged to subsequently dropped features.
+Consequently, no artificial values remained in this particular returned matrix, and its sample medians did not change across seeds.
+The largest absolute sample-median shift relative to the unrescued retained matrix was `r number(max(abs(rescue_seeds$median_shift_vs_original)))` log2 units.
+This null result does not establish seed invariance for datasets whose rescued features survive filtering.
+
+## Measured-value holdout does not remove selection bias
+
+In random masking, both automatic policies declined all 30 datasets.
+In low-tail masking, both accepted all 30.
+No-rescue ImputeFinder had conditional missing-cell RMSE `r number(estimate(h,"automatic_none","missing_RMSE",mask="low_tail"))` log2 units.
+The DEP-style route had RMSE `r number(estimate(h,"DEP_absence","missing_RMSE",mask="low_tail"))`.
+These errors apply to returned features; the supplement reports retained and reconstructed fractions.
+They provide no evidence that ImputeFinder improves reconstruction generally.
+They also do not reveal errors for naturally absent measurements, which have no observed target in this dataset.
+
+## Controlled mixtures provide a separate downstream check
+
+Table 2 reports the median-normalised iPRG2015 analysis.
+Counts sum across six correlated contrasts and must not be interpreted as six independent experiments.
+The supplement preserves every contrast, pipeline failure, spike estimate, and the unnormalised sensitivity analysis.
+Across both normalization choices, proDA satisfied its numerical criterion in `r sum(spikein$proda_converged[spikein$method=="proDA"]==1,na.rm=TRUE)` of 12 fits.
+
+```{r spikein-table}
+primary_spikes <- subset(spikein,normalization=="observed_median")
+rows <- lapply(setdiff(names(labels),"manual_12"),function(method) {
+    z <- primary_spikes[primary_spikes$method==method,]
+    data.frame(Method=labels[[method]],
+        `Completed contrasts`=paste0(sum(z$available),"/6"),
+        `Spike discoveries`=paste0(sum(z$spikes_detected),"/36"),
+        `Background calls`=if(any(z$available==1))sum(z$background_discoveries,na.rm=TRUE) else NA_integer_,
+        `Estimable spike effects`=paste0(sum(z$spikes_estimated),"/36"),check.names=FALSE)
+})
+knitr::kable(do.call(rbind,rows),caption="Table 2. External controlled-mixture results. Background calls are summed feature-contrast outcomes, not unique proteins. Missing counts indicate no completed contrasts.")
+```
+
+One false background discovery alongside six true positives already yields FDP of at least 14.3% in a contrast.
+Conversely, zero observed false discoveries cannot establish general 5% FDR control.
+The external analysis tests performance on real instrument-derived intensities with known added concentrations.
+It does not remove the limits imposed by six spike proteins, technical replication, upstream matching, and relatively little missingness.
+
+# Discussion
+
+ImputeFinder's contribution is an explicit and inspectable routing contract.
+Original evidence, artificial insertions, absent blocks, rejected features, candidate cutoffs, and failures remain recoverable from the result.
+That contract supports sensitivity analysis and prevents a completed matrix from obscuring how its values were selected.
+It does not solve the general identification problem for missing-data mechanisms.
+
+The counterexamples are consequential.
+Observed-covariate MAR can produce a descending intensity profile, while high-intensity MNAR violates the detector's assumed direction.
+Hard censoring can leave too little observed transition evidence for automatic fitting.
+The full public-data table yielded multiple transitions in every condition and feature-bootstrap fit.
+These results argue for reviewing the stored diagnostics, reporting abstention, and retaining no-rescue analyses.
+They do not support choosing manual cutoffs solely to maximise a desired downstream discovery count.
+
+Rescue should be treated as an explicit modelling intervention.
+The inserted minimum can affect the fitted profile, feature retention, imputer training, and normalization summaries.
+The absence of a value does not establish that the biological quantity was near the smallest observed intensity.
+Users who need that assumption must justify it for their assay or retain an absent state.
+
+The comparison has defined limits.
+Simulations use simplified feature distributions and only two conditions.
+The downstream comparison fixes a small imputer set and does not optimise each established workflow.
+Deep-learning and Bayesian reconstruction methods provide additional approaches that were not evaluated here [18,19].
+The observational protein table comes from one assay subset with disease-related heterogeneity and no known naturally missing values.
+The independent controlled-mixture experiment contains only six spike proteins and technical replication.
+Complete-feature masking introduces selection bias and does not recreate acquisition failures.
+Feature-bootstrap stability is not calibrated under correlated protein groups.
+Single-imputation inference can remain anticonservative even when reconstruction appears satisfactory.
+
+Consequently, this article supports software correctness, traceability, and bounded empirical characterisation.
+It does not support claims of first condition-aware mixed imputation, mechanism recovery from arbitrary observations, universal superiority, or validated disease discovery.
+Studies requiring those stronger claims need corresponding experimental truth, appropriate competing implementations, and application-specific calibration.
+
+# Software and reproducibility
+
+The package is distributed under GPL-3.0-or-later at <https://github.com/eturkes/imputefinder>.
+The evaluated package version is 0.99.8; the automatic detector is method version 3.
+The source archive is not described as an accepted Bioconductor release.
+
+`publication/reproduce.py` regenerates source extraction, all analyses, figures, and this article.
+Its `--verify` mode independently reruns the analyses and compares deterministic evidence hashes.
+The source-data manifest pins source and output SHA256 digests.
+`publication/check-results.R` validates required dimensions, denominators, and failure handling.
+`tools/check-package.R` builds the source package and runs examples, tests, and vignettes.
+The supplementary files include all per-dataset outcomes, structured real-data diagnostics, sensitivity tables, and software versions.
+No hosted continuous-integration result, journal acceptance, or public archive deposit is inferred from these local checks.
+
+# Declarations for author confirmation
+
+The displayed author name follows the package metadata and is provisional for journal submission.
+The final author list, affiliations, contributions, funding, and competing-interest statements require author confirmation.
+This analysis reuses public data and recruits no new participants.
+The corresponding ethics and data-reuse wording requires author confirmation against the selected journal's requirements.
+The target journal, archival release identifier, and submission details remain editorial decisions.
+
+# References
+
+1. Rubin DB. Inference and missing data. *Biometrika*. 1976;63:581–592. <https://doi.org/10.1093/biomet/63.3.581>.
+2. Nabi R, Bhattacharya R. On Testability and Goodness of Fit Tests in Missing Data Models. *Proceedings of UAI*. 2023;216:1467–1477. <https://proceedings.mlr.press/v216/nabi23a.html>.
+3. Li M, Smyth GK. Neither random nor censored: estimating intensity-dependent probabilities for missing values in label-free proteomics. *Bioinformatics*. 2023;39:btad200. <https://doi.org/10.1093/bioinformatics/btad200>.
+4. Zhang X, Smits AH, van Tilburg GBA, Ovaa H, Huber W, Vermeulen M. Proteome-wide identification of ubiquitin interactions using UbIA-MS. *Nature Protocols*. 2018;13:530–550. <https://doi.org/10.1038/nprot.2017.147>.
+5. DEP. Missing value handling. Official package workflow. <https://bioconductor.posit.co/packages/3.21/bioc/vignettes/DEP/inst/doc/MissingValues.html>.
+6. Wieczorek S, Combes F, Lazar C, et al. DAPAR & ProStaR: software to perform statistical analyses in quantitative discovery proteomics. *Bioinformatics*. 2017;33:135–136. <https://doi.org/10.1093/bioinformatics/btw580>.
+7. Hediyeh-Zadeh S, Webb AI, Davis MJ. MsImpute: Estimation of Missing Peptide Intensity Data in Label-Free Quantitative Mass Spectrometry. *Molecular & Cellular Proteomics*. 2023;22:100558. <https://doi.org/10.1016/j.mcpro.2023.100558>.
+8. Shi Y, Zhong H, Rogalski JC, Foster LJ. Optimizing imputation strategies for mass spectrometry-based proteomics considering intensity and missing value rates. *Computational and Structural Biotechnology Journal*. 2025;27:1818–1826. <https://doi.org/10.1016/j.csbj.2025.04.041>.
+9. Fowler SL, Behr TS, Turkes E, et al. Tau filaments are tethered within brain extracellular vesicles in Alzheimer's disease. *Nature Neuroscience*. 2025;28:40–48. <https://doi.org/10.1038/s41593-024-01801-5>.
+10. Turkes E. Development of Gene Set Enrichment and Imputation Methods for Transcriptomics and Proteomics: Application in the Study of Neurofibrillary Tangle-bearing Neurons in Alzheimer's Disease. Doctoral thesis. University College London; 2025. <https://discovery.ucl.ac.uk/id/eprint/10215006/>.
+11. Harris L, Fondrie WE, Oh S, Noble WS. Evaluating Proteomics Imputation Methods with Improved Criteria. *Journal of Proteome Research*. 2023;22:3427–3438. <https://doi.org/10.1021/acs.jproteome.3c00205>.
+12. Ritchie ME, Phipson B, Wu D, et al. limma powers differential expression analyses for RNA-sequencing and microarray studies. *Nucleic Acids Research*. 2015;43:e47. <https://doi.org/10.1093/nar/gkv007>.
+13. Ahlmann-Eltze C, Anders S. proDA: Probabilistic Dropout Analysis for Identifying Differentially Abundant Proteins in Label-Free Mass Spectrometry. *bioRxiv*, preprint. 2020 revision. <https://doi.org/10.1101/661496>. Software: <https://doi.org/10.18129/B9.bioc.proDA>.
+14. Benjamini Y, Hochberg Y. Controlling the false discovery rate: a practical and powerful approach to multiple testing. *Journal of the Royal Statistical Society B*. 1995;57:289–300. <https://doi.org/10.1111/j.2517-6161.1995.tb02031.x>.
+15. Wesseling H, et al. Tau PTM Profiles Identify Patient Heterogeneity and Stages of Alzheimer's Disease. *Cell*. 2020;183:1699–1713.e13. <https://doi.org/10.1016/j.cell.2020.10.029>.
+16. Choi M, Eren-Dogu ZF, Colangelo C, et al. ABRF Proteome Informatics Research Group (iPRG) 2015 Study: Detection of Differentially Abundant Proteins in Label-Free Quantitative LC-MS/MS Experiments. *Journal of Proteome Research*. 2017;16:945–957. <https://doi.org/10.1021/acs.jproteome.6b00881>. Committee spike design: <https://abrf.org/wp-content/uploads/iPRG15.pdf>.
+17. Bloom J, Triantafyllidis A, Quaglieri A, Ngov PB, Infusini G, Webb A. Mass Dynamics 1.0: A Streamlined, Web-Based Environment for Analyzing, Sharing, and Integrating Label-Free Data. *Journal of Proteome Research*. 2021;20:5180–5188. <https://doi.org/10.1021/acs.jproteome.1c00683>.
+18. Webel H, Niu L, Nielsen AB, et al. Imputation of label-free quantitative mass spectrometry-based proteomics data using self-supervised deep learning. *Nature Communications*. 2024;15:3599. <https://doi.org/10.1038/s41467-024-48711-5>.
+19. He J, et al. msBayesImpute as a versatile framework for addressing missing values in biomedical mass spectrometry proteomics data. *Communications Chemistry*. 2026. <https://doi.org/10.1038/s42004-026-02106-3>.
+20. Lazar C, Burger T. imputeLCMD: A Collection of Methods for Left-Censored Missing Data Imputation. R package version 2.1; 2022. <https://doi.org/10.32614/CRAN.package.imputeLCMD>.

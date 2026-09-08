@@ -310,6 +310,12 @@ external choices, not defaults or runtime dependencies.
 
 ## Further reading
 
+The [standalone article](publication/manuscript.html) reports independent
+simulations, full-table public-data validation, and downstream sensitivity.
+Its [reproduction protocol](publication/PROTOCOL.md) defines the comparisons
+and failure-inclusive metrics. These results do not establish missingness
+mechanisms or general superiority over existing imputation workflows.
+
 The [vignette](vignettes/imputefinder.Rmd) covers automatic cutoffs, sensitivity
 checks, downstream branching, and a bundled PXD020717 Tau-phosphosite extract.
 The selected real-data example demonstrates classification, not disease effects.

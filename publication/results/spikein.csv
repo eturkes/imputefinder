@@ -1,0 +1,143 @@
+"contrast","normalization","method","reason","warnings","available","retained","tested","spikes_detected","spikes_total","spike_power","background_discoveries","realized_FDP","spike_effect_RMSE","spikes_estimated","proda_converged","proda_iterations","proda_error","proda_default_converged"
+"2_vs_1","observed_median","observed_only","","Partial NA coefficients for 20 probe(s)",1,3251,3231,5,6,0.833333333333333,6,0.545454545454545,1.06406120320817,6,NA,NA,NA,NA
+"2_vs_1","observed_median","proDA","","",1,3251,3251,5,6,0.833333333333333,2,0.285714285714286,1.05954231476865,6,1,2,0.000134866449819681,1
+"2_vs_1","observed_median","uniform_KNN","","9 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 11 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3251,3251,5,6,0.833333333333333,26,0.838709677419355,1.06406120320817,6,NA,NA,NA,NA
+"2_vs_1","observed_median","uniform_MinProb","","",1,3251,3251,5,6,0.833333333333333,6,0.545454545454545,1.06406120320817,6,NA,NA,NA,NA
+"2_vs_1","observed_median","DEP_absence","","9 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 11 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3251,3251,5,6,0.833333333333333,7,0.583333333333333,1.06406120320817,6,NA,NA,NA,NA
+"2_vs_1","observed_median","automatic_minimum","Could not estimate an automatic cutoff for condition `B`: The profile does not contain a clear downward transition with an interior boundary. Inspect the error's `profile` field, then supply a named manual cutoff for `B` through `cutoffs`.","",0,0,0,0,6,0,NA,NA,NA,0,NA,NA,NA,NA
+"2_vs_1","observed_median","automatic_none","Could not estimate an automatic cutoff for condition `B`: The profile does not contain a clear downward transition with an interior boundary. Inspect the error's `profile` field, then supply a named manual cutoff for `B` through `cutoffs`.","",0,0,0,0,6,0,NA,NA,NA,0,NA,NA,NA,NA
+"2_vs_1","none","observed_only","","Partial NA coefficients for 20 probe(s)",1,3251,3231,5,6,0.833333333333333,5,0.5,1.07314916761251,6,NA,NA,NA,NA
+"2_vs_1","none","proDA","","",1,3251,3251,2,6,0.333333333333333,0,0,1.06206407817426,6,1,2,0.00088226826758761,1
+"2_vs_1","none","uniform_KNN","","9 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 11 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3251,3251,5,6,0.833333333333333,27,0.84375,1.07314916761251,6,NA,NA,NA,NA
+"2_vs_1","none","uniform_MinProb","","",1,3251,3251,5,6,0.833333333333333,7,0.583333333333333,1.07314916761251,6,NA,NA,NA,NA
+"2_vs_1","none","DEP_absence","","9 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 11 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3251,3251,5,6,0.833333333333333,7,0.583333333333333,1.07314916761251,6,NA,NA,NA,NA
+"2_vs_1","none","automatic_minimum","Could not estimate an automatic cutoff for condition `B`: The profile does not contain a clear downward transition with an interior boundary. Inspect the error's `profile` field, then supply a named manual cutoff for `B` through `cutoffs`.","",0,0,0,0,6,0,NA,NA,NA,0,NA,NA,NA,NA
+"2_vs_1","none","automatic_none","Could not estimate an automatic cutoff for condition `B`: The profile does not contain a clear downward transition with an interior boundary. Inspect the error's `profile` field, then supply a named manual cutoff for `B` through `cutoffs`.","",0,0,0,0,6,0,NA,NA,NA,0,NA,NA,NA,NA
+"3_vs_1","observed_median","observed_only","","Partial NA coefficients for 20 probe(s)",1,3253,3233,4,6,0.666666666666667,1,0.2,1.36690822700811,6,NA,NA,NA,NA
+"3_vs_1","observed_median","proDA","","",1,3253,3253,4,6,0.666666666666667,0,0,1.32473719784309,6,1,2,8.87866923135229e-05,1
+"3_vs_1","observed_median","uniform_KNN","","11 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 9 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3253,3253,4,6,0.666666666666667,17,0.80952380952381,1.36690822700811,6,NA,NA,NA,NA
+"3_vs_1","observed_median","uniform_MinProb","","",1,3253,3253,4,6,0.666666666666667,2,0.333333333333333,1.36690822700811,6,NA,NA,NA,NA
+"3_vs_1","observed_median","DEP_absence","","11 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 9 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3253,3253,4,6,0.666666666666667,2,0.333333333333333,1.36690822700811,6,NA,NA,NA,NA
+"3_vs_1","observed_median","automatic_minimum","","",1,3193,3193,4,6,0.666666666666667,1,0.2,1.36690822700811,6,NA,NA,NA,NA
+"3_vs_1","observed_median","automatic_none","","4 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3193,3193,4,6,0.666666666666667,2,0.333333333333333,1.36690822700811,6,NA,NA,NA,NA
+"3_vs_1","none","observed_only","","Partial NA coefficients for 20 probe(s)",1,3253,3233,4,6,0.666666666666667,1,0.2,1.3801964642834,6,NA,NA,NA,NA
+"3_vs_1","none","proDA","","",1,3253,3253,1,6,0.166666666666667,0,0,1.32026347703911,6,1,3,0.000147439618133337,1
+"3_vs_1","none","uniform_KNN","","11 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 9 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3253,3253,4,6,0.666666666666667,17,0.80952380952381,1.3801964642834,6,NA,NA,NA,NA
+"3_vs_1","none","uniform_MinProb","","",1,3253,3253,4,6,0.666666666666667,3,0.428571428571429,1.3801964642834,6,NA,NA,NA,NA
+"3_vs_1","none","DEP_absence","","11 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 9 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3253,3253,4,6,0.666666666666667,3,0.428571428571429,1.3801964642834,6,NA,NA,NA,NA
+"3_vs_1","none","automatic_minimum","","",1,3193,3193,4,6,0.666666666666667,4,0.5,1.3801964642834,6,NA,NA,NA,NA
+"3_vs_1","none","automatic_none","","4 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3193,3193,4,6,0.666666666666667,3,0.428571428571429,1.3801964642834,6,NA,NA,NA,NA
+"4_vs_1","observed_median","observed_only","","Partial NA coefficients for 25 probe(s)",1,3249,3224,5,6,0.833333333333333,7,0.583333333333333,0.769487514566843,6,NA,NA,NA,NA
+"4_vs_1","observed_median","proDA","","",1,3249,3249,5,6,0.833333333333333,3,0.375,0.75904761097603,6,1,2,3.37090803412465e-05,1
+"4_vs_1","observed_median","uniform_KNN","","7 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 18 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3249,3249,5,6,0.833333333333333,32,0.864864864864865,0.769487514566843,6,NA,NA,NA,NA
+"4_vs_1","observed_median","uniform_MinProb","","",1,3249,3249,5,6,0.833333333333333,8,0.615384615384615,0.769487514566843,6,NA,NA,NA,NA
+"4_vs_1","observed_median","DEP_absence","","7 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 18 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3249,3249,5,6,0.833333333333333,12,0.705882352941177,0.769487514566843,6,NA,NA,NA,NA
+"4_vs_1","observed_median","automatic_minimum","","",1,3192,3192,5,6,0.833333333333333,8,0.615384615384615,0.769487514566843,6,NA,NA,NA,NA
+"4_vs_1","observed_median","automatic_none","","3 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 6 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3192,3192,5,6,0.833333333333333,13,0.722222222222222,0.769487514566843,6,NA,NA,NA,NA
+"4_vs_1","none","observed_only","","Partial NA coefficients for 25 probe(s)",1,3249,3224,5,6,0.833333333333333,7,0.583333333333333,0.778137807596683,6,NA,NA,NA,NA
+"4_vs_1","none","proDA","","",1,3249,3249,2,6,0.333333333333333,0,0,0.760446238631277,6,1,2,0.000256043574475813,1
+"4_vs_1","none","uniform_KNN","","7 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 18 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3249,3249,5,6,0.833333333333333,35,0.875,0.778137807596683,6,NA,NA,NA,NA
+"4_vs_1","none","uniform_MinProb","","",1,3249,3249,5,6,0.833333333333333,9,0.642857142857143,0.778137807596683,6,NA,NA,NA,NA
+"4_vs_1","none","DEP_absence","","7 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 18 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3249,3249,5,6,0.833333333333333,9,0.642857142857143,0.778137807596683,6,NA,NA,NA,NA
+"4_vs_1","none","automatic_minimum","","",1,3192,3192,5,6,0.833333333333333,11,0.6875,0.778137807596683,6,NA,NA,NA,NA
+"4_vs_1","none","automatic_none","","3 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 6 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3192,3192,5,6,0.833333333333333,14,0.736842105263158,0.778137807596683,6,NA,NA,NA,NA
+"3_vs_2","observed_median","observed_only","","Partial NA coefficients for 22 probe(s)",1,3253,3231,5,6,0.833333333333333,6,0.545454545454545,1.29925780168043,6,NA,NA,NA,NA
+"3_vs_2","observed_median","proDA","","",1,3253,3253,2,6,0.333333333333333,1,0.333333333333333,1.2733409064829,6,1,2,0.000344214268823869,1
+"3_vs_2","observed_median","uniform_KNN","","13 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 9 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3253,3253,5,6,0.833333333333333,24,0.827586206896552,1.29925780168043,6,NA,NA,NA,NA
+"3_vs_2","observed_median","uniform_MinProb","","",1,3253,3253,5,6,0.833333333333333,4,0.444444444444444,1.29925780168043,6,NA,NA,NA,NA
+"3_vs_2","observed_median","DEP_absence","","13 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 9 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3253,3253,5,6,0.833333333333333,4,0.444444444444444,1.29925780168043,6,NA,NA,NA,NA
+"3_vs_2","observed_median","automatic_minimum","Could not estimate an automatic cutoff for condition `A`: The profile does not contain a clear downward transition with an interior boundary. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`.","",0,0,0,0,6,0,NA,NA,NA,0,NA,NA,NA,NA
+"3_vs_2","observed_median","automatic_none","Could not estimate an automatic cutoff for condition `A`: The profile does not contain a clear downward transition with an interior boundary. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`.","",0,0,0,0,6,0,NA,NA,NA,0,NA,NA,NA,NA
+"3_vs_2","none","observed_only","","Partial NA coefficients for 22 probe(s)",1,3253,3231,5,6,0.833333333333333,4,0.444444444444444,1.28044670152476,6,NA,NA,NA,NA
+"3_vs_2","none","proDA","","",1,3253,3253,2,6,0.333333333333333,0,0,1.24313632011761,6,1,3,3.20066417269056e-05,1
+"3_vs_2","none","uniform_KNN","","13 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 9 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3253,3253,5,6,0.833333333333333,27,0.84375,1.28044670152476,6,NA,NA,NA,NA
+"3_vs_2","none","uniform_MinProb","","",1,3253,3253,5,6,0.833333333333333,4,0.444444444444444,1.28044670152476,6,NA,NA,NA,NA
+"3_vs_2","none","DEP_absence","","13 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 9 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3253,3253,5,6,0.833333333333333,4,0.444444444444444,1.28044670152476,6,NA,NA,NA,NA
+"3_vs_2","none","automatic_minimum","Could not estimate an automatic cutoff for condition `A`: The profile does not contain a clear downward transition with an interior boundary. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`.","",0,0,0,0,6,0,NA,NA,NA,0,NA,NA,NA,NA
+"3_vs_2","none","automatic_none","Could not estimate an automatic cutoff for condition `A`: The profile does not contain a clear downward transition with an interior boundary. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`.","",0,0,0,0,6,0,NA,NA,NA,0,NA,NA,NA,NA
+"4_vs_2","observed_median","observed_only","","Partial NA coefficients for 21 probe(s)",1,3246,3225,6,6,1,12,0.666666666666667,1.346675118674,6,NA,NA,NA,NA
+"4_vs_2","observed_median","proDA","","",1,3246,3246,6,6,1,2,0.25,1.33174381844894,6,1,2,0.000161631805110252,1
+"4_vs_2","observed_median","uniform_KNN","","6 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 15 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3246,3246,6,6,1,36,0.857142857142857,1.346675118674,6,NA,NA,NA,NA
+"4_vs_2","observed_median","uniform_MinProb","","",1,3246,3246,6,6,1,10,0.625,1.346675118674,6,NA,NA,NA,NA
+"4_vs_2","observed_median","DEP_absence","","6 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 15 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3246,3246,6,6,1,17,0.739130434782609,1.346675118674,6,NA,NA,NA,NA
+"4_vs_2","observed_median","automatic_minimum","Could not estimate an automatic cutoff for condition `A`: The profile does not contain a clear downward transition with an interior boundary. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`.","",0,0,0,0,6,0,NA,NA,NA,0,NA,NA,NA,NA
+"4_vs_2","observed_median","automatic_none","Could not estimate an automatic cutoff for condition `A`: The profile does not contain a clear downward transition with an interior boundary. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`.","",0,0,0,0,6,0,NA,NA,NA,0,NA,NA,NA,NA
+"4_vs_2","none","observed_only","","Partial NA coefficients for 21 probe(s)",1,3246,3225,6,6,1,10,0.625,1.34348449190843,6,NA,NA,NA,NA
+"4_vs_2","none","proDA","","",1,3246,3246,5,6,0.833333333333333,0,0,1.32106869150741,6,1,2,0.000247548160977654,1
+"4_vs_2","none","uniform_KNN","","6 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 15 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3246,3246,6,6,1,36,0.857142857142857,1.34348449190843,6,NA,NA,NA,NA
+"4_vs_2","none","uniform_MinProb","","",1,3246,3246,6,6,1,12,0.666666666666667,1.34348449190843,6,NA,NA,NA,NA
+"4_vs_2","none","DEP_absence","","6 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 15 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3246,3246,6,6,1,15,0.714285714285714,1.34348449190843,6,NA,NA,NA,NA
+"4_vs_2","none","automatic_minimum","Could not estimate an automatic cutoff for condition `A`: The profile does not contain a clear downward transition with an interior boundary. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`.","",0,0,0,0,6,0,NA,NA,NA,0,NA,NA,NA,NA
+"4_vs_2","none","automatic_none","Could not estimate an automatic cutoff for condition `A`: The profile does not contain a clear downward transition with an interior boundary. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`.","",0,0,0,0,6,0,NA,NA,NA,0,NA,NA,NA,NA
+"4_vs_3","observed_median","observed_only","","Partial NA coefficients for 21 probe(s)",1,3248,3227,5,6,0.833333333333333,3,0.375,1.25540463235262,6,NA,NA,NA,NA
+"4_vs_3","observed_median","proDA","","",1,3248,3248,2,6,0.333333333333333,0,0,1.21177490787321,6,1,2,0.000288737760323085,1
+"4_vs_3","observed_median","uniform_KNN","","4 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 17 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3248,3248,5,6,0.833333333333333,35,0.875,1.25540463235262,6,NA,NA,NA,NA
+"4_vs_3","observed_median","uniform_MinProb","","",1,3248,3248,5,6,0.833333333333333,6,0.545454545454545,1.25540463235262,6,NA,NA,NA,NA
+"4_vs_3","observed_median","DEP_absence","","4 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 17 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3248,3248,5,6,0.833333333333333,12,0.705882352941177,1.25540463235262,6,NA,NA,NA,NA
+"4_vs_3","observed_median","automatic_minimum","","",1,3187,3187,5,6,0.833333333333333,4,0.444444444444444,1.25540463235262,6,NA,NA,NA,NA
+"4_vs_3","observed_median","automatic_none","","2 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 7 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3187,3187,5,6,0.833333333333333,13,0.722222222222222,1.25540463235262,6,NA,NA,NA,NA
+"4_vs_3","none","observed_only","","Partial NA coefficients for 21 probe(s)",1,3248,3227,5,6,0.833333333333333,3,0.375,1.20606882517074,6,NA,NA,NA,NA
+"4_vs_3","none","proDA","","",1,3248,3248,1,6,0.166666666666667,0,0,1.14624103890364,6,1,2,0.000375075350102367,1
+"4_vs_3","none","uniform_KNN","","4 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 17 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3248,3248,5,6,0.833333333333333,28,0.848484848484849,1.20606882517074,6,NA,NA,NA,NA
+"4_vs_3","none","uniform_MinProb","","",1,3248,3248,5,6,0.833333333333333,4,0.444444444444444,1.20606882517074,6,NA,NA,NA,NA
+"4_vs_3","none","DEP_absence","","4 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 17 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3248,3248,5,6,0.833333333333333,8,0.615384615384615,1.20606882517074,6,NA,NA,NA,NA
+"4_vs_3","none","automatic_minimum","","",1,3187,3187,5,6,0.833333333333333,5,0.5,1.20606882517074,6,NA,NA,NA,NA
+"4_vs_3","none","automatic_none","","2 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 7 rows with more than 99 % entries missing;
+ mean imputation used for these rows",1,3187,3187,5,6,0.833333333333333,11,0.6875,1.20606882517074,6,NA,NA,NA,NA

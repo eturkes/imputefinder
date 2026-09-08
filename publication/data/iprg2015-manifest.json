@@ -1,0 +1,32 @@
+{
+  "archive_bytes": 580636238,
+  "excluded_rows": 52,
+  "filtering": "Exclude reverse, site-only, and contaminant groups; retain declared spikes even if contaminant-flagged",
+  "identifiers": "Blinded surrogate spike accessions supplied by the study; not current organism annotations",
+  "intensity": "MaxQuant 1.6.17.0 Intensity columns, not LFQ intensity; zero becomes NA; positive values become log2",
+  "member": "txt/proteinGroups.txt",
+  "member_bytes": 7658671,
+  "member_compressed_bytes": 2449219,
+  "member_crc32": "dda01138",
+  "original_accession": "MSV000079843",
+  "original_study": "iPRG2015; four mixtures from one yeast lysate, three technical runs per mixture",
+  "outputs_sha256": {
+    "iprg2015-exclusions.csv": "48c5a5bfc73579b3d0ca867d148a0728206e7167d60f778a0f988577ac50853d",
+    "iprg2015-features.csv": "6ce72d19d6bcccce185c1ab1d381aa2afaca9cdd8bebc8439f910e5018bbeff6",
+    "iprg2015-intensities.csv": "3669617f0c596cb27912084af4783755c6597ff7f2a9a8488b96993d2286fd82",
+    "iprg2015-samples.csv": "349e7c5967c73a7bcc9dcf1f08a6e3d2e95cd580c454051b44202ede8b6ae259",
+    "iprg2015-truth.csv": "b71142b7b4ae6524a9e450e11948684beeb5e8e8ce73c02ba4fcf82eee926a94"
+  },
+  "reprocessing_accession": "PXD028038",
+  "reprocessing_article": "https://doi.org/10.1021/acs.jproteome.1c00683",
+  "retained_rows": 3262,
+  "samples": 12,
+  "source_rows": 3314,
+  "source_sha256": "4ab473a7a1bd942ac8d95e29e5993718f581a0bec06f250a7c7f604c79515792",
+  "source_url": "https://ftp.pride.ebi.ac.uk/pride/data/archive/2022/04/PXD028038/iPRG2015_MQ_txt.zip.zip",
+  "spike_amounts_source": "https://raw.githubusercontent.com/MassDynamics/lfq_benchmark/962d154ffe20b4eea27a341f56f3d67f8a6cd580/resources/IPRGSpikes.csv",
+  "spike_groups": 6,
+  "spike_id_source": "https://raw.githubusercontent.com/MassDynamics/lfq_benchmark/962d154ffe20b4eea27a341f56f3d67f8a6cd580/app/benchmarkers/iprg_benchmarker.py",
+  "truth_limit": "Known mixture effects and constant yeast background; no known causes for individual missing cells",
+  "upstream_matching": "Match between runs enabled; this analysis does not repeat peptide identification or alignment"
+}

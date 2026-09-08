@@ -6,6 +6,8 @@
 ^tools$
 ^data-raw$
 ^imputefinder-results$
+^publication$
+^AGENTS\.md$
 ^.*\.Rcheck$
 ^.*\.BiocCheck$
 ^imputefinder_.*\.tar\.gz$

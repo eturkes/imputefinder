@@ -1,0 +1,1227 @@
+"scenario","seed","method","available","retained_fraction","tested_fraction","reconstructed_missing_fraction","missing_RMSE","effect_RMSE","FDP","power","discoveries","proda_converged","proda_iterations","proda_error","proda_default_converged","warnings","reason"
+"MCAR",1,"observed_only",1,1,0.948333333333333,0,NA,0.2777983691134,0.0434782608695652,0.780141843971631,115,NA,NA,NA,NA,"Partial NA coefficients for 31 probe(s)",""
+"MCAR",1,"proDA",1,1,0.996666666666667,0,NA,1.0881810511605,0,0.765957446808511,108,1,5,6.27702612979039e-05,1,"",""
+"MCAR",1,"uniform_KNN",1,1,1,1,1.62027485615992,1.16581511014749,0.166666666666667,0.99290780141844,168,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",1,"uniform_MinProb",1,1,1,1,6.09628080858525,1.64536097494998,0,0.226950354609929,32,NA,NA,NA,NA,"",""
+"MCAR",1,"DEP_absence",1,1,1,1,0.660490364720435,0.351703473323542,0.161676646706587,0.99290780141844,167,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",1,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",1,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",1,"manual_12",1,0.623333333333333,0.623333333333333,0.506735751295337,0.871702434307835,0.456978044722308,0.178571428571429,0.652482269503546,112,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",2,"observed_only",1,1,0.948333333333333,0,NA,0.274764547725298,0.0260869565217391,0.777777777777778,115,NA,NA,NA,NA,"Partial NA coefficients for 31 probe(s)",""
+"MCAR",2,"proDA",1,1,1,0,NA,1.08945231355393,0,0.770833333333333,111,1,4,0.000122516181794225,1,"",""
+"MCAR",2,"uniform_KNN",1,1,1,1,1.71221642376744,1.21776928629182,0.17816091954023,0.993055555555556,174,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",2,"uniform_MinProb",1,1,1,1,6.08369305619447,1.61436879525717,0,0.229166666666667,33,NA,NA,NA,NA,"",""
+"MCAR",2,"DEP_absence",1,1,1,1,0.57416432656427,0.315318803713038,0.148809523809524,0.993055555555556,168,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",2,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",2,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",2,"manual_12",1,0.643333333333333,0.643333333333333,0.535995796111403,0.863531016991753,0.414522053627017,0.1,0.6875,110,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",3,"observed_only",1,1,0.948333333333333,0,NA,0.273576089830687,0.00869565217391304,0.791666666666667,115,NA,NA,NA,NA,"Partial NA coefficients for 31 probe(s)",""
+"MCAR",3,"proDA",1,1,1,0,NA,1.08213357697017,0,0.763888888888889,110,1,4,0.000121566965342759,1,"",""
+"MCAR",3,"uniform_KNN",1,1,1,1,1.82363761442824,1.28153055190223,0.225806451612903,1,186,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",3,"uniform_MinProb",1,1,1,1,6.05417563629866,1.59575234807661,0.0285714285714286,0.236111111111111,35,NA,NA,NA,NA,"",""
+"MCAR",3,"DEP_absence",1,1,1,1,0.660483633694948,0.375674015128023,0.213114754098361,1,183,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",3,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",3,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",3,"manual_12",1,0.651666666666667,0.651666666666667,0.527525387493319,0.894537278328187,0.438842653012787,0.100917431192661,0.680555555555556,109,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",4,"observed_only",1,1,0.948333333333333,0,NA,0.274718567460764,0.0431034482758621,0.787234042553192,116,NA,NA,NA,NA,"Partial NA coefficients for 31 probe(s)",""
+"MCAR",4,"proDA",1,1,0.998333333333333,0,NA,1.06564073781719,0,0.773049645390071,109,1,7,8.3268778766271e-05,1,"",""
+"MCAR",4,"uniform_KNN",1,1,1,1,1.57153021500294,1.12835915806056,0.233695652173913,1,184,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",4,"uniform_MinProb",1,1,1,1,6.28045655597268,1.539027174487,0.0810810810810811,0.24113475177305,37,NA,NA,NA,NA,"",""
+"MCAR",4,"DEP_absence",1,1,1,1,0.705494498094194,0.385813729967177,0.212290502793296,1,179,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",4,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",4,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",4,"manual_12",1,0.615,0.615,0.501027749229188,0.881627259660119,0.415677853245068,0.0666666666666667,0.695035460992908,105,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",5,"observed_only",1,1,0.95,0,NA,0.284427811165271,0.0564516129032258,0.790540540540541,124,NA,NA,NA,NA,"Partial NA coefficients for 30 probe(s)",""
+"MCAR",5,"proDA",1,1,1,0,NA,1.07804071794546,0.0087719298245614,0.763513513513513,114,1,5,1.00464779854849e-05,1,"",""
+"MCAR",5,"uniform_KNN",1,1,1,1,1.63088735272203,1.15523311283889,0.238341968911917,0.993243243243243,193,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",5,"uniform_MinProb",1,1,1,1,6.6501281086305,1.77883309508953,0.0294117647058824,0.222972972972973,34,NA,NA,NA,NA,"",""
+"MCAR",5,"DEP_absence",1,1,1,1,0.712883403034754,0.46523711658766,0.226315789473684,0.993243243243243,190,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",5,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",5,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",5,"manual_12",1,0.623333333333333,0.623333333333333,0.482864450127877,1.14535431188471,0.539069762606562,0.0810810810810811,0.689189189189189,111,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",6,"observed_only",1,1,0.95,0,NA,0.290035540944177,0.0256410256410256,0.786206896551724,117,NA,NA,NA,NA,"Partial NA coefficients for 30 probe(s)",""
+"MCAR",6,"proDA",1,1,1,0,NA,1.11098375719465,0.00869565217391304,0.786206896551724,115,1,4,0.000218791668317926,1,"",""
+"MCAR",6,"uniform_KNN",1,1,1,1,1.67755347678812,1.19246890407508,0.240837696335079,1,191,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",6,"uniform_MinProb",1,1,1,1,6.16837541782358,1.68276380200919,0.0540540540540541,0.241379310344828,37,NA,NA,NA,NA,"",""
+"MCAR",6,"DEP_absence",1,1,1,1,0.536403991469687,0.315656513305201,0.228723404255319,1,188,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",6,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",6,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",6,"manual_12",1,0.633333333333333,0.633333333333333,0.504766949152542,0.896032629083292,0.414959559133048,0.0917431192660551,0.682758620689655,109,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",7,"observed_only",1,1,0.95,0,NA,0.288978387620098,0.0564516129032258,0.795918367346939,124,NA,NA,NA,NA,"Partial NA coefficients for 30 probe(s)",""
+"MCAR",7,"proDA",1,1,1,0,NA,1.10503915901764,0.0172413793103448,0.775510204081633,116,1,4,0.00028948849104624,1,"",""
+"MCAR",7,"uniform_KNN",1,1,1,1,1.65367025208333,1.17762118754527,0.21505376344086,0.993197278911565,186,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",7,"uniform_MinProb",1,1,1,1,6.06127794232731,1.58345032571522,0.0294117647058824,0.224489795918367,34,NA,NA,NA,NA,"",""
+"MCAR",7,"DEP_absence",1,1,1,1,0.551032352288562,0.311794063748423,0.21505376344086,0.993197278911565,186,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",7,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",7,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",7,"manual_12",1,0.633333333333333,0.633333333333333,0.51853813559322,0.851007053659128,0.405862739677567,0.115044247787611,0.680272108843537,113,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",8,"observed_only",1,1,0.948333333333333,0,NA,0.264274166855904,0.0491803278688525,0.794520547945205,122,NA,NA,NA,NA,"Partial NA coefficients for 31 probe(s)",""
+"MCAR",8,"proDA",1,1,1,0,NA,1.09127895635674,0.0173913043478261,0.773972602739726,115,1,4,0.000202761884320099,1,"",""
+"MCAR",8,"uniform_KNN",1,1,1,1,1.69643701162433,1.19168209816413,0.229946524064171,0.986301369863014,187,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",8,"uniform_MinProb",1,1,1,1,5.73093752610774,1.51265857874856,0.0476190476190476,0.273972602739726,42,NA,NA,NA,NA,"",""
+"MCAR",8,"DEP_absence",1,1,1,1,0.780288377955642,0.50208007861342,0.225806451612903,0.986301369863014,186,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",8,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",8,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",8,"manual_12",1,0.676666666666667,0.676666666666667,0.546195652173913,1.01678924011533,0.606876116243302,0.161538461538462,0.746575342465753,130,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",9,"observed_only",1,1,0.948333333333333,0,NA,0.294216672359823,0.0806451612903226,0.786206896551724,124,NA,NA,NA,NA,"Partial NA coefficients for 31 probe(s)",""
+"MCAR",9,"proDA",1,1,0.988333333333333,0,NA,1.10906129083422,0,0.751724137931034,109,1,4,0.000132824526137145,1,"",""
+"MCAR",9,"uniform_KNN",1,1,1,1,1.67678323986452,1.15910836495075,0.224598930481283,1,187,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",9,"uniform_MinProb",1,1,1,1,5.87106833639065,1.54119072204992,0.0571428571428571,0.227586206896552,35,NA,NA,NA,NA,"",""
+"MCAR",9,"DEP_absence",1,1,1,1,0.675979948793176,0.427790470467462,0.224598930481283,1,187,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",9,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",9,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",9,"manual_12",1,0.676666666666667,0.676666666666667,0.560540540540541,0.968195867066794,0.497246940762224,0.114754098360656,0.744827586206897,122,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",10,"observed_only",1,1,0.948333333333333,0,NA,0.275040388449789,0.0176991150442478,0.787234042553192,113,NA,NA,NA,NA,"Partial NA coefficients for 31 probe(s)",""
+"MCAR",10,"proDA",1,1,1,0,NA,1.04209681116754,0,0.780141843971631,110,1,4,0.000217261426210301,1,"",""
+"MCAR",10,"uniform_KNN",1,1,1,1,1.59263844208847,1.11199301275453,0.245989304812834,1,187,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",10,"uniform_MinProb",1,1,1,1,5.96797884878941,1.56498065290779,0.0512820512820513,0.26241134751773,39,NA,NA,NA,NA,"",""
+"MCAR",10,"DEP_absence",1,1,1,1,0.657253086315597,0.371086082705342,0.237837837837838,1,185,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",10,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",10,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",10,"manual_12",1,0.648333333333333,0.648333333333333,0.525634106853751,0.831273188808177,0.368926460816062,0.092436974789916,0.765957446808511,119,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",11,"observed_only",1,1,0.95,0,NA,0.27357383194855,0.0175438596491228,0.783216783216783,114,NA,NA,NA,NA,"Partial NA coefficients for 30 probe(s)",""
+"MCAR",11,"proDA",1,1,1,0,NA,1.08814586135228,0.00884955752212389,0.783216783216783,113,1,4,0.000237756070003654,1,"",""
+"MCAR",11,"uniform_KNN",1,1,1,1,1.64432611036998,1.159957856549,0.1875,1,176,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",11,"uniform_MinProb",1,1,1,1,6.0497824302217,1.54413475058655,0.0526315789473684,0.251748251748252,38,NA,NA,NA,NA,"",""
+"MCAR",11,"DEP_absence",1,1,1,1,0.551084689413263,0.310699657524016,0.182857142857143,1,175,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",11,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",11,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",11,"manual_12",1,0.658333333333333,0.658333333333333,0.534261241970021,0.971424227246476,0.434566202702872,0.0630630630630631,0.727272727272727,111,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",12,"observed_only",1,1,0.95,0,NA,0.270602418165014,0.0256410256410256,0.791666666666667,117,NA,NA,NA,NA,"Partial NA coefficients for 30 probe(s)",""
+"MCAR",12,"proDA",1,1,1,0,NA,1.07396932941083,0.00884955752212389,0.777777777777778,113,1,4,0.000260245609223828,1,"",""
+"MCAR",12,"uniform_KNN",1,1,1,1,1.6001979123792,1.15588837408548,0.213114754098361,1,183,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",12,"uniform_MinProb",1,1,1,1,5.94099452802885,1.4424780476954,0,0.236111111111111,34,NA,NA,NA,NA,"",""
+"MCAR",12,"DEP_absence",1,1,1,1,0.570939934569609,0.311621717943626,0.208791208791209,1,182,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",12,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",12,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",12,"manual_12",1,0.648333333333333,0.648333333333333,0.512466843501326,0.922159347327342,0.410850556976042,0.102564102564103,0.729166666666667,117,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",13,"observed_only",1,1,0.95,0,NA,0.272283319432774,0.0420168067226891,0.786206896551724,119,NA,NA,NA,NA,"Partial NA coefficients for 30 probe(s)",""
+"MCAR",13,"proDA",1,1,1,0,NA,1.04191715203353,0,0.779310344827586,113,1,4,0.000242961182189974,1,"",""
+"MCAR",13,"uniform_KNN",1,1,1,1,1.59668399816821,1.1197587071958,0.220430107526882,1,186,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",13,"uniform_MinProb",1,1,1,1,5.68395510079685,1.38760427111775,0,0.241379310344828,35,NA,NA,NA,NA,"",""
+"MCAR",13,"DEP_absence",1,1,1,1,0.62127405103775,0.31444351200097,0.207650273224044,1,183,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",13,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",13,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",13,"manual_12",1,0.653333333333333,0.653333333333333,0.53509234828496,0.951443105498322,0.435142170046284,0.0825688073394495,0.689655172413793,109,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",14,"observed_only",1,1,0.95,0,NA,0.28220981729662,0.0578512396694215,0.786206896551724,121,NA,NA,NA,NA,"Partial NA coefficients for 30 probe(s)",""
+"MCAR",14,"proDA",1,1,1,0,NA,1.08482571712809,0.00869565217391304,0.786206896551724,115,1,4,0.000328152638524361,1,"",""
+"MCAR",14,"uniform_KNN",1,1,1,1,1.5976660721734,1.14661335119923,0.198895027624309,1,181,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",14,"uniform_MinProb",1,1,1,1,6.10201397502895,1.54459958165165,0.075,0.255172413793103,40,NA,NA,NA,NA,"",""
+"MCAR",14,"DEP_absence",1,1,1,1,0.567545738777467,0.326745825548545,0.189944134078212,1,179,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",14,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",14,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",14,"manual_12",1,0.656666666666667,0.656666666666667,0.534318901795143,0.942248616760777,0.453586125316429,0.106194690265487,0.696551724137931,113,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",15,"observed_only",1,1,0.95,0,NA,0.277721884003231,0.0336134453781513,0.787671232876712,119,NA,NA,NA,NA,"Partial NA coefficients for 30 probe(s)",""
+"MCAR",15,"proDA",1,1,0.975,0,NA,1.12259198542234,0.00952380952380952,0.712328767123288,105,1,22,0.000974300247520077,0,"",""
+"MCAR",15,"uniform_KNN",1,1,1,1,1.65083632300805,1.17088961096911,0.21505376344086,1,186,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",15,"uniform_MinProb",1,1,1,1,6.33301764869761,1.67587574107789,0,0.253424657534247,37,NA,NA,NA,NA,"",""
+"MCAR",15,"DEP_absence",1,1,1,1,0.550478616478027,0.315043953042449,0.210810810810811,1,185,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",15,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",15,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",15,"manual_12",1,0.663333333333333,0.663333333333333,0.533298097251586,1.07477862730225,0.492677387915015,0.076271186440678,0.746575342465753,118,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",16,"observed_only",1,1,0.95,0,NA,0.26625337648742,0.040983606557377,0.795918367346939,122,NA,NA,NA,NA,"Partial NA coefficients for 30 probe(s)",""
+"MCAR",16,"proDA",1,1,1,0,NA,1.10520298440174,0.00847457627118644,0.795918367346939,118,1,4,0.00043322012421169,1,"",""
+"MCAR",16,"uniform_KNN",1,1,1,1,1.62738102160706,1.14118945254923,0.21505376344086,0.993197278911565,186,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",16,"uniform_MinProb",1,1,1,1,5.95993585319051,1.53416623926863,0.0263157894736842,0.251700680272109,38,NA,NA,NA,NA,"",""
+"MCAR",16,"DEP_absence",1,1,1,1,0.537482094760234,0.309276833174403,0.197802197802198,0.993197278911565,182,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",16,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",16,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",16,"manual_12",1,0.615,0.615,0.5,0.842082210494603,0.402768116525465,0.0948275862068965,0.714285714285714,116,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",17,"observed_only",1,1,0.95,0,NA,0.260750838759636,0.0416666666666667,0.793103448275862,120,NA,NA,NA,NA,"Partial NA coefficients for 30 probe(s)",""
+"MCAR",17,"proDA",1,1,1,0,NA,1.03682216529874,0.00884955752212389,0.772413793103448,113,1,4,0.000201630114213441,1,"",""
+"MCAR",17,"uniform_KNN",1,1,1,1,1.62580521670514,1.14592434059056,0.185393258426966,1,178,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",17,"uniform_MinProb",1,1,1,1,6.10811809684134,1.5720574903045,0,0.262068965517241,38,NA,NA,NA,NA,"",""
+"MCAR",17,"DEP_absence",1,1,1,1,0.58142594122672,0.311183851252351,0.176136363636364,1,176,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",17,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",17,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",17,"manual_12",1,0.655,0.655,0.520922746781116,0.980906917700614,0.414877960111467,0.06,0.648275862068965,100,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",18,"observed_only",1,1,0.948333333333333,0,NA,0.266970753765007,0.0265486725663717,0.780141843971631,113,NA,NA,NA,NA,"Partial NA coefficients for 31 probe(s)",""
+"MCAR",18,"proDA",1,1,1,0,NA,1.07739652908993,0.00900900900900901,0.780141843971631,111,1,4,0.00031697177819964,1,"",""
+"MCAR",18,"uniform_KNN",1,1,1,1,1.75353737456149,1.22324629098843,0.220994475138122,1,181,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",18,"uniform_MinProb",1,1,1,1,6.20752155712662,1.57854557203625,0.0294117647058824,0.234042553191489,34,NA,NA,NA,NA,"",""
+"MCAR",18,"DEP_absence",1,1,1,1,0.625024034518756,0.345189382492692,0.212290502793296,1,179,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",18,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",18,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",18,"manual_12",1,0.678333333333333,0.678333333333333,0.553403431101273,0.928785210827904,0.4112786549355,0.087378640776699,0.666666666666667,103,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",19,"observed_only",1,1,0.95,0,NA,0.27838313589194,0.0588235294117647,0.767123287671233,119,NA,NA,NA,NA,"Partial NA coefficients for 30 probe(s)",""
+"MCAR",19,"proDA",1,1,1,0,NA,1.13368178855228,0.0178571428571429,0.753424657534247,112,1,4,9.83831570557558e-05,1,"",""
+"MCAR",19,"uniform_KNN",1,1,1,1,1.66270884464134,1.19470873713871,0.232804232804233,0.993150684931507,189,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",19,"uniform_MinProb",1,1,1,1,6.17839675834114,1.59389921831263,0,0.23972602739726,35,NA,NA,NA,NA,"",""
+"MCAR",19,"DEP_absence",1,1,1,1,0.559127576253555,0.31552658929791,0.216216216216216,0.993150684931507,185,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",19,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",19,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",19,"manual_12",1,0.648333333333333,0.648333333333333,0.524512387981023,0.904319494316974,0.411906336121083,0.12037037037037,0.650684931506849,108,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",20,"observed_only",1,1,0.95,0,NA,0.281318831632525,0.0495867768595041,0.793103448275862,121,NA,NA,NA,NA,"Partial NA coefficients for 30 probe(s)",""
+"MCAR",20,"proDA",1,1,1,0,NA,1.02797114042932,0.00892857142857143,0.76551724137931,112,1,4,0.000225806083439186,1,"",""
+"MCAR",20,"uniform_KNN",1,1,1,1,1.52414321050613,1.08545528820672,0.253886010362694,0.993103448275862,193,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",20,"uniform_MinProb",1,1,1,1,5.83441758255668,1.48985956765738,0,0.227586206896552,33,NA,NA,NA,NA,"",""
+"MCAR",20,"DEP_absence",1,1,1,1,0.546510493975389,0.319710593200133,0.253886010362694,0.993103448275862,193,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",20,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",20,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",20,"manual_12",1,0.64,0.64,0.519292604501608,1.04796617670027,0.45499889352709,0.076271186440678,0.751724137931034,118,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",21,"observed_only",1,1,0.948333333333333,0,NA,0.264341021378293,0.0357142857142857,0.765957446808511,112,NA,NA,NA,NA,"Partial NA coefficients for 31 probe(s)",""
+"MCAR",21,"proDA",1,1,1,0,NA,1.07180034665542,0,0.75886524822695,107,1,4,6.80586868334359e-05,1,"",""
+"MCAR",21,"uniform_KNN",1,1,1,1,1.82311421474658,1.29227126563709,0.184971098265896,1,173,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",21,"uniform_MinProb",1,1,1,1,6.49146680602283,1.65753416798995,0,0.276595744680851,39,NA,NA,NA,NA,"",""
+"MCAR",21,"DEP_absence",1,1,1,1,0.726920525554201,0.397457240627115,0.180232558139535,1,172,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",21,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",21,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",21,"manual_12",1,0.66,0.66,0.544,1.19211042077112,0.568759241315829,0.101694915254237,0.75177304964539,118,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",22,"observed_only",1,1,0.95,0,NA,0.2748163705062,0.0353982300884956,0.778571428571429,113,NA,NA,NA,NA,"Partial NA coefficients for 30 probe(s)",""
+"MCAR",22,"proDA",1,1,1,0,NA,1.03633903244581,0.00934579439252336,0.757142857142857,107,1,4,7.10300699009015e-05,1,"",""
+"MCAR",22,"uniform_KNN",1,1,1,1,1.58310525445995,1.12548533003854,0.209039548022599,1,177,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",22,"uniform_MinProb",1,1,1,1,5.92643631741906,1.5161171915725,0,0.242857142857143,34,NA,NA,NA,NA,"",""
+"MCAR",22,"DEP_absence",1,1,1,1,0.6073212112078,0.337486714406411,0.190751445086705,1,173,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",22,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",22,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",22,"manual_12",1,0.621666666666667,0.621666666666667,0.489204844655082,1.05515226608275,0.443730031529903,0.0689655172413793,0.771428571428571,116,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",23,"observed_only",1,1,0.946666666666667,0,NA,0.265166295264489,0.0263157894736842,0.787234042553192,114,NA,NA,NA,NA,"Partial NA coefficients for 32 probe(s)",""
+"MCAR",23,"proDA",1,1,1,0,NA,1.06200394499934,0,0.787234042553192,111,1,4,0.00015019918778894,1,"",""
+"MCAR",23,"uniform_KNN",1,1,1,1,1.83230549623333,1.29593634653541,0.198863636363636,1,176,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",23,"uniform_MinProb",1,1,1,1,5.7080118402924,1.45028526739593,0.0465116279069767,0.290780141843972,43,NA,NA,NA,NA,"",""
+"MCAR",23,"DEP_absence",1,1,1,1,0.817313131345111,0.351566307494341,0.175438596491228,1,171,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",23,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",23,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",23,"manual_12",1,0.668333333333333,0.668333333333333,0.549597855227882,0.936183924971996,0.481827067748216,0.128205128205128,0.723404255319149,117,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",24,"observed_only",1,1,0.95,0,NA,0.261590622387762,0.0169491525423729,0.789115646258503,118,NA,NA,NA,NA,"Partial NA coefficients for 30 probe(s)",""
+"MCAR",24,"proDA",1,1,0.993333333333333,0,NA,1.07331890665722,0,0.761904761904762,112,1,4,0.000898421799172623,1,"",""
+"MCAR",24,"uniform_KNN",1,1,1,1,1.66689799039567,1.16339187301537,0.16,1,175,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",24,"uniform_MinProb",1,1,1,1,5.73805874016869,1.43600591628712,0.027027027027027,0.244897959183673,37,NA,NA,NA,NA,"",""
+"MCAR",24,"DEP_absence",1,1,1,1,0.526056307109419,0.28799795021839,0.16,1,175,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",24,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",24,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",24,"manual_12",1,0.65,0.65,0.525674960296453,0.790164690829175,0.359036955209288,0.0775862068965517,0.727891156462585,116,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",25,"observed_only",1,1,0.948333333333333,0,NA,0.265291664563434,0.0341880341880342,0.784722222222222,117,NA,NA,NA,NA,"Partial NA coefficients for 31 probe(s)",""
+"MCAR",25,"proDA",1,1,1,0,NA,1.1014413220701,0.00892857142857143,0.770833333333333,112,1,4,2.1750683085976e-05,1,"",""
+"MCAR",25,"uniform_KNN",1,1,1,1,1.80718950756296,1.26644523346881,0.177142857142857,1,175,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",25,"uniform_MinProb",1,1,1,1,6.11931415644156,1.602368635967,0.027027027027027,0.25,37,NA,NA,NA,NA,"",""
+"MCAR",25,"DEP_absence",1,1,1,1,0.60366810519061,0.304216633672071,0.157894736842105,1,171,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",25,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",25,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",25,"manual_12",1,0.641666666666667,0.641666666666667,0.518994114499732,0.987716272585748,0.440108512815319,0.0695652173913043,0.743055555555556,115,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",26,"observed_only",1,1,0.946666666666667,0,NA,0.280542977859502,0.0247933884297521,0.797297297297297,121,NA,NA,NA,NA,"Partial NA coefficients for 32 probe(s)",""
+"MCAR",26,"proDA",1,1,1,0,NA,1.04841101660515,0,0.756756756756757,112,1,4,0.00026493225083141,1,"",""
+"MCAR",26,"uniform_KNN",1,1,1,1,1.60757381289692,1.14675695948488,0.227513227513228,0.986486486486487,189,NA,NA,NA,NA,"32 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",26,"uniform_MinProb",1,1,1,1,6.45914153188626,1.71257497431555,0.0555555555555556,0.22972972972973,36,NA,NA,NA,NA,"",""
+"MCAR",26,"DEP_absence",1,1,1,1,0.873442938265122,0.529992929913833,0.210810810810811,0.986486486486487,185,NA,NA,NA,NA,"32 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",26,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",26,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",26,"manual_12",1,0.65,0.65,0.523684210526316,1.38195877386933,0.701067328071432,0.0956521739130435,0.702702702702703,115,NA,NA,NA,NA,"32 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",27,"observed_only",1,1,0.948333333333333,0,NA,0.282762161752709,0.0677966101694915,0.774647887323944,118,NA,NA,NA,NA,"Partial NA coefficients for 31 probe(s)",""
+"MCAR",27,"proDA",1,1,1,0,NA,1.13160348061861,0.00909090909090909,0.767605633802817,110,1,4,0.000289078427628459,1,"",""
+"MCAR",27,"uniform_KNN",1,1,1,1,1.6579314104004,1.17897122708983,0.228260869565217,1,184,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",27,"uniform_MinProb",1,1,1,1,6.1187404940907,1.60673244655704,0.0263157894736842,0.26056338028169,38,NA,NA,NA,NA,"",""
+"MCAR",27,"DEP_absence",1,1,1,1,0.70135652565572,0.443344048713677,0.228260869565217,1,184,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",27,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",27,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",27,"manual_12",1,0.67,0.67,0.552928533046749,0.929252448444288,0.49816310632907,0.0991735537190083,0.767605633802817,121,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",28,"observed_only",1,1,0.95,0,NA,0.294438717327427,0.0504201680672269,0.79020979020979,119,NA,NA,NA,NA,"Partial NA coefficients for 30 probe(s)",""
+"MCAR",28,"proDA",1,1,1,0,NA,1.07892382661618,0.0176991150442478,0.776223776223776,113,1,4,0.000371587564586726,1,"",""
+"MCAR",28,"uniform_KNN",1,1,1,1,1.59344945573986,1.13416438847064,0.235294117647059,1,187,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",28,"uniform_MinProb",1,1,1,1,6.17497931159262,1.62363220296737,0,0.237762237762238,34,NA,NA,NA,NA,"",""
+"MCAR",28,"DEP_absence",1,1,1,1,0.597720233451688,0.348339565710886,0.218579234972678,1,183,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",28,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",28,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",28,"manual_12",1,0.613333333333333,0.613333333333333,0.484910485933504,0.884077196324559,0.424478192658425,0.0956521739130435,0.727272727272727,115,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",29,"observed_only",1,1,0.948333333333333,0,NA,0.273282577351121,0.0588235294117647,0.783216783216783,119,NA,NA,NA,NA,"Partial NA coefficients for 31 probe(s)",""
+"MCAR",29,"proDA",1,1,0.995,0,NA,1.13018963851845,0.00925925925925926,0.748251748251748,108,1,8,0.000378418789052247,1,"",""
+"MCAR",29,"uniform_KNN",1,1,1,1,1.76585555153088,1.29998816080121,0.209944751381215,1,181,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",29,"uniform_MinProb",1,1,1,1,6.10964857208485,1.62029090296168,0.0975609756097561,0.258741258741259,41,NA,NA,NA,NA,"",""
+"MCAR",29,"DEP_absence",1,1,1,1,0.657053456830049,0.406310975714895,0.196629213483146,1,178,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",29,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",29,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",29,"manual_12",1,0.618333333333333,0.618333333333333,0.499488229273286,0.996679397493029,0.490277181331532,0.0642201834862385,0.713286713286713,109,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",30,"observed_only",1,1,0.95,0,NA,0.273321183087697,0.0327868852459016,0.797297297297297,122,NA,NA,NA,NA,"Partial NA coefficients for 30 probe(s)",""
+"MCAR",30,"proDA",1,1,1,0,NA,1.04794270855223,0.00862068965517241,0.777027027027027,116,1,4,0.000204274208852727,1,"",""
+"MCAR",30,"uniform_KNN",1,1,1,1,1.6384666160931,1.15943419491902,0.229166666666667,1,192,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",30,"uniform_MinProb",1,1,1,1,6.01366924363453,1.57374465628021,0,0.236486486486486,35,NA,NA,NA,NA,"",""
+"MCAR",30,"DEP_absence",1,1,1,1,0.557872991291193,0.309388291274949,0.221052631578947,1,190,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"MCAR",30,"automatic_minimum",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",30,"automatic_none",0,0,0,0,NA,NA,NA,0,0,NA,NA,NA,NA,"","Could not estimate an automatic cutoff for condition `A`: Missingness does not decrease clearly enough with intensity. Inspect the error's `profile` field, then supply a named manual cutoff for `A` through `cutoffs`."
+"MCAR",30,"manual_12",1,0.638333333333333,0.638333333333333,0.514013749338974,0.894355807786301,0.434700868381239,0.11965811965812,0.695945945945946,117,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",1,"observed_only",1,0.99,0.865,0,NA,0.302932089127079,0.0404040404040404,0.664335664335664,99,NA,NA,NA,NA,"Partial NA coefficients for 75 probe(s)",""
+"mixed",1,"proDA",1,0.99,0.981666666666667,0,NA,1.09040204749621,0.0390625,0.86013986013986,128,1,3,0.000762491489419838,1,"",""
+"mixed",1,"uniform_KNN",1,0.99,0.99,0.969949916527546,2.43496902631656,1.75782299837841,0.318840579710145,0.986013986013986,207,NA,NA,NA,NA,"54 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 21 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",1,"uniform_MinProb",1,0.99,0.99,0.969949916527546,3.46350647184747,1.05897663867929,0.02,0.342657342657343,50,NA,NA,NA,NA,"",""
+"mixed",1,"DEP_absence",1,0.99,0.99,0.969949916527546,0.98214034678568,0.424728871609528,0.190184049079755,0.923076923076923,163,NA,NA,NA,NA,"54 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 21 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",1,"automatic_minimum",1,0.558333333333333,0.558333333333333,0.287145242070117,1.53791427957625,0.55048869155829,0.0571428571428571,0.692307692307692,105,NA,NA,NA,NA,"",""
+"mixed",1,"automatic_none",1,0.563333333333333,0.563333333333333,0.290901502504174,1.81353601974275,1.04638997846119,0.105263157894737,0.713286713286713,114,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",1,"manual_12",1,0.643333333333333,0.643333333333333,0.360601001669449,1.43964069750367,0.863161706059609,0.0603448275862069,0.762237762237762,116,NA,NA,NA,NA,"32 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",2,"observed_only",1,0.993333333333333,0.888333333333333,0,NA,0.296588519570323,0.0275229357798165,0.726027397260274,109,NA,NA,NA,NA,"Partial NA coefficients for 63 probe(s)",""
+"mixed",2,"proDA",1,0.993333333333333,0.993333333333333,0,NA,1.21943547173698,0.0797101449275362,0.86986301369863,138,1,6,0.000906527146807779,1,"",""
+"mixed",2,"uniform_KNN",1,0.993333333333333,0.993333333333333,0.978938130759105,2.53688713319076,1.73107778405892,0.300492610837438,0.972602739726027,203,NA,NA,NA,NA,"49 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 14 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",2,"uniform_MinProb",1,0.993333333333333,0.993333333333333,0.978938130759105,3.53770502117686,1.09196449227521,0,0.335616438356164,49,NA,NA,NA,NA,"",""
+"mixed",2,"DEP_absence",1,0.993333333333333,0.993333333333333,0.978938130759105,1.018735975931,0.406465077183227,0.2,0.931506849315068,170,NA,NA,NA,NA,"49 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 14 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",2,"automatic_minimum",1,0.576666666666667,0.576666666666667,0.294866169372532,1.91144739555031,0.602943565735577,0.0505050505050505,0.643835616438356,99,NA,NA,NA,NA,"",""
+"mixed",2,"automatic_none",1,0.57,0.57,0.288284335234752,2.042773199282,1.0764182790843,0.0490196078431373,0.664383561643836,102,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",2,"manual_12",1,0.646666666666667,0.646666666666667,0.363317244405441,1.52043476981026,0.854904019795789,0.0619469026548673,0.726027397260274,113,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 2 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",3,"observed_only",1,0.986666666666667,0.86,0,NA,0.283675281188167,0.0194174757281553,0.696551724137931,103,NA,NA,NA,NA,"Partial NA coefficients for 76 probe(s)",""
+"mixed",3,"proDA",1,0.986666666666667,0.986666666666667,0,NA,1.32354076584868,0.102739726027397,0.903448275862069,146,1,4,0.000200505667941737,1,"",""
+"mixed",3,"uniform_KNN",1,0.986666666666667,0.986666666666667,0.958904109589041,2.65331261374567,1.82516663771152,0.355140186915888,0.951724137931034,214,NA,NA,NA,NA,"59 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 17 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",3,"uniform_MinProb",1,0.986666666666667,0.986666666666667,0.958904109589041,3.43121845906809,1.04747668931456,0.0163934426229508,0.413793103448276,61,NA,NA,NA,NA,"",""
+"mixed",3,"DEP_absence",1,0.986666666666667,0.986666666666667,0.958904109589041,1.08148228361122,0.474062610142567,0.189024390243902,0.917241379310345,164,NA,NA,NA,NA,"59 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 17 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",3,"automatic_minimum",1,0.651666666666667,0.651666666666667,0.361301369863014,1.80913497246153,0.758836963208753,0.0540540540540541,0.724137931034483,111,NA,NA,NA,NA,"",""
+"mixed",3,"automatic_none",1,0.655,0.655,0.364297945205479,1.68410600546797,0.987632203192923,0.094017094017094,0.731034482758621,117,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",3,"manual_12",1,0.651666666666667,0.651666666666667,0.366010273972603,1.55697294101697,0.916935949054439,0.0847457627118644,0.744827586206897,118,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",4,"observed_only",1,0.995,0.893333333333333,0,NA,0.304733949639134,0.036697247706422,0.734265734265734,109,NA,NA,NA,NA,"Partial NA coefficients for 61 probe(s)",""
+"mixed",4,"proDA",1,0.995,0.995,0,NA,1.13676833994825,0.0769230769230769,0.923076923076923,143,1,3,0.000419243401151293,1,"",""
+"mixed",4,"uniform_KNN",1,0.995,0.995,0.984056687333924,2.39308030727508,1.64738877041177,0.284210526315789,0.951048951048951,190,NA,NA,NA,NA,"45 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 16 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",4,"uniform_MinProb",1,0.995,0.995,0.984056687333924,3.4790594462229,1.08348615557043,0.0980392156862745,0.321678321678322,51,NA,NA,NA,NA,"",""
+"mixed",4,"DEP_absence",1,0.995,0.995,0.984056687333924,1.00197928124956,0.394362807026926,0.173913043478261,0.93006993006993,161,NA,NA,NA,NA,"45 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 16 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",4,"automatic_minimum",1,0.576666666666667,0.576666666666667,0.305137289636847,2.32096985108179,0.943846630003638,0.0891089108910891,0.643356643356643,101,NA,NA,NA,NA,"",""
+"mixed",4,"automatic_none",1,0.68,0.68,0.408768821966342,1.53361441582698,0.886443568179053,0.12396694214876,0.741258741258741,121,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",4,"manual_12",1,0.643333333333333,0.643333333333333,0.364481842338353,1.5272966798982,0.894694003380106,0.121739130434783,0.706293706293706,115,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",5,"observed_only",1,0.996666666666667,0.888333333333333,0,NA,0.289562168703322,0.0294117647058824,0.678082191780822,102,NA,NA,NA,NA,"Partial NA coefficients for 65 probe(s)",""
+"mixed",5,"proDA",1,0.996666666666667,0.996666666666667,0,NA,1.15547860030752,0.0827586206896552,0.910958904109589,145,1,3,0.000178609301825875,1,"",""
+"mixed",5,"uniform_KNN",1,0.996666666666667,0.996666666666667,0.989551589029169,2.41487029175244,1.67613138271556,0.29064039408867,0.986301369863014,203,NA,NA,NA,NA,"53 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 12 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",5,"uniform_MinProb",1,0.996666666666667,0.996666666666667,0.989551589029169,3.39197445964467,1.04541866753766,0.0232558139534884,0.287671232876712,43,NA,NA,NA,NA,"",""
+"mixed",5,"DEP_absence",1,0.996666666666667,0.996666666666667,0.989551589029169,0.917560064995531,0.450499155146307,0.204819277108434,0.904109589041096,166,NA,NA,NA,NA,"53 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 12 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",5,"automatic_minimum",1,0.625,0.625,0.343056160208968,1.13663569914285,0.347024265706733,0.0490196078431373,0.664383561643836,102,NA,NA,NA,NA,"",""
+"mixed",5,"automatic_none",1,0.623333333333333,0.623333333333333,0.341314758380496,1.71577273365816,0.982274175091211,0.109090909090909,0.671232876712329,110,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",5,"manual_12",1,0.63,0.63,0.347845015237266,1.54340616819607,0.883275661541124,0.029126213592233,0.684931506849315,103,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",6,"observed_only",1,0.99,0.873333333333333,0,NA,0.313530393459844,0.0337078651685393,0.601398601398601,89,NA,NA,NA,NA,"Partial NA coefficients for 70 probe(s)",""
+"mixed",6,"proDA",1,0.99,0.99,0,NA,1.06563301950132,0.0434782608695652,0.769230769230769,115,1,3,0.000342624485620161,1,"",""
+"mixed",6,"uniform_KNN",1,0.99,0.99,0.968858131487889,2.48786141594316,1.72622755390977,0.3,0.93006993006993,190,NA,NA,NA,NA,"43 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 27 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",6,"uniform_MinProb",1,0.99,0.99,0.968858131487889,3.2494764174682,0.986982056387566,0.037037037037037,0.363636363636364,54,NA,NA,NA,NA,"",""
+"mixed",6,"DEP_absence",1,0.99,0.99,0.968858131487889,1.11223066977858,0.466388460808845,0.194630872483221,0.839160839160839,149,NA,NA,NA,NA,"43 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 27 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",6,"automatic_minimum",1,0.526666666666667,0.526666666666667,0.256487889273356,2.63035974202115,0.866940115820819,0.0625,0.524475524475524,80,NA,NA,NA,NA,"",""
+"mixed",6,"automatic_none",1,0.526666666666667,0.526666666666667,0.256487889273356,2.05096566780136,1.08309896522212,0.0752688172043011,0.601398601398601,93,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",6,"manual_12",1,0.648333333333333,0.648333333333333,0.358131487889273,1.46387828167383,0.853929230696368,0.0673076923076923,0.678321678321678,104,NA,NA,NA,NA,"32 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 4 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",7,"observed_only",1,0.99,0.88,0,NA,0.319562659141978,0.0404040404040404,0.683453237410072,99,NA,NA,NA,NA,"Partial NA coefficients for 66 probe(s)",""
+"mixed",7,"proDA",1,0.99,0.986666666666667,0,NA,1.14490124293638,0.099290780141844,0.913669064748201,141,1,3,0.000215881313061932,1,"",""
+"mixed",7,"uniform_KNN",1,0.99,0.99,0.969322539412015,2.54633482894652,1.70865903187986,0.322916666666667,0.935251798561151,192,NA,NA,NA,NA,"49 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 17 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",7,"uniform_MinProb",1,0.99,0.99,0.969322539412015,3.54267110285945,1.11101062682911,0,0.345323741007194,48,NA,NA,NA,NA,"",""
+"mixed",7,"DEP_absence",1,0.99,0.99,0.969322539412015,1.17110951114685,0.457583652815668,0.178807947019868,0.892086330935252,151,NA,NA,NA,NA,"49 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 17 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",7,"automatic_minimum",1,0.57,0.57,0.288879420536856,1.60134587363748,0.673368128357092,0.0392156862745098,0.705035971223022,102,NA,NA,NA,NA,"",""
+"mixed",7,"automatic_none",1,0.571666666666667,0.571666666666667,0.290157648061355,1.77730742286082,0.987616782655907,0.0754716981132075,0.705035971223022,106,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",7,"manual_12",1,0.635,0.635,0.345547507456327,1.44173371073771,0.827251418969078,0.0714285714285714,0.748201438848921,112,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",8,"observed_only",1,0.99,0.895,0,NA,0.293618281523805,0.0280373831775701,0.717241379310345,107,NA,NA,NA,NA,"Partial NA coefficients for 57 probe(s)",""
+"mixed",8,"proDA",1,0.99,0.986666666666667,0,NA,1.18500220723336,0.096551724137931,0.903448275862069,145,1,3,0.000144534184475181,1,"",""
+"mixed",8,"uniform_KNN",1,0.99,0.99,0.96797153024911,2.44513903788456,1.65146170246703,0.265193370165746,0.917241379310345,181,NA,NA,NA,NA,"42 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 15 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",8,"uniform_MinProb",1,0.99,0.99,0.96797153024911,3.45324793971754,1.03378986481307,0.0212765957446809,0.317241379310345,47,NA,NA,NA,NA,"",""
+"mixed",8,"DEP_absence",1,0.99,0.99,0.96797153024911,1.08596545208716,0.412829951099473,0.150326797385621,0.896551724137931,153,NA,NA,NA,NA,"42 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 15 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",8,"automatic_minimum",1,0.543333333333333,0.543333333333333,0.278024911032028,3.35149923877381,1.4930740281591,0.0459770114942529,0.572413793103448,87,NA,NA,NA,NA,"",""
+"mixed",8,"automatic_none",1,0.608333333333333,0.608333333333333,0.32873665480427,1.88044406963036,1.02673200623793,0.0818181818181818,0.696551724137931,110,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",8,"manual_12",1,0.665,0.665,0.388345195729537,1.39088524835734,0.835338556961336,0.075,0.76551724137931,120,NA,NA,NA,NA,"32 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",9,"observed_only",1,0.99,0.881666666666667,0,NA,0.301772445678033,0.00961538461538462,0.705479452054795,104,NA,NA,NA,NA,"Partial NA coefficients for 65 probe(s)",""
+"mixed",9,"proDA",1,0.99,0.99,0,NA,1.20281371137391,0.104895104895105,0.876712328767123,143,1,3,0.000460584851671568,1,"",""
+"mixed",9,"uniform_KNN",1,0.99,0.99,0.969296375266525,2.50687678138586,1.67155483641924,0.318840579710145,0.965753424657534,207,NA,NA,NA,NA,"47 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 18 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",9,"uniform_MinProb",1,0.99,0.99,0.969296375266525,3.61812890738011,1.03992870640205,0.0227272727272727,0.294520547945205,44,NA,NA,NA,NA,"",""
+"mixed",9,"DEP_absence",1,0.99,0.99,0.969296375266525,1.11635527270415,0.374624916146849,0.182352941176471,0.952054794520548,170,NA,NA,NA,NA,"47 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 18 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",9,"automatic_minimum",1,0.556666666666667,0.556666666666667,0.291684434968017,3.00508914430441,1.13922149903682,0.0319148936170213,0.623287671232877,94,NA,NA,NA,NA,"",""
+"mixed",9,"automatic_none",1,0.56,0.56,0.294669509594883,1.94625850292592,1.08040745483935,0.0576923076923077,0.671232876712329,104,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",9,"manual_12",1,0.653333333333333,0.653333333333333,0.378678038379531,1.41178392668628,0.830738492282501,0.0683760683760684,0.746575342465753,117,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",10,"observed_only",1,0.993333333333333,0.865,0,NA,0.290103981257149,0.03,0.678321678321678,100,NA,NA,NA,NA,"Partial NA coefficients for 77 probe(s)",""
+"mixed",10,"proDA",1,0.993333333333333,0.993333333333333,0,NA,1.31488801490023,0.126760563380282,0.867132867132867,142,1,4,3.10940301237392e-05,1,"",""
+"mixed",10,"uniform_KNN",1,0.993333333333333,0.993333333333333,0.980132450331126,2.66349066185641,1.87995074800625,0.339805825242718,0.951048951048951,206,NA,NA,NA,NA,"49 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 28 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",10,"uniform_MinProb",1,0.993333333333333,0.993333333333333,0.980132450331126,3.64537172244312,1.13795697541882,0.04,0.335664335664336,50,NA,NA,NA,NA,"",""
+"mixed",10,"DEP_absence",1,0.993333333333333,0.993333333333333,0.980132450331126,1.08627915611027,0.418604585884742,0.1875,0.909090909090909,160,NA,NA,NA,NA,"49 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 28 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",10,"automatic_minimum",1,0.581666666666667,0.581666666666667,0.287251655629139,2.27337235789507,0.956166578016356,0.0824742268041237,0.622377622377622,97,NA,NA,NA,NA,"",""
+"mixed",10,"automatic_none",1,0.583333333333333,0.583333333333333,0.288493377483444,2.05764494729755,1.12573310061333,0.0970873786407767,0.65034965034965,103,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",10,"manual_12",1,0.63,0.63,0.334437086092715,1.5537426399217,0.901861279124499,0.0754716981132075,0.685314685314685,106,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",11,"observed_only",1,0.991666666666667,0.886666666666667,0,NA,0.29679814143239,0,0.684931506849315,100,NA,NA,NA,NA,"Partial NA coefficients for 63 probe(s)",""
+"mixed",11,"proDA",1,0.991666666666667,0.991666666666667,0,NA,1.24841891220319,0.0719424460431655,0.883561643835616,139,1,3,7.53499085817921e-05,1,"",""
+"mixed",11,"uniform_KNN",1,0.991666666666667,0.991666666666667,0.972887483054677,2.4796668857431,1.72085084030162,0.259259259259259,0.958904109589041,189,NA,NA,NA,NA,"46 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 17 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",11,"uniform_MinProb",1,0.991666666666667,0.991666666666667,0.972887483054677,3.63820882313551,1.06337098309481,0.0416666666666667,0.315068493150685,48,NA,NA,NA,NA,"",""
+"mixed",11,"DEP_absence",1,0.991666666666667,0.991666666666667,0.972887483054677,0.949509321536808,0.400845682904355,0.144736842105263,0.89041095890411,152,NA,NA,NA,NA,"46 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 17 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",11,"automatic_minimum",1,0.61,0.61,0.31947582467239,2.17827347566778,0.660220503825724,0.0326086956521739,0.60958904109589,92,NA,NA,NA,NA,"",""
+"mixed",11,"automatic_none",1,0.61,0.61,0.31947582467239,1.78851756429553,0.977617863823848,0.0480769230769231,0.678082191780822,104,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",11,"manual_12",1,0.676666666666667,0.676666666666667,0.381382738364211,1.41327505698021,0.816436096506349,0.0454545454545455,0.719178082191781,110,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",12,"observed_only",1,0.99,0.903333333333333,0,NA,0.276812293250699,0,0.716216216216216,106,NA,NA,NA,NA,"Partial NA coefficients for 52 probe(s)",""
+"mixed",12,"proDA",1,0.99,0.99,0,NA,1.09187120654182,0.0492957746478873,0.912162162162162,142,1,3,0.000573316852658713,1,"",""
+"mixed",12,"uniform_KNN",1,0.99,0.99,0.967567567567568,2.35550771944571,1.55706857906521,0.206703910614525,0.959459459459459,179,NA,NA,NA,NA,"42 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 10 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",12,"uniform_MinProb",1,0.99,0.99,0.967567567567568,3.47333776892064,1.03923903991553,0,0.358108108108108,53,NA,NA,NA,NA,"",""
+"mixed",12,"DEP_absence",1,0.99,0.99,0.967567567567568,1.0614258825545,0.4285421281584,0.149068322981366,0.925675675675676,161,NA,NA,NA,NA,"42 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 10 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",12,"automatic_minimum",1,0.593333333333333,0.593333333333333,0.31036036036036,2.30682474078989,0.800067200397803,0.01,0.668918918918919,100,NA,NA,NA,NA,"",""
+"mixed",12,"automatic_none",1,0.591666666666667,0.591666666666667,0.309009009009009,1.83063975232768,1.03049810409581,0.0267857142857143,0.736486486486487,112,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",12,"manual_12",1,0.668333333333333,0.668333333333333,0.378378378378378,1.43817248860011,0.844121761921623,0.0530973451327434,0.722972972972973,113,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",13,"observed_only",1,0.99,0.895,0,NA,0.288174562147316,0.0185185185185185,0.726027397260274,108,NA,NA,NA,NA,"Partial NA coefficients for 57 probe(s)",""
+"mixed",13,"proDA",1,0.99,0.99,0,NA,1.1328255001376,0.0579710144927536,0.89041095890411,138,1,4,6.88499567208033e-05,1,"",""
+"mixed",13,"uniform_KNN",1,0.99,0.99,0.96877710320902,2.26595461420684,1.55862499089693,0.270833333333333,0.958904109589041,192,NA,NA,NA,NA,"38 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 19 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",13,"uniform_MinProb",1,0.99,0.99,0.96877710320902,3.61511388443063,1.09777877443503,0.0344827586206897,0.383561643835616,58,NA,NA,NA,NA,"",""
+"mixed",13,"DEP_absence",1,0.99,0.99,0.96877710320902,1.01935243078056,0.405403496772683,0.175757575757576,0.931506849315068,165,NA,NA,NA,NA,"38 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 19 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",13,"automatic_minimum",1,0.646666666666667,0.646666666666667,0.369470945359931,2.74850654238347,1.06132396452416,0.0202020202020202,0.664383561643836,99,NA,NA,NA,NA,"",""
+"mixed",13,"automatic_none",1,0.646666666666667,0.646666666666667,0.369470945359931,1.51551048597549,0.890100240366473,0.0854700854700855,0.732876712328767,117,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",13,"manual_12",1,0.648333333333333,0.648333333333333,0.371205550737207,1.3587585635123,0.795939551469056,0.0540540540540541,0.719178082191781,111,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 2 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",14,"observed_only",1,0.996666666666667,0.886666666666667,0,NA,0.275929752223765,0,0.682758620689655,99,NA,NA,NA,NA,"Partial NA coefficients for 66 probe(s)",""
+"mixed",14,"proDA",1,0.996666666666667,0.996666666666667,0,NA,1.14532210983763,0.0579710144927536,0.896551724137931,138,1,4,1.64296462630666e-05,1,"",""
+"mixed",14,"uniform_KNN",1,0.996666666666667,0.996666666666667,0.988774555659495,2.46136291911341,1.69044672528389,0.256544502617801,0.979310344827586,191,NA,NA,NA,NA,"54 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 12 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",14,"uniform_MinProb",1,0.996666666666667,0.996666666666667,0.988774555659495,3.34305310479218,0.986498934844966,0,0.393103448275862,57,NA,NA,NA,NA,"",""
+"mixed",14,"DEP_absence",1,0.996666666666667,0.996666666666667,0.988774555659495,0.927945519285195,0.447311272451161,0.1625,0.924137931034483,160,NA,NA,NA,NA,"54 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 12 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",14,"automatic_minimum",1,0.631666666666667,0.631666666666667,0.340037418147802,2.12740836404947,0.685840222616626,0.0202020202020202,0.668965517241379,99,NA,NA,NA,NA,"",""
+"mixed",14,"automatic_none",1,0.628333333333333,0.628333333333333,0.336763330215154,1.78429582163434,0.980197206475416,0.0566037735849057,0.689655172413793,106,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",14,"manual_12",1,0.685,0.685,0.393826005612722,1.4189249217728,0.80445378779062,0.045045045045045,0.731034482758621,111,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",15,"observed_only",1,0.988333333333333,0.873333333333333,0,NA,0.312986132776092,0.0560747663551402,0.701388888888889,107,NA,NA,NA,NA,"Partial NA coefficients for 69 probe(s)",""
+"mixed",15,"proDA",1,0.988333333333333,0.988333333333333,0,NA,1.19455057060924,0.125827814569536,0.916666666666667,151,1,4,0.000207610850532599,1,"",""
+"mixed",15,"uniform_KNN",1,0.988333333333333,0.988333333333333,0.963620614984842,2.38219553582599,1.71430982219385,0.366515837104072,0.972222222222222,221,NA,NA,NA,NA,"49 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 20 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",15,"uniform_MinProb",1,0.988333333333333,0.988333333333333,0.963620614984842,3.54222281698062,1.15561853027101,0,0.326388888888889,47,NA,NA,NA,NA,"",""
+"mixed",15,"DEP_absence",1,0.988333333333333,0.988333333333333,0.963620614984842,0.965812744324031,0.465083824455809,0.272727272727273,0.944444444444444,187,NA,NA,NA,NA,"49 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 20 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",15,"automatic_minimum",1,0.633333333333333,0.633333333333333,0.35339974014725,1.18170744992599,0.425578024263845,0.0884955752212389,0.715277777777778,113,NA,NA,NA,NA,"",""
+"mixed",15,"automatic_none",1,0.638333333333333,0.638333333333333,0.35643135556518,1.71567099167793,1.00564046039761,0.0964912280701754,0.715277777777778,114,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",15,"manual_12",1,0.641666666666667,0.641666666666667,0.365093113902122,1.47822535879355,0.877505839893448,0.0560747663551402,0.701388888888889,107,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 3 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",16,"observed_only",1,0.99,0.896666666666667,0,NA,0.302791073101279,0.0283018867924528,0.710344827586207,106,NA,NA,NA,NA,"Partial NA coefficients for 56 probe(s)",""
+"mixed",16,"proDA",1,0.99,0.99,0,NA,1.01078811446453,0.0534351145038168,0.855172413793103,131,1,3,0.000214348580441729,1,"",""
+"mixed",16,"uniform_KNN",1,0.99,0.99,0.969924812030075,2.23762488937776,1.56858375769915,0.288770053475936,0.917241379310345,187,NA,NA,NA,NA,"45 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 11 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",16,"uniform_MinProb",1,0.99,0.99,0.969924812030075,3.47741694931541,1.0523879751519,0.0566037735849057,0.344827586206897,53,NA,NA,NA,NA,"",""
+"mixed",16,"DEP_absence",1,0.99,0.99,0.969924812030075,1.119492837076,0.406591142363611,0.1875,0.896551724137931,160,NA,NA,NA,NA,"45 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 11 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",16,"automatic_minimum",1,0.563333333333333,0.563333333333333,0.278195488721804,4.16094390267226,2.03182414610943,0.0769230769230769,0.579310344827586,91,NA,NA,NA,NA,"",""
+"mixed",16,"automatic_none",1,0.563333333333333,0.563333333333333,0.279448621553885,1.8841017105582,1.05550217909684,0.0618556701030928,0.627586206896552,97,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",16,"manual_12",1,0.625,0.625,0.335839598997494,1.53363320073708,0.8945524300757,0.0495049504950495,0.662068965517241,101,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",17,"observed_only",1,0.986666666666667,0.893333333333333,0,NA,0.296465194771357,0.0560747663551402,0.701388888888889,107,NA,NA,NA,NA,"Partial NA coefficients for 56 probe(s)",""
+"mixed",17,"proDA",1,0.986666666666667,0.98,0,NA,1.13958512626172,0.0652173913043478,0.895833333333333,138,1,3,0.000825495733745671,1,"",""
+"mixed",17,"uniform_KNN",1,0.986666666666667,0.986666666666667,0.958060288335518,2.33539471031071,1.61528734080462,0.268817204301075,0.944444444444444,186,NA,NA,NA,NA,"49 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 7 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",17,"uniform_MinProb",1,0.986666666666667,0.986666666666667,0.958060288335518,3.39395753966515,0.980537515523749,0.0217391304347826,0.3125,46,NA,NA,NA,NA,"",""
+"mixed",17,"DEP_absence",1,0.986666666666667,0.986666666666667,0.958060288335518,0.998242307979466,0.419155691740542,0.153846153846154,0.916666666666667,156,NA,NA,NA,NA,"49 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 7 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",17,"automatic_minimum",1,0.59,0.59,0.302315421581477,2.46865413638411,0.927211120563646,0.0674157303370786,0.576388888888889,89,NA,NA,NA,NA,"",""
+"mixed",17,"automatic_none",1,0.588333333333333,0.588333333333333,0.300131061598952,1.88769268509957,1.02847062827182,0.0816326530612245,0.625,98,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",17,"manual_12",1,0.656666666666667,0.656666666666667,0.35998252512014,1.48088489022136,0.83309931429654,0.0740740740740741,0.694444444444444,108,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",18,"observed_only",1,0.99,0.896666666666667,0,NA,0.297142588476556,0.0181818181818182,0.72972972972973,110,NA,NA,NA,NA,"Partial NA coefficients for 56 probe(s)",""
+"mixed",18,"proDA",1,0.99,0.99,0,NA,1.07442141556902,0.0234375,0.844594594594595,128,1,4,3.53614613832595e-05,1,"",""
+"mixed",18,"uniform_KNN",1,0.99,0.99,0.966866083755177,2.36964249426442,1.62232897971297,0.251336898395722,0.945945945945946,187,NA,NA,NA,NA,"43 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",18,"uniform_MinProb",1,0.99,0.99,0.966866083755177,3.55230163953678,1.07321438453911,0.0163934426229508,0.405405405405405,61,NA,NA,NA,NA,"",""
+"mixed",18,"DEP_absence",1,0.99,0.99,0.966866083755177,1.06445201117429,0.426395923407443,0.15,0.918918918918919,160,NA,NA,NA,NA,"43 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",18,"automatic_minimum",1,0.615,0.615,0.320294523699954,3.236727182757,1.14461333865463,0.0303030303030303,0.648648648648649,99,NA,NA,NA,NA,"",""
+"mixed",18,"automatic_none",1,0.708333333333333,0.708333333333333,0.41785549930971,1.51715152992463,0.859946273342909,0.0826446280991736,0.75,121,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",18,"manual_12",1,0.69,0.69,0.398067188219052,1.4079161329775,0.800225118706891,0.0737704918032787,0.763513513513513,122,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",19,"observed_only",1,1,0.911666666666667,0,NA,0.301548441800936,0.0194174757281553,0.711267605633803,103,NA,NA,NA,NA,"Partial NA coefficients for 53 probe(s)",""
+"mixed",19,"proDA",1,1,1,0,NA,1.14755749299164,0.0507246376811594,0.922535211267606,138,1,4,0.000192024413278182,1,"",""
+"mixed",19,"uniform_KNN",1,1,1,1,2.34534251316345,1.56625117000111,0.209039548022599,0.985915492957746,177,NA,NA,NA,NA,"42 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 11 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",19,"uniform_MinProb",1,1,1,1,3.53678731356004,1.04771431663192,0,0.330985915492958,47,NA,NA,NA,NA,"",""
+"mixed",19,"DEP_absence",1,1,1,1,0.950411745311839,0.383795338885093,0.138157894736842,0.922535211267606,152,NA,NA,NA,NA,"42 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 11 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",19,"automatic_minimum",1,0.681666666666667,0.681666666666667,0.40238860817639,2.68384608767802,0.987006371076757,0.0412371134020619,0.654929577464789,97,NA,NA,NA,NA,"",""
+"mixed",19,"automatic_none",1,0.68,0.68,0.401010564997703,1.65186249821804,0.930043340585264,0.0740740740740741,0.704225352112676,108,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",19,"manual_12",1,0.701666666666667,0.701666666666667,0.423977951309141,1.39143612767558,0.810363204104664,0.075,0.78169014084507,120,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",20,"observed_only",1,0.991666666666667,0.898333333333333,0,NA,0.3092651805292,0.0198019801980198,0.707142857142857,101,NA,NA,NA,NA,"Partial NA coefficients for 56 probe(s)",""
+"mixed",20,"proDA",1,0.991666666666667,0.991666666666667,0,NA,1.15481896244473,0.0615384615384615,0.871428571428571,130,1,6,1.18954090712311e-05,1,"",""
+"mixed",20,"uniform_KNN",1,0.991666666666667,0.991666666666667,0.972144846796657,2.41149304226165,1.621578592166,0.292553191489362,0.95,188,NA,NA,NA,NA,"43 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",20,"uniform_MinProb",1,0.991666666666667,0.991666666666667,0.972144846796657,3.2265156054481,0.985236143968628,0,0.407142857142857,57,NA,NA,NA,NA,"",""
+"mixed",20,"DEP_absence",1,0.991666666666667,0.991666666666667,0.972144846796657,1.00074857753112,0.462625282002296,0.1875,0.928571428571429,160,NA,NA,NA,NA,"43 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",20,"automatic_minimum",1,0.631666666666667,0.631666666666667,0.342154131847725,1.761065085743,0.600006485454793,0.0396039603960396,0.692857142857143,101,NA,NA,NA,NA,"",""
+"mixed",20,"automatic_none",1,0.646666666666667,0.646666666666667,0.357010213556175,1.86435798278413,1.02441145531005,0.036697247706422,0.75,109,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",20,"manual_12",1,0.676666666666667,0.676666666666667,0.38811513463324,1.38030672248186,0.789521590694332,0.0467289719626168,0.728571428571429,107,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",21,"observed_only",1,0.986666666666667,0.883333333333333,0,NA,0.279459662276447,0.00952380952380952,0.727272727272727,105,NA,NA,NA,NA,"Partial NA coefficients for 62 probe(s)",""
+"mixed",21,"proDA",1,0.986666666666667,0.986666666666667,0,NA,1.18869820155774,0.0709219858156028,0.916083916083916,141,1,3,0.000318168683544276,1,"",""
+"mixed",21,"uniform_KNN",1,0.986666666666667,0.986666666666667,0.95608417200366,2.49323742827617,1.7135825955632,0.25668449197861,0.972027972027972,187,NA,NA,NA,NA,"41 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 21 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",21,"uniform_MinProb",1,0.986666666666667,0.986666666666667,0.95608417200366,3.48114647466665,0.979012003891113,0.0178571428571429,0.384615384615385,56,NA,NA,NA,NA,"",""
+"mixed",21,"DEP_absence",1,0.986666666666667,0.986666666666667,0.95608417200366,0.978301457247236,0.371513789185125,0.100671140939597,0.937062937062937,149,NA,NA,NA,NA,"41 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 21 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",21,"automatic_minimum",1,0.616666666666667,0.616666666666667,0.332570905763952,1.47976104330818,0.554381749816693,0.0619469026548673,0.741258741258741,113,NA,NA,NA,NA,"",""
+"mixed",21,"automatic_none",1,0.616666666666667,0.616666666666667,0.332570905763952,1.92194194406754,1.04706678305975,0.0526315789473684,0.755244755244755,114,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",21,"manual_12",1,0.711666666666667,0.711666666666667,0.424977127172919,1.29563524006895,0.755359237874442,0.0583333333333333,0.79020979020979,120,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",22,"observed_only",1,0.99,0.888333333333333,0,NA,0.303978260985968,0.0283018867924528,0.695945945945946,106,NA,NA,NA,NA,"Partial NA coefficients for 61 probe(s)",""
+"mixed",22,"proDA",1,0.99,0.988333333333333,0,NA,1.08692081197865,0.0671641791044776,0.844594594594595,134,1,4,0.000540528221535973,1,"",""
+"mixed",22,"uniform_KNN",1,0.99,0.99,0.968925334484247,2.3211137811561,1.61878292155344,0.264864864864865,0.918918918918919,185,NA,NA,NA,NA,"40 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 21 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",22,"uniform_MinProb",1,0.99,0.99,0.968925334484247,3.08507191625287,0.980487508617492,0.0208333333333333,0.317567567567568,48,NA,NA,NA,NA,"",""
+"mixed",22,"DEP_absence",1,0.99,0.99,0.968925334484247,1.10219345433061,0.472356674377397,0.151315789473684,0.871621621621622,152,NA,NA,NA,NA,"40 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 21 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",22,"automatic_minimum",1,0.621666666666667,0.621666666666667,0.329305135951662,2.40844795650466,0.755793274720967,0.0113636363636364,0.587837837837838,88,NA,NA,NA,NA,"",""
+"mixed",22,"automatic_none",1,0.623333333333333,0.623333333333333,0.330599913681485,1.83699234323448,1.03929211645443,0.0917431192660551,0.668918918918919,109,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",22,"manual_12",1,0.646666666666667,0.646666666666667,0.3539059128183,1.54649961526801,0.895624417606297,0.0476190476190476,0.675675675675676,105,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",23,"observed_only",1,0.986666666666667,0.896666666666667,0,NA,0.31244103507058,0.0283018867924528,0.710344827586207,106,NA,NA,NA,NA,"Partial NA coefficients for 54 probe(s)",""
+"mixed",23,"proDA",1,0.986666666666667,0.986666666666667,0,NA,1.04887099586648,0.0454545454545455,0.868965517241379,132,1,3,0.00098635013901815,1,"",""
+"mixed",23,"uniform_KNN",1,0.986666666666667,0.986666666666667,0.956144358154408,2.31425652686602,1.60370672141238,0.25668449197861,0.958620689655172,187,NA,NA,NA,NA,"43 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 11 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",23,"uniform_MinProb",1,0.986666666666667,0.986666666666667,0.956144358154408,3.48040768756452,1.07747618457785,0.0363636363636364,0.36551724137931,55,NA,NA,NA,NA,"",""
+"mixed",23,"DEP_absence",1,0.986666666666667,0.986666666666667,0.956144358154408,0.952401548949773,0.406179705518032,0.15527950310559,0.937931034482759,161,NA,NA,NA,NA,"43 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 11 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",23,"automatic_minimum",1,0.631666666666667,0.631666666666667,0.341708542713568,1.33204224794829,0.519004271487757,0.0818181818181818,0.696551724137931,110,NA,NA,NA,NA,"",""
+"mixed",23,"automatic_none",1,0.635,0.635,0.343992690726359,1.68174078282409,0.927364151890554,0.0884955752212389,0.710344827586207,113,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",23,"manual_12",1,0.678333333333333,0.678333333333333,0.391502969392417,1.48577407826999,0.841997302274907,0.0756302521008403,0.758620689655172,119,NA,NA,NA,NA,"32 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 2 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",24,"observed_only",1,0.993333333333333,0.88,0,NA,0.302457556471661,0.0392156862745098,0.680555555555556,102,NA,NA,NA,NA,"Partial NA coefficients for 68 probe(s)",""
+"mixed",24,"proDA",1,0.993333333333333,0.993333333333333,0,NA,1.09621464175585,0.0454545454545455,0.875,132,1,3,0.000228868831451944,1,"",""
+"mixed",24,"uniform_KNN",1,0.993333333333333,0.993333333333333,0.97953091684435,2.4050068383552,1.75348315733775,0.297029702970297,0.986111111111111,202,NA,NA,NA,NA,"48 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 20 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",24,"uniform_MinProb",1,0.993333333333333,0.993333333333333,0.97953091684435,3.45236797102083,1.09470504515187,0.0217391304347826,0.3125,46,NA,NA,NA,NA,"",""
+"mixed",24,"DEP_absence",1,0.993333333333333,0.993333333333333,0.97953091684435,0.891727890974805,0.403825514921148,0.190184049079755,0.916666666666667,163,NA,NA,NA,NA,"48 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 20 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",24,"automatic_minimum",1,0.588333333333333,0.588333333333333,0.304477611940298,3.32358970184983,1.11424196576539,0.0526315789473684,0.5,76,NA,NA,NA,NA,"",""
+"mixed",24,"automatic_none",1,0.588333333333333,0.588333333333333,0.304051172707889,1.72711268738087,0.977680526470851,0.0776699029126214,0.659722222222222,103,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",24,"manual_12",1,0.638333333333333,0.638333333333333,0.360341151385927,1.35483163220236,0.782573003795004,0.0458715596330275,0.722222222222222,109,NA,NA,NA,NA,"32 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",25,"observed_only",1,0.986666666666667,0.873333333333333,0,NA,0.294191795486905,0.0454545454545455,0.729166666666667,110,NA,NA,NA,NA,"Partial NA coefficients for 68 probe(s)",""
+"mixed",25,"proDA",1,0.986666666666667,0.986666666666667,0,NA,1.1541314654866,0.119205298013245,0.923611111111111,151,1,4,1.2724661405807e-05,1,"",""
+"mixed",25,"uniform_KNN",1,0.986666666666667,0.986666666666667,0.958939264328486,2.71387970793406,1.66020336481436,0.304123711340206,0.9375,194,NA,NA,NA,NA,"51 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 17 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",25,"uniform_MinProb",1,0.986666666666667,0.986666666666667,0.958939264328486,3.54227448506144,1.13353872704532,0.0196078431372549,0.347222222222222,51,NA,NA,NA,NA,"",""
+"mixed",25,"DEP_absence",1,0.986666666666667,0.986666666666667,0.958939264328486,1.36475292137022,0.435296327351626,0.188679245283019,0.895833333333333,159,NA,NA,NA,NA,"51 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 17 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",25,"automatic_minimum",1,0.593333333333333,0.593333333333333,0.298118049615056,2.34860850214941,0.828682796496104,0.0505050505050505,0.652777777777778,99,NA,NA,NA,NA,"",""
+"mixed",25,"automatic_none",1,0.593333333333333,0.593333333333333,0.298118049615056,1.75836828459103,0.975668878146641,0.0956521739130435,0.722222222222222,115,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",25,"manual_12",1,0.638333333333333,0.638333333333333,0.334901625320787,1.50785079875333,0.858908258282504,0.0454545454545455,0.729166666666667,110,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",26,"observed_only",1,0.986666666666667,0.87,0,NA,0.296584406914228,0.0566037735849057,0.694444444444444,106,NA,NA,NA,NA,"Partial NA coefficients for 70 probe(s)",""
+"mixed",26,"proDA",1,0.986666666666667,0.986666666666667,0,NA,1.10705761756599,0.0461538461538462,0.861111111111111,130,1,3,0.000118032011050782,1,"",""
+"mixed",26,"uniform_KNN",1,0.986666666666667,0.986666666666667,0.958513396715644,2.4441021296076,1.68157435177727,0.333333333333333,0.944444444444444,204,NA,NA,NA,NA,"46 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 24 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",26,"uniform_MinProb",1,0.986666666666667,0.986666666666667,0.958513396715644,3.2181278675553,0.94581991283066,0,0.375,54,NA,NA,NA,NA,"",""
+"mixed",26,"DEP_absence",1,0.986666666666667,0.986666666666667,0.958513396715644,0.987316557021796,0.411626161952873,0.177215189873418,0.902777777777778,158,NA,NA,NA,NA,"46 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 24 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",26,"automatic_minimum",1,0.608333333333333,0.608333333333333,0.312445980985307,1.84153540703674,0.646369990299489,0.0444444444444444,0.597222222222222,90,NA,NA,NA,NA,"",""
+"mixed",26,"automatic_none",1,0.611666666666667,0.611666666666667,0.313310285220398,1.85707962700375,1.05810878865258,0.058252427184466,0.673611111111111,103,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",26,"manual_12",1,0.658333333333333,0.658333333333333,0.363439930855661,1.47191715602741,0.869305887390194,0.0714285714285714,0.722222222222222,112,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",27,"observed_only",1,0.99,0.883333333333333,0,NA,0.299626409574707,0.037037037037037,0.712328767123288,108,NA,NA,NA,NA,"Partial NA coefficients for 64 probe(s)",""
+"mixed",27,"proDA",1,0.99,0.99,0,NA,1.16139228660203,0.0839160839160839,0.897260273972603,143,1,3,0.000225415643316588,1,"",""
+"mixed",27,"uniform_KNN",1,0.99,0.99,0.968641114982578,2.44467558557911,1.65095602509878,0.300492610837438,0.972602739726027,203,NA,NA,NA,NA,"49 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 15 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",27,"uniform_MinProb",1,0.99,0.99,0.968641114982578,3.48386377885596,1.01894131771072,0.0185185185185185,0.363013698630137,54,NA,NA,NA,NA,"",""
+"mixed",27,"DEP_absence",1,0.99,0.99,0.968641114982578,1.08943300977335,0.395296474783005,0.16969696969697,0.938356164383562,165,NA,NA,NA,NA,"49 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 15 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",27,"automatic_minimum",1,0.626666666666667,0.626666666666667,0.333623693379791,1.9350318146625,0.571935847761645,0.018348623853211,0.732876712328767,109,NA,NA,NA,NA,"",""
+"mixed",27,"automatic_none",1,0.628333333333333,0.628333333333333,0.33493031358885,1.86772334095197,1.03137967842566,0.0353982300884956,0.746575342465753,113,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",27,"manual_12",1,0.653333333333333,0.653333333333333,0.361498257839721,1.49631978681096,0.875662109254092,0.05,0.780821917808219,120,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",28,"observed_only",1,0.981666666666667,0.886666666666667,0,NA,0.295969106592826,0.0458715596330275,0.712328767123288,109,NA,NA,NA,NA,"Partial NA coefficients for 57 probe(s)",""
+"mixed",28,"proDA",1,0.981666666666667,0.981666666666667,0,NA,1.13911033199235,0.0620689655172414,0.931506849315068,145,1,3,0.000160275991636577,1,"",""
+"mixed",28,"uniform_KNN",1,0.981666666666667,0.981666666666667,0.942533739660427,2.2758592990893,1.58602237463999,0.285714285714286,0.958904109589041,196,NA,NA,NA,NA,"44 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",28,"uniform_MinProb",1,0.981666666666667,0.981666666666667,0.942533739660427,3.3638686191399,1.04135185014156,0.0454545454545455,0.287671232876712,44,NA,NA,NA,NA,"",""
+"mixed",28,"DEP_absence",1,0.981666666666667,0.981666666666667,0.942533739660427,0.925562817009121,0.39005789449809,0.192771084337349,0.917808219178082,166,NA,NA,NA,NA,"44 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",28,"automatic_minimum",1,0.608333333333333,0.608333333333333,0.321723987810187,3.44564528209574,1.46057788515137,0.010989010989011,0.616438356164384,91,NA,NA,NA,NA,"",""
+"mixed",28,"automatic_none",1,0.65,0.65,0.35785807575098,1.56434352019821,0.897087576808938,0.0854700854700855,0.732876712328767,117,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",28,"manual_12",1,0.67,0.67,0.378754897692643,1.33054384883171,0.777355900676029,0.0598290598290598,0.753424657534247,117,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",29,"observed_only",1,0.99,0.89,0,NA,0.299822681879811,0.0373831775700935,0.700680272108844,107,NA,NA,NA,NA,"Partial NA coefficients for 60 probe(s)",""
+"mixed",29,"proDA",1,0.99,0.99,0,NA,1.10762569820987,0.0579710144927536,0.884353741496599,138,1,4,0.000143095864158121,1,"",""
+"mixed",29,"uniform_KNN",1,0.99,0.99,0.968113374667848,2.41344722531907,1.56965350190478,0.31219512195122,0.959183673469388,205,NA,NA,NA,NA,"47 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",29,"uniform_MinProb",1,0.99,0.99,0.968113374667848,3.31631124287744,1.03867678416978,0.0192307692307692,0.346938775510204,52,NA,NA,NA,NA,"",""
+"mixed",29,"DEP_absence",1,0.99,0.99,0.968113374667848,1.00978227534925,0.438263262042385,0.22093023255814,0.91156462585034,172,NA,NA,NA,NA,"47 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",29,"automatic_minimum",1,0.593333333333333,0.593333333333333,0.298494242692648,1.53356237248214,0.487336902175839,0.0404040404040404,0.646258503401361,99,NA,NA,NA,NA,"",""
+"mixed",29,"automatic_none",1,0.598333333333333,0.598333333333333,0.304251550044287,1.81233606958152,0.973305573761874,0.0934579439252336,0.659863945578231,107,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",29,"manual_12",1,0.661666666666667,0.661666666666667,0.366253321523472,1.35176704177661,0.746186555175232,0.0714285714285714,0.707482993197279,112,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",30,"observed_only",1,0.991666666666667,0.893333333333333,0,NA,0.303880370902431,0.0392156862745098,0.695035460992908,102,NA,NA,NA,NA,"Partial NA coefficients for 59 probe(s)",""
+"mixed",30,"proDA",1,0.991666666666667,0.99,0,NA,1.08973657580251,0.0597014925373134,0.893617021276596,134,1,3,0.000452911841523678,1,"",""
+"mixed",30,"uniform_KNN",1,0.991666666666667,0.991666666666667,0.972118959107807,2.41996386710413,1.62562504601819,0.286458333333333,0.971631205673759,192,NA,NA,NA,NA,"45 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 14 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",30,"uniform_MinProb",1,0.991666666666667,0.991666666666667,0.972118959107807,3.34975530708882,1.01439816916681,0.0204081632653061,0.340425531914894,49,NA,NA,NA,NA,"",""
+"mixed",30,"DEP_absence",1,0.991666666666667,0.991666666666667,0.972118959107807,1.04694697347954,0.460343301920461,0.177215189873418,0.921985815602837,158,NA,NA,NA,NA,"45 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 14 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",30,"automatic_minimum",1,0.601666666666667,0.601666666666667,0.313661710037175,2.72275326747353,1.24988791835777,0.0776699029126214,0.673758865248227,103,NA,NA,NA,NA,"",""
+"mixed",30,"automatic_none",1,0.61,0.61,0.321096654275093,1.8871158094616,1.04063546318322,0.0769230769230769,0.765957446808511,117,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"mixed",30,"manual_12",1,0.693333333333333,0.693333333333333,0.403345724907063,1.47250795153397,0.85865185656336,0.0975609756097561,0.787234042553192,123,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",1,"observed_only",1,0.998333333333333,0.913333333333333,0,NA,0.504436045248837,0.0365853658536585,0.548611111111111,82,NA,NA,NA,NA,"Partial NA coefficients for 51 probe(s)",""
+"heteroscedastic_batch",1,"proDA",1,0.998333333333333,0.998333333333333,0,NA,1.07559381513158,0,0,0,1,3,0.000476463703692646,1,"",""
+"heteroscedastic_batch",1,"uniform_KNN",1,0.998333333333333,0.998333333333333,0.99437148217636,2.38796826189199,1.52981035936374,0.171052631578947,0.875,152,NA,NA,NA,NA,"38 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",1,"uniform_MinProb",1,0.998333333333333,0.998333333333333,0.99437148217636,3.1459190811341,0.941505292071095,0,0.263888888888889,38,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",1,"DEP_absence",1,0.998333333333333,0.998333333333333,0.99437148217636,1.20387364013115,0.468820640876353,0.0909090909090909,0.833333333333333,132,NA,NA,NA,NA,"38 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",1,"automatic_minimum",1,0.605,0.605,0.310975609756098,1.87747832330465,0.516363607569918,0,0.618055555555556,89,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",1,"automatic_none",1,0.606666666666667,0.606666666666667,0.312851782363977,2.0604755142105,1.0567260369134,0.0103092783505155,0.666666666666667,97,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",1,"manual_12",1,0.676666666666667,0.676666666666667,0.384146341463415,1.458080541643,0.790656924257845,0.0357142857142857,0.75,112,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",2,"observed_only",1,0.995,0.896666666666667,0,NA,0.51382075381075,0.0897435897435897,0.493055555555556,78,NA,NA,NA,NA,"Partial NA coefficients for 59 probe(s)",""
+"heteroscedastic_batch",2,"proDA",1,0.995,0.995,0,NA,1.22645363631581,1,0,1,1,4,0.000281702996260755,1,"",""
+"heteroscedastic_batch",2,"uniform_KNN",1,0.995,0.995,0.98274209012464,2.62966738721531,1.63663343964652,0.189873417721519,0.888888888888889,158,NA,NA,NA,NA,"45 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 14 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",2,"uniform_MinProb",1,0.995,0.995,0.98274209012464,3.44334495139276,1.01218467711052,0,0.25,36,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",2,"DEP_absence",1,0.995,0.995,0.98274209012464,1.31429203536441,0.503681305831691,0.0916030534351145,0.826388888888889,131,NA,NA,NA,NA,"45 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 14 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",2,"automatic_minimum",1,0.598333333333333,0.598333333333333,0.306327900287632,2.14777520303392,0.670029333337178,0,0.673611111111111,97,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",2,"automatic_none",1,0.598333333333333,0.598333333333333,0.306327900287632,2.03323165206861,1.05038852428145,0.0186915887850467,0.729166666666667,107,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",2,"manual_12",1,0.685,0.685,0.384947267497603,1.47353265862041,0.790454190030073,0.0188679245283019,0.722222222222222,106,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",3,"observed_only",1,0.995,0.898333333333333,0,NA,0.536877585156959,0.0555555555555556,0.472222222222222,72,NA,NA,NA,NA,"Partial NA coefficients for 58 probe(s)",""
+"heteroscedastic_batch",3,"proDA",1,0.995,0.995,0,NA,1.08039812947354,0,0,0,1,4,0.000528697033629933,1,"",""
+"heteroscedastic_batch",3,"uniform_KNN",1,0.995,0.995,0.983614019116978,2.43074975759594,1.5899460483776,0.216049382716049,0.881944444444444,162,NA,NA,NA,NA,"47 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 11 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",3,"uniform_MinProb",1,0.995,0.995,0.983614019116978,3.20836705392144,1.00415955356388,0,0.25,36,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",3,"DEP_absence",1,0.995,0.995,0.983614019116978,1.30572264119317,0.540378020733433,0.123188405797101,0.840277777777778,138,NA,NA,NA,NA,"47 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 11 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",3,"automatic_minimum",1,0.703333333333333,0.703333333333333,0.402822030040965,3.94493457921573,1.54938082259308,0.0114942528735632,0.597222222222222,87,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",3,"automatic_none",1,0.703333333333333,0.703333333333333,0.402822030040965,1.59577035547432,0.837759651245502,0.0467289719626168,0.708333333333333,107,NA,NA,NA,NA,"33 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",3,"manual_12",1,0.676666666666667,0.676666666666667,0.373236231224397,1.43394467664725,0.773127108247809,0.019047619047619,0.715277777777778,105,NA,NA,NA,NA,"33 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",4,"observed_only",1,0.995,0.901666666666667,0,NA,0.51314389502051,0.0759493670886076,0.506944444444444,79,NA,NA,NA,NA,"Partial NA coefficients for 56 probe(s)",""
+"heteroscedastic_batch",4,"proDA",1,0.995,0.995,0,NA,1.07414614777187,0,0,0,1,3,0.000518018480601152,1,"",""
+"heteroscedastic_batch",4,"uniform_KNN",1,0.995,0.995,0.98326359832636,2.55393414149092,1.56800016849156,0.215189873417722,0.861111111111111,158,NA,NA,NA,NA,"43 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",4,"uniform_MinProb",1,0.995,0.995,0.98326359832636,3.57778032191202,1.04748197536666,0,0.25,36,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",4,"DEP_absence",1,0.995,0.995,0.98326359832636,1.44822176312292,0.498452118862614,0.120300751879699,0.8125,133,NA,NA,NA,NA,"43 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",4,"automatic_minimum",1,0.66,0.66,0.362157136215714,2.74498394775301,0.910527486969727,0,0.583333333333333,84,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",4,"automatic_none",1,0.663333333333333,0.663333333333333,0.364946536494654,1.72494639866814,0.938741834720516,0.0347826086956522,0.770833333333333,115,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",4,"manual_12",1,0.678333333333333,0.678333333333333,0.378428637842864,1.51328288603057,0.835158870750719,0.00917431192660551,0.75,109,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",5,"observed_only",1,0.998333333333333,0.905,0,NA,0.556280888154934,0.0705882352941176,0.526666666666667,85,NA,NA,NA,NA,"Partial NA coefficients for 56 probe(s)",""
+"heteroscedastic_batch",5,"proDA",1,0.998333333333333,0.998333333333333,0,NA,1.09488118983978,0,0,0,1,4,0.000177153648901554,1,"",""
+"heteroscedastic_batch",5,"uniform_KNN",1,0.998333333333333,0.998333333333333,0.99469964664311,2.46537460921964,1.62120053461383,0.208588957055215,0.86,163,NA,NA,NA,NA,"40 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 16 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",5,"uniform_MinProb",1,0.998333333333333,0.998333333333333,0.99469964664311,3.67353585051858,1.04938441959165,0,0.206666666666667,31,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",5,"DEP_absence",1,0.998333333333333,0.998333333333333,0.99469964664311,1.34457269821167,0.50639023515408,0.0962962962962963,0.813333333333333,135,NA,NA,NA,NA,"40 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 16 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",5,"automatic_minimum",1,0.618333333333333,0.618333333333333,0.325088339222615,2.3017171398287,0.913222603944529,0,0.62,93,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",5,"automatic_none",1,0.618333333333333,0.618333333333333,0.325088339222615,1.76375166317574,0.993108809845899,0.0176991150442478,0.74,113,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",5,"manual_12",1,0.666666666666667,0.666666666666667,0.378533568904594,1.43008097832894,0.830046162671655,0.0504201680672269,0.753333333333333,119,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",6,"observed_only",1,0.998333333333333,0.913333333333333,0,NA,0.504454225088293,0.0140845070422535,0.479452054794521,71,NA,NA,NA,NA,"Partial NA coefficients for 51 probe(s)",""
+"heteroscedastic_batch",6,"proDA",1,0.998333333333333,0.998333333333333,0,NA,1.08738877033932,0,0,0,1,4,0.000314665719050828,1,"",""
+"heteroscedastic_batch",6,"uniform_KNN",1,0.998333333333333,0.998333333333333,0.994587280108254,2.53624244445957,1.54416294982812,0.129496402877698,0.828767123287671,139,NA,NA,NA,NA,"37 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 14 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",6,"uniform_MinProb",1,0.998333333333333,0.998333333333333,0.994587280108254,3.42868638162838,1.0678436200896,0.027027027027027,0.246575342465753,37,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",6,"DEP_absence",1,0.998333333333333,0.998333333333333,0.994587280108254,1.43344742492105,0.459213527168157,0.0175438596491228,0.767123287671233,114,NA,NA,NA,NA,"37 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 14 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",6,"automatic_minimum",1,0.618333333333333,0.618333333333333,0.330175913396482,3.01199374621512,0.992091712720531,0.0256410256410256,0.520547945205479,78,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",6,"automatic_none",1,0.618333333333333,0.618333333333333,0.330175913396482,1.92480549380989,1.02398024991804,0.0188679245283019,0.712328767123288,106,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",6,"manual_12",1,0.655,0.655,0.359494812810104,1.65214200681804,0.919956361863868,0.00952380952380952,0.712328767123288,105,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",7,"observed_only",1,0.998333333333333,0.903333333333333,0,NA,0.466734154652904,0.0394736842105263,0.514084507042254,76,NA,NA,NA,NA,"Partial NA coefficients for 57 probe(s)",""
+"heteroscedastic_batch",7,"proDA",1,0.998333333333333,0.998333333333333,0,NA,1.15211196894159,0.333333333333333,0.0140845070422535,3,1,4,0.000466303419583557,1,"",""
+"heteroscedastic_batch",7,"uniform_KNN",1,0.998333333333333,0.998333333333333,0.994523048836148,2.50930622519256,1.58728050143642,0.206451612903226,0.866197183098592,155,NA,NA,NA,NA,"46 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 11 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",7,"uniform_MinProb",1,0.998333333333333,0.998333333333333,0.994523048836148,3.36724595034904,1.00730259628472,0,0.28169014084507,40,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",7,"DEP_absence",1,0.998333333333333,0.998333333333333,0.994523048836148,1.36675232357214,0.526645893114915,0.0819672131147541,0.788732394366197,122,NA,NA,NA,NA,"46 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 11 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",7,"automatic_minimum",1,0.588333333333333,0.588333333333333,0.29073482428115,4.18702445560196,1.51008542795123,0,0.612676056338028,87,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",7,"automatic_none",1,0.586666666666667,0.586666666666667,0.288452761296212,2.10959062819616,1.13257103214953,0,0.690140845070423,98,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",7,"manual_12",1,0.661666666666667,0.661666666666667,0.361935189411228,1.45405630923081,0.790911982116787,0,0.704225352112676,100,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",8,"observed_only",1,0.993333333333333,0.906666666666667,0,NA,0.482390579614022,0.0379746835443038,0.527777777777778,79,NA,NA,NA,NA,"Partial NA coefficients for 52 probe(s)",""
+"heteroscedastic_batch",8,"proDA",1,0.993333333333333,0.993333333333333,0,NA,1.10101440418899,0,0,0,1,4,0.000390758308945083,1,"",""
+"heteroscedastic_batch",8,"uniform_KNN",1,0.993333333333333,0.993333333333333,0.976131277971159,2.45087672827404,1.55083879263679,0.221518987341772,0.854166666666667,158,NA,NA,NA,NA,"38 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 14 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",8,"uniform_MinProb",1,0.993333333333333,0.993333333333333,0.976131277971159,3.20888542553525,0.978510643972221,0.0232558139534884,0.291666666666667,43,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",8,"DEP_absence",1,0.993333333333333,0.993333333333333,0.976131277971159,1.25843789712077,0.522817913284412,0.139705882352941,0.8125,136,NA,NA,NA,NA,"38 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 14 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",8,"automatic_minimum",1,0.631666666666667,0.631666666666667,0.332173048234709,2.38102468091634,0.976177813814663,0.0106382978723404,0.645833333333333,94,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",8,"automatic_none",1,0.631666666666667,0.631666666666667,0.333664843361512,1.86955420123592,0.941136961242346,0.0754716981132075,0.680555555555556,106,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",8,"manual_12",1,0.685,0.685,0.388861263053207,1.39192396710003,0.73495582567997,0.0280373831775701,0.722222222222222,107,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",9,"observed_only",1,0.993333333333333,0.895,0,NA,0.53535439601512,0.0615384615384615,0.417808219178082,65,NA,NA,NA,NA,"Partial NA coefficients for 59 probe(s)",""
+"heteroscedastic_batch",9,"proDA",1,0.993333333333333,0.993333333333333,0,NA,1.18101900302724,0,0,0,1,4,0.000177189289400506,1,"",""
+"heteroscedastic_batch",9,"uniform_KNN",1,0.993333333333333,0.993333333333333,0.977580569827184,2.59201976485864,1.62635841156951,0.171052631578947,0.863013698630137,152,NA,NA,NA,NA,"47 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 12 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",9,"uniform_MinProb",1,0.993333333333333,0.993333333333333,0.977580569827184,3.30972278796767,1.00438527621754,0,0.212328767123288,31,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",9,"DEP_absence",1,0.993333333333333,0.993333333333333,0.977580569827184,1.30829221273317,0.516992140223969,0.064,0.801369863013699,125,NA,NA,NA,NA,"47 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 12 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",9,"automatic_minimum",1,0.688333333333333,0.688333333333333,0.400747314339094,1.72879428167392,0.659331016599717,0.010752688172043,0.63013698630137,93,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",9,"automatic_none",1,0.691666666666667,0.691666666666667,0.403549743110696,1.7456339645692,0.918448413734538,0.0560747663551402,0.691780821917808,107,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",9,"manual_12",1,0.678333333333333,0.678333333333333,0.387669313404951,1.48650291840746,0.819300156118307,0.0297029702970297,0.671232876712329,101,NA,NA,NA,NA,"32 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",10,"observed_only",1,0.995,0.903333333333333,0,NA,0.499294914247197,0,0.540540540540541,80,NA,NA,NA,NA,"Partial NA coefficients for 55 probe(s)",""
+"heteroscedastic_batch",10,"proDA",1,0.995,0.995,0,NA,1.08846884484624,0,0,0,1,4,0.000258863810014619,1,"",""
+"heteroscedastic_batch",10,"uniform_KNN",1,0.995,0.995,0.983448275862069,2.37808855501888,1.53677527682949,0.188679245283019,0.871621621621622,159,NA,NA,NA,NA,"43 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 12 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",10,"uniform_MinProb",1,0.995,0.995,0.983448275862069,3.27193879990861,0.996252582574557,0,0.243243243243243,36,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",10,"DEP_absence",1,0.995,0.995,0.983448275862069,1.18490240992887,0.466322045248413,0.0534351145038168,0.837837837837838,131,NA,NA,NA,NA,"43 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 12 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",10,"automatic_minimum",1,0.621666666666667,0.621666666666667,0.32,1.9455848646892,0.671449294684881,0,0.695945945945946,103,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",10,"automatic_none",1,0.62,0.62,0.31816091954023,1.93374221526071,1.05035204784869,0,0.722972972972973,107,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",10,"manual_12",1,0.671666666666667,0.671666666666667,0.381149425287356,1.49942449707813,0.831224375591871,0.018018018018018,0.736486486486487,111,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 2 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",11,"observed_only",1,0.993333333333333,0.906666666666667,0,NA,0.55806333221559,0.0422535211267606,0.489208633093525,71,NA,NA,NA,NA,"Partial NA coefficients for 52 probe(s)",""
+"heteroscedastic_batch",11,"proDA",1,0.993333333333333,0.993333333333333,0,NA,1.20752432105202,0,0,0,1,4,0.0002457432259107,1,"",""
+"heteroscedastic_batch",11,"uniform_KNN",1,0.993333333333333,0.993333333333333,0.97754911131899,2.57286944928923,1.56459391589399,0.183673469387755,0.863309352517986,147,NA,NA,NA,NA,"39 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",11,"uniform_MinProb",1,0.993333333333333,0.993333333333333,0.97754911131899,3.45566656600967,1.05657915247512,0.0512820512820513,0.266187050359712,39,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",11,"DEP_absence",1,0.993333333333333,0.993333333333333,0.97754911131899,1.41692728965496,0.47434616016144,0.08,0.827338129496403,125,NA,NA,NA,NA,"39 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",11,"automatic_minimum",1,0.611666666666667,0.611666666666667,0.30355472404116,2.45977839766907,0.787046133417985,0,0.618705035971223,86,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",11,"automatic_none",1,0.616666666666667,0.616666666666667,0.30823199251637,1.92437639040277,0.99274978695555,0.03,0.697841726618705,100,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",11,"manual_12",1,0.668333333333333,0.668333333333333,0.361085126286249,1.47721529015089,0.791625331249351,0.0202020202020202,0.697841726618705,99,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",12,"observed_only",1,0.995,0.906666666666667,0,NA,0.565802261495155,0.0547945205479452,0.485915492957746,73,NA,NA,NA,NA,"Partial NA coefficients for 53 probe(s)",""
+"heteroscedastic_batch",12,"proDA",1,0.995,0.995,0,NA,1.10575742664464,0,0,0,1,4,0.000512360858038429,1,"",""
+"heteroscedastic_batch",12,"uniform_KNN",1,0.995,0.995,0.983614019116978,2.53636409297057,1.59249775283762,0.166666666666667,0.809859154929577,138,NA,NA,NA,NA,"37 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 16 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",12,"uniform_MinProb",1,0.995,0.995,0.983614019116978,3.50462242414611,0.951704679735324,0,0.21830985915493,31,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",12,"DEP_absence",1,0.995,0.995,0.983614019116978,1.39769872694817,0.500147689701367,0.0789473684210526,0.73943661971831,114,NA,NA,NA,NA,"37 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 16 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",12,"automatic_minimum",1,0.553333333333333,0.553333333333333,0.26809285389167,2.0844459051671,0.65502235902399,0,0.542253521126761,77,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",12,"automatic_none",1,0.555,0.555,0.269003186162949,2.01020505885493,1.00892848052301,0.0235294117647059,0.584507042253521,85,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",12,"manual_12",1,0.67,0.67,0.375056895766955,1.54515722979602,0.816925129418574,0.0101010101010101,0.690140845070423,99,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",13,"observed_only",1,0.993333333333333,0.918333333333333,0,NA,0.601371853580707,0.0875,0.514084507042254,80,NA,NA,NA,NA,"Partial NA coefficients for 45 probe(s)",""
+"heteroscedastic_batch",13,"proDA",1,0.993333333333333,0.993333333333333,0,NA,1.07741831569437,0,0,0,1,5,9.09972154640694e-06,1,"",""
+"heteroscedastic_batch",13,"uniform_KNN",1,0.993333333333333,0.993333333333333,0.978368634520054,2.37822763338207,1.48583731272,0.189189189189189,0.845070422535211,148,NA,NA,NA,NA,"39 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 6 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",13,"uniform_MinProb",1,0.993333333333333,0.993333333333333,0.978368634520054,3.64402437183985,1.04779449223588,0,0.232394366197183,33,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",13,"DEP_absence",1,0.993333333333333,0.993333333333333,0.978368634520054,1.38783201655072,0.525188075980882,0.119402985074627,0.830985915492958,134,NA,NA,NA,NA,"39 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 6 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",13,"automatic_minimum",1,0.633333333333333,0.633333333333333,0.335286164939162,2.64325586985022,1.08506210451724,0,0.654929577464789,93,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",13,"automatic_none",1,0.635,0.635,0.33618747183416,1.67409522354976,0.904142701297842,0.0392156862745098,0.690140845070423,102,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",13,"manual_12",1,0.666666666666667,0.666666666666667,0.369986480396575,1.37816832019067,0.757050321682527,0.0825688073394495,0.704225352112676,109,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",14,"observed_only",1,0.995,0.891666666666667,0,NA,0.458633249995068,0.038961038961039,0.513888888888889,77,NA,NA,NA,NA,"Partial NA coefficients for 62 probe(s)",""
+"heteroscedastic_batch",14,"proDA",1,0.995,0.995,0,NA,1.14036641223232,0,0.00694444444444444,1,1,4,0.000363591164074158,1,"",""
+"heteroscedastic_batch",14,"uniform_KNN",1,0.995,0.995,0.982938388625592,2.48819495626721,1.61734011396884,0.19496855345912,0.888888888888889,159,NA,NA,NA,NA,"41 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 21 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",14,"uniform_MinProb",1,0.995,0.995,0.982938388625592,3.10016569207902,0.962607634452978,0.0263157894736842,0.256944444444444,38,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",14,"DEP_absence",1,0.995,0.995,0.982938388625592,1.17503736665678,0.478401546704697,0.0687022900763359,0.847222222222222,131,NA,NA,NA,NA,"41 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 21 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",14,"automatic_minimum",1,0.656666666666667,0.656666666666667,0.351184834123223,1.93834099656446,0.717144741621929,0,0.631944444444444,91,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",14,"automatic_none",1,0.661666666666667,0.661666666666667,0.354976303317536,1.79931804634045,0.953949066202692,0,0.722222222222222,104,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",14,"manual_12",1,0.693333333333333,0.693333333333333,0.389099526066351,1.34598766533466,0.72486960095373,0.00909090909090909,0.756944444444444,110,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 2 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",15,"observed_only",1,0.998333333333333,0.911666666666667,0,NA,0.55831430763512,0.0697674418604651,0.551724137931034,86,NA,NA,NA,NA,"Partial NA coefficients for 52 probe(s)",""
+"heteroscedastic_batch",15,"proDA",1,0.998333333333333,0.998333333333333,0,NA,1.14739843301317,0,0,0,1,4,0.00066238687573168,1,"",""
+"heteroscedastic_batch",15,"uniform_KNN",1,0.998333333333333,0.998333333333333,0.994500458295142,2.53894782957413,1.56957073214355,0.232142857142857,0.889655172413793,168,NA,NA,NA,NA,"39 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",15,"uniform_MinProb",1,0.998333333333333,0.998333333333333,0.994500458295142,3.63612394543692,1.09418696721399,0.0303030303030303,0.220689655172414,33,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",15,"DEP_absence",1,0.998333333333333,0.998333333333333,0.994500458295142,1.36772626458041,0.522536205986682,0.125,0.868965517241379,144,NA,NA,NA,NA,"39 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",15,"automatic_minimum",1,0.72,0.72,0.43858845096242,3.58176015784695,1.35894511806832,0.0117647058823529,0.579310344827586,85,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",15,"automatic_none",1,0.72,0.72,0.43858845096242,1.56955301802481,0.8136583314374,0.0571428571428571,0.682758620689655,105,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",15,"manual_12",1,0.688333333333333,0.688333333333333,0.403299725022915,1.30246998174616,0.73533855201408,0.0272727272727273,0.737931034482759,110,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",16,"observed_only",1,0.998333333333333,0.9,0,NA,0.57427835396647,0.0625,0.319148936170213,48,NA,NA,NA,NA,"Partial NA coefficients for 59 probe(s)",""
+"heteroscedastic_batch",16,"proDA",1,0.998333333333333,0.998333333333333,0,NA,1.18612241313548,0,0,0,1,4,0.000330555626160176,1,"",""
+"heteroscedastic_batch",16,"uniform_KNN",1,0.998333333333333,0.998333333333333,0.994520547945206,2.60034320571125,1.66176999917547,0.177777777777778,0.787234042553192,135,NA,NA,NA,NA,"41 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 18 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",16,"uniform_MinProb",1,0.998333333333333,0.998333333333333,0.994520547945206,3.5547393740399,1.09632820295611,0,0.24113475177305,34,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",16,"DEP_absence",1,0.998333333333333,0.998333333333333,0.994520547945206,1.33228675028893,0.511901068367453,0.0642201834862385,0.723404255319149,109,NA,NA,NA,NA,"41 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 18 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",16,"automatic_minimum",1,0.566666666666667,0.566666666666667,0.29041095890411,2.8244013019615,0.964088467093152,0,0.50354609929078,71,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",16,"automatic_none",1,0.575,0.575,0.298630136986301,1.88877432229821,0.979755234574963,0.0465116279069767,0.581560283687943,86,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",16,"manual_12",1,0.658333333333333,0.658333333333333,0.379908675799087,1.41568167694985,0.789031325171158,0.032258064516129,0.638297872340426,93,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",17,"observed_only",1,0.996666666666667,0.903333333333333,0,NA,0.529876860336409,0.0533333333333333,0.486301369863014,75,NA,NA,NA,NA,"Partial NA coefficients for 56 probe(s)",""
+"heteroscedastic_batch",17,"proDA",1,0.996666666666667,0.996666666666667,0,NA,1.15939181870341,0.666666666666667,0.00684931506849315,3,1,4,3.66991601122e-05,1,"",""
+"heteroscedastic_batch",17,"uniform_KNN",1,0.996666666666667,0.996666666666667,0.988355167394469,2.61736925257812,1.57012730068493,0.184210526315789,0.849315068493151,152,NA,NA,NA,NA,"41 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 15 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",17,"uniform_MinProb",1,0.996666666666667,0.996666666666667,0.988355167394469,3.61388999645214,1.02288940899891,0,0.212328767123288,31,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",17,"DEP_absence",1,0.996666666666667,0.996666666666667,0.988355167394469,1.31130085658506,0.431143851511024,0.0692307692307692,0.828767123287671,130,NA,NA,NA,NA,"41 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 15 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",17,"automatic_minimum",1,0.693333333333333,0.693333333333333,0.394953905870936,4.00751374597813,1.38690064465637,0.0125,0.541095890410959,80,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",17,"automatic_none",1,0.695,0.695,0.397379912663755,1.74200514986223,0.900893346359481,0.0571428571428571,0.678082191780822,105,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",17,"manual_12",1,0.696666666666667,0.696666666666667,0.400776322173702,1.52651062053869,0.820711147919803,0.0185185185185185,0.726027397260274,108,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 2 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",18,"observed_only",1,0.996666666666667,0.916666666666667,0,NA,0.586870526599381,0.0337078651685393,0.589041095890411,89,NA,NA,NA,NA,"Partial NA coefficients for 48 probe(s)",""
+"heteroscedastic_batch",18,"proDA",1,0.996666666666667,0.996666666666667,0,NA,1.19531076538264,1,0,2,1,4,0.000486106072534374,1,"",""
+"heteroscedastic_batch",18,"uniform_KNN",1,0.996666666666667,0.996666666666667,0.988483685220729,2.53551940268676,1.59921124882933,0.20125786163522,0.86986301369863,159,NA,NA,NA,NA,"39 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 9 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",18,"uniform_MinProb",1,0.996666666666667,0.996666666666667,0.988483685220729,3.54523623389697,1.12144765854185,0,0.26027397260274,38,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",18,"DEP_absence",1,0.996666666666667,0.996666666666667,0.988483685220729,1.3356020067058,0.52190148675493,0.137931034482759,0.856164383561644,145,NA,NA,NA,NA,"39 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 9 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",18,"automatic_minimum",1,0.62,0.62,0.31957773512476,2.05888477883873,0.888763840473256,0.0196078431372549,0.684931506849315,102,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",18,"automatic_none",1,0.63,0.63,0.330134357005758,2.04173373041324,1.06990288869473,0.00884955752212389,0.767123287671233,113,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",18,"manual_12",1,0.673333333333333,0.673333333333333,0.365642994241843,1.63258057786143,0.873608705024004,0.0181818181818182,0.73972602739726,110,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",19,"observed_only",1,0.996666666666667,0.916666666666667,0,NA,0.491423559664563,0.0128205128205128,0.527397260273973,78,NA,NA,NA,NA,"Partial NA coefficients for 48 probe(s)",""
+"heteroscedastic_batch",19,"proDA",1,0.996666666666667,0.996666666666667,0,NA,1.13717500121483,0,0,0,1,4,0.000188860541619512,1,"",""
+"heteroscedastic_batch",19,"uniform_KNN",1,0.996666666666667,0.996666666666667,0.988269794721408,2.47398681757603,1.55360328178454,0.151724137931034,0.842465753424658,145,NA,NA,NA,NA,"37 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 11 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",19,"uniform_MinProb",1,0.996666666666667,0.996666666666667,0.988269794721408,3.45239046476891,1.04294766965128,0.0425531914893617,0.308219178082192,47,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",19,"DEP_absence",1,0.996666666666667,0.996666666666667,0.988269794721408,1.29496796551552,0.445604686782024,0.082089552238806,0.842465753424658,134,NA,NA,NA,NA,"37 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 11 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",19,"automatic_minimum",1,0.651666666666667,0.651666666666667,0.347507331378299,1.77403200379979,0.664936815697148,0.0099009900990099,0.684931506849315,101,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",19,"automatic_none",1,0.65,0.65,0.346041055718475,1.88028942744534,0.985520176097534,0.0458715596330275,0.712328767123288,109,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",19,"manual_12",1,0.693333333333333,0.693333333333333,0.396871945259042,1.36585312739193,0.732846783582793,0.00892857142857143,0.76027397260274,112,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",20,"observed_only",1,0.991666666666667,0.881666666666667,0,NA,0.565169436450822,0.0777777777777778,0.572413793103448,90,NA,NA,NA,NA,"Partial NA coefficients for 66 probe(s)",""
+"heteroscedastic_batch",20,"proDA",1,0.991666666666667,0.991666666666667,0,NA,1.22974914409272,0,0,0,1,3,0.000788803739080239,1,"",""
+"heteroscedastic_batch",20,"uniform_KNN",1,0.991666666666667,0.991666666666667,0.972375690607735,2.89479566875537,1.69234938538438,0.211180124223602,0.875862068965517,161,NA,NA,NA,NA,"46 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 20 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",20,"uniform_MinProb",1,0.991666666666667,0.991666666666667,0.972375690607735,3.59144343592956,1.04156316755237,0.0285714285714286,0.23448275862069,35,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",20,"DEP_absence",1,0.991666666666667,0.991666666666667,0.972375690607735,1.48998037271666,0.476940200564087,0.0793650793650794,0.8,126,NA,NA,NA,NA,"46 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 20 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",20,"automatic_minimum",1,0.693333333333333,0.693333333333333,0.372467771639042,3.73690593307469,1.33459187485162,0.0232558139534884,0.579310344827586,86,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",20,"automatic_none",1,0.681666666666667,0.681666666666667,0.360957642725599,1.57929941026595,0.854896981699096,0.00934579439252336,0.731034482758621,107,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",20,"manual_12",1,0.68,0.68,0.361418047882136,1.44420624734732,0.775105844203982,0.0277777777777778,0.724137931034483,108,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",21,"observed_only",1,0.99,0.91,0,NA,0.52614259901265,0.0135135135135135,0.5,74,NA,NA,NA,NA,"Partial NA coefficients for 48 probe(s)",""
+"heteroscedastic_batch",21,"proDA",1,0.99,0.99,0,NA,1.14305595995934,0,0,0,1,5,0.000154716687671455,1,"",""
+"heteroscedastic_batch",21,"uniform_KNN",1,0.99,0.99,0.965909090909091,2.4653988864231,1.53361738388879,0.173333333333333,0.849315068493151,150,NA,NA,NA,NA,"36 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 12 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",21,"uniform_MinProb",1,0.99,0.99,0.965909090909091,3.56928007636663,1.07527325935089,0,0.246575342465753,36,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",21,"DEP_absence",1,0.99,0.99,0.965909090909091,1.34015604101173,0.463748963327516,0.0909090909090909,0.821917808219178,132,NA,NA,NA,NA,"36 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 12 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",21,"automatic_minimum",1,0.606666666666667,0.606666666666667,0.314867424242424,2.84545193282968,1.14158133729834,0,0.561643835616438,82,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",21,"automatic_none",1,0.608333333333333,0.608333333333333,0.315814393939394,1.9786598997707,1.04739971266795,0.0303030303030303,0.657534246575342,99,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",21,"manual_12",1,0.685,0.685,0.393939393939394,1.45438198640319,0.771168098392422,0.00970873786407767,0.698630136986301,103,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",22,"observed_only",1,0.996666666666667,0.898333333333333,0,NA,0.535543649400168,0.0705882352941176,0.541095890410959,85,NA,NA,NA,NA,"Partial NA coefficients for 59 probe(s)",""
+"heteroscedastic_batch",22,"proDA",1,0.996666666666667,0.996666666666667,0,NA,1.24938410792221,0,0,0,1,4,0.00048502442585366,1,"",""
+"heteroscedastic_batch",22,"uniform_KNN",1,0.996666666666667,0.996666666666667,0.989051094890511,2.6019107563291,1.66590498093871,0.197452229299363,0.863013698630137,157,NA,NA,NA,NA,"46 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",22,"uniform_MinProb",1,0.996666666666667,0.996666666666667,0.989051094890511,3.68351966047008,1.06984013228148,0.0277777777777778,0.23972602739726,36,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",22,"DEP_absence",1,0.996666666666667,0.996666666666667,0.989051094890511,1.37857705541619,0.483657482302333,0.0852713178294574,0.808219178082192,129,NA,NA,NA,NA,"46 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",22,"automatic_minimum",1,0.595,0.595,0.302007299270073,2.31917196819517,0.836029351136139,0.0222222222222222,0.602739726027397,90,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",22,"automatic_none",1,0.596666666666667,0.596666666666667,0.302919708029197,2.20285329086324,1.12534993276107,0.032258064516129,0.616438356164384,93,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",22,"manual_12",1,0.683333333333333,0.683333333333333,0.382755474452555,1.4625140951501,0.783082310281659,0.018348623853211,0.732876712328767,109,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",23,"observed_only",1,0.99,0.903333333333333,0,NA,0.516579789683807,0.0289855072463768,0.45578231292517,69,NA,NA,NA,NA,"Partial NA coefficients for 52 probe(s)",""
+"heteroscedastic_batch",23,"proDA",1,0.99,0.99,0,NA,1.07646509644724,0,0,0,1,4,0.000285838335821116,1,"",""
+"heteroscedastic_batch",23,"uniform_KNN",1,0.99,0.99,0.967914438502674,2.50820525184425,1.58163775450355,0.176470588235294,0.857142857142857,153,NA,NA,NA,NA,"41 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 11 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",23,"uniform_MinProb",1,0.99,0.99,0.967914438502674,3.54753262675698,1.13290487431698,0,0.224489795918367,33,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",23,"DEP_absence",1,0.99,0.99,0.967914438502674,1.34041397770258,0.497500771873912,0.0930232558139535,0.795918367346939,129,NA,NA,NA,NA,"41 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 11 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",23,"automatic_minimum",1,0.683333333333333,0.683333333333333,0.38903743315508,2.04417959740425,0.863628524344161,0.0421052631578947,0.619047619047619,95,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",23,"automatic_none",1,0.688333333333333,0.688333333333333,0.395276292335116,1.90221273347807,0.971775416063492,0.0594059405940594,0.646258503401361,101,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",23,"manual_12",1,0.653333333333333,0.653333333333333,0.356951871657754,1.48050608056538,0.814148199005059,0.0192307692307692,0.693877551020408,104,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",24,"observed_only",1,0.996666666666667,0.9,0,NA,0.58495959217029,0.0813953488372093,0.548611111111111,86,NA,NA,NA,NA,"Partial NA coefficients for 58 probe(s)",""
+"heteroscedastic_batch",24,"proDA",1,0.996666666666667,0.996666666666667,0,NA,1.11177602641681,0,0,0,1,4,0.000667211212205826,1,"",""
+"heteroscedastic_batch",24,"uniform_KNN",1,0.996666666666667,0.996666666666667,0.989247311827957,2.49933282569606,1.5773656222251,0.235294117647059,0.8125,153,NA,NA,NA,NA,"40 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 18 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",24,"uniform_MinProb",1,0.996666666666667,0.996666666666667,0.989247311827957,3.36998057132007,1.00050757602886,0.0238095238095238,0.284722222222222,42,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",24,"DEP_absence",1,0.996666666666667,0.996666666666667,0.989247311827957,1.25257727032556,0.482755481983454,0.096,0.784722222222222,125,NA,NA,NA,NA,"40 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 18 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",24,"automatic_minimum",1,0.64,0.64,0.332437275985663,1.83938312302074,0.53248076592588,0.021978021978022,0.618055555555556,91,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",24,"automatic_none",1,0.638333333333333,0.638333333333333,0.329749103942652,1.87475959936512,0.994695813298336,0.0648148148148148,0.701388888888889,108,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",24,"manual_12",1,0.656666666666667,0.656666666666667,0.351254480286738,1.46583864258636,0.783162043558733,0.0208333333333333,0.652777777777778,96,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",25,"observed_only",1,0.991666666666667,0.893333333333333,0,NA,0.534736895000845,0.0769230769230769,0.413793103448276,65,NA,NA,NA,NA,"Partial NA coefficients for 59 probe(s)",""
+"heteroscedastic_batch",25,"proDA",1,0.991666666666667,0.991666666666667,0,NA,1.06643704785574,0.0606060606060606,0.427586206896552,66,1,4,0.000176984293215487,1,"",""
+"heteroscedastic_batch",25,"uniform_KNN",1,0.991666666666667,0.991666666666667,0.973901696389735,2.55031144937403,1.56253725559329,0.174825174825175,0.813793103448276,143,NA,NA,NA,NA,"46 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",25,"uniform_MinProb",1,0.991666666666667,0.991666666666667,0.973901696389735,3.29488827015163,1.10512161063959,0.0476190476190476,0.275862068965517,42,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",25,"DEP_absence",1,0.991666666666667,0.991666666666667,0.973901696389735,1.3798185793256,0.529550364569301,0.0769230769230769,0.744827586206897,117,NA,NA,NA,NA,"46 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",25,"automatic_minimum",1,0.585,0.585,0.289691170073945,2.89857471784973,1.06506545043202,0,0.517241379310345,75,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",25,"automatic_none",1,0.585,0.585,0.289691170073945,1.88584061293688,0.992568934789257,0.0408163265306122,0.648275862068965,98,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",25,"manual_12",1,0.63,0.63,0.332753371030883,1.51361363552357,0.808425974752386,0.0315789473684211,0.63448275862069,95,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",26,"observed_only",1,0.991666666666667,0.903333333333333,0,NA,0.558474519899749,0.0410958904109589,0.48951048951049,73,NA,NA,NA,NA,"Partial NA coefficients for 53 probe(s)",""
+"heteroscedastic_batch",26,"proDA",1,0.991666666666667,0.991666666666667,0,NA,1.08717841940255,0,0,0,1,4,0.000355913061572809,1,"",""
+"heteroscedastic_batch",26,"uniform_KNN",1,0.991666666666667,0.991666666666667,0.972862957937585,2.49191445501857,1.5316997064524,0.181818181818182,0.818181818181818,143,NA,NA,NA,NA,"43 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 10 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",26,"uniform_MinProb",1,0.991666666666667,0.991666666666667,0.972862957937585,3.52137268601002,1.03181812092136,0,0.244755244755245,35,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",26,"DEP_absence",1,0.991666666666667,0.991666666666667,0.972862957937585,1.39200889502761,0.454364417732632,0.0256410256410256,0.797202797202797,117,NA,NA,NA,NA,"43 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 10 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",26,"automatic_minimum",1,0.608333333333333,0.608333333333333,0.318407960199005,2.53910094683892,0.978273901914567,0.010989010989011,0.629370629370629,91,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",26,"automatic_none",1,0.613333333333333,0.613333333333333,0.32157394843962,2.06081947402157,1.04330354695848,0.0510204081632653,0.65034965034965,98,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",26,"manual_12",1,0.655,0.655,0.363636363636364,1.595204287736,0.83827709419092,0,0.643356643356643,92,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 1 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",27,"observed_only",1,0.991666666666667,0.893333333333333,0,NA,0.499151090959188,0.0649350649350649,0.489795918367347,77,NA,NA,NA,NA,"Partial NA coefficients for 59 probe(s)",""
+"heteroscedastic_batch",27,"proDA",1,0.991666666666667,0.991666666666667,0,NA,1.11089245661593,0,0,0,1,4,0.000595779910084194,1,"",""
+"heteroscedastic_batch",27,"uniform_KNN",1,0.991666666666667,0.991666666666667,0.972924187725632,2.54788578508412,1.65333596285961,0.187878787878788,0.91156462585034,165,NA,NA,NA,NA,"43 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 16 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",27,"uniform_MinProb",1,0.991666666666667,0.991666666666667,0.972924187725632,3.50273591536185,1.09040358926824,0,0.26530612244898,39,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",27,"DEP_absence",1,0.991666666666667,0.991666666666667,0.972924187725632,1.29026177980499,0.49471070418597,0.0681818181818182,0.836734693877551,132,NA,NA,NA,NA,"43 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 16 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",27,"automatic_minimum",1,0.568333333333333,0.568333333333333,0.278880866425993,2.47078829485679,0.975300615646817,0,0.557823129251701,82,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",27,"automatic_none",1,0.57,0.57,0.279783393501805,2.03907693190379,1.08725034907884,0.03125,0.63265306122449,96,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",27,"manual_12",1,0.658333333333333,0.658333333333333,0.361462093862816,1.50720508869005,0.826537488615629,0.0192307692307692,0.693877551020408,104,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",28,"observed_only",1,0.99,0.896666666666667,0,NA,0.553228813237968,0.0675675675675676,0.469387755102041,74,NA,NA,NA,NA,"Partial NA coefficients for 56 probe(s)",""
+"heteroscedastic_batch",28,"proDA",1,0.99,0.99,0,NA,1.17337956744137,0.5,0.00680272108843537,2,1,4,0.000835483088563895,1,"",""
+"heteroscedastic_batch",28,"uniform_KNN",1,0.99,0.99,0.967257844474761,2.57372851810018,1.62638561924418,0.197368421052632,0.829931972789116,152,NA,NA,NA,NA,"42 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 14 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",28,"uniform_MinProb",1,0.99,0.99,0.967257844474761,3.59945479437033,1.1174484507264,0,0.238095238095238,35,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",28,"DEP_absence",1,0.99,0.99,0.967257844474761,1.36632667169014,0.498210892539467,0.0666666666666667,0.761904761904762,120,NA,NA,NA,NA,"42 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 14 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",28,"automatic_minimum",1,0.601666666666667,0.601666666666667,0.310140973169623,2.01697399530442,0.776805404553255,0,0.585034013605442,86,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",28,"automatic_none",1,0.601666666666667,0.601666666666667,0.310140973169623,1.81621894511479,0.982988821807378,0.0388349514563107,0.673469387755102,103,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",28,"manual_12",1,0.688333333333333,0.688333333333333,0.394270122783083,1.49102990439108,0.827814248408731,0.018018018018018,0.741496598639456,111,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",29,"observed_only",1,0.99,0.896666666666667,0,NA,0.566582079259224,0.0512820512820513,0.517482517482518,78,NA,NA,NA,NA,"Partial NA coefficients for 56 probe(s)",""
+"heteroscedastic_batch",29,"proDA",1,0.99,0.99,0,NA,1.19925908323003,1,0,1,1,4,0.000118539651091798,1,"",""
+"heteroscedastic_batch",29,"uniform_KNN",1,0.99,0.99,0.966021708352997,2.67138857919828,1.64823877322397,0.215189873417722,0.867132867132867,158,NA,NA,NA,NA,"43 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",29,"uniform_MinProb",1,0.99,0.99,0.966021708352997,3.59830340541347,1.00857972317324,0,0.251748251748252,36,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",29,"DEP_absence",1,0.99,0.99,0.966021708352997,1.33906183590614,0.486663882367644,0.0852713178294574,0.825174825174825,129,NA,NA,NA,NA,"43 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 13 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",29,"automatic_minimum",1,0.64,0.64,0.33317602642756,2.45051271073384,0.845503896839866,0,0.608391608391608,87,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",29,"automatic_none",1,0.64,0.64,0.33317602642756,1.94674042994051,1.01595040855032,0,0.706293706293706,101,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",29,"manual_12",1,0.688333333333333,0.688333333333333,0.385087305332704,1.54305892130784,0.808367568059098,0.0099009900990099,0.699300699300699,101,NA,NA,NA,NA,"31 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",30,"observed_only",1,0.995,0.89,0,NA,0.616789051462888,0.111111111111111,0.5,81,NA,NA,NA,NA,"Partial NA coefficients for 63 probe(s)",""
+"heteroscedastic_batch",30,"proDA",1,0.995,0.995,0,NA,1.15511176256465,0,0,0,1,4,0.000634399022945525,1,"",""
+"heteroscedastic_batch",30,"uniform_KNN",1,0.995,0.995,0.984007107952021,2.56817801660629,1.64645652849858,0.248484848484848,0.861111111111111,165,NA,NA,NA,NA,"44 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 19 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",30,"uniform_MinProb",1,0.995,0.995,0.984007107952021,3.41070331519699,1.03351561016844,0,0.284722222222222,41,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",30,"DEP_absence",1,0.995,0.995,0.984007107952021,1.31781897536593,0.512755573023437,0.113636363636364,0.8125,132,NA,NA,NA,NA,"44 rows with more than 99 % entries missing;
+ mean imputation used for these rows | 19 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",30,"automatic_minimum",1,0.601666666666667,0.601666666666667,0.311861394935584,2.09359516872405,0.87469081207073,0.0116279069767442,0.590277777777778,86,NA,NA,NA,NA,"",""
+"heteroscedastic_batch",30,"automatic_none",1,0.601666666666667,0.601666666666667,0.311861394935584,1.97118488316777,1.03458413780424,0.0927835051546392,0.611111111111111,97,NA,NA,NA,NA,"30 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""
+"heteroscedastic_batch",30,"manual_12",1,0.636666666666667,0.636666666666667,0.351399378054198,1.57379553125276,0.845462285688595,0.0202020202020202,0.673611111111111,99,NA,NA,NA,NA,"32 rows with more than 99 % entries missing;
+ mean imputation used for these rows",""

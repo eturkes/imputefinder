@@ -1,0 +1,9 @@
+"rescue","cutoff_delta","mode","anchor","available","retained","rescued","reason","complete","MAR","MNAR","absent","insufficient","cutoff_AD","cutoff_control"
+"none",NA,"automatic","automatic",TRUE,1684,0,"",2215,920,1390,71,592,24.2888948511251,22.8418978003284
+"none",-1,"sensitivity","automatic",TRUE,1760,0,"",2215,1285,763,71,854,23.2888948511251,21.8418978003284
+"none",0,"sensitivity","automatic",TRUE,1684,0,"",2215,920,1390,71,592,24.2888948511251,22.8418978003284
+"none",1,"sensitivity","automatic",TRUE,1545,0,"",2215,539,2003,71,360,25.2888948511251,23.8418978003284
+"minimum",NA,"automatic","automatic",TRUE,1680,71,"",2215,907,1478,0,588,24.3246279388807,22.8531379765622
+"minimum",-1,"sensitivity","automatic",TRUE,1759,71,"",2215,1281,842,0,850,23.3246279388807,21.8531379765622
+"minimum",0,"sensitivity","automatic",TRUE,1680,71,"",2215,907,1478,0,588,24.3246279388807,22.8531379765622
+"minimum",1,"sensitivity","automatic",TRUE,1543,71,"",2215,531,2083,0,359,25.3246279388807,23.8531379765622
