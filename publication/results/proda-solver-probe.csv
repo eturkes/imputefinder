@@ -1,7 +1,0 @@
-"scenario","seed","cap","converged","iterations","error"
-"MCAR",1,20,TRUE,5,6.27702612979039e-05
-"MCAR",1,100,TRUE,5,6.27702612979039e-05
-"mixed",1,20,TRUE,3,0.000762491489419838
-"mixed",1,100,TRUE,3,0.000762491489419838
-"heteroscedastic_batch",1,20,TRUE,3,0.000476463703692646
-"heteroscedastic_batch",1,100,TRUE,3,0.000476463703692646

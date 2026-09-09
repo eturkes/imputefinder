@@ -310,12 +310,6 @@ external choices, not defaults or runtime dependencies.
 
 ## Further reading
 
-The [standalone article](publication/manuscript.html) reports independent
-simulations, full-table public-data validation, and downstream sensitivity.
-Its [reproduction protocol](publication/PROTOCOL.md) defines the comparisons
-and failure-inclusive metrics. These results do not establish missingness
-mechanisms or general superiority over existing imputation workflows.
-
 The [vignette](vignettes/imputefinder.Rmd) covers automatic cutoffs, sensitivity
 checks, downstream branching, and a bundled PXD020717 Tau-phosphosite extract.
 The selected real-data example demonstrates classification, not disease effects.
@@ -324,8 +318,7 @@ To read the rendered vignette, install suggested dependencies and build with
 `build_vignettes = TRUE`, then run `vignette("imputefinder")`. The first-run
 script needs no vignette build. Use `citation("imputefinder")` for citation details.
 
-Regenerate the figure with `Rscript tools/render-quickstart.R`. Tests run the
-same example and check classifications and exports.
+Tests run the first-result example and check classifications and exports.
 
 ## Verification
 
@@ -335,17 +328,16 @@ features, unequal groups, rescue reproducibility, input-order invariance, and
 unsupported profiles. They verify behavior under specified models, not accuracy
 for arbitrary proteomics experiments.
 
-Run the committed build and check from the repository root:
+Install the suggested dependencies, then build and check from the repository root:
 
 ```sh
-Rscript tools/check-package.R
-Rscript tools/check-package.R --bioc
+R CMD build .
+R CMD check --no-manual imputefinder_0.99.8.tar.gz
+Rscript -e 'BiocCheck::BiocCheck("imputefinder_0.99.8.tar.gz", `new-package` = TRUE)'
 ```
 
-Install dependencies first. The second command adds BiocCheck; logs remain
-under `.checks/`. Both run examples, tests, and vignettes. CI targets Linux,
-macOS, Windows, and Linux with R-devel; configured jobs are not evidence of
-hosted passes.
+The build and check run examples, tests, and vignettes. Install `BiocCheck`
+before the final command. Use the archive name for the version you build.
 
 ## Limitations
 

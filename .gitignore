@@ -11,7 +11,6 @@
 *.Rproj
 
 # Package build and check output
-/.checks/
 /*.tar.gz
 /*.Rcheck/
 /*.BiocCheck/
@@ -35,14 +34,6 @@
 
 # First-run example output
 /imputefinder-results/
-
-# Publication scratch and local dependencies
-/publication/cache/
-/publication/.library/
-/publication/*.knit.md
-/publication/*.utf8.md
-/publication/*_files/
-__pycache__/
 
 # Operating-system metadata
 .DS_Store
